@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parseStringPromise } from 'xml2js';
-import { ModbusClient } from './modbusClient';
 
 const USER_AGENT = 'typescript-sep2client';
 
@@ -13,7 +12,6 @@ export class SEP2Client {
     private pen: string;
     private lfdi: string;
     private nsmap: Record<string, string>;
-    private modbusClient: ModbusClient;
 
     constructor(
         host: string,
@@ -21,8 +19,6 @@ export class SEP2Client {
         certPath: string,
         keyPath: string,
         pen: number,
-        modbusHost: string,
-        modbusPort: number,
     ) {
         this.host = host;
         this.dcapUri = dcapUri;
@@ -35,8 +31,6 @@ export class SEP2Client {
             sep2: 'urn:ieee:std:2030.5:ns',
             csipaus: 'https://csipaus.org/ns',
         };
-
-        this.modbusClient = new ModbusClient(modbusHost, modbusPort);
     }
 
     private getCertificateLfdi(certPath: string): string {
@@ -123,10 +117,7 @@ export class SEP2Client {
         for (const control of derControls) {
             const exportLimit =
                 control['sep2:DERControlBase'][0]['csipaus:opModExLimW'][0];
-            const importLimit =
-                control['sep2:DERControlBase'][0]['csipaus:opModImLimW'][0];
-            await this.modbusClient.setExportLimit(exportLimit);
-            await this.modbusClient.setImportLimit(importLimit);
+            // TODO Apply exportLimit to Modbus
         }
     }
 }

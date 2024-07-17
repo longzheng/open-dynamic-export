@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { SEP2Client } from './sep2Client';
 import { assertEnv, parseSunspecModbusHosts } from './config';
 import { safeParseInt } from './number';
+import { ModbusClient } from './modbusClient';
 
 const sep2Host = assertEnv('SEP2_HOST');
 const sep2DcapUri = assertEnv('SEP2_DCAP_URI');
@@ -30,6 +31,11 @@ async function main() {
             console.error('Error handling DER control:', error);
         }
     }, 60000); // Adjust interval as needed
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const modbusClients = modbusHosts.map(
+        ({ ip, port, id }) => new ModbusClient(ip, port, id),
+    );
+
 }
 
 main().catch((error) => console.error('Error starting SEP2 client:', error));

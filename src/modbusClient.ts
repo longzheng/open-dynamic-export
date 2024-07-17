@@ -3,10 +3,10 @@ import ModbusRTU from 'modbus-serial';
 export class ModbusClient {
     private client: ModbusRTU;
 
-    constructor(host: string, port: number) {
+    constructor(host: string, port: number, id: number) {
         this.client = new ModbusRTU();
         this.client.connectTCP(host, { port });
-        this.client.setID(1);
+        this.client.setID(id);
     }
 
     public async setExportLimit(limit: number): Promise<void> {
