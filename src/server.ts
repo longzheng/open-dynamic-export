@@ -12,30 +12,29 @@ const sep2Pen = safeParseInt(assertEnv('SEP2_PEN'));
 const modbusHosts = parseSunspecModbusHosts(assertEnv('MODBUS_HOST'));
 
 async function main() {
-    const sep2Client = new SEP2Client(
-        sep2Host,
-        sep2DcapUri,
-        sep2CertPath,
-        sep2KeyPath,
-        sep2Pen,
-        modbusHosts[0]!.ip,
-        modbusHosts[0]!.port,
-    );
+    const sep2Client = new SEP2Client({
+        host: sep2Host,
+        dcapUri: sep2DcapUri,
+        certPath: sep2CertPath,
+        keyPath: sep2KeyPath,
+        pen: sep2Pen,
+    });
+
     await sep2Client.initialize();
 
-    // Set an interval to handle DER control periodically
-    setInterval(async () => {
-        try {
-            await sep2Client.handleDERControl();
-        } catch (error) {
-            console.error('Error handling DER control:', error);
-        }
-    }, 60000); // Adjust interval as needed
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const modbusClients = modbusHosts.map(
         ({ ip, port, id }) => new ModbusClient(ip, port, id),
     );
 
+    // // Set an interval to handle DER control periodically
+    // setInterval(async () => {
+    //     try {
+    //         await sep2Client.handleDERControl();
+    //     } catch (error) {
+    //         console.error('Error handling DER control:', error);
+    //     }
+    // }, 60000); // Adjust interval as needed
 }
 
 main().catch((error) => console.error('Error starting SEP2 client:', error));

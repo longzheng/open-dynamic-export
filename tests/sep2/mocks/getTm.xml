@@ -1,0 +1,10 @@
+<Time xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns" href="/api/v2/tm">
+    <currentTime>1682475024</currentTime>
+    <dstEndTime>1699174800</dstEndTime>
+    <dstOffset>3600</dstOffset>
+    <dstStartTime>1678615200</dstStartTime>
+    <localTime>1682453424</localTime>
+    <quality>5</quality>
+    <tzOffset>-25200</tzOffset>
+</Time> 

@@ -1,75 +1,64 @@
 import { SEP2Client } from './sep2Client';
-import {
-    mockDeviceCapabilitiesXml,
-    mockTimeLinkXml,
-    mockDerControlListXml,
-} from './mockXmlPayloads';
-import { describe, beforeAll, it, expect } from 'vitest';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { describe, beforeAll, it, expect, vi } from 'vitest';
+import { readFileSync } from 'fs';
+import path from 'path';
 
-// Mock Modbus Client
-class MockModbusClient {
-    public async setExportLimit(limit: number): Promise<void> {
-        console.log(`Mock setExportLimit called with ${limit}`);
-    }
+const mock = new MockAdapter(axios);
 
-    public async setImportLimit(limit: number): Promise<void> {
-        console.log(`Mock setImportLimit called with ${limit}`);
-    }
+function mockFileUrl(file: string): string {
+    return `${path.join(__dirname, '..', '/tests/sep2/mocks/')}${file}`;
 }
 
-// Mock fetch setup
-const mockFetch = (url: string, options: any) => {
-    if (url.includes('/dcap')) {
-        return Promise.resolve(
-            new Response(mockDeviceCapabilitiesXml, { status: 200 }),
-        );
-    } else if (url.includes('/time')) {
-        return Promise.resolve(new Response(mockTimeLinkXml, { status: 200 }));
-    } else if (url.includes('/dercontrol')) {
-        return Promise.resolve(
-            new Response(mockDerControlListXml, { status: 200 }),
-        );
-    } else {
-        return Promise.reject(new Error('Unknown URL'));
-    }
-};
-
-(global as any).fetch = mockFetch;
-
-describe('SEP2Client', () => {
+describe('SEP2Server', () => {
     let sep2Client: SEP2Client;
 
     beforeAll(() => {
-        sep2Client = new SEP2Client(
-            'http://localhost',
-            '/dcap',
-            'cert.pem',
-            'key.pem',
-            12345,
-            'localhost',
-            502,
-        );
-        (sep2Client as any).modbusClient = new MockModbusClient(); // Replace Modbus client with a mock
+        sep2Client = new SEP2Client({
+            host: 'http://example.com',
+            dcapUri: '/dcap',
+            certPath: 'cert.pem',
+            keyPath: 'key.pem',
+            pen: 12345,
+        });
     });
 
     it('should get device capabilities', async () => {
-        const [tmUri, edevUri, mupUri] =
+        mock.onGet('http://example.com/dcap').reply(
+            200,
+            readFileSync(mockFileUrl('getDcap.xml')),
+        );
+
+        const { tmUri, edevUri, mupUri } =
             await sep2Client.getDeviceCapabilities();
 
-        expect(tmUri).toBe('/time');
-        expect(edevUri).toBe('/edev');
-        expect(mupUri).toBe('/mup');
+        expect(tmUri).toBe('/api/v2/tm');
+        expect(edevUri).toBe('/api/v2/edev');
+        expect(mupUri).toBe('/api/v2/mup');
     });
 
     it('should check time link', async () => {
+        mock.onGet('http://example.com/time').reply(
+            200,
+            readFileSync(mockFileUrl('getTm.xml')),
+        );
+
+        // mock system date to match the time in the mock file
+        const mockDate = new Date(1682475024000);
+        vi.setSystemTime(mockDate);
+
         await sep2Client.checkTimeLink('/time');
 
         // Validate the log output to ensure time sync check
     });
 
     it('should handle DER control events', async () => {
-        await sep2Client.handleDERControl();
+        mock.onGet('http://example.com/path/to/dercontrol').reply(
+            200,
+            readFileSync(mockFileUrl('getDerp_TESTPROG3_Derc.xml')),
+        );
 
-        // MockModbusClient should log the setExportLimit and setImportLimit calls
+        await sep2Client.handleDERControl();
     });
 });

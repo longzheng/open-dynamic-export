@@ -1,0 +1,6 @@
+<DeviceCapability xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns">
+    <TimeLink href="/api/v2/tm"/>
+    <EndDeviceListLink all="5" href="/api/v2/edev"/>
+    <MirrorUsagePointListLink all="2" href="/api/v2/mup"/>
+</DeviceCapability> 
