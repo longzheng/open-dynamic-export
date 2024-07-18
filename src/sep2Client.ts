@@ -6,14 +6,15 @@ import { parseStringPromise } from 'xml2js';
 import * as https from 'https';
 import { safeParseInt } from './number';
 import { assertIsString } from './assert';
+import { getCertificateLfdi } from './cert';
 
 const USER_AGENT = 'typescript-sep2client';
 
 export class SEP2Client {
     private host: string;
     private dcapUri: string;
-    private certPath: string;
-    private keyPath: string;
+    private cert: string;
+    private key: string;
     private pen: string;
     private lfdi: string;
     private nsmap: Record<string, string>;
@@ -34,10 +35,10 @@ export class SEP2Client {
     }) {
         this.host = host;
         this.dcapUri = dcapUri;
-        this.certPath = resolve(certPath);
-        this.keyPath = resolve(keyPath);
+        this.cert = readFileSync(resolve(certPath), 'utf-8');
+        this.key = readFileSync(resolve(keyPath), 'utf-8');
         this.pen = pen.toString().padStart(8, '0');
-        this.lfdi = this.getCertificateLfdi(this.certPath).replace(/-/g, '');
+        this.lfdi = getCertificateLfdi(this.cert);
 
         this.nsmap = {
             sep2: 'urn:ieee:std:2030.5:ns',
@@ -52,17 +53,11 @@ export class SEP2Client {
                 'Content-Type': 'application/sep+xml',
             },
             httpsAgent: new https.Agent({
-                cert: readFileSync(this.certPath),
-                key: readFileSync(this.keyPath),
+                cert: this.cert,
+                key: this.key,
                 rejectUnauthorized: false, // Skip certificate check for now
             }),
         });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private getCertificateLfdi(certPath: string): string {
-        // Placeholder function to get certificate LFDI, implementation needed
-        return '0000000000000000000000000000000000000000';
     }
 
     private async makeRequest(
