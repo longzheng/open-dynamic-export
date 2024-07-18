@@ -1,7 +1,5 @@
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'https';
 import { getCertificateLfdi } from '../cert';
@@ -24,20 +22,20 @@ export class SEP2Client {
     constructor({
         host,
         dcapUri,
-        certPath,
-        keyPath,
+        cert,
+        key,
         pen,
     }: {
         host: string;
         dcapUri: string;
-        certPath: string;
-        keyPath: string;
+        cert: string;
+        key: string;
         pen: number;
     }) {
         this.host = host;
         this.dcapUri = dcapUri;
-        this.cert = readFileSync(resolve(certPath), 'utf-8');
-        this.key = readFileSync(resolve(keyPath), 'utf-8');
+        this.cert = cert;
+        this.key = key;
         this.pen = pen.toString().padStart(8, '0');
         this.lfdi = getCertificateLfdi(this.cert);
 
