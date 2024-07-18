@@ -23,6 +23,7 @@ module.exports = {
         '@typescript-eslint/consistent-type-imports': 'error',
         '@typescript-eslint/switch-exhaustiveness-check': 'error',
         '@typescript-eslint/no-unnecessary-condition': 'error',
+        '@typescript-eslint/no-unused-vars': 'warn',
     },
     overrides: [
         {

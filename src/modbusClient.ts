@@ -5,7 +5,7 @@ export class ModbusClient {
 
     constructor(host: string, port: number, id: number) {
         this.client = new ModbusRTU();
-        this.client.connectTCP(host, { port });
+        void this.client.connectTCP(host, { port });
         this.client.setID(id);
     }
 

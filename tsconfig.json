@@ -11,7 +11,9 @@
         // too strict with third-party lib type definitions
         "exactOptionalPropertyTypes": false,
         // prevent unreachable code being auto deleted
-        "allowUnreachableCode": true
+        "allowUnreachableCode": true,
+        // allow unused during dev
+        "noUnusedLocals": false,
     },
     "include": ["src/", "scripts/"]
 }
