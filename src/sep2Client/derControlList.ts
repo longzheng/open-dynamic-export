@@ -1,31 +1,31 @@
 import { assertArray, assertString } from './assert';
 import { stringIntToBoolean } from './boolean';
-import { parseEndDeviceObject, type EndDevice } from './endDevice';
+import { parseDERControlXmlObject, type DERControl } from './derControl';
 import { parseListXmlObject, type List } from './list';
 
-export type EndDeviceList = {
+export type DERControlList = {
     list: List;
     subscribable: boolean;
-    endDevices: EndDevice[];
+    derControls: DERControl[];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function parseEndDeviceListXml(xml: any): EndDeviceList {
+export function parseDerControlListXml(xml: any): DERControlList {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const list = parseListXmlObject(xml['EndDeviceList']);
+    const list = parseListXmlObject(xml['DERControlList']);
     const subscribable = stringIntToBoolean(
-        assertString(xml['EndDeviceList']['$']['subscribable']),
+        assertString(xml['DERControlList']['$']['subscribable']),
     );
-    const endDeviceArray = assertArray(xml['EndDeviceList']['EndDevice']);
+    const derControlArray = assertArray(xml['DERControlList']['DERControl']);
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-    const endDevices = endDeviceArray.map((endDeviceXml) =>
-        parseEndDeviceObject(endDeviceXml),
+    const derControls = derControlArray.map((derControlXml) =>
+        parseDERControlXmlObject(derControlXml),
     );
 
     return {
         list,
         subscribable,
-        endDevices,
+        derControls,
     };
 }

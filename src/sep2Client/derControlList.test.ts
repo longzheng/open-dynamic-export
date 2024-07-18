@@ -1,19 +1,21 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from './mocks';
-import { parseEndDeviceListXml } from './endDeviceList';
+import { parseDerControlListXml } from './derControlList';
 
-it('should parse end device list XML', async () => {
+it('should parse DERControlList XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const xml = await parseStringPromise(getMockFile('getEdev.xml'));
+    const xml = await parseStringPromise(
+        getMockFile('getDerp_TESTPROG3_derc.xml'),
+    );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
-    const endDeviceList = parseEndDeviceListXml(xml);
+    const endDeviceList = parseDerControlListXml(xml);
 
     expect(endDeviceList.list.all).toBe(5);
     expect(endDeviceList.subscribable).toBe(true);
-    expect(endDeviceList.endDevices.length).toBe(3);
-    expect(endDeviceList.endDevices[0]?.lFDI).toBe(
-        '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
+    expect(endDeviceList.derControls.length).toBe(5);
+    expect(endDeviceList.derControls[0]?.mRID).toBe(
+        'DC1B27AC943B44AC87DAF7E162B6F6D4',
     );
 });
