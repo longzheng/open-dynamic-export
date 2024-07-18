@@ -70,7 +70,7 @@ it('should get end device list', async () => {
 it('should handle DER control events', async () => {
     mockAxios
         .onGet('http://example.com/path/to/dercontrol')
-        .reply(200, getMockFile('getDerp_TESTPROG3_Derc.xml'));
+        .reply(200, getMockFile('getDerp_TESTPROG3_derc.xml'));
 
     await sep2Client.handleDERControl();
 });
