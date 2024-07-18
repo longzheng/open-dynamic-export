@@ -4,9 +4,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'https';
-import { safeParseInt } from '../number';
-import { assertIsString } from '../assert';
 import { getCertificateLfdi } from '../cert';
+import type { DeviceCapabilityResponse } from './deviceCapability';
+import { parseDeviceCapabilityXml } from './deviceCapability';
+import { parseTimeXml } from './time';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -67,45 +68,26 @@ export class SEP2Client {
 
     public async initialize() {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { tmUri, edevUri, mupUri } = await this.getDeviceCapabilities();
-        await this.checkTimeLink(tmUri);
+        const { timeLink } = await this.getDeviceCapabilities();
+        await this.assertTimeDelta(timeLink.href);
         // Initialize other necessary components
     }
 
-    async getDeviceCapabilities(): Promise<{
-        tmUri: string;
-        edevUri: string;
-        mupUri: string;
-    }> {
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    async getDeviceCapabilities(): Promise<DeviceCapabilityResponse> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await this.makeRequest(this.dcapUri);
-        const tmUri = xml['DeviceCapability']['TimeLink'][0]['$']['href'];
-        const edevUri =
-            xml['DeviceCapability']['EndDeviceListLink'][0]['$']['href'];
-        const mupUri =
-            xml['DeviceCapability']['MirrorUsagePointListLink'][0]['$']['href'];
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-        assertIsString(tmUri);
-        assertIsString(edevUri);
-        assertIsString(mupUri);
-
-        return { tmUri, edevUri, mupUri };
+        return parseDeviceCapabilityXml(xml);
     }
 
-    async checkTimeLink(tmUri: string) {
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        const xml = await this.makeRequest(tmUri);
-        const timeUtc = xml['Time']['currentTime'][0];
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    async assertTimeDelta(timeHref: string) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const xml = await this.makeRequest(timeHref);
 
-        assertIsString(timeUtc);
+        const time = parseTimeXml(xml);
 
-        const timeUtcInt = safeParseInt(timeUtc);
-
-        const dt = new Date(timeUtcInt * 1000);
         const now = new Date();
-        const delta = now.getTime() - dt.getTime();
+        const delta = now.getTime() - time.currentTime.getTime();
 
         if (Math.abs(delta) > 60000) {
             // 1 minute in milliseconds
@@ -136,6 +118,7 @@ export class SEP2Client {
 
 // default polling and post rates for resources
 // extracted from page 16 of SEP2 Client Handbook
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const defaultIntervalSeconds = {
     DeviceCapability: 300,
     EndDeviceList: 300,
