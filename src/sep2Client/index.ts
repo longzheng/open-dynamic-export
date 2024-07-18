@@ -133,3 +133,13 @@ export class SEP2Client {
         }
     }
 }
+
+// default polling and post rates for resources
+// extracted from page 16 of SEP2 Client Handbook
+const defaultIntervalSeconds = {
+    DeviceCapability: 300,
+    EndDeviceList: 300,
+    FunctionSetAssignmentsList: 300,
+    DERProgramList: 300,
+    MirrorUsagePoint: 300,
+};
