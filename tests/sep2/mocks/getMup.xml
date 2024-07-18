@@ -11,7 +11,7 @@
     <MirrorUsagePoint href="/api/v2/mup/86e73745-8a19-4ece-86c8-78a6852964a5">
         <mRID>4075DE6031E562ACF4D9EA0B00057269</mRID>
         <description>Site Measurement</description>
-        <roleFlags>0B</roleFlags>
+        <roleFlags>03</roleFlags>
         <serviceCategoryKind>0</serviceCategoryKind>
         <status>1</status>
         <deviceLFDI>4075DE6031E562ACF4D9EAA765A5B2ED00057269</deviceLFDI>
