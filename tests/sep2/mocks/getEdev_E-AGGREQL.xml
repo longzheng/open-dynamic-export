@@ -1,0 +1,9 @@
+<EndDevice xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns" subscribable="0" href="/api/v2/edev/E-AGGREQL">
+    <lFDI>B1857F74B5DA25E82E78BE34877221CB89D55F45</lFDI>
+    <LogEventListLink all="0" href="/api/v2/edev/E-AGGREQL/lel"/>
+    <sFDI>476530583793</sFDI>
+    <changedTime>1682464920</changedTime>
+    <RegistrationLink href="/api/v2/edev/E-AGGREQL/rg"/>
+    <SubscriptionListLink all="0" href="/api/v2/edev/E-AGGREQL/sub"/>
+</EndDevice> 

@@ -1,0 +1,11 @@
+<EndDevice xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns" subscribable="0" href="/api/v2/edev/_EQLDEV3">
+    <DERListLink all="1" href="/api/v2/edev/_EQLDEV3/der"/>
+    <lFDI>4075DE6031E562ACF4D9EAA765A5B2ED00057269</lFDI>
+    <LogEventListLink all="0" href="/api/v2/edev/_EQLDEV3/lel"/>
+    <sFDI>173034634270</sFDI>
+    <changedTime>1682464970</changedTime>
+    <enabled>true</enabled>
+    <FunctionSetAssignmentsListLink all="2" href="/api/v2/edev/_EQLDEV3/fsa"/>
+    <RegistrationLink href="/api/v2/edev/_EQLDEV3/rg"/>
+</EndDevice> 

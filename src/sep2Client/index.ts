@@ -8,6 +8,7 @@ import { getCertificateLfdi } from '../cert';
 import type { DeviceCapabilityResponse } from './deviceCapability';
 import { parseDeviceCapabilityXml } from './deviceCapability';
 import { parseTimeXml } from './time';
+import { parseEndDeviceListXml } from './endDeviceList';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -67,8 +68,11 @@ export class SEP2Client {
     }
 
     public async initialize() {
-        const { timeLink } = await this.getDeviceCapabilities();
+        const { timeLink, endDeviceListLink } =
+            await this.getDeviceCapabilities();
         await this.assertTimeDelta(timeLink.href);
+
+        await this.getEndDeviceList(endDeviceListLink.href);
     }
 
     async getDeviceCapabilities(): Promise<DeviceCapabilityResponse> {
@@ -94,6 +98,13 @@ export class SEP2Client {
                 `Clock is not synced with Utility Server, delta ${delta}ms`,
             );
         }
+    }
+
+    async getEndDeviceList(endDeviceListHref: string) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const xml = await this.makeRequest(endDeviceListHref);
+
+        return parseEndDeviceListXml(xml);
     }
 
     public async handleDERControl() {

@@ -1,4 +1,4 @@
-import { safeParseInt } from './number';
+import { safeParseIntString } from './number';
 
 export function assertEnv(name: string): string {
     const value = process.env[name];
@@ -25,8 +25,8 @@ export function parseSunspecModbusHosts(
 
         return {
             ip,
-            port: safeParseInt(port),
-            id: safeParseInt(id),
+            port: safeParseIntString(port),
+            id: safeParseIntString(id),
         };
     });
 }

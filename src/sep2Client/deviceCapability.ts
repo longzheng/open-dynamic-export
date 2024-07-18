@@ -1,5 +1,5 @@
 import type { Link } from './link';
-import { parseLinkXml } from './link';
+import { parseLinkXmlObject } from './link';
 
 export type DeviceCapabilityResponse = {
     timeLink: Link;
@@ -9,15 +9,15 @@ export type DeviceCapabilityResponse = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDeviceCapabilityXml(xml: any): DeviceCapabilityResponse {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const timeLink = parseLinkXml(xml['DeviceCapability']['TimeLink'][0]);
-    const endDeviceListLink = parseLinkXml(
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    const timeLink = parseLinkXmlObject(xml['DeviceCapability']['TimeLink'][0]);
+    const endDeviceListLink = parseLinkXmlObject(
         xml['DeviceCapability']['EndDeviceListLink'][0],
     );
-    const mirrorUsagePointListLink = parseLinkXml(
+    const mirrorUsagePointListLink = parseLinkXmlObject(
         xml['DeviceCapability']['MirrorUsagePointListLink'][0],
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         timeLink,

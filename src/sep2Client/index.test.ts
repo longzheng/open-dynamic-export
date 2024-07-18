@@ -56,6 +56,16 @@ it('should assert time delta with exception', async () => {
     ).rejects.toThrowError('Clock is not synced with Utility Server');
 });
 
+it('should get end device list', async () => {
+    mockAxios
+        .onGet('http://example.com/edev')
+        .reply(200, getMockFile('getEdev.xml'));
+
+    const { endDevices } = await sep2Client.getEndDeviceList('/edev');
+
+    expect(endDevices.length).toBe(3);
+});
+
 it('should handle DER control events', async () => {
     mockAxios
         .onGet('http://example.com/path/to/dercontrol')
