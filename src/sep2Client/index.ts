@@ -67,10 +67,8 @@ export class SEP2Client {
     }
 
     public async initialize() {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { timeLink } = await this.getDeviceCapabilities();
         await this.assertTimeDelta(timeLink.href);
-        // Initialize other necessary components
     }
 
     async getDeviceCapabilities(): Promise<DeviceCapabilityResponse> {
@@ -80,6 +78,7 @@ export class SEP2Client {
         return parseDeviceCapabilityXml(xml);
     }
 
+    // ensure the utility server time and the client time is not out of sync
     async assertTimeDelta(timeHref: string) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await this.makeRequest(timeHref);
