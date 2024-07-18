@@ -8,7 +8,7 @@ import { safeParseInt } from './number';
 import { assertIsString } from './assert';
 import { getCertificateLfdi } from './cert';
 
-const USER_AGENT = 'typescript-sep2client';
+const USER_AGENT = 'open-dynamic-export';
 
 export class SEP2Client {
     private host: string;
@@ -17,8 +17,7 @@ export class SEP2Client {
     private key: string;
     private pen: string;
     private lfdi: string;
-    private nsmap: Record<string, string>;
-    private sesh: AxiosInstance;
+    private axiosInstance: AxiosInstance;
 
     constructor({
         host,
@@ -40,12 +39,7 @@ export class SEP2Client {
         this.pen = pen.toString().padStart(8, '0');
         this.lfdi = getCertificateLfdi(this.cert);
 
-        this.nsmap = {
-            sep2: 'urn:ieee:std:2030.5:ns',
-            csipaus: 'https://csipaus.org/ns',
-        };
-
-        this.sesh = axios.create({
+        this.axiosInstance = axios.create({
             baseURL: this.host,
             headers: {
                 'User-Agent': USER_AGENT,
@@ -66,7 +60,7 @@ export class SEP2Client {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any> {
         const url = `${this.host}${link}`;
-        const response = await this.sesh.get<string>(url, { params });
+        const response = await this.axiosInstance.get<string>(url, { params });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return await parseStringPromise(response.data);
     }
