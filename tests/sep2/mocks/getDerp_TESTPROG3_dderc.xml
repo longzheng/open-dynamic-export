@@ -1,0 +1,17 @@
+<DefaultDERControl xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns" subscribable="0" href="/api/v2/derp/TESTPRG3/dderc">
+    <mRID>E6F3A83FC1E64929BB4502AA0CEA0FDB</mRID>
+    <version>0</version>
+    <DERControlBase>
+        <ns2:opModImpLimW>
+            <multiplier>2</multiplier>
+            <value>15</value>
+        </ns2:opModImpLimW>
+        <ns2:opModExpLimW>
+            <multiplier>2</multiplier>
+            <value>15</value>
+        </ns2:opModExpLimW>
+        <opModEnergize>true</opModEnergize>
+    </DERControlBase>
+    <setSoftGradW>1</setSoftGradW>
+</DefaultDERControl>

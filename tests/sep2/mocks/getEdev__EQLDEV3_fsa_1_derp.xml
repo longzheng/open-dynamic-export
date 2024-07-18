@@ -1,0 +1,11 @@
+<DERProgramList xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns" pollRate="301" all="1" results="1" subscribable="1">
+    <DERProgram subscribable="0" href="/api/v2/derp/P-_EQLDEV3">
+        <mRID>C882D1F83246441786FB8278FECDBA09</mRID>
+        <description>_EQLDEV3 Program</description>
+        <version>1</version>
+        <DERControlListLink all="0" href="/api/v2/derp/P-_EQLDEV3/derc"/>
+        <DERCurveListLink all="0" href="/api/v2/derp/P-_EQLDEV3/dc"/>
+        <primacy>102</primacy>
+    </DERProgram>
+</DERProgramList> 
