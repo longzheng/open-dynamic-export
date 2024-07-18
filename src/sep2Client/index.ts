@@ -4,9 +4,9 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'https';
-import { safeParseInt } from './number';
-import { assertIsString } from './assert';
-import { getCertificateLfdi } from './cert';
+import { safeParseInt } from '../number';
+import { assertIsString } from '../assert';
+import { getCertificateLfdi } from '../cert';
 
 const USER_AGENT = 'open-dynamic-export';
 

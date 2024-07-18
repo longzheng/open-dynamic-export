@@ -1,4 +1,4 @@
-import { SEP2Client } from './sep2Client';
+import { SEP2Client } from './index';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { describe, beforeAll, it, expect, vi } from 'vitest';
