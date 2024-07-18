@@ -3,9 +3,9 @@ import { parseStringPromise } from 'xml2js';
 import { getMockFile } from './mocks';
 import {
     parseMirrorUsagePointXmlObject,
-    MirrorUsagePointRoleFlag,
     MirrorUsagePointStatus,
 } from './mirrorUsagePoint';
+import { RoleFlagsType } from './roleFlagsType';
 
 it('should parse end device DER with XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -21,7 +21,9 @@ it('should parse end device DER with XML', async () => {
 
     expect(mirrorUsagePoint.mRID).toEqual('4075DE6031E562ACF4D9EA4900057269');
     expect(mirrorUsagePoint.description).toEqual('Device Measurement');
-    expect(mirrorUsagePoint.roleFlags).toEqual(MirrorUsagePointRoleFlag.Der);
+    expect(mirrorUsagePoint.roleFlags).toEqual(
+        RoleFlagsType.isDER | RoleFlagsType.isMirror | RoleFlagsType.isSubmeter,
+    );
     expect(mirrorUsagePoint.serviceCategoryKind).toEqual('0');
     expect(mirrorUsagePoint.status).toEqual(MirrorUsagePointStatus.On);
     expect(mirrorUsagePoint.deviceLFDI).toEqual(

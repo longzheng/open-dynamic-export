@@ -1,9 +1,6 @@
+import { stringHexToEnumType } from '../enum';
 import { assertString } from './assert';
-
-export enum MirrorUsagePointRoleFlag {
-    Site = '03',
-    Der = '49',
-}
+import { type RoleFlagsType } from './roleFlagsType';
 
 export enum MirrorUsagePointStatus {
     Off = '0',
@@ -13,7 +10,7 @@ export enum MirrorUsagePointStatus {
 export type MirrorUsagePoint = {
     mRID: string;
     description: string;
-    roleFlags: MirrorUsagePointRoleFlag;
+    roleFlags: RoleFlagsType;
     // TODO: unknown use?
     serviceCategoryKind: string;
     status: MirrorUsagePointStatus;
@@ -27,7 +24,7 @@ export function parseMirrorUsagePointXmlObject(
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const mRID = assertString(mirrorUsagePointObject['mRID'][0]);
     const description = assertString(mirrorUsagePointObject['description'][0]);
-    const roleFlags = stringToRoleFlag(
+    const roleFlags = stringHexToEnumType<RoleFlagsType>(
         assertString(mirrorUsagePointObject['roleFlags'][0]),
     );
     const serviceCategoryKind = assertString(
@@ -47,17 +44,6 @@ export function parseMirrorUsagePointXmlObject(
         status,
         deviceLFDI,
     };
-}
-
-function stringToRoleFlag(value: string): MirrorUsagePointRoleFlag {
-    switch (value) {
-        case '03':
-            return MirrorUsagePointRoleFlag.Site;
-        case '49':
-            return MirrorUsagePointRoleFlag.Der;
-        default:
-            throw new Error(`Unexpected role flag: ${value}`);
-    }
 }
 
 function stringToStatus(value: string): MirrorUsagePointStatus {
