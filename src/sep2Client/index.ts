@@ -102,7 +102,13 @@ export class SEP2Client {
 
     async getEndDeviceList(endDeviceListHref: string) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await this.makeRequest(endDeviceListHref);
+        const xml = await this.makeRequest(endDeviceListHref, {
+            // get all records
+            // start
+            s: '0',
+            // length
+            l: '255',
+        });
 
         return parseEndDeviceListXml(xml);
     }
