@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { SEP2Client } from './sep2Client';
+import { SEP2Client } from './sep2/client';
 import { getConfig } from './config';
 import { ModbusClient } from './sunspec/modbusClient';
 import { resolve } from 'path';

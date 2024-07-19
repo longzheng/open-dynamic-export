@@ -1,10 +1,6 @@
 import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
-import {
-    registersToString,
-    registersToUint16,
-    registersToUint32,
-} from './registers';
+import { parseCommonBlock } from './models/commonBlock';
 
 export class ModbusClient {
     private client: ModbusRTU;
@@ -79,34 +75,6 @@ export class ModbusClient {
 
         const result = await this.client.readHoldingRegisters(40000, 69);
 
-        const SID = registersToUint32(result.data.slice(0, 2));
-
-        // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
-        // assert this is the case or this isn't SunSpec
-        // 0x53756e53 ('SunS')
-        if (SID !== 0x53756e53) {
-            throw new Error('Not a SunSpec device');
-        }
-
-        return {
-            // Well-known value. Uniquely identifies this as a SunSpec Modbus Map
-            SID,
-            // Length of sunspec model common (1)
-            ID: registersToUint16(result.data.slice(2, 3)),
-            // Length of sunspec model common (1)
-            L: registersToUint16(result.data.slice(3, 4)),
-            // Manufacturer
-            Mn: registersToString(result.data.slice(4, 20)),
-            // Device model
-            Md: registersToString(result.data.slice(20, 36)),
-            // Options
-            Opt: registersToString(result.data.slice(36, 44)),
-            // SW version of inverter
-            Vr: registersToString(result.data.slice(44, 52)),
-            // Serialnumber of the inverter
-            SN: registersToString(result.data.slice(52, 68)),
-            // Modbus Device Address
-            DA: registersToUint16(result.data.slice(68, 69)),
-        };
+        return parseCommonBlock(result.data);
     }
 }
