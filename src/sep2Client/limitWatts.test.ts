@@ -1,7 +1,8 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from './mocks';
-import { parseLimitWattsXmlObject } from './limitWatts';
+import type { LimitWatts } from './limitWatts';
+import { limitWattsToWatts, parseLimitWattsXmlObject } from './limitWatts';
 
 it('should parse limit watts XML with multiplier 2', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -16,8 +17,7 @@ it('should parse limit watts XML with multiplier 2', async () => {
     const link = parseLimitWattsXmlObject(limitWattsXmlObject);
 
     expect(link.value).toBe(15);
-    expect(link.powerOfTenMultiplier).toBe(2);
-    expect(link.watts).toBe(1500);
+    expect(link.multiplier).toBe(2);
 });
 
 it('should parse limit watts XML with multiplier 0', async () => {
@@ -35,6 +35,23 @@ it('should parse limit watts XML with multiplier 0', async () => {
     const link = parseLimitWattsXmlObject(limitWattsXmlObject);
 
     expect(link.value).toBe(2512);
-    expect(link.powerOfTenMultiplier).toBe(0);
-    expect(link.watts).toBe(2512);
+    expect(link.multiplier).toBe(0);
+});
+
+it('limitWattsToWatts should convert limitWatts to watts with multiplier 2', () => {
+    const limitWatts = {
+        value: 15,
+        multiplier: 2,
+    } satisfies LimitWatts;
+
+    expect(limitWattsToWatts(limitWatts)).toBe(1500);
+});
+
+it('limitWattsToWatts should convert limitWatts to watts with multiplier 0', () => {
+    const limitWatts = {
+        value: 2512,
+        multiplier: 0,
+    } satisfies LimitWatts;
+
+    expect(limitWattsToWatts(limitWatts)).toBe(2512);
 });

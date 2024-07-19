@@ -15,9 +15,7 @@ it('should parse Default DER Control XML', async () => {
 
     expect(defaultDerControl.mRID).toBe('E6F3A83FC1E64929BB4502AA0CEA0FDB');
     expect(defaultDerControl.version).toBe(0);
-    expect(defaultDerControl.derControlBase.siteExportLimitWatts?.watts).toBe(
-        1500,
-    );
+    expect(defaultDerControl.derControlBase.opModExpLimW?.value).toBe(15);
     expect(defaultDerControl.setGradW).toBe(undefined);
     expect(defaultDerControl.setSoftGradW).toStrictEqual({
         type: 'limited',

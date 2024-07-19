@@ -3,42 +3,47 @@ import { stringToBoolean } from './boolean';
 import { parseLimitWattsXmlObject, type LimitWatts } from './limitWatts';
 
 export type DERControlBase = {
-    siteImportLimitWatts?: LimitWatts;
-    siteExportLimitWatts?: LimitWatts;
-    generationLimit?: LimitWatts;
-    loadLimit?: LimitWatts;
-    energize?: boolean;
+    // site import limit
+    opModImpLimW?: LimitWatts;
+    // site export limit
+    opModExpLimW?: LimitWatts;
+    // site generation limit
+    opModGenLimW?: LimitWatts;
+    // site load limit
+    opModLoadLimW?: LimitWatts;
+    // energize
+    opModEnergize?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-    const siteImportLimitWatts = parseLimitWattsXmlObjectOptional(
+    const opModImpLimW = parseLimitWattsXmlObjectOptional(
         xmlObject['ns2:opModImpLimW'],
     );
-    const siteExportLimitWatts = parseLimitWattsXmlObjectOptional(
+    const opModExpLimW = parseLimitWattsXmlObjectOptional(
         xmlObject['ns2:opModExpLimW'],
     );
-    const generationLimit = parseLimitWattsXmlObjectOptional(
+    const opModGenLimW = parseLimitWattsXmlObjectOptional(
         xmlObject['ns2:opModGenLimW'],
     );
-    const loadLimit = parseLimitWattsXmlObjectOptional(
+    const opModLoadLimW = parseLimitWattsXmlObjectOptional(
         xmlObject['ns2:opModLoadLimW'],
     );
-    const energizeXmlObject = xmlObject['opModEnergize'];
+    const opModEnergizeXmlObject = xmlObject['opModEnergize'];
     /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
-    const energize = energizeXmlObject
+    const opModEnergize = opModEnergizeXmlObject
         ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          stringToBoolean(assertString(energizeXmlObject[0]))
+          stringToBoolean(assertString(opModEnergizeXmlObject[0]))
         : undefined;
 
     return {
-        siteImportLimitWatts,
-        siteExportLimitWatts,
-        generationLimit,
-        loadLimit,
-        energize,
+        opModImpLimW,
+        opModExpLimW,
+        opModGenLimW,
+        opModLoadLimW,
+        opModEnergize,
     };
 }
 

@@ -3,8 +3,8 @@ import { assertString } from './assert';
 
 export type LimitWatts = {
     value: number;
-    powerOfTenMultiplier: number;
-    watts: number;
+    // power of ten multiplier
+    multiplier: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,7 +18,11 @@ export function parseLimitWattsXmlObject(xmlObject: any): LimitWatts {
 
     return {
         value,
-        powerOfTenMultiplier,
-        watts: value * 10 ** powerOfTenMultiplier,
+        multiplier: powerOfTenMultiplier,
     };
+}
+
+// helper function to convert LimitWatts to watts
+export function limitWattsToWatts(limitWatts: LimitWatts): number {
+    return limitWatts.value * 10 ** limitWatts.multiplier;
 }

@@ -37,5 +37,5 @@ it('should parse Default DER Control XML', async () => {
     expect(derControl.interval.start.getTime()).toBe(1682475300000);
     expect(derControl.interval.durationSeconds).toBe(300);
     expect(derControl.interval.end.getTime()).toBe(1682475300000 + 300 * 1000);
-    expect(derControl.derControlBase.siteExportLimitWatts?.watts).toBe(2512);
+    expect(derControl.derControlBase.opModExpLimW?.value).toBe(2512);
 });

@@ -17,11 +17,11 @@ it('should parse DERControlBase XML from DefaultDERControl', async () => {
         derControlBaseXmlObject,
     );
 
-    expect(derControlBase.siteImportLimitWatts?.watts).toBe(1500);
-    expect(derControlBase.siteExportLimitWatts?.watts).toBe(1500);
-    expect(derControlBase.generationLimit).toBe(undefined);
-    expect(derControlBase.loadLimit).toBe(undefined);
-    expect(derControlBase.energize).toBe(true);
+    expect(derControlBase.opModImpLimW?.value).toBe(15);
+    expect(derControlBase.opModExpLimW?.value).toBe(15);
+    expect(derControlBase.opModGenLimW).toBe(undefined);
+    expect(derControlBase.opModLoadLimW).toBe(undefined);
+    expect(derControlBase.opModEnergize).toBe(true);
 });
 
 it('should parse DERControlBase XML from DERControlList', async () => {
@@ -38,9 +38,9 @@ it('should parse DERControlBase XML from DERControlList', async () => {
         derControlBaseXmlObject,
     );
 
-    expect(derControlBase.siteImportLimitWatts?.watts).toBe(3512);
-    expect(derControlBase.siteExportLimitWatts?.watts).toBe(2512);
-    expect(derControlBase.generationLimit?.watts).toBe(30000);
-    expect(derControlBase.loadLimit?.watts).toBe(30000);
-    expect(derControlBase.energize).toBe(undefined);
+    expect(derControlBase.opModImpLimW?.value).toBe(3512);
+    expect(derControlBase.opModExpLimW?.value).toBe(2512);
+    expect(derControlBase.opModGenLimW?.value).toBe(3);
+    expect(derControlBase.opModLoadLimW?.value).toBe(3);
+    expect(derControlBase.opModEnergize).toBe(undefined);
 });
