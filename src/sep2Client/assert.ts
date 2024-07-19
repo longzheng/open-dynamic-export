@@ -7,6 +7,11 @@ export function assertString(value: unknown): string {
 }
 
 export function assertArray<T>(value: T) {
+    // array can be empty
+    if (value === undefined) {
+        return [];
+    }
+
     if (!Array.isArray(value)) {
         throw new Error(`Expected array, got ${typeof value}`);
     }
