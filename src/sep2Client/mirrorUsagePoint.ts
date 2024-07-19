@@ -1,6 +1,7 @@
-import { stringHexToEnumType } from '../enum';
+import { safeParseStringToEnumType, stringHexToEnumType } from '../enum';
 import { assertString } from './assert';
 import { type RoleFlagsType } from './roleFlagsType';
+import { ServiceKind } from './serviceKind';
 
 export enum MirrorUsagePointStatus {
     Off = '0',
@@ -11,8 +12,7 @@ export type MirrorUsagePoint = {
     mRID: string;
     description: string;
     roleFlags: RoleFlagsType;
-    // TODO: unknown use?
-    serviceCategoryKind: string;
+    serviceCategoryKind: ServiceKind;
     status: MirrorUsagePointStatus;
     deviceLFDI: string;
 };
@@ -27,11 +27,13 @@ export function parseMirrorUsagePointXmlObject(
     const roleFlags = stringHexToEnumType<RoleFlagsType>(
         assertString(mirrorUsagePointObject['roleFlags'][0]),
     );
-    const serviceCategoryKind = assertString(
-        mirrorUsagePointObject['serviceCategoryKind'][0],
+    const serviceCategoryKind = safeParseStringToEnumType(
+        assertString(mirrorUsagePointObject['serviceCategoryKind'][0]),
+        ServiceKind,
     );
-    const status = stringToStatus(
+    const status = safeParseStringToEnumType(
         assertString(mirrorUsagePointObject['status'][0]),
+        MirrorUsagePointStatus,
     );
     const deviceLFDI = assertString(mirrorUsagePointObject['deviceLFDI'][0]);
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
@@ -44,15 +46,4 @@ export function parseMirrorUsagePointXmlObject(
         status,
         deviceLFDI,
     };
-}
-
-function stringToStatus(value: string): MirrorUsagePointStatus {
-    switch (value) {
-        case '1':
-            return MirrorUsagePointStatus.On;
-        case '0':
-            return MirrorUsagePointStatus.Off;
-        default:
-            throw new Error(`Unexpected status: ${value}`);
-    }
 }

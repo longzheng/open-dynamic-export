@@ -6,6 +6,7 @@ import {
     MirrorUsagePointStatus,
 } from './mirrorUsagePoint';
 import { RoleFlagsType } from './roleFlagsType';
+import { ServiceKind } from './serviceKind';
 
 it('should parse end device DER with XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -24,7 +25,9 @@ it('should parse end device DER with XML', async () => {
     expect(mirrorUsagePoint.roleFlags).toEqual(
         RoleFlagsType.isDER | RoleFlagsType.isMirror | RoleFlagsType.isSubmeter,
     );
-    expect(mirrorUsagePoint.serviceCategoryKind).toEqual('0');
+    expect(mirrorUsagePoint.serviceCategoryKind).toEqual(
+        ServiceKind.Electricity,
+    );
     expect(mirrorUsagePoint.status).toEqual(MirrorUsagePointStatus.On);
     expect(mirrorUsagePoint.deviceLFDI).toEqual(
         '4075DE6031E562ACF4D9EAA765A5B2ED00057269',

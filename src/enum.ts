@@ -21,3 +21,18 @@ export function mapEnumValueToEnumFlagsObject<T extends EnumType>(
             {} as Record<keyof T, boolean>,
         );
 }
+
+export function safeParseStringToEnumType<T extends EnumType>(
+    value: string,
+    enumObject: T,
+) {
+    const enumName = (Object.keys(enumObject) as Array<keyof T>).find(
+        (k) => enumObject[k] === value,
+    );
+
+    if (!enumName) {
+        throw Error('value is not in enum');
+    }
+
+    return enumObject[enumName];
+}
