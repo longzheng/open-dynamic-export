@@ -3,6 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { beforeAll, it, expect, vi } from 'vitest';
 import { getMockFile } from './mocks';
+import { ResponseStatus } from './derControlResponse';
 
 const mockAxios = new MockAdapter(axios);
 
@@ -67,13 +68,37 @@ it('should get end device list', async () => {
     expect(endDevices.length).toBe(3);
 });
 
-it('should handle DER control events', async () => {
+it('should post DER control response', async () => {
     mockAxios
-        .onGet('http://example.com/path/to/dercontrol')
-        .reply(200, getMockFile('getDerp_TESTPROG3_derc.xml'));
+        .onPost('http://example.com/api/v2/rsps/res-ms/rsp', {
+            asymmetricMatch: (value: string) => {
+                return value.includes(
+                    '<DERControlResponse xmlns="urn:ieee:std:2030.5:ns">',
+                );
+            },
+        })
+        .reply(200);
 
-    await sep2Client.handleDERControl();
+    const response = await sep2Client.postDerControlResponse(
+        '/api/v2/rsps/res-ms/rsp',
+        {
+            createdDateTime: new Date(),
+            endDeviceLFDI: '0000',
+            status: ResponseStatus.EventReceived,
+            subject: '0000',
+        },
+    );
+
+    expect(response.status).toBe(200);
 });
+
+// it('should handle DER control events', async () => {
+//     mockAxios
+//         .onGet('http://example.com/path/to/dercontrol')
+//         .reply(200, getMockFile('getDerp_TESTPROG3_derc.xml'));
+
+//     await sep2Client.handleDERControl();
+// });
 
 const mockCert = `-----BEGIN CERTIFICATE-----
 MIICYzCCAgmgAwIBAgIUanA0NK+hTe21hmSr9D+at8yQHDMwCgYIKoZIzj0EAwIw

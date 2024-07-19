@@ -1,4 +1,4 @@
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'https';
@@ -7,6 +7,9 @@ import type { DeviceCapabilityResponse } from './deviceCapability';
 import { parseDeviceCapabilityXml } from './deviceCapability';
 import { parseTimeXml } from './time';
 import { parseEndDeviceListXml } from './endDeviceList';
+import type { DerControlResponse } from './derControlResponse';
+import { generateDerControlResponse } from './derControlResponse';
+import { convertToXml } from './builder';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -54,7 +57,7 @@ export class SEP2Client {
         });
     }
 
-    private async makeRequest(
+    private async getRequest(
         link: string,
         params?: Record<string, string>,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,17 +68,38 @@ export class SEP2Client {
         return await parseStringPromise(response.data);
     }
 
+    private async postResponse(
+        link: string,
+        data: unknown,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<AxiosResponse> {
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.post<string>(url, data);
+        return response;
+    }
+
+    private async putResponse(
+        link: string,
+        data: unknown,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<AxiosResponse> {
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.put<string>(url, data);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return response;
+    }
+
     public async initialize() {
         const { timeLink, endDeviceListLink } =
             await this.getDeviceCapabilities();
-        await this.assertTimeDelta(timeLink.href);
 
+        await this.assertTimeDelta(timeLink.href);
         await this.getEndDeviceList(endDeviceListLink.href);
     }
 
     async getDeviceCapabilities(): Promise<DeviceCapabilityResponse> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await this.makeRequest(this.dcapUri);
+        const xml = await this.getRequest(this.dcapUri);
 
         return parseDeviceCapabilityXml(xml);
     }
@@ -83,7 +107,7 @@ export class SEP2Client {
     // ensure the utility server time and the client time is not out of sync
     async assertTimeDelta(timeHref: string) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await this.makeRequest(timeHref);
+        const xml = await this.getRequest(timeHref);
 
         const time = parseTimeXml(xml);
 
@@ -100,7 +124,7 @@ export class SEP2Client {
 
     async getEndDeviceList(endDeviceListHref: string) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await this.makeRequest(endDeviceListHref, {
+        const xml = await this.getRequest(endDeviceListHref, {
             // get all records
             // start
             s: '0',
@@ -111,23 +135,32 @@ export class SEP2Client {
         return parseEndDeviceListXml(xml);
     }
 
-    public async handleDERControl() {
-        // Example to get DERControl events and apply to Modbus
-        const derControlUri = '/path/to/dercontrol'; // Update with actual path
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        const xml = await this.makeRequest(derControlUri);
-        const derControls = xml['DERControlList']['DERControl'];
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-
-        for (const control of derControls) {
-            /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const exportLimit =
-                control['DERControlBase'][0]['ns2:opModExpLimW'][0];
-            /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-            // TODO Apply exportLimit to Modbus
-        }
+    async postDerControlResponse(
+        replyToHref: string,
+        response: DerControlResponse,
+    ) {
+        const data = generateDerControlResponse(response);
+        const xml = convertToXml(data);
+        return await this.postResponse(replyToHref, xml);
     }
+
+    // public async handleDERControl() {
+    //     // Example to get DERControl events and apply to Modbus
+    //     const derControlUri = '/path/to/dercontrol'; // Update with actual path
+    //     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    //     const xml = await this.getRequest(derControlUri);
+    //     const derControls = xml['DERControlList']['DERControl'];
+    //     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
+    //     for (const control of derControls) {
+    //         /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //         const exportLimit =
+    //             control['DERControlBase'][0]['ns2:opModExpLimW'][0];
+    //         /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    //         // TODO Apply exportLimit to Modbus
+    //     }
+    // }
 }
 
 // default polling and post rates for resources

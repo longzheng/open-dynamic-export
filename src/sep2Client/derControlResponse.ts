@@ -1,3 +1,6 @@
+import { dateToStringSeconds } from './date';
+import { xmlns } from './namespace';
+
 // The status field contains the acknowledgement or status. Each event type (DRLC, DER, Price, or Text) can return different status information (e.g. an Acknowledge will be returned for a Price event where a DRLC event can return Event Received, Event Started, and Event Completed). The Status field value definitions are defined in Table 27: Response Types by Function Set.
 // EventReceived = 1,
 // EventStarted = 2,
@@ -15,10 +18,6 @@
 // EventAbortedProgram = 14,
 // EventNotApplicable = 252,
 // EventInvalid = 253,
-
-import { dateToStringSeconds } from './date';
-import { xmlns } from './namespace';
-
 // EventExpired = 254,
 export enum ResponseStatus {
     EventReceived = 1,
@@ -41,13 +40,11 @@ export enum ResponseStatus {
 }
 
 export type DerControlResponse = {
-    DERControlResponse: {
-        $: { xmlns: string };
-        createdDateTime: string;
-        endDeviceLFDI: string;
-        status: string;
-        subject: string;
-    };
+    createdDateTime: Date;
+    endDeviceLFDI: string;
+    status: ResponseStatus;
+    // the mRID of the DERControl that is being responded to
+    subject: string;
 };
 
 export function generateDerControlResponse({
@@ -55,13 +52,7 @@ export function generateDerControlResponse({
     endDeviceLFDI,
     status,
     subject,
-}: {
-    createdDateTime: Date;
-    endDeviceLFDI: string;
-    status: ResponseStatus;
-    // the mRID of the DERControl that is being responded to
-    subject: string;
-}): DerControlResponse {
+}: DerControlResponse) {
     return {
         DERControlResponse: {
             $: { xmlns: xmlns._ },
