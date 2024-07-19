@@ -97,3 +97,12 @@ I opted for the CATCH Power Solar Relay solution since it was already installed 
 So I thought I should put my efforts on making a better product that is open source since I have an interest in energy markets and was curious about the SEP2/CSIP-AUS standards.
 
 I got in touch with Energy Queensland who was surprisingly helpful (for a government agency) and was open to the idea of an open-source client.
+
+## Resources
+
+- [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf)
+- [IEEE 2030.5 Data Model](https://zepben.github.io/evolve/docs/2030-5/)
+- [SEP2 Common Library](https://github.com/ethanndickson/sep2_common) Rust library
+- [SEP2-Tools](https://github.com/aguinane/SEP2-Tools) Python library
+- [CSIP spec](https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf)
+- [CSIP-AUS spec](https://arena.gov.au/assets/2021/09/common-smart-inverter-profile-australia.pdf)
