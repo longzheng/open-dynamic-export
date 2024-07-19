@@ -1,16 +1,16 @@
 import { assertString } from './assert';
 import { stringToBoolean } from './boolean';
-import { parseLimitWattsXmlObject, type LimitWatts } from './limitWatts';
+import { parseActivePowerXmlObject, type ActivePower } from './activePower';
 
 export type DERControlBase = {
     // site import limit
-    opModImpLimW?: LimitWatts;
+    opModImpLimW?: ActivePower;
     // site export limit
-    opModExpLimW?: LimitWatts;
+    opModExpLimW?: ActivePower;
     // site generation limit
-    opModGenLimW?: LimitWatts;
+    opModGenLimW?: ActivePower;
     // site load limit
-    opModLoadLimW?: LimitWatts;
+    opModLoadLimW?: ActivePower;
     // energize
     opModEnergize?: boolean;
 };
@@ -50,7 +50,7 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
 function parseLimitWattsXmlObjectOptional(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
-): LimitWatts | undefined {
+): ActivePower | undefined {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return xmlObject ? parseLimitWattsXmlObject(xmlObject[0]) : undefined;
+    return xmlObject ? parseActivePowerXmlObject(xmlObject[0]) : undefined;
 }
