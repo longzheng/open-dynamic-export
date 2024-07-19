@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { convertToXml } from './builder';
+import { objectToXml } from './builder';
 import { DERControlType } from './derControlType';
 import { generateDerSettingsResponse } from './derSettings';
 
@@ -26,7 +26,7 @@ it('should generate DERSettings XML', () => {
         },
     });
 
-    const xml = convertToXml(response);
+    const xml = objectToXml(response);
 
     expect(xml).toBe(`<?xml version="1.0"?>
 <DERSettings xmlns="urn:ieee:std:2030.5:ns">

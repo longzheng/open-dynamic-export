@@ -1,4 +1,4 @@
-import { convertToHex } from '../number';
+import { numberToHex } from '../number';
 import { generateActivePowerResponse, type ActivePower } from './activePower';
 import {
     generateApparentPowerResponse,
@@ -37,7 +37,7 @@ export function generateDerSettingsResponse({
         DERSettings: {
             $: { xmlns: xmlns._ },
             updatedTime: dateToStringSeconds(updatedTime),
-            modesEnabled: convertToHex(modesEnabled).padStart(8, '0'),
+            modesEnabled: numberToHex(modesEnabled).padStart(8, '0'),
             setGradW: setGradW.toString(),
             setMaxVA: generateApparentPowerResponse(setMaxVA),
             setMaxW: generateActivePowerResponse(setMaxW),

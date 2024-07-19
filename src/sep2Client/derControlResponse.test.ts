@@ -3,7 +3,7 @@ import {
     generateDerControlResponse,
     ResponseStatus,
 } from './derControlResponse';
-import { convertToXml } from './builder';
+import { objectToXml } from './builder';
 
 it('should generate DERControlResponse XML', () => {
     const response = generateDerControlResponse({
@@ -13,7 +13,7 @@ it('should generate DERControlResponse XML', () => {
         subject: 'DC1B27AC943B44AC87DAF7E162B6F6D4',
     });
 
-    const xml = convertToXml(response);
+    const xml = objectToXml(response);
 
     expect(xml).toBe(`<?xml version="1.0"?>
 <DERControlResponse xmlns="urn:ieee:std:2030.5:ns">

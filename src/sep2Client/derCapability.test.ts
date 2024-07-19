@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { convertToXml } from './builder';
+import { objectToXml } from './builder';
 import { generateDerCapabilityResponse } from './derCapability';
 import { DERControlType } from './derControlType';
 import { DOEModesSupportedType } from './doeModesSupportedType';
@@ -36,7 +36,7 @@ it('should generate DERCapability XML', () => {
         },
     });
 
-    const xml = convertToXml(response);
+    const xml = objectToXml(response);
 
     expect(xml).toBe(`<?xml version="1.0"?>
 <DERCapability xmlns="urn:ieee:std:2030.5:ns" xmlns:csipaus="https://csipaus.org/ns">

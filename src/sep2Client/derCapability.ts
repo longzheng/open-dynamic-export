@@ -1,4 +1,4 @@
-import { convertToHex } from '../number';
+import { numberToHex } from '../number';
 import { generateActivePowerResponse, type ActivePower } from './activePower';
 import {
     generateApparentPowerResponse,
@@ -41,8 +41,8 @@ export function generateDerCapabilityResponse({
     return {
         DERCapability: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
-            modesSupported: convertToHex(modesSupported).padStart(8, '0'),
-            'csipaus:doeModesSupported': convertToHex(
+            modesSupported: numberToHex(modesSupported).padStart(8, '0'),
+            'csipaus:doeModesSupported': numberToHex(
                 doeModesSupported,
             ).padStart(8, '0'),
             type: type.toString(),

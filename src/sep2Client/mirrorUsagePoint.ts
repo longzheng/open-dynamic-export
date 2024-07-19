@@ -1,5 +1,7 @@
 import { safeParseStringToEnumType, stringHexToEnumType } from '../enum';
+import { numberToHex } from '../number';
 import { assertString } from './assert';
+import { xmlns } from './namespace';
 import { type RoleFlagsType } from './roleFlagsType';
 import { ServiceKind } from './serviceKind';
 
@@ -45,5 +47,26 @@ export function parseMirrorUsagePointXmlObject(
         serviceCategoryKind,
         status,
         deviceLFDI,
+    };
+}
+
+export function generateMirrorUsagePointResponse({
+    mRID,
+    description,
+    roleFlags,
+    serviceCategoryKind,
+    status,
+    deviceLFDI,
+}: MirrorUsagePoint) {
+    return {
+        MirrorUsagePoint: {
+            $: { xmlns: xmlns._ },
+            mRID,
+            description,
+            roleFlags: numberToHex(roleFlags).padStart(2, '0'),
+            serviceCategoryKind,
+            status,
+            deviceLFDI,
+        },
     };
 }

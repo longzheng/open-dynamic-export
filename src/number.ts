@@ -14,6 +14,6 @@ export function safeParseHexString(value: string): number {
     return parsed;
 }
 
-export function convertToHex(value: number): string {
+export function numberToHex(value: number): string {
     return value.toString(16).toUpperCase();
 }

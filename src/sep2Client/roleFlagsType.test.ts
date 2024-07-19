@@ -1,13 +1,13 @@
 import { it, expect } from 'vitest';
 import type { RoleFlagsTypeObject } from './roleFlagsType';
 import { mapEnumNumberToRoleFlagsObject, RoleFlagsType } from './roleFlagsType';
-import { convertToHex } from '../number';
+import { numberToHex } from '../number';
 
 it('site is 3 hex', () => {
     const value =
         RoleFlagsType.isMirror | RoleFlagsType.isPremisesAggregationPoint;
 
-    const hex = convertToHex(value);
+    const hex = numberToHex(value);
 
     expect(hex).toBe('3');
 });
@@ -16,7 +16,7 @@ it('DER is 49 hex', () => {
     const value =
         RoleFlagsType.isMirror | RoleFlagsType.isDER | RoleFlagsType.isSubmeter;
 
-    const hex = convertToHex(value);
+    const hex = numberToHex(value);
 
     expect(hex).toBe('49');
 });

@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { convertToXml } from './builder';
+import { objectToXml } from './builder';
 import { generateDerStatusResponse, OperationalModeStatus } from './derStatus';
 import { ConnectStatus } from './connectStatus';
 
@@ -16,7 +16,7 @@ it('should generate DERStatus XML', () => {
         },
     });
 
-    const xml = convertToXml(response);
+    const xml = objectToXml(response);
 
     expect(xml).toBe(`<?xml version="1.0"?>
 <DERStatus xmlns="urn:ieee:std:2030.5:ns">

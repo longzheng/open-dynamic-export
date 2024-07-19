@@ -9,7 +9,7 @@ import { parseTimeXml } from './time';
 import { parseEndDeviceListXml } from './endDeviceList';
 import type { DerControlResponse } from './derControlResponse';
 import { generateDerControlResponse } from './derControlResponse';
-import { convertToXml } from './builder';
+import { objectToXml } from './builder';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -140,7 +140,7 @@ export class SEP2Client {
         response: DerControlResponse,
     ) {
         const data = generateDerControlResponse(response);
-        const xml = convertToXml(data);
+        const xml = objectToXml(data);
         return await this.postResponse(replyToHref, xml);
     }
 
