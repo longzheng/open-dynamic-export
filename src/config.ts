@@ -1,32 +1,37 @@
-import { safeParseIntString } from './number';
+import { z } from 'zod';
+import { readFileSync } from 'fs';
 
-export function assertEnv(name: string): string {
-    const value = process.env[name];
-    if (!value) {
-        throw new Error(`Environment variable ${name} is required`);
+const sunspecModbusSchema = z.object({
+    ip: z.string().regex(/^(\d{1,3}\.){3}\d{1,3}$/),
+    port: z.number().min(1).max(65535),
+    unitId: z.number().min(1).max(255),
+});
+
+const configSchema = z.object({
+    sep2: z.object({
+        host: z.string().url(),
+        dcapUri: z.string(),
+        certPath: z.string(),
+        keyPath: z.string(),
+        pen: z.number(),
+    }),
+    sunspecModbus: z.array(sunspecModbusSchema),
+});
+
+export type Config = z.infer<typeof configSchema>;
+
+export function getConfig() {
+    const configJson = readFileSync('config.json', 'utf8');
+
+    if (!configJson) {
+        throw new Error(`config.json is not found`);
     }
-    return value;
-}
 
-// parse the SUNSPEC_MODBUS_HOSTS environment variable into a config object array
-export function parseSunspecModbusHosts(
-    value: string,
-): { ip: string; port: number; id: number }[] {
-    const hosts = value.split(',');
+    const result = configSchema.safeParse(JSON.parse(configJson));
 
-    return hosts.map((host) => {
-        const [ip, port, id] = host.split(':');
+    if (!result.success) {
+        throw new Error(`config.json is not valid`);
+    }
 
-        if (!ip || !port || !id) {
-            throw new Error(
-                `SUNSPEC_MODBUS_HOSTS must be in the format IP:PORT:ID, the value "${host}" is invalid.`,
-            );
-        }
-
-        return {
-            ip,
-            port: safeParseIntString(port),
-            id: safeParseIntString(id),
-        };
-    });
+    return result.data;
 }

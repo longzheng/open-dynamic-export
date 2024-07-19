@@ -57,13 +57,13 @@ The downside of a direct client approach is the registration process is manual a
 - [x] Private Enterprise Number (PEN) registration
 - [x] SEP2 client
   - [x] XML response parsing
-  - [ ] XML request generation
+  - [x] XML request generation
   - [ ] Scheduled polling and pushing
   - [ ] DER status/capability/settings reporting
   - [ ] DER control events acknowledgement
   - [ ] Telemetry reporting
 - [ ] SunSpec Modbus client
-- [ ] Fronius inverter testing
+  - [ ] Fronius inverter testing
 - [ ] Dynamic export control logic
 
 Future

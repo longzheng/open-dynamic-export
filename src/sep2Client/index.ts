@@ -10,6 +10,7 @@ import { parseEndDeviceListXml } from './endDeviceList';
 import type { DerControlResponse } from './derControlResponse';
 import { generateDerControlResponse } from './derControlResponse';
 import { objectToXml } from './builder';
+import type { Config } from '../config';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -23,23 +24,19 @@ export class SEP2Client {
     private axiosInstance: AxiosInstance;
 
     constructor({
-        host,
-        dcapUri,
+        sep2Config,
         cert,
         key,
-        pen,
     }: {
-        host: string;
-        dcapUri: string;
+        sep2Config: Pick<Config['sep2'], 'host' | 'dcapUri' | 'pen'>;
         cert: string;
         key: string;
-        pen: number;
     }) {
-        this.host = host;
-        this.dcapUri = dcapUri;
+        this.host = sep2Config.host;
+        this.dcapUri = sep2Config.dcapUri;
         this.cert = cert;
         this.key = key;
-        this.pen = pen.toString().padStart(8, '0');
+        this.pen = sep2Config.pen.toString().padStart(8, '0');
         this.lfdi = getCertificateLfdi(this.cert);
 
         this.axiosInstance = axios.create({

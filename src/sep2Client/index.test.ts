@@ -11,11 +11,13 @@ let sep2Client: SEP2Client;
 
 beforeAll(() => {
     sep2Client = new SEP2Client({
-        host: 'http://example.com',
-        dcapUri: '/dcap',
+        sep2Config: {
+            host: 'http://example.com',
+            dcapUri: '/dcap',
+            pen: 12345,
+        },
         cert: mockCert,
         key: mockKey,
-        pen: 12345,
     });
 });
 
