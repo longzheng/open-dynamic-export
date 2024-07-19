@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { SEP2Client } from './sep2Client';
-import { ModbusClient } from './modbusClient';
 import { getConfig } from './config';
+import { ModbusClient } from './sunspec/modbusClient';
 import { resolve } from 'path';
 import { readFileSync } from 'node:fs';
 
