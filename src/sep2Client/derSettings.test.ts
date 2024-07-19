@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { convertToXml } from './builder';
 import { DERControlType } from './derControlType';
-import { generateDerSettingsResponse } from './derSettingsResponse';
+import { generateDerSettingsResponse } from './derSettings';
 
 it('should generate DERSettings XML', () => {
     const response = generateDerSettingsResponse({

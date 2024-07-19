@@ -12,7 +12,7 @@ import {
     type ReactivePower,
 } from './reactivePower';
 
-export type DERSettingsResponse = {
+export type DERSettings = {
     updatedTime: Date;
     modesEnabled: DERControlType;
     // Set default rate of change (ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a default ramp rate.
@@ -32,7 +32,7 @@ export function generateDerSettingsResponse({
     setMaxVA,
     setMaxW,
     setMaxVar,
-}: DERSettingsResponse) {
+}: DERSettings) {
     return {
         DERSettings: {
             $: { xmlns: xmlns._ },

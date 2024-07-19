@@ -1,9 +1,6 @@
 import { it, expect } from 'vitest';
 import { convertToXml } from './builder';
-import {
-    generateDerStatusResponse,
-    OperationalModeStatus,
-} from './derStatusResponse';
+import { generateDerStatusResponse, OperationalModeStatus } from './derStatus';
 import { ConnectStatus } from './connectStatus';
 
 it('should generate DERStatus XML', () => {

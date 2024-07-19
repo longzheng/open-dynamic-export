@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
 import { convertToXml } from './builder';
-import { generateDerCapabilityResponse } from './derCapabilityResponse';
+import { generateDerCapabilityResponse } from './derCapability';
 import { DERControlType } from './derControlType';
 import { DOEModesSupportedType } from './doeModesSupportedType';
 import { DERType } from './derType';

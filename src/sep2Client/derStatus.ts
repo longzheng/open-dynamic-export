@@ -15,7 +15,7 @@ export enum OperationalModeStatus {
     TestMode = 3,
 }
 
-export type DERStatusResponse = {
+export type DERStatus = {
     readingTime: Date;
     operationalModeStatus: {
         dateTime: Date;
@@ -32,7 +32,7 @@ export function generateDerStatusResponse({
     readingTime,
     operationalModeStatus,
     genConnectStatus,
-}: DERStatusResponse) {
+}: DERStatus) {
     return {
         DERStatus: {
             $: { xmlns: xmlns._ },
