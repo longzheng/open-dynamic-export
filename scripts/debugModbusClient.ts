@@ -9,9 +9,14 @@ void (async () => {
         ({ ip, port, unitId }) => new ModbusClient(ip, port, unitId),
     );
 
-    const commonBlock = await Promise.all(
-        modbusClients.map((client) => client.getCommonBlock()),
+    const clientsData = await Promise.all(
+        modbusClients.map(async (client) => {
+            return {
+                common: await client.getCommonBlock(),
+                inverter: await client.getFroniusInverterBlock(),
+            };
+        }),
     );
 
-    console.dir(commonBlock);
+    console.dir(clientsData);
 })();

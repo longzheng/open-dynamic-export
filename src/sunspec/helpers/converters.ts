@@ -28,3 +28,23 @@ export function registersToUint16(registers: number[]) {
 
     return registers[0]!;
 }
+
+export function registersToInt16(registers: number[]) {
+    if (registers.length !== 1) {
+        throw new Error('Invalid register length');
+    }
+
+    return (registers[0]! << 16) >> 16;
+}
+
+export function registersToSunssf(registers: number[]) {
+    return registersToInt16(registers);
+}
+
+export function registersToAcc32(registers: number[]) {
+    if (registers.length !== 2) {
+        throw new Error('Invalid register length');
+    }
+
+    return (registers[0]! << 16) + registers[1]!;
+}

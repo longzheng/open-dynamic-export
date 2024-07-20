@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { registersToString, registersToUint32 } from './registers';
+import { registersToString, registersToUint32 } from './converters';
 
 it('registersToUint32 should convert registers to a 32-bit unsigned integer', () => {
     const registers = [0x1234, 0x5678];

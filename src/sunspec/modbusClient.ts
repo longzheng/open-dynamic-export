@@ -1,13 +1,15 @@
 import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
-import { parseCommonBlock } from './models/commonBlock';
+import { commonBlock } from './models/commonBlock';
+import { froniusInverterBlock } from './models/froniusInverterBlock';
 
 export class ModbusClient {
-    private client: ModbusRTU;
+    public client: ModbusRTU;
     private host: string;
     private port: number;
     private unitId: number;
     private openPromise: Promise<boolean> | null = null;
+    // private getCommonBlock:
 
     constructor(host: string, port: number, unitId: number) {
         this.client = new ModbusRTU();
@@ -63,7 +65,7 @@ export class ModbusClient {
         return openPromise;
     }
 
-    private async waitUntilOpen() {
+    public async waitUntilOpen() {
         while (!this.client.isOpen) {
             await this.openAsync();
             await scheduler.wait(1000);
@@ -71,10 +73,21 @@ export class ModbusClient {
     }
 
     async getCommonBlock() {
-        await this.waitUntilOpen();
+        const data = await commonBlock.get(this);
 
-        const result = await this.client.readHoldingRegisters(40000, 69);
+        // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
+        // assert this is the case or this isn't SunSpec
+        // 0x53756e53 ('SunS')
+        if (data.SID !== 0x53756e53) {
+            throw new Error('Not a SunSpec device');
+        }
 
-        return parseCommonBlock(result.data);
+        return data;
+    }
+
+    async getFroniusInverterBlock() {
+        const data = await froniusInverterBlock.get(this);
+
+        return data;
     }
 }
