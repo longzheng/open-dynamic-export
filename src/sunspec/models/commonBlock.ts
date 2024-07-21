@@ -7,23 +7,23 @@ import { sunSpecBlockFactory } from './sunSpecBlockFactory';
 
 export type CommonBlock = {
     // Well-known value. Uniquely identifies this as a SunSpec Modbus Map
-    SID: number;
+    C_SunSpec_ID: number;
     // Length of sunspec model common (1)
-    ID: number;
+    C_SunSpec_DID: number;
     // Length of sunspec model common (1)
-    L: number;
+    C_SunSpec_Length: number;
     // Manufacturer
-    Mn: string;
+    C_Manufacturer: string;
     // Device model
-    Md: string;
+    C_Model: string;
     // Options
-    Opt: string;
+    C_Option: string;
     // SW version of inverter
-    Vr: string;
+    C_Version: string;
     // Serialnumber of the inverter
-    SN: string;
+    C_SerialNumber: string;
     // Modbus Device Address
-    DA: number;
+    C_DeviceAddress: number;
 };
 
 export const commonBlock = sunSpecBlockFactory<CommonBlock>({
@@ -32,47 +32,47 @@ export const commonBlock = sunSpecBlockFactory<CommonBlock>({
         length: 69,
     },
     mapping: {
-        SID: {
+        C_SunSpec_ID: {
             start: 0,
             end: 2,
             converter: registersToUint32,
         },
-        ID: {
+        C_SunSpec_DID: {
             start: 2,
             end: 3,
             converter: registersToUint16,
         },
-        L: {
+        C_SunSpec_Length: {
             start: 3,
             end: 4,
             converter: registersToUint16,
         },
-        Mn: {
+        C_Manufacturer: {
             start: 4,
             end: 20,
             converter: registersToString,
         },
-        Md: {
+        C_Model: {
             start: 20,
             end: 36,
             converter: registersToString,
         },
-        Opt: {
+        C_Option: {
             start: 36,
             end: 44,
             converter: registersToString,
         },
-        Vr: {
+        C_Version: {
             start: 44,
             end: 52,
             converter: registersToString,
         },
-        SN: {
+        C_SerialNumber: {
             start: 52,
             end: 68,
             converter: registersToString,
         },
-        DA: {
+        C_DeviceAddress: {
             start: 68,
             end: 69,
             converter: registersToUint16,

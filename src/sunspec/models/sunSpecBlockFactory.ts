@@ -41,7 +41,21 @@ export function sunSpecBlockFactory<T extends Record<string, unknown>>(config: {
 
                         const value = registers.data.slice(start, end);
 
-                        return [key, converter ? converter(value) : value];
+                        const convertedValue = (() => {
+                            try {
+                                return converter ? converter(value) : value;
+                            } catch (error) {
+                                if (error instanceof Error) {
+                                    throw new Error(
+                                        `Error converting value for key ${key} with value ${value.toString()}: ${error.message}`,
+                                    );
+                                }
+
+                                throw error;
+                            }
+                        })();
+
+                        return [key, convertedValue];
                     }),
                 ),
             } as T;

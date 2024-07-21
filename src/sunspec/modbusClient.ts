@@ -1,7 +1,8 @@
 import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
 import { commonBlock } from './models/commonBlock';
-import { froniusInverterBlock } from './models/froniusInverterBlock';
+import { getInverterBlockByBrand } from './models/inverterBlock';
+import type { SunSpecBrand } from './models/brand';
 
 export class ModbusClient {
     public client: ModbusRTU;
@@ -78,15 +79,15 @@ export class ModbusClient {
         // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
         // assert this is the case or this isn't SunSpec
         // 0x53756e53 ('SunS')
-        if (data.SID !== 0x53756e53) {
+        if (data.C_SunSpec_ID !== 0x53756e53) {
             throw new Error('Not a SunSpec device');
         }
 
         return data;
     }
 
-    async getFroniusInverterBlock() {
-        const data = await froniusInverterBlock.get(this);
+    async getInverterBlock(brand: SunSpecBrand) {
+        const data = await getInverterBlockByBrand(brand).get(this);
 
         return data;
     }
