@@ -1,9 +1,15 @@
 import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
 import { commonModel } from './models/commonModel';
-import { getInverterModelByBrand } from './models/inverterModel';
+import {
+    inverterModel,
+    inverterModelAddressStartByBrand,
+} from './models/inverterModel';
 import type { SunSpecBrand } from './models/brand';
-import { getNameplateModelByBrand } from './models/nameplateModel';
+import {
+    nameplateModel,
+    nameplateModelAddressStartByBrand,
+} from './models/nameplateModel';
 
 export class ModbusClient {
     public client: ModbusRTU;
@@ -74,7 +80,10 @@ export class ModbusClient {
     }
 
     async getCommonModel() {
-        const data = await commonModel.get(this);
+        const data = await commonModel.get({
+            client: this,
+            addressStart: 40000,
+        });
 
         // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
         // assert this is the case or this isn't SunSpec
@@ -91,7 +100,10 @@ export class ModbusClient {
     }
 
     async getInverterModel(brand: SunSpecBrand) {
-        const data = await getInverterModelByBrand(brand).get(this);
+        const data = await inverterModel.get({
+            client: this,
+            addressStart: inverterModelAddressStartByBrand(brand),
+        });
 
         if (data.ID !== 101 && data.ID !== 102 && data.ID !== 103) {
             throw new Error('Not a SunSpec inverter monitoring model');
@@ -101,7 +113,10 @@ export class ModbusClient {
     }
 
     async getNameplateModel(brand: SunSpecBrand) {
-        const data = await getNameplateModelByBrand(brand).get(this);
+        const data = await nameplateModel.get({
+            client: this,
+            addressStart: nameplateModelAddressStartByBrand(brand),
+        });
 
         if (data.ID !== 120) {
             throw new Error('Not a SunSpec nameplate model');

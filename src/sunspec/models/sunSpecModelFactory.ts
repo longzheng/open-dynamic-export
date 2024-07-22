@@ -3,10 +3,7 @@ import type { ModbusClient } from '../modbusClient';
 export function sunSpecModelFactory<
     Model extends Record<string, unknown>,
 >(config: {
-    address: {
-        start: number;
-        length: number;
-    };
+    addressLength: number;
     mapping: {
         [K in keyof Model]: {
             converter?: (value: number[]) => Model[K];
@@ -15,15 +12,19 @@ export function sunSpecModelFactory<
         };
     };
 }): {
-    get(modbusClient: ModbusClient): Promise<Model>;
+    get(params: {
+        client: ModbusClient;
+        // the starting address for different manufacturers might be different
+        addressStart: number;
+    }): Promise<Model>;
 } {
     return {
-        get: async (modbusClient) => {
-            await modbusClient.waitUntilOpen();
+        get: async ({ client, addressStart }) => {
+            await client.waitUntilOpen();
 
-            const registers = await modbusClient.client.readHoldingRegisters(
-                config.address.start,
-                config.address.length,
+            const registers = await client.client.readHoldingRegisters(
+                addressStart,
+                config.addressLength,
             );
 
             return {
