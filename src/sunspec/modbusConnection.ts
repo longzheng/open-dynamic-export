@@ -15,6 +15,7 @@ import {
     settingsModelAddressStartByBrand,
 } from './models/settings';
 import { statusModel, statusModelAddressStartByBrand } from './models/status';
+import type { ControlsModelWrite } from './models/controls';
 import {
     controlsModel,
     controlsModelAddressStartByBrand,
@@ -22,14 +23,22 @@ import {
 
 export class ModbusConnection {
     public client: ModbusRTU;
-    private host: string;
+    private ip: string;
     private port: number;
     private unitId: number;
     private openPromise: Promise<boolean> | null = null;
 
-    constructor(host: string, port: number, unitId: number) {
+    constructor({
+        ip,
+        port,
+        unitId,
+    }: {
+        ip: string;
+        port: number;
+        unitId: number;
+    }) {
         this.client = new ModbusRTU();
-        this.host = host;
+        this.ip = ip;
         this.port = port;
         this.unitId = unitId;
 
@@ -50,7 +59,7 @@ export class ModbusConnection {
         }
 
         try {
-            await this.client.connectTCP(this.host, { port: this.port });
+            await this.client.connectTCP(this.ip, { port: this.port });
             this.client.setID(this.unitId);
             this.client.setTimeout(1000);
             console.log('Modbus client connected');
@@ -89,7 +98,7 @@ export class ModbusConnection {
     }
 
     async getCommonModel() {
-        const data = await commonModel.get({
+        const data = await commonModel.read({
             modbusConnection: this,
             addressStart: 40000,
         });
@@ -109,7 +118,7 @@ export class ModbusConnection {
     }
 
     async getInverterModel(brand: SunSpecBrand) {
-        const data = await inverterModel.get({
+        const data = await inverterModel.read({
             modbusConnection: this,
             addressStart: inverterModelAddressStartByBrand(brand),
         });
@@ -122,7 +131,7 @@ export class ModbusConnection {
     }
 
     async getNameplateModel(brand: SunSpecBrand) {
-        const data = await nameplateModel.get({
+        const data = await nameplateModel.read({
             modbusConnection: this,
             addressStart: nameplateModelAddressStartByBrand(brand),
         });
@@ -135,7 +144,7 @@ export class ModbusConnection {
     }
 
     async getSettingsModel(brand: SunSpecBrand) {
-        const data = await settingsModel.get({
+        const data = await settingsModel.read({
             modbusConnection: this,
             addressStart: settingsModelAddressStartByBrand(brand),
         });
@@ -148,7 +157,7 @@ export class ModbusConnection {
     }
 
     async getStatusModel(brand: SunSpecBrand) {
-        const data = await statusModel.get({
+        const data = await statusModel.read({
             modbusConnection: this,
             addressStart: statusModelAddressStartByBrand(brand),
         });
@@ -161,7 +170,7 @@ export class ModbusConnection {
     }
 
     async getControlsModel(brand: SunSpecBrand) {
-        const data = await controlsModel.get({
+        const data = await controlsModel.read({
             modbusConnection: this,
             addressStart: controlsModelAddressStartByBrand(brand),
         });
@@ -171,5 +180,13 @@ export class ModbusConnection {
         }
 
         return data;
+    }
+
+    async writeControlsModel(brand: SunSpecBrand, values: ControlsModelWrite) {
+        return await controlsModel.write({
+            modbusConnection: this,
+            addressStart: controlsModelAddressStartByBrand(brand),
+            values,
+        });
     }
 }

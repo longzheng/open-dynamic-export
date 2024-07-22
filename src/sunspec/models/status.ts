@@ -57,117 +57,116 @@ export type StatusModel = {
 };
 
 export const statusModel = sunSpecModelFactory<StatusModel>({
-    addressLength: 46,
     mapping: {
         ID: {
             start: 0,
             end: 1,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         L: {
             start: 1,
             end: 2,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         PVConn: {
             start: 2,
             end: 3,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         StorConn: {
             start: 3,
             end: 4,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         ECPConn: {
             start: 4,
             end: 5,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         ActWh: {
             start: 5,
             end: 9,
-            converter: registersToAcc64BigInt,
+            readConverter: registersToAcc64BigInt,
         },
         ActVAh: {
             start: 9,
             end: 13,
-            converter: registersToAcc64BigInt,
+            readConverter: registersToAcc64BigInt,
         },
         ActVArhQ1: {
             start: 13,
             end: 17,
-            converter: registersToAcc64BigInt,
+            readConverter: registersToAcc64BigInt,
         },
         ActVArhQ2: {
             start: 17,
             end: 21,
-            converter: registersToAcc64BigInt,
+            readConverter: registersToAcc64BigInt,
         },
         ActVArhQ3: {
             start: 21,
             end: 25,
-            converter: registersToAcc64BigInt,
+            readConverter: registersToAcc64BigInt,
         },
         ActVArhQ4: {
             start: 25,
             end: 29,
-            converter: registersToAcc64BigInt,
+            readConverter: registersToAcc64BigInt,
         },
         VArAval: {
             start: 29,
             end: 30,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         VArAval_SF: {
             start: 30,
             end: 31,
-            converter: registersToSunssf,
+            readConverter: registersToSunssf,
         },
         WAval: {
             start: 31,
             end: 32,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         WAval_SF: {
             start: 32,
             end: 33,
-            converter: registersToSunssf,
+            readConverter: registersToSunssf,
         },
         StSetLimMsk: {
             start: 33,
             end: 35,
-            converter: registersToUint32,
+            readConverter: registersToUint32,
         },
         StActCtl: {
             start: 35,
             end: 37,
-            converter: registersToUint32,
+            readConverter: registersToUint32,
         },
         TmSrc: {
             start: 37,
             end: 41,
-            converter: registersToString,
+            readConverter: registersToString,
         },
         Tms: {
             start: 41,
             end: 43,
-            converter: registersToUint32,
+            readConverter: registersToUint32,
         },
         RtSt: {
             start: 43,
             end: 44,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         Ris: {
             start: 44,
             end: 45,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         Ris_SF: {
             start: 45,
             end: 46,
-            converter: registersToSunssf,
+            readConverter: registersToSunssf,
         },
     },
 });

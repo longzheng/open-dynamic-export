@@ -28,52 +28,51 @@ export type CommonModel = {
 };
 
 export const commonModel = sunSpecModelFactory<CommonModel>({
-    addressLength: 69,
     mapping: {
         SID: {
             start: 0,
             end: 2,
-            converter: registersToUint32,
+            readConverter: registersToUint32,
         },
         ID: {
             start: 2,
             end: 3,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         L: {
             start: 3,
             end: 4,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         Mn: {
             start: 4,
             end: 20,
-            converter: registersToString,
+            readConverter: registersToString,
         },
         Md: {
             start: 20,
             end: 36,
-            converter: registersToString,
+            readConverter: registersToString,
         },
         Opt: {
             start: 36,
             end: 44,
-            converter: registersToString,
+            readConverter: registersToString,
         },
         Vr: {
             start: 44,
             end: 52,
-            converter: registersToString,
+            readConverter: registersToString,
         },
         SN: {
             start: 52,
             end: 68,
-            converter: registersToString,
+            readConverter: registersToString,
         },
         DA: {
             start: 68,
             end: 69,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
     },
 });

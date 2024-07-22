@@ -7,7 +7,7 @@ const config = getConfig();
 
 void (async () => {
     const modbusConnections = config.sunspecModbus.map(
-        ({ ip, port, unitId }) => new ModbusConnection(ip, port, unitId),
+        ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
     );
 
     const clientsData = await Promise.all(

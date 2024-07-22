@@ -2,6 +2,8 @@ import {
     registersToUint16,
     registersToInt16,
     registersToSunssf,
+    uint16ToRegisters,
+    int16ToRegisters,
 } from '../helpers/converters';
 import type { SunSpecBrand } from './brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -62,138 +64,186 @@ export type ControlsModel = {
     VArPct_SF: number;
 };
 
-export const controlsModel = sunSpecModelFactory<ControlsModel>({
-    addressLength: 26,
+export type ControlsModelWrite = Pick<
+    ControlsModel,
+    | 'Conn_WinTms'
+    | 'Conn_RvrtTms'
+    | 'Conn'
+    | 'WMaxLimPct'
+    | 'WMaxLimPct_WinTms'
+    | 'WMaxLimPct_RvrtTms'
+    | 'WMaxLimPct_RmpTms'
+    | 'WMaxLim_Ena'
+    | 'OutPFSet'
+    | 'OutPFSet_WinTms'
+    | 'OutPFSet_RvrtTms'
+    | 'OutPFSet_RmpTms'
+    | 'OutPFSet_Ena'
+    | 'VArWMaxPct'
+    | 'VArMaxPct'
+    | 'VArAvalPct'
+    | 'VArPct_WinTms'
+    | 'VArPct_RvrtTms'
+    | 'VArPct_RmpTms'
+    | 'VArPct_Mod'
+    | 'VArPct_Ena'
+>;
+
+export const controlsModel = sunSpecModelFactory<
+    ControlsModel,
+    keyof ControlsModelWrite
+>({
     mapping: {
         ID: {
             start: 0,
             end: 1,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         L: {
             start: 1,
             end: 2,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
         },
         Conn_WinTms: {
             start: 2,
             end: 3,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         Conn_RvrtTms: {
             start: 3,
             end: 4,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         Conn: {
             start: 4,
             end: 5,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WMaxLimPct: {
             start: 5,
             end: 6,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WMaxLimPct_WinTms: {
             start: 6,
             end: 7,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WMaxLimPct_RvrtTms: {
             start: 7,
             end: 8,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WMaxLimPct_RmpTms: {
             start: 8,
             end: 9,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WMaxLim_Ena: {
             start: 9,
             end: 10,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         OutPFSet: {
             start: 10,
             end: 11,
-            converter: registersToInt16,
+            readConverter: registersToInt16,
+            writeConverter: int16ToRegisters,
         },
         OutPFSet_WinTms: {
             start: 11,
             end: 12,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         OutPFSet_RvrtTms: {
             start: 12,
             end: 13,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         OutPFSet_RmpTms: {
             start: 13,
             end: 14,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         OutPFSet_Ena: {
             start: 14,
             end: 15,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         VArWMaxPct: {
             start: 15,
             end: 16,
-            converter: registersToInt16,
+            readConverter: registersToInt16,
+            writeConverter: int16ToRegisters,
         },
         VArMaxPct: {
             start: 16,
             end: 17,
-            converter: registersToInt16,
+            readConverter: registersToInt16,
+            writeConverter: int16ToRegisters,
         },
         VArAvalPct: {
             start: 17,
             end: 18,
-            converter: registersToInt16,
+            readConverter: registersToInt16,
+            writeConverter: int16ToRegisters,
         },
         VArPct_WinTms: {
             start: 18,
             end: 19,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         VArPct_RvrtTms: {
             start: 19,
             end: 20,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         VArPct_RmpTms: {
             start: 20,
             end: 21,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         VArPct_Mod: {
             start: 21,
             end: 22,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         VArPct_Ena: {
             start: 22,
             end: 23,
-            converter: registersToUint16,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WMaxLimPct_SF: {
             start: 23,
             end: 24,
-            converter: registersToSunssf,
+            readConverter: registersToSunssf,
         },
         OutPFSet_SF: {
             start: 24,
             end: 25,
-            converter: registersToSunssf,
+            readConverter: registersToSunssf,
         },
         VArPct_SF: {
             start: 25,
             end: 26,
-            converter: registersToSunssf,
+            readConverter: registersToSunssf,
         },
     },
 });

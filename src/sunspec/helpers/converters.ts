@@ -29,12 +29,29 @@ export function registersToUint16(registers: number[]) {
     return registers[0]!;
 }
 
+export function uint16ToRegisters(value: number): number[] {
+    if (value < 0 || value > 0xffff) {
+        throw new Error('Value out of range for uint16');
+    }
+
+    return [value];
+}
+
 export function registersToInt16(registers: number[]) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
 
     return (registers[0]! << 16) >> 16;
+}
+
+export function int16ToRegisters(value: number): number[] {
+    if (value < -32768 || value > 32767) {
+        throw new Error('Value out of range for int16');
+    }
+
+    // Ensure the value is treated as a 16-bit signed integer
+    return [value & 0xffff];
 }
 
 export function registersToSunssf(registers: number[]) {

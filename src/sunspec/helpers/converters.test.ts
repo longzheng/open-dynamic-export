@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import {
+    int16ToRegisters,
     registersToAcc32,
     registersToAcc64BigInt,
     registersToInt16,
@@ -7,6 +8,7 @@ import {
     registersToSunssf,
     registersToUint16,
     registersToUint32,
+    uint16ToRegisters,
 } from './converters';
 
 it('registersToUint32 should convert registers to a 32-bit unsigned integer', () => {
@@ -49,4 +51,16 @@ it('registersToAcc64 should convert registers to a 64 bit accumulator', () => {
     const registers = [0x0001, 0x0001, 0x0001, 0x0001];
     const result = registersToAcc64BigInt(registers);
     expect(result).toBe(281479271743489n);
+});
+
+it('uint16ToRegisters should convert a 16-bit unsigned integer to registers', () => {
+    const value = 4660;
+    const result = uint16ToRegisters(value);
+    expect(result).toEqual([0x1234]);
+});
+
+it('int16ToRegisters should convert a 16-bit signed integer to registers', () => {
+    const value = -20;
+    const result = int16ToRegisters(value);
+    expect(result).toEqual([0xffec]);
 });

@@ -1,68 +1,203 @@
+import { objectEntriesWithType } from '../../object';
 import type { ModbusConnection } from '../modbusConnection';
 
+export type Mapping<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Model extends Record<string, any>,
+    WriteableKeys extends keyof Model,
+> = {
+    [Key in keyof Model]: {
+        readConverter: (value: number[]) => Model[Key];
+        start: number;
+        end: number;
+    } & (Key extends WriteableKeys
+        ? // if the key is writeable, it must have a writeConverter
+          { writeConverter: (value: Model[Key]) => number[] }
+        : { writeConverter?: undefined });
+};
+
 export function sunSpecModelFactory<
-    Model extends Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Model extends Record<string, any>,
+    WriteableKeys extends keyof Model = never,
 >(config: {
-    addressLength: number;
-    mapping: {
-        [K in keyof Model]: {
-            converter?: (value: number[]) => Model[K];
-            start: number;
-            end: number;
-        };
-    };
+    mapping: Mapping<Model, WriteableKeys>;
 }): {
-    get(params: {
+    read(params: {
         modbusConnection: ModbusConnection;
         // the starting address for different manufacturers might be different
         addressStart: number;
     }): Promise<Model>;
+    write(params: {
+        modbusConnection: ModbusConnection;
+        addressStart: number;
+        values: Pick<Model, WriteableKeys>;
+    }): Promise<void>;
 } {
+    const mappingEntries = objectEntriesWithType(config.mapping);
+
+    if (mappingEntries.length === 0) {
+        throw new Error('Model mapping is empty');
+    }
+
+    // validate mappings are contiguous
+    for (let i = 0; i < mappingEntries.length - 1; i++) {
+        const [key, mapping] = mappingEntries[i]!;
+        const [, nextMapping] = mappingEntries[i + 1]!;
+
+        if (mapping.end !== nextMapping.start) {
+            throw new Error(
+                `Invalid mapping for key ${key.toString()}. End: ${mapping.end}, next start: ${nextMapping.start}`,
+            );
+        }
+    }
+
+    const lastMapping = mappingEntries[mappingEntries.length - 1];
+    const length = lastMapping![1].end;
+
     return {
-        get: async ({ modbusConnection, addressStart }) => {
+        read: async ({ modbusConnection, addressStart }) => {
             await modbusConnection.waitUntilOpen();
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
                     addressStart,
-                    config.addressLength,
+                    length,
                 );
 
-            return {
-                ...Object.fromEntries(
-                    Object.keys(config.mapping).map((key) => {
-                        const { start, end, converter } =
-                            config.mapping[key as keyof Model];
+            return convertReadRegisters({
+                registers: registers.data,
+                mapping: config.mapping,
+            });
+        },
+        write: async ({ modbusConnection, addressStart, values }) => {
+            await modbusConnection.waitUntilOpen();
 
-                        if (
-                            end > registers.data.length ||
-                            start > registers.data.length
-                        ) {
-                            throw new Error(
-                                `Invalid register range for key ${key}. Start: ${start}, end: ${end}, registers length: ${registers.data.length}`,
-                            );
-                        }
+            const registerValues = convertWriteRegisters({
+                values,
+                mapping: config.mapping,
+                length,
+            });
 
-                        const value = registers.data.slice(start, end);
+            await modbusConnection.client.writeRegisters(
+                addressStart,
+                registerValues,
+            );
 
-                        const convertedValue = (() => {
-                            try {
-                                return converter ? converter(value) : value;
-                            } catch (error) {
-                                if (error instanceof Error) {
-                                    throw new Error(
-                                        `Error converting value for key ${key} with value ${value.toString()}: ${error.message}`,
-                                    );
-                                }
+            const registers =
+                await modbusConnection.client.readHoldingRegisters(
+                    addressStart,
+                    length,
+                );
 
-                                throw error;
-                            }
-                        })();
+            // confirm the registers were written correctly
+            const writtenValues = convertReadRegisters({
+                registers: registers.data,
+                mapping: config.mapping,
+            });
 
-                        return [key, convertedValue];
-                    }),
-                ),
-            } as Model;
+            objectEntriesWithType(values).forEach(([key, value]) => {
+                if (writtenValues[key] !== value) {
+                    throw new Error(
+                        `Failed to write value for key ${key.toString()}. Expected ${value}, got ${writtenValues[key]}`,
+                    );
+                }
+            });
         },
     };
+}
+
+export function convertReadRegisters<
+    Model extends Record<string, unknown>,
+    WriteableKeys extends keyof Model = never,
+>({
+    registers,
+    mapping,
+}: {
+    registers: number[];
+    mapping: Mapping<Model, WriteableKeys>;
+}): Model {
+    return {
+        ...Object.fromEntries(
+            objectEntriesWithType(mapping).map(
+                ([key, { start, end, readConverter }]) => {
+                    const value = registers.slice(start, end);
+
+                    const convertedValue = (() => {
+                        try {
+                            return readConverter(value);
+                        } catch (error) {
+                            if (error instanceof Error) {
+                                throw new Error(
+                                    `Error converting read value for key ${key.toString()} with value ${value.toString()}: ${error.message}`,
+                                );
+                            }
+
+                            throw error;
+                        }
+                    })();
+
+                    return [key, convertedValue];
+                },
+            ),
+        ),
+    } as Model;
+}
+
+export function convertWriteRegisters<
+    Model extends Record<string, unknown>,
+    WriteableKeys extends keyof Model = never,
+>({
+    values,
+    mapping,
+    length,
+}: {
+    values: Pick<Model, WriteableKeys>;
+    mapping: Mapping<Model, WriteableKeys>;
+    length: number;
+}): number[] {
+    // sunspec allows for writing values to registers that do not support writing, they will simply be ignored
+    // we use this behaviour as a shortcut to use the same model definition and start address for reading and writing
+
+    // start with all empty registers
+    const registers = Array<number>(length).fill(0);
+
+    objectEntriesWithType(values).forEach(([key, value]) => {
+        const { start, end, writeConverter } = mapping[key];
+
+        if (!writeConverter) {
+            return;
+        }
+
+        const convertedValue = (() => {
+            try {
+                return (
+                    writeConverter as (
+                        // overcome TypeScript type issue
+                        value: Model[WriteableKeys],
+                    ) => number[]
+                )(value);
+            } catch (error) {
+                if (error instanceof Error) {
+                    throw new Error(
+                        `Error converting write value for key ${key.toString()} with value ${String(value)}: ${error.message}`,
+                    );
+                }
+
+                throw error;
+            }
+        })();
+
+        const length = end - start;
+
+        if (convertedValue.length !== length) {
+            throw new Error(
+                `Invalid write value for key ${key.toString()}. Expected length ${length}, got ${convertedValue.length}`,
+            );
+        }
+
+        registers.splice(start, length, ...convertedValue);
+    });
+
+    return registers;
 }

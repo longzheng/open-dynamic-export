@@ -30,7 +30,7 @@ async function main() {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const modbusClients = config.sunspecModbus.map(
-        ({ ip, port, unitId }) => new ModbusConnection(ip, port, unitId),
+        ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
     );
 
     // // Set an interval to handle DER control periodically
