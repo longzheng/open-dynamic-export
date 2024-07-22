@@ -48,3 +48,16 @@ export function registersToAcc32(registers: number[]) {
 
     return (registers[0]! << 16) + registers[1]!;
 }
+
+export function registersToAcc64(registers: number[]) {
+    if (registers.length !== 4) {
+        throw new Error('Invalid register length');
+    }
+
+    return (
+        (registers[0]! << 48) +
+        (registers[1]! << 32) +
+        (registers[2]! << 16) +
+        registers[3]!
+    );
+}

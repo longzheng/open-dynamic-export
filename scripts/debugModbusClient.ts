@@ -20,6 +20,9 @@ void (async () => {
                 common,
                 inverter: await client.getInverterModel(brand),
                 nameplate: await client.getNameplateModel(brand),
+                settings: await client.getSettingsModel(brand),
+                status: await client.getStatusModel(brand),
+                controls: await client.getControlsModel(brand),
             };
         }),
     );

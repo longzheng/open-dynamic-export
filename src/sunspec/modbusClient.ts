@@ -10,6 +10,15 @@ import {
     nameplateModel,
     nameplateModelAddressStartByBrand,
 } from './models/nameplateModel';
+import {
+    settingsModel,
+    settingsModelAddressStartByBrand,
+} from './models/settings';
+import { statusModel, statusModelAddressStartByBrand } from './models/status';
+import {
+    controlsModel,
+    controlsModelAddressStartByBrand,
+} from './models/controls';
 
 export class ModbusClient {
     public client: ModbusRTU;
@@ -120,6 +129,45 @@ export class ModbusClient {
 
         if (data.ID !== 120) {
             throw new Error('Not a SunSpec nameplate model');
+        }
+
+        return data;
+    }
+
+    async getSettingsModel(brand: SunSpecBrand) {
+        const data = await settingsModel.get({
+            client: this,
+            addressStart: settingsModelAddressStartByBrand(brand),
+        });
+
+        if (data.ID !== 121) {
+            throw new Error('Not a SunSpec settings model');
+        }
+
+        return data;
+    }
+
+    async getStatusModel(brand: SunSpecBrand) {
+        const data = await statusModel.get({
+            client: this,
+            addressStart: statusModelAddressStartByBrand(brand),
+        });
+
+        if (data.ID !== 122) {
+            throw new Error('Not a SunSpec status model');
+        }
+
+        return data;
+    }
+
+    async getControlsModel(brand: SunSpecBrand) {
+        const data = await controlsModel.get({
+            client: this,
+            addressStart: controlsModelAddressStartByBrand(brand),
+        });
+
+        if (data.ID !== 123) {
+            throw new Error('Not a SunSpec controls model');
         }
 
         return data;
