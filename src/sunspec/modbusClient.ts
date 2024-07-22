@@ -1,8 +1,9 @@
 import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
-import { commonBlock } from './models/commonBlock';
-import { getInverterBlockByBrand } from './models/inverterBlock';
+import { commonModel } from './models/commonModel';
+import { getInverterModelByBrand } from './models/inverterModel';
 import type { SunSpecBrand } from './models/brand';
+import { getNameplateModelByBrand } from './models/nameplateModel';
 
 export class ModbusClient {
     public client: ModbusRTU;
@@ -10,7 +11,6 @@ export class ModbusClient {
     private port: number;
     private unitId: number;
     private openPromise: Promise<boolean> | null = null;
-    // private getCommonBlock:
 
     constructor(host: string, port: number, unitId: number) {
         this.client = new ModbusRTU();
@@ -73,21 +73,39 @@ export class ModbusClient {
         }
     }
 
-    async getCommonBlock() {
-        const data = await commonBlock.get(this);
+    async getCommonModel() {
+        const data = await commonModel.get(this);
 
         // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
         // assert this is the case or this isn't SunSpec
         // 0x53756e53 ('SunS')
-        if (data.C_SunSpec_ID !== 0x53756e53) {
+        if (data.SID !== 0x53756e53) {
             throw new Error('Not a SunSpec device');
+        }
+
+        if (data.ID !== 1) {
+            throw new Error('Not a SunSpec common model');
         }
 
         return data;
     }
 
-    async getInverterBlock(brand: SunSpecBrand) {
-        const data = await getInverterBlockByBrand(brand).get(this);
+    async getInverterModel(brand: SunSpecBrand) {
+        const data = await getInverterModelByBrand(brand).get(this);
+
+        if (data.ID !== 101 && data.ID !== 102 && data.ID !== 103) {
+            throw new Error('Not a SunSpec inverter monitoring model');
+        }
+
+        return data;
+    }
+
+    async getNameplateModel(brand: SunSpecBrand) {
+        const data = await getNameplateModelByBrand(brand).get(this);
+
+        if (data.ID !== 120) {
+            throw new Error('Not a SunSpec nameplate model');
+        }
 
         return data;
     }

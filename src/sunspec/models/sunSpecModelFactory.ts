@@ -1,19 +1,21 @@
 import type { ModbusClient } from '../modbusClient';
 
-export function sunSpecBlockFactory<T extends Record<string, unknown>>(config: {
+export function sunSpecModelFactory<
+    Model extends Record<string, unknown>,
+>(config: {
     address: {
         start: number;
         length: number;
     };
     mapping: {
-        [K in keyof T]: {
-            converter?: (value: number[]) => T[K];
+        [K in keyof Model]: {
+            converter?: (value: number[]) => Model[K];
             start: number;
             end: number;
         };
     };
 }): {
-    get(modbusClient: ModbusClient): Promise<T>;
+    get(modbusClient: ModbusClient): Promise<Model>;
 } {
     return {
         get: async (modbusClient) => {
@@ -28,7 +30,7 @@ export function sunSpecBlockFactory<T extends Record<string, unknown>>(config: {
                 ...Object.fromEntries(
                     Object.keys(config.mapping).map((key) => {
                         const { start, end, converter } =
-                            config.mapping[key as keyof T];
+                            config.mapping[key as keyof Model];
 
                         if (
                             end > registers.data.length ||
@@ -58,7 +60,7 @@ export function sunSpecBlockFactory<T extends Record<string, unknown>>(config: {
                         return [key, convertedValue];
                     }),
                 ),
-            } as T;
+            } as Model;
         },
     };
 }

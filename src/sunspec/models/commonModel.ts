@@ -3,76 +3,77 @@ import {
     registersToUint16,
     registersToUint32,
 } from '../helpers/converters';
-import { sunSpecBlockFactory } from './sunSpecBlockFactory';
+import { sunSpecModelFactory } from './sunSpecModelFactory';
 
-export type CommonBlock = {
+// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+export type CommonModel = {
     // Well-known value. Uniquely identifies this as a SunSpec Modbus Map
-    C_SunSpec_ID: number;
+    SID: number;
     // Length of sunspec model common (1)
-    C_SunSpec_DID: number;
+    ID: number;
     // Length of sunspec model common (1)
-    C_SunSpec_Length: number;
+    L: number;
     // Manufacturer
-    C_Manufacturer: string;
+    Mn: string;
     // Device model
-    C_Model: string;
+    Md: string;
     // Options
-    C_Option: string;
+    Opt: string;
     // SW version of inverter
-    C_Version: string;
+    Vr: string;
     // Serialnumber of the inverter
-    C_SerialNumber: string;
+    SN: string;
     // Modbus Device Address
-    C_DeviceAddress: number;
+    DA: number;
 };
 
-export const commonBlock = sunSpecBlockFactory<CommonBlock>({
+export const commonModel = sunSpecModelFactory<CommonModel>({
     address: {
         start: 40000,
         length: 69,
     },
     mapping: {
-        C_SunSpec_ID: {
+        SID: {
             start: 0,
             end: 2,
             converter: registersToUint32,
         },
-        C_SunSpec_DID: {
+        ID: {
             start: 2,
             end: 3,
             converter: registersToUint16,
         },
-        C_SunSpec_Length: {
+        L: {
             start: 3,
             end: 4,
             converter: registersToUint16,
         },
-        C_Manufacturer: {
+        Mn: {
             start: 4,
             end: 20,
             converter: registersToString,
         },
-        C_Model: {
+        Md: {
             start: 20,
             end: 36,
             converter: registersToString,
         },
-        C_Option: {
+        Opt: {
             start: 36,
             end: 44,
             converter: registersToString,
         },
-        C_Version: {
+        Vr: {
             start: 44,
             end: 52,
             converter: registersToString,
         },
-        C_SerialNumber: {
+        SN: {
             start: 52,
             end: 68,
             converter: registersToString,
         },
-        C_DeviceAddress: {
+        DA: {
             start: 68,
             end: 69,
             converter: registersToUint16,

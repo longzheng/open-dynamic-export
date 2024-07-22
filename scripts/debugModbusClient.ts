@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
 import { ModbusClient } from '../src/sunspec/modbusClient';
-import { getBrandByCommonBlock } from '../src/sunspec/models/brand';
+import { getBrandByCommonModel } from '../src/sunspec/models/brand';
 
 const config = getConfig();
 
@@ -12,13 +12,14 @@ void (async () => {
 
     const clientsData = await Promise.all(
         modbusClients.map(async (client) => {
-            const common = await client.getCommonBlock();
+            const common = await client.getCommonModel();
 
-            const brand = getBrandByCommonBlock(common);
+            const brand = getBrandByCommonModel(common);
 
             return {
                 common,
-                inverter: await client.getInverterBlock(brand),
+                inverter: await client.getInverterModel(brand),
+                nameplate: await client.getNameplateModel(brand),
             };
         }),
     );
