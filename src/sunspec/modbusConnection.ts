@@ -20,7 +20,7 @@ import {
     controlsModelAddressStartByBrand,
 } from './models/controls';
 
-export class ModbusClient {
+export class ModbusConnection {
     public client: ModbusRTU;
     private host: string;
     private port: number;
@@ -90,7 +90,7 @@ export class ModbusClient {
 
     async getCommonModel() {
         const data = await commonModel.get({
-            client: this,
+            modbusConnection: this,
             addressStart: 40000,
         });
 
@@ -110,7 +110,7 @@ export class ModbusClient {
 
     async getInverterModel(brand: SunSpecBrand) {
         const data = await inverterModel.get({
-            client: this,
+            modbusConnection: this,
             addressStart: inverterModelAddressStartByBrand(brand),
         });
 
@@ -123,7 +123,7 @@ export class ModbusClient {
 
     async getNameplateModel(brand: SunSpecBrand) {
         const data = await nameplateModel.get({
-            client: this,
+            modbusConnection: this,
             addressStart: nameplateModelAddressStartByBrand(brand),
         });
 
@@ -136,7 +136,7 @@ export class ModbusClient {
 
     async getSettingsModel(brand: SunSpecBrand) {
         const data = await settingsModel.get({
-            client: this,
+            modbusConnection: this,
             addressStart: settingsModelAddressStartByBrand(brand),
         });
 
@@ -149,7 +149,7 @@ export class ModbusClient {
 
     async getStatusModel(brand: SunSpecBrand) {
         const data = await statusModel.get({
-            client: this,
+            modbusConnection: this,
             addressStart: statusModelAddressStartByBrand(brand),
         });
 
@@ -162,7 +162,7 @@ export class ModbusClient {
 
     async getControlsModel(brand: SunSpecBrand) {
         const data = await controlsModel.get({
-            client: this,
+            modbusConnection: this,
             addressStart: controlsModelAddressStartByBrand(brand),
         });
 

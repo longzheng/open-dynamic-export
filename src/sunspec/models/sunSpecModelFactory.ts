@@ -1,4 +1,4 @@
-import type { ModbusClient } from '../modbusClient';
+import type { ModbusConnection } from '../modbusConnection';
 
 export function sunSpecModelFactory<
     Model extends Record<string, unknown>,
@@ -13,19 +13,20 @@ export function sunSpecModelFactory<
     };
 }): {
     get(params: {
-        client: ModbusClient;
+        modbusConnection: ModbusConnection;
         // the starting address for different manufacturers might be different
         addressStart: number;
     }): Promise<Model>;
 } {
     return {
-        get: async ({ client, addressStart }) => {
-            await client.waitUntilOpen();
+        get: async ({ modbusConnection, addressStart }) => {
+            await modbusConnection.waitUntilOpen();
 
-            const registers = await client.client.readHoldingRegisters(
-                addressStart,
-                config.addressLength,
-            );
+            const registers =
+                await modbusConnection.client.readHoldingRegisters(
+                    addressStart,
+                    config.addressLength,
+                );
 
             return {
                 ...Object.fromEntries(

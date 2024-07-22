@@ -1,17 +1,17 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { ModbusClient } from '../src/sunspec/modbusClient';
+import { ModbusConnection } from '../src/sunspec/modbusConnection';
 import { getBrandByCommonModel } from '../src/sunspec/models/brand';
 
 const config = getConfig();
 
 void (async () => {
-    const modbusClients = config.sunspecModbus.map(
-        ({ ip, port, unitId }) => new ModbusClient(ip, port, unitId),
+    const modbusConnections = config.sunspecModbus.map(
+        ({ ip, port, unitId }) => new ModbusConnection(ip, port, unitId),
     );
 
     const clientsData = await Promise.all(
-        modbusClients.map(async (client) => {
+        modbusConnections.map(async (client) => {
             const common = await client.getCommonModel();
 
             const brand = getBrandByCommonModel(common);

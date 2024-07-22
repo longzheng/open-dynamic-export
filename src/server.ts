@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { SEP2Client } from './sep2/client';
 import { getConfig } from './config';
-import { ModbusClient } from './sunspec/modbusClient';
+import { ModbusConnection } from './sunspec/modbusConnection';
 import { resolve } from 'path';
 import { readFileSync } from 'node:fs';
 
@@ -30,7 +30,7 @@ async function main() {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const modbusClients = config.sunspecModbus.map(
-        ({ ip, port, unitId }) => new ModbusClient(ip, port, unitId),
+        ({ ip, port, unitId }) => new ModbusConnection(ip, port, unitId),
     );
 
     // // Set an interval to handle DER control periodically
