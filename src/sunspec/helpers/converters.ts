@@ -49,15 +49,15 @@ export function registersToAcc32(registers: number[]) {
     return (registers[0]! << 16) + registers[1]!;
 }
 
-export function registersToAcc64(registers: number[]) {
+export function registersToAcc64BigInt(registers: number[]): bigint {
     if (registers.length !== 4) {
         throw new Error('Invalid register length');
     }
 
     return (
-        (registers[0]! << 48) +
-        (registers[1]! << 32) +
-        (registers[2]! << 16) +
-        registers[3]!
+        (BigInt(registers[0]!) << 48n) +
+        (BigInt(registers[1]!) << 32n) +
+        (BigInt(registers[2]!) << 16n) +
+        BigInt(registers[3]!)
     );
 }

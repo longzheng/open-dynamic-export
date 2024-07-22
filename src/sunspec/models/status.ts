@@ -1,9 +1,9 @@
 import {
     registersToUint16,
-    registersToAcc64,
     registersToString,
     registersToUint32,
     registersToSunssf,
+    registersToAcc64BigInt,
 } from '../helpers/converters';
 import type { SunSpecBrand } from './brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -21,17 +21,17 @@ export type StatusModel = {
     // ECP connection status: disconnected=0 connected=1.
     ECPConn: ECPConn;
     // AC lifetime active (real) energy output.
-    ActWh: number;
+    ActWh: bigint;
     // AC lifetime apparent energy output.
-    ActVAh: number;
+    ActVAh: bigint;
     // AC lifetime reactive energy output in quadrant 1.
-    ActVArhQ1: number;
+    ActVArhQ1: bigint;
     // AC lifetime reactive energy output in quadrant 2.
-    ActVArhQ2: number;
+    ActVArhQ2: bigint;
     // AC lifetime negative energy output in quadrant 3.
-    ActVArhQ3: number;
+    ActVArhQ3: bigint;
     // AC lifetime reactive energy output in quadrant 4.
-    ActVArhQ4: number;
+    ActVArhQ4: bigint;
     // Amount of VARs available without impacting watts output.
     VArAval: number;
     // Scale factor for available VARs.
@@ -87,32 +87,32 @@ export const statusModel = sunSpecModelFactory<StatusModel>({
         ActWh: {
             start: 5,
             end: 9,
-            converter: registersToAcc64,
+            converter: registersToAcc64BigInt,
         },
         ActVAh: {
             start: 9,
             end: 13,
-            converter: registersToAcc64,
+            converter: registersToAcc64BigInt,
         },
         ActVArhQ1: {
             start: 13,
             end: 17,
-            converter: registersToAcc64,
+            converter: registersToAcc64BigInt,
         },
         ActVArhQ2: {
             start: 17,
             end: 21,
-            converter: registersToAcc64,
+            converter: registersToAcc64BigInt,
         },
         ActVArhQ3: {
             start: 21,
             end: 25,
-            converter: registersToAcc64,
+            converter: registersToAcc64BigInt,
         },
         ActVArhQ4: {
             start: 25,
             end: 29,
-            converter: registersToAcc64,
+            converter: registersToAcc64BigInt,
         },
         VArAval: {
             start: 29,
