@@ -1,15 +1,15 @@
 import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
-import { commonModel } from './models/commonModel';
+import { commonModel } from './models/common';
 import {
     inverterModel,
     inverterModelAddressStartByBrand,
-} from './models/inverterModel';
-import type { SunSpecBrand } from './models/brand';
+} from './models/inverter';
+import type { SunSpecBrand } from './brand';
 import {
     nameplateModel,
     nameplateModelAddressStartByBrand,
-} from './models/nameplateModel';
+} from './models/nameplate';
 import {
     settingsModel,
     settingsModelAddressStartByBrand,

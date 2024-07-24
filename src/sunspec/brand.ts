@@ -1,4 +1,4 @@
-import type { CommonModel } from './commonModel';
+import type { CommonModel } from './models/common';
 
 export type SunSpecBrand = 'fronius' | 'sma' | 'solaredge';
 

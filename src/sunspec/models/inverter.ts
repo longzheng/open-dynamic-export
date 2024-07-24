@@ -9,7 +9,7 @@ import {
     registersToSunssfNullable,
     registersToUint32Nullable,
 } from '../helpers/converters';
-import type { SunSpecBrand } from './brand';
+import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx

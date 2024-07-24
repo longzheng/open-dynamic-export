@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
 import { ModbusConnection } from '../src/sunspec/modbusConnection';
-import { getBrandByCommonModel } from '../src/sunspec/models/brand';
+import { getBrandByCommonModel } from '../src/sunspec/brand';
 
 const config = getConfig();
 
