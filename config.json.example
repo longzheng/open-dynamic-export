@@ -6,7 +6,7 @@
         "keyPath": "key.pem",
         "pen": 12345
     },
-    "sunspec": {
+    "sunSpec": {
         "inverters": [
             {
                 "ip": "192.168.1.6",

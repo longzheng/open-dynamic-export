@@ -15,7 +15,7 @@ const configSchema = z.object({
         keyPath: z.string(),
         pen: z.number(),
     }),
-    sunspec: z.object({
+    sunSpec: z.object({
         inverters: z.array(sunspecModbusSchema),
         meters: z.array(sunspecModbusSchema),
     }),

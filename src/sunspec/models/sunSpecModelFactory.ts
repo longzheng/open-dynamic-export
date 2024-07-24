@@ -1,5 +1,5 @@
 import { objectEntriesWithType } from '../../object';
-import type { ModbusConnection } from '../modbusConnection';
+import type { SunSpecConnection } from '../connection/base';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,12 +24,12 @@ export function sunSpecModelFactory<
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
-        modbusConnection: ModbusConnection;
+        modbusConnection: SunSpecConnection;
         // the starting address for different manufacturers might be different
         addressStart: number;
     }): Promise<Model>;
     write(params: {
-        modbusConnection: ModbusConnection;
+        modbusConnection: SunSpecConnection;
         addressStart: number;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;

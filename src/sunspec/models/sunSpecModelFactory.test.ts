@@ -12,7 +12,7 @@ import {
     registersToUint16,
     uint16ToRegisters,
 } from '../helpers/converters';
-import { ModbusConnection } from '../modbusConnection';
+import { InverterSunSpecConnection } from '../connection/inverter';
 
 vi.mock('modbus-serial', async (importOriginal) => {
     const actual = await importOriginal();
@@ -67,10 +67,10 @@ const model = sunSpecModelFactory<Model, keyof ModelWrite>({
 });
 
 describe('sunSpecModelFactory', () => {
-    let modbusConnection: ModbusConnection;
+    let inverterSunSpecConnection: InverterSunSpecConnection;
 
     beforeEach(() => {
-        modbusConnection = new ModbusConnection({
+        inverterSunSpecConnection = new InverterSunSpecConnection({
             ip: '127.0.0.1',
             port: 502,
             unitId: 1,
@@ -118,10 +118,11 @@ describe('sunSpecModelFactory', () => {
         const readHoldingRegistersMock = vi.fn().mockResolvedValue({
             data: [0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00],
         });
-        modbusConnection.client.readHoldingRegisters = readHoldingRegistersMock;
+        inverterSunSpecConnection.client.readHoldingRegisters =
+            readHoldingRegistersMock;
 
         const result = await model.read({
-            modbusConnection,
+            modbusConnection: inverterSunSpecConnection,
             addressStart: 40000,
         });
 
@@ -137,10 +138,11 @@ describe('sunSpecModelFactory', () => {
         const readHoldingRegistersMock = vi.fn().mockResolvedValue({
             data: [0x0001, 0x0003, 0xff80, 0x6865, 0x6c6c, 0x6f00],
         });
-        modbusConnection.client.readHoldingRegisters = readHoldingRegistersMock;
+        inverterSunSpecConnection.client.readHoldingRegisters =
+            readHoldingRegistersMock;
 
         const writeRegistersMock = vi.fn();
-        modbusConnection.client.writeRegisters = writeRegistersMock;
+        inverterSunSpecConnection.client.writeRegisters = writeRegistersMock;
 
         const values = {
             Hello: 3,
@@ -149,7 +151,7 @@ describe('sunSpecModelFactory', () => {
 
         await model.write({
             values,
-            modbusConnection,
+            modbusConnection: inverterSunSpecConnection,
             addressStart: 40000,
         });
 

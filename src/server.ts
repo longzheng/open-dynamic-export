@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { SEP2Client } from './sep2/client';
 import { getConfig } from './config';
-import { ModbusConnection } from './sunspec/modbusConnection';
 import { resolve } from 'path';
 import { readFileSync } from 'node:fs';
+import { InverterSunSpecConnection } from './sunspec/connection/inverter';
 
 const config = getConfig();
 
@@ -29,8 +29,9 @@ async function main() {
     await sep2Client.initialize();
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const modbusClients = config.sunspecModbus.map(
-        ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
+    const invertersConnections = config.sunSpec.inverters.map(
+        ({ ip, port, unitId }) =>
+            new InverterSunSpecConnection({ ip, port, unitId }),
     );
 
     // // Set an interval to handle DER control periodically

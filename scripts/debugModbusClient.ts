@@ -1,17 +1,20 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { ModbusConnection } from '../src/sunspec/modbusConnection';
 import { getBrandByCommonModel } from '../src/sunspec/brand';
+import { InverterSunSpecConnection } from '../src/sunspec/connection/inverter';
+import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
 
 const config = getConfig();
 
 void (async () => {
-    const invertersConnections = config.sunspec.inverters.map(
-        ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
+    const invertersConnections = config.sunSpec.inverters.map(
+        ({ ip, port, unitId }) =>
+            new InverterSunSpecConnection({ ip, port, unitId }),
     );
 
-    const metersConnections = config.sunspec.meters.map(
-        ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
+    const metersConnections = config.sunSpec.meters.map(
+        ({ ip, port, unitId }) =>
+            new MeterSunSpecConnection({ ip, port, unitId }),
     );
 
     const invertersData = await Promise.all(
