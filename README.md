@@ -106,3 +106,4 @@ I got in touch with Energy Queensland who was surprisingly helpful (for a govern
 - [SEP2-Tools](https://github.com/aguinane/SEP2-Tools) Python library
 - [CSIP spec](https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf)
 - [CSIP-AUS spec](https://arena.gov.au/assets/2021/09/common-smart-inverter-profile-australia.pdf)
+- [Dynamic Exports Test Procedure](https://www.talkingpower.com.au/71619/widgets/376925/documents/239206)
