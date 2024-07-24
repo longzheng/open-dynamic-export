@@ -6,26 +6,45 @@ import { getBrandByCommonModel } from '../src/sunspec/brand';
 const config = getConfig();
 
 void (async () => {
-    const modbusConnections = config.sunspecModbus.map(
+    const invertersConnections = config.sunspec.inverters.map(
         ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
     );
 
-    const clientsData = await Promise.all(
-        modbusConnections.map(async (client) => {
-            const common = await client.getCommonModel();
+    const metersConnections = config.sunspec.meters.map(
+        ({ ip, port, unitId }) => new ModbusConnection({ ip, port, unitId }),
+    );
+
+    const invertersData = await Promise.all(
+        invertersConnections.map(async (inverter) => {
+            const common = await inverter.getCommonModel();
 
             const brand = getBrandByCommonModel(common);
 
             return {
                 common,
-                inverter: await client.getInverterModel(brand),
-                nameplate: await client.getNameplateModel(brand),
-                settings: await client.getSettingsModel(brand),
-                status: await client.getStatusModel(brand),
-                controls: await client.getControlsModel(brand),
+                inverter: await inverter.getInverterModel(brand),
+                nameplate: await inverter.getNameplateModel(brand),
+                settings: await inverter.getSettingsModel(brand),
+                status: await inverter.getStatusModel(brand),
+                controls: await inverter.getControlsModel(brand),
             };
         }),
     );
 
-    console.dir(clientsData);
+    console.dir(invertersData);
+
+    const metersData = await Promise.all(
+        metersConnections.map(async (meter) => {
+            const common = await meter.getCommonModel();
+
+            const brand = getBrandByCommonModel(common);
+
+            return {
+                common,
+                meter: await meter.getMeterModel(brand),
+            };
+        }),
+    );
+
+    console.dir(metersData);
 })();

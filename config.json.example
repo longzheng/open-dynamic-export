@@ -6,11 +6,20 @@
         "keyPath": "key.pem",
         "pen": 12345
     },
-    "sunspecModbus": [
-        {
-            "ip": "192.168.1.6",
-            "port": 502,
-            "unitId": 1
-        }
-    ]
+    "sunspec": {
+        "inverters": [
+            {
+                "ip": "192.168.1.6",
+                "port": 502,
+                "unitId": 1
+            }
+        ],
+        "meters": [
+            {
+                "ip": "192.168.1.6",
+                "port": 502,
+                "unitId": 240
+            }
+        ]
+    }
 }

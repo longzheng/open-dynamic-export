@@ -15,7 +15,10 @@ const configSchema = z.object({
         keyPath: z.string(),
         pen: z.number(),
     }),
-    sunspecModbus: z.array(sunspecModbusSchema),
+    sunspec: z.object({
+        inverters: z.array(sunspecModbusSchema),
+        meters: z.array(sunspecModbusSchema),
+    }),
 });
 
 export type Config = z.infer<typeof configSchema>;

@@ -20,6 +20,7 @@ import {
     controlsModel,
     controlsModelAddressStartByBrand,
 } from './models/controls';
+import { meterModel, meterModelAddressStartByBrand } from './models/meter';
 
 export class ModbusConnection {
     public client: ModbusRTU;
@@ -188,5 +189,18 @@ export class ModbusConnection {
             addressStart: controlsModelAddressStartByBrand(brand),
             values,
         });
+    }
+
+    async getMeterModel(brand: SunSpecBrand) {
+        const data = await meterModel.read({
+            modbusConnection: this,
+            addressStart: meterModelAddressStartByBrand(brand),
+        });
+
+        if (data.ID !== 201 && data.ID !== 202 && data.ID !== 203) {
+            throw new Error('Not a SunSpec meter model');
+        }
+
+        return data;
     }
 }
