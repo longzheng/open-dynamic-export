@@ -27,7 +27,7 @@ it('should generate DERStatus XML', () => {
     </operationalModeStatus>
     <genConnectStatus>
         <dateTime>1682475028</dateTime>
-        <value>1</value>
+        <value>01</value>
     </genConnectStatus>
 </DERStatus>`);
 });

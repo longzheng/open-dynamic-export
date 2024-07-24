@@ -1,6 +1,7 @@
 import type { ConnectStatus } from './connectStatus';
 import { dateToStringSeconds } from '../helpers/date';
 import { xmlns } from '../helpers/namespace';
+import { numberToHex } from '../../number';
 
 /// DER OperationalModeStatus value:
 /// 0 - Not applicable / Unknown
@@ -45,7 +46,7 @@ export function generateDerStatusResponse({
                 dateTime: dateToStringSeconds(genConnectStatus.dateTime),
                 // TODO: in the handbook documentation this is explained as an explicit
                 // however in the spec this is a bitmap flag
-                value: genConnectStatus.value.toString(),
+                value: numberToHex(genConnectStatus.value).padStart(2, '0'),
             },
         },
     };
