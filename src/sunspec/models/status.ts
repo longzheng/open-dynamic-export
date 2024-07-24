@@ -1,9 +1,10 @@
 import {
     registersToUint16,
-    registersToString,
-    registersToUint32,
-    registersToSunssf,
     registersToAcc64BigInt,
+    registersToSunssfNullable,
+    registersToUint16Nullable,
+    registersToUint32Nullable,
+    registersToStringNullable,
 } from '../helpers/converters';
 import type { SunSpecBrand } from './brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -11,6 +12,7 @@ import { sunSpecModelFactory } from './sunSpecModelFactory';
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type StatusModel = {
     // Model identifier
+    // 122 is Inverter Controls Extended Measurements and Status
     ID: number;
     // Model length
     L: number;
@@ -33,27 +35,27 @@ export type StatusModel = {
     // AC lifetime reactive energy output in quadrant 4.
     ActVArhQ4: bigint;
     // Amount of VARs available without impacting watts output.
-    VArAval: number;
+    VArAval: number | null;
     // Scale factor for available VARs.
-    VArAval_SF: number;
+    VArAval_SF: number | null;
     // Amount of Watts available.
-    WAval: number;
+    WAval: number | null;
     // Scale factor for available Watts.
-    WAval_SF: number;
+    WAval_SF: number | null;
     // Bit Mask indicating setpoint limit(s) reached.
-    StSetLimMsk: StSetLimMsk;
+    StSetLimMsk: StSetLimMsk | null;
     // Bit Mask indicating which inverter controls are currently active.
-    StActCtl: StActCtl;
+    StActCtl: StActCtl | null;
     // Source of time synchronization.
-    TmSrc: string;
+    TmSrc: string | null;
     // Seconds since 01-01-2000 00:00 UTC
-    Tms: number;
+    Tms: number | null;
     // Bit Mask indicating active ride-through status.
-    RtSt: RtSt;
+    RtSt: RtSt | null;
     // Isolation resistance.
-    Ris: number;
+    Ris: number | null;
     // Scale factor for isolation resistance.
-    Ris_SF: number;
+    Ris_SF: number | null;
 };
 
 export const statusModel = sunSpecModelFactory<StatusModel>({
@@ -116,57 +118,57 @@ export const statusModel = sunSpecModelFactory<StatusModel>({
         VArAval: {
             start: 29,
             end: 30,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         VArAval_SF: {
             start: 30,
             end: 31,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         WAval: {
             start: 31,
             end: 32,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         WAval_SF: {
             start: 32,
             end: 33,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         StSetLimMsk: {
             start: 33,
             end: 35,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
         StActCtl: {
             start: 35,
             end: 37,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
         TmSrc: {
             start: 37,
             end: 41,
-            readConverter: registersToString,
+            readConverter: registersToStringNullable,
         },
         Tms: {
             start: 41,
             end: 43,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
         RtSt: {
             start: 43,
             end: 44,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         Ris: {
             start: 44,
             end: 45,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         Ris_SF: {
             start: 45,
             end: 46,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
     },
 });

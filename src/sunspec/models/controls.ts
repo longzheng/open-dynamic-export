@@ -4,6 +4,11 @@ import {
     registersToSunssf,
     uint16ToRegisters,
     int16ToRegisters,
+    registersToUint16Nullable,
+    uint16NullableToRegisters,
+    registersToInt16Nullable,
+    int16NullableToRegisters,
+    registersToSunssfNullable,
 } from '../helpers/converters';
 import type { SunSpecBrand } from './brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -11,49 +16,50 @@ import { sunSpecModelFactory } from './sunSpecModelFactory';
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type ControlsModel = {
     // Model identifier
+    // 123 is Immediate Inverter Controls
     ID: number;
     // Model length
     L: number;
     // Time window for connect/disconnect
-    Conn_WinTms: number;
+    Conn_WinTms: number | null;
     // Timeout period for connect/disconnect
-    Conn_RvrtTms: number;
+    Conn_RvrtTms: number | null;
     // Enumerated valued. Connection control
     Conn: Conn;
     // Set power output to specified level
     WMaxLimPct: number;
     // Time window for power limit change
-    WMaxLimPct_WinTms: number;
+    WMaxLimPct_WinTms: number | null;
     // Timeout period for power limit
-    WMaxLimPct_RvrtTms: number;
+    WMaxLimPct_RvrtTms: number | null;
     // Ramp time for moving from current setpoint to new setpoint
-    WMaxLimPct_RmpTms: number;
+    WMaxLimPct_RmpTms: number | null;
     // Enumerated valued. Throttle enable/disable control
     WMaxLim_Ena: WMaxLim_Ena;
     // Set power factor to specific value - cosine of angle
     OutPFSet: number;
     // Time window for power factor change
-    OutPFSet_WinTms: number;
+    OutPFSet_WinTms: number | null;
     // Timeout period for power factor
-    OutPFSet_RvrtTms: number;
+    OutPFSet_RvrtTms: number | null;
     // Ramp time for moving from current setpoint to new setpoint
-    OutPFSet_RmpTms: number;
+    OutPFSet_RmpTms: number | null;
     // Enumerated valued. Fixed power factor enable/disable control
     OutPFSet_Ena: OutPFSet_Ena;
     // Reactive power in percent of WMax
-    VArWMaxPct: number;
+    VArWMaxPct: number | null;
     // Reactive power in percent of VArMax
-    VArMaxPct: number;
+    VArMaxPct: number | null;
     // Reactive power in percent of VArAval
-    VArAvalPct: number;
+    VArAvalPct: number | null;
     // Time window for VAR limit change
-    VArPct_WinTms: number;
+    VArPct_WinTms: number | null;
     // Timeout period for VAR limit
-    VArPct_RvrtTms: number;
+    VArPct_RvrtTms: number | null;
     // Ramp time for moving from current setpoint to new setpoint
-    VArPct_RmpTms: number;
+    VArPct_RmpTms: number | null;
     // Enumerated value. VAR percent limit mode
-    VArPct_Mod: VArPct_Mod;
+    VArPct_Mod: VArPct_Mod | null;
     // Enumerated valued. Percent limit VAr enable/disable control
     VArPct_Ena: VArPct_Ena;
     // Scale factor for power output percent
@@ -61,7 +67,7 @@ export type ControlsModel = {
     // Scale factor for power factor
     OutPFSet_SF: number;
     // Scale factor for reactive power percent
-    VArPct_SF: number;
+    VArPct_SF: number | null;
 };
 
 export type ControlsModelWrite = Pick<
@@ -107,14 +113,14 @@ export const controlsModel = sunSpecModelFactory<
         Conn_WinTms: {
             start: 2,
             end: 3,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         Conn_RvrtTms: {
             start: 3,
             end: 4,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         Conn: {
             start: 4,
@@ -131,20 +137,20 @@ export const controlsModel = sunSpecModelFactory<
         WMaxLimPct_WinTms: {
             start: 6,
             end: 7,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         WMaxLimPct_RvrtTms: {
             start: 7,
             end: 8,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         WMaxLimPct_RmpTms: {
             start: 8,
             end: 9,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         WMaxLim_Ena: {
             start: 9,
@@ -161,20 +167,20 @@ export const controlsModel = sunSpecModelFactory<
         OutPFSet_WinTms: {
             start: 11,
             end: 12,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         OutPFSet_RvrtTms: {
             start: 12,
             end: 13,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         OutPFSet_RmpTms: {
             start: 13,
             end: 14,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         OutPFSet_Ena: {
             start: 14,
@@ -185,44 +191,44 @@ export const controlsModel = sunSpecModelFactory<
         VArWMaxPct: {
             start: 15,
             end: 16,
-            readConverter: registersToInt16,
-            writeConverter: int16ToRegisters,
+            readConverter: registersToInt16Nullable,
+            writeConverter: int16NullableToRegisters,
         },
         VArMaxPct: {
             start: 16,
             end: 17,
-            readConverter: registersToInt16,
-            writeConverter: int16ToRegisters,
+            readConverter: registersToInt16Nullable,
+            writeConverter: int16NullableToRegisters,
         },
         VArAvalPct: {
             start: 17,
             end: 18,
-            readConverter: registersToInt16,
-            writeConverter: int16ToRegisters,
+            readConverter: registersToInt16Nullable,
+            writeConverter: int16NullableToRegisters,
         },
         VArPct_WinTms: {
             start: 18,
             end: 19,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         VArPct_RvrtTms: {
             start: 19,
             end: 20,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         VArPct_RmpTms: {
             start: 20,
             end: 21,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         VArPct_Mod: {
             start: 21,
             end: 22,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         VArPct_Ena: {
             start: 22,
@@ -243,7 +249,7 @@ export const controlsModel = sunSpecModelFactory<
         VArPct_SF: {
             start: 25,
             end: 26,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
     },
 });

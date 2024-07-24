@@ -1,4 +1,4 @@
-export function registersToString(registers: number[]): string {
+export function registersToString(registers: number[]) {
     const buffer = Buffer.from(
         registers.flatMap((register) => [
             (register >> 8) & 0xff,
@@ -13,12 +13,28 @@ export function registersToString(registers: number[]): string {
     );
 }
 
+export function registersToStringNullable(registers: number[]) {
+    if (registers.every((register) => register === 0)) {
+        return null;
+    }
+
+    return registersToString(registers);
+}
+
 export function registersToUint32(registers: number[]) {
     if (registers.length !== 2) {
         throw new Error('Invalid register length');
     }
 
     return (registers[0]! << 16) | registers[1]!;
+}
+
+export function registersToUint32Nullable(registers: number[]) {
+    if (registers.every((register) => register === 0xffff)) {
+        return null;
+    }
+
+    return registersToUint32(registers);
 }
 
 export function registersToUint16(registers: number[]) {
@@ -29,6 +45,18 @@ export function registersToUint16(registers: number[]) {
     return registers[0]!;
 }
 
+export function registersToUint16Nullable(registers: number[]) {
+    if (registers.length !== 1) {
+        throw new Error('Invalid register length');
+    }
+
+    if (registers[0] === 0xffff) {
+        return null;
+    }
+
+    return registersToUint16(registers);
+}
+
 export function uint16ToRegisters(value: number): number[] {
     if (value < 0 || value > 0xffff) {
         throw new Error('Value out of range for uint16');
@@ -37,12 +65,32 @@ export function uint16ToRegisters(value: number): number[] {
     return [value];
 }
 
+export function uint16NullableToRegisters(value: number | null): number[] {
+    if (value === null) {
+        return [0xffff];
+    }
+
+    return uint16ToRegisters(value);
+}
+
 export function registersToInt16(registers: number[]) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
 
     return (registers[0]! << 16) >> 16;
+}
+
+export function registersToInt16Nullable(registers: number[]) {
+    if (registers.length !== 1) {
+        throw new Error('Invalid register length');
+    }
+
+    if (registers[0] === 0x8000) {
+        return null;
+    }
+
+    return registersToInt16(registers);
 }
 
 export function int16ToRegisters(value: number): number[] {
@@ -54,8 +102,21 @@ export function int16ToRegisters(value: number): number[] {
     return [value & 0xffff];
 }
 
+export function int16NullableToRegisters(value: number | null): number[] {
+    if (value === null) {
+        return [0x8000];
+    }
+
+    // Ensure the value is treated as a 16-bit signed integer
+    return [value & 0xffff];
+}
+
 export function registersToSunssf(registers: number[]) {
     return registersToInt16(registers);
+}
+
+export function registersToSunssfNullable(registers: number[]) {
+    return registersToInt16Nullable(registers);
 }
 
 export function registersToAcc32(registers: number[]) {

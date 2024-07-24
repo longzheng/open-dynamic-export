@@ -1,6 +1,8 @@
 import {
     registersToString,
+    registersToStringNullable,
     registersToUint16,
+    registersToUint16Nullable,
     registersToUint32,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -18,13 +20,13 @@ export type CommonModel = {
     // Device model
     Md: string;
     // Options
-    Opt: string;
+    Opt: string | null;
     // SW version of inverter
-    Vr: string;
+    Vr: string | null;
     // Serialnumber of the inverter
     SN: string;
     // Modbus Device Address
-    DA: number;
+    DA: number | null;
 };
 
 export const commonModel = sunSpecModelFactory<CommonModel>({
@@ -57,12 +59,12 @@ export const commonModel = sunSpecModelFactory<CommonModel>({
         Opt: {
             start: 36,
             end: 44,
-            readConverter: registersToString,
+            readConverter: registersToStringNullable,
         },
         Vr: {
             start: 44,
             end: 52,
-            readConverter: registersToString,
+            readConverter: registersToStringNullable,
         },
         SN: {
             start: 52,
@@ -72,7 +74,7 @@ export const commonModel = sunSpecModelFactory<CommonModel>({
         DA: {
             start: 68,
             end: 69,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
     },
 });

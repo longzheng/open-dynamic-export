@@ -2,6 +2,8 @@ import {
     registersToUint16,
     registersToSunssf,
     registersToInt16,
+    registersToUint16Nullable,
+    registersToSunssfNullable,
 } from '../helpers/converters';
 import type { SunSpecBrand } from './brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -49,21 +51,21 @@ export type NameplateModel = {
     // Scale factor
     PFRtg_SF: number;
     // Nominal energy rating of storage device.
-    WHRtg: number;
+    WHRtg: number | null;
     // Scale factor
-    WHRtg_SF: number;
+    WHRtg_SF: number | null;
     // The usable capacity of the battery.  Maximum charge minus minimum charge from a technology capability perspective (Amp-hour capacity rating).
-    AhrRtg: number;
+    AhrRtg: number | null;
     // Scale factor
-    AhrRtg_SF: number;
+    AhrRtg_SF: number | null;
     // Maximum rate of energy transfer into the storage device.
-    MaxChaRte: number;
+    MaxChaRte: number | null;
     // Scale factor
-    MaxChaRte_SF: number;
+    MaxChaRte_SF: number | null;
     // Maximum rate of energy transfer out of the storage device.
-    MaxDisChaRte: number;
+    MaxDisChaRte: number | null;
     // Scale factor
-    MaxDisChaRte_SF: number;
+    MaxDisChaRte_SF: number | null;
 };
 
 export const nameplateModel = sunSpecModelFactory<NameplateModel>({
@@ -166,42 +168,42 @@ export const nameplateModel = sunSpecModelFactory<NameplateModel>({
         WHRtg: {
             start: 19,
             end: 20,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         WHRtg_SF: {
             start: 20,
             end: 21,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         AhrRtg: {
             start: 21,
             end: 22,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         AhrRtg_SF: {
             start: 22,
             end: 23,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         MaxChaRte: {
             start: 23,
             end: 24,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         MaxChaRte_SF: {
             start: 24,
             end: 25,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         MaxDisChaRte: {
             start: 25,
             end: 26,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         MaxDisChaRte_SF: {
             start: 26,
             end: 27,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
     },
 });

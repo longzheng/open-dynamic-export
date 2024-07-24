@@ -4,6 +4,10 @@ import {
     registersToInt16,
     registersToAcc32,
     registersToUint32,
+    registersToUint16Nullable,
+    registersToInt16Nullable,
+    registersToSunssfNullable,
+    registersToUint32Nullable,
 } from '../helpers/converters';
 import type { SunSpecBrand } from './brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
@@ -21,22 +25,22 @@ export type InverterModel = {
     // Phase A Current
     AphA: number;
     // Phase B Current
-    AphB: number;
+    AphB: number | null;
     // Phase C Current
-    AphC: number;
+    AphC: number | null;
     A_SF: number;
     // Phase Voltage AB
-    PPVphAB: number;
+    PPVphAB: number | null;
     // Phase Voltage BC
-    PPVphBC: number;
+    PPVphBC: number | null;
     // Phase Voltage CA
-    PPVphCA: number;
+    PPVphCA: number | null;
     // Phase Voltage AN
     PhVphA: number;
     // Phase Voltage BN
-    PhVphB: number;
+    PhVphB: number | null;
     // Phase Voltage CN
-    PhVphC: number;
+    PhVphC: number | null;
     V_SF: number;
     // AC Power
     W: number;
@@ -45,51 +49,51 @@ export type InverterModel = {
     Hz: number;
     Hz_SF: number;
     // AC Apparent Power
-    VA: number;
-    VA_SF: number;
+    VA: number | null;
+    VA_SF: number | null;
     // AC Reactive Power
-    VAr: number;
-    VAr_SF: number;
+    VAr: number | null;
+    VAr_SF: number | null;
     // AC Power Factor
-    PF: number;
-    PF_SF: number;
+    PF: number | null;
+    PF_SF: number | null;
     // AC Energy
     WH: number;
     WH_SF: number;
     // DC Amps
-    DCA: number;
-    DCA_SF: number;
+    DCA: number | null;
+    DCA_SF: number | null;
     // DC Voltage
-    DCV: number;
-    DCV_SF: number;
+    DCV: number | null;
+    DCV_SF: number | null;
     // DC Power
-    DCW: number;
-    DCW_SF: number;
+    DCW: number | null;
+    DCW_SF: number | null;
     // Cabinet Temperature
     TmpCab: number;
     // Heat Sink Temperature
-    TmpSnk: number;
+    TmpSnk: number | null;
     // Transformer Temperature
-    TmpTrns: number;
+    TmpTrns: number | null;
     // Other Temperature
-    TmpOt: number;
+    TmpOt: number | null;
     Tmp_SF: number;
     // Operating State
     St: InverterState;
     // Vendor Operating State
-    StVnd: number;
+    StVnd: number | null;
     // Event1
     Evt1: InverterEvent1;
     // Event Bitfield 2
     Evt2: number;
     // Vendor Event Bitfield 1
-    EvtVnd1: number;
+    EvtVnd1: number | null;
     // Vendor Event Bitfield 2
-    EvtVnd2: number;
+    EvtVnd2: number | null;
     // Vendor Event Bitfield 3
-    EvtVnd3: number;
+    EvtVnd3: number | null;
     // Vendor Event Bitfield 4
-    EvtVnd4: number;
+    EvtVnd4: number | null;
 };
 
 export const inverterModel = sunSpecModelFactory<InverterModel>({
@@ -117,12 +121,12 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         AphB: {
             start: 4,
             end: 5,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         AphC: {
             start: 5,
             end: 6,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         A_SF: {
             start: 6,
@@ -132,17 +136,17 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         PPVphAB: {
             start: 7,
             end: 8,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         PPVphBC: {
             start: 8,
             end: 9,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         PPVphCA: {
             start: 9,
             end: 10,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         PhVphA: {
             start: 10,
@@ -152,12 +156,12 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         PhVphB: {
             start: 11,
             end: 12,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         PhVphC: {
             start: 12,
             end: 13,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         V_SF: {
             start: 13,
@@ -187,32 +191,32 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         VA: {
             start: 18,
             end: 19,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         VA_SF: {
             start: 19,
             end: 20,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         VAr: {
             start: 20,
             end: 21,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         VAr_SF: {
             start: 21,
             end: 22,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         PF: {
             start: 22,
             end: 23,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         PF_SF: {
             start: 23,
             end: 24,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         WH: {
             start: 24,
@@ -227,32 +231,32 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         DCA: {
             start: 27,
             end: 28,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         DCA_SF: {
             start: 28,
             end: 29,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         DCV: {
             start: 29,
             end: 30,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         DCV_SF: {
             start: 30,
             end: 31,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         DCW: {
             start: 31,
             end: 32,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         DCW_SF: {
             start: 32,
             end: 33,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         TmpCab: {
             start: 33,
@@ -262,17 +266,17 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         TmpSnk: {
             start: 34,
             end: 35,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         TmpTrns: {
             start: 35,
             end: 36,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         TmpOt: {
             start: 36,
             end: 37,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         Tmp_SF: {
             start: 37,
@@ -287,7 +291,7 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         StVnd: {
             start: 39,
             end: 40,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         Evt1: {
             start: 40,
@@ -302,22 +306,22 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         EvtVnd1: {
             start: 44,
             end: 46,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
         EvtVnd2: {
             start: 46,
             end: 48,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
         EvtVnd3: {
             start: 48,
             end: 50,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
         EvtVnd4: {
             start: 50,
             end: 52,
-            readConverter: registersToUint32,
+            readConverter: registersToUint32Nullable,
         },
     },
 });
