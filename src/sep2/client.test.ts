@@ -1,9 +1,10 @@
 import { SEP2Client } from './client';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { beforeAll, it, expect, vi } from 'vitest';
+import { beforeAll, it, expect, vi, describe } from 'vitest';
 import { getMockFile } from './helpers/mocks';
 import { ResponseStatus } from './models/derControlResponse';
+import { RoleFlagsType } from './models/roleFlagsType';
 
 const mockAxios = new MockAdapter(axios);
 
@@ -92,6 +93,36 @@ it('should post DER control response', async () => {
     );
 
     expect(response.status).toBe(200);
+});
+
+describe('generateUsagePointMrid', () => {
+    it('should generate usage point MRID for site', () => {
+        const result = sep2Client.generateUsagePointMrid(
+            RoleFlagsType.isMirror | RoleFlagsType.isPremisesAggregationPoint,
+        );
+
+        expect(result).toBe('B9A8A75E324D2312AD09F80300012345');
+    });
+
+    it('should generate usage point MRID for DER', () => {
+        const result = sep2Client.generateUsagePointMrid(
+            RoleFlagsType.isMirror |
+                RoleFlagsType.isDER |
+                RoleFlagsType.isSubmeter,
+        );
+
+        expect(result).toBe('B9A8A75E324D2312AD09F84900012345');
+    });
+});
+
+it('should generate meter reading MRID', () => {
+    const result = sep2Client.generateMeterReadingMrid();
+    const result2 = sep2Client.generateMeterReadingMrid();
+
+    console.log(result, result2);
+
+    expect(result).toContain('00012345');
+    expect(result).not.toBe(result2);
 });
 
 // it('should handle DER control events', async () => {

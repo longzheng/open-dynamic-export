@@ -10,6 +10,7 @@ import type { QualityFlags } from './qualityFlags';
 import type { UomType } from './uomType';
 
 export type MirrorMeterReading = {
+    // reading MRID should be a random UUIDv4 with the PEN
     mRID: string;
     description: string;
     lastUpdateTime: Date;

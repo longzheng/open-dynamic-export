@@ -11,6 +11,7 @@ export enum MirrorUsagePointStatus {
 }
 
 export type MirrorUsagePoint = {
+    // A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN.
     mRID: string;
     description: string;
     roleFlags: RoleFlagsType;

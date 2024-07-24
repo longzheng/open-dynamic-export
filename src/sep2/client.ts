@@ -1,7 +1,7 @@
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
-import * as https from 'https';
+import * as https from 'node:https';
 import { getCertificateLfdi } from '../cert';
 import type { DeviceCapabilityResponse } from './models/deviceCapability';
 import { parseDeviceCapabilityXml } from './models/deviceCapability';
@@ -11,6 +11,9 @@ import type { DerControlResponse } from './models/derControlResponse';
 import { generateDerControlResponse } from './models/derControlResponse';
 import { objectToXml } from './helpers/xml';
 import type { Config } from '../config';
+import type { RoleFlagsType } from './models/roleFlagsType';
+import { numberToHex } from '../number';
+import { randomUUID } from 'node:crypto';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -139,6 +142,14 @@ export class SEP2Client {
         const data = generateDerControlResponse(response);
         const xml = objectToXml(data);
         return await this.postResponse(replyToHref, xml);
+    }
+
+    generateUsagePointMrid(roleFlags: RoleFlagsType) {
+        return `${this.lfdi.substring(0, 22)}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
+    }
+
+    generateMeterReadingMrid() {
+        return `${randomUUID().replace(/-/g, '').substring(0, 24)}${this.pen}`;
     }
 
     // public async handleDERControl() {
