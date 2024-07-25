@@ -1,8 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks';
-import type { ActivePower } from './activePower';
-import { activePowerToWatts, parseActivePowerXmlObject } from './activePower';
+import { parseActivePowerXmlObject } from './activePower';
 
 it('should parse active power XML with multiplier 2', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -36,22 +35,4 @@ it('should parse active power XML with multiplier 0', async () => {
 
     expect(link.value).toBe(2512);
     expect(link.multiplier).toBe(0);
-});
-
-it('activePowerToWatts should convert ActivePower to watts with multiplier 2', () => {
-    const limitWatts = {
-        value: 15,
-        multiplier: 2,
-    } satisfies ActivePower;
-
-    expect(activePowerToWatts(limitWatts)).toBe(1500);
-});
-
-it('activePowerToWatts should convert ActivePower to watts with multiplier 0', () => {
-    const limitWatts = {
-        value: 2512,
-        multiplier: 0,
-    } satisfies ActivePower;
-
-    expect(activePowerToWatts(limitWatts)).toBe(2512);
 });

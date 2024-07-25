@@ -23,11 +23,6 @@ export function parseActivePowerXmlObject(xmlObject: any): ActivePower {
     };
 }
 
-// helper function to convert ActivePower to watts
-export function activePowerToWatts(activePower: ActivePower): number {
-    return activePower.value * 10 ** activePower.multiplier;
-}
-
 export function generateActivePowerResponse({
     value,
     multiplier,

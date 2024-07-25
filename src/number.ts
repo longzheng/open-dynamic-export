@@ -17,3 +17,7 @@ export function safeParseHexString(value: string): number {
 export function numberToHex(value: number): string {
     return value.toString(16).toUpperCase();
 }
+
+export function numberWithPow10(number: number, pow10: number): number {
+    return number * 10 ** pow10;
+}
