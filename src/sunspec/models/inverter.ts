@@ -358,6 +358,7 @@ export enum InverterState {
 
 // SunSpec_Information_Model_Reference_20210302.xlsx
 export enum InverterEvent1 {
+    NONE = 0,
     GROUND_FAULT = 1 << 0,
     DC_OVER_VOLT = 1 << 1,
     AC_DISCONNECT = 1 << 2,

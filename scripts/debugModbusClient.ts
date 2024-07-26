@@ -3,6 +3,9 @@ import { getConfig } from '../src/config';
 import { getBrandByCommonModel } from '../src/sunspec/brand';
 import { InverterSunSpecConnection } from '../src/sunspec/connection/inverter';
 import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
+import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics';
+import { getInverterMetrics } from '../src/sunspec/helpers/inverterMetrics';
+import { getTelemetryFromSunSpec } from '../src/coordinator.ts/telemetry';
 
 const config = getConfig();
 
@@ -16,6 +19,8 @@ void (async () => {
         ({ ip, port, unitId }) =>
             new MeterSunSpecConnection({ ip, port, unitId }),
     );
+
+    console.log('inverters data');
 
     const invertersData = await Promise.all(
         invertersConnections.map(async (inverter) => {
@@ -36,6 +41,8 @@ void (async () => {
 
     console.dir(invertersData);
 
+    console.log('meters data');
+
     const metersData = await Promise.all(
         metersConnections.map(async (meter) => {
             const common = await meter.getCommonModel();
@@ -50,4 +57,21 @@ void (async () => {
     );
 
     console.dir(metersData);
+
+    console.log('meter metrics');
+
+    console.dir(getMeterMetrics(metersData[0]!.meter));
+
+    console.log('inverter metrics');
+
+    console.dir(getInverterMetrics(invertersData[0]!.inverter));
+
+    console.log('telemetry');
+
+    const telemetry = getTelemetryFromSunSpec({
+        inverters: invertersData.map(({ inverter }) => inverter),
+        meters: metersData.map(({ meter }) => meter),
+    });
+
+    console.dir(telemetry);
 })();

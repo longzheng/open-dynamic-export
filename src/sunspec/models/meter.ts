@@ -528,6 +528,7 @@ export const meterModel = sunSpecModelFactory<MeterModel>({
 });
 
 export enum MeterEvent {
+    None = 0,
     PowerFailure = 2,
     UnderVoltage = 3,
     LowPF = 4,

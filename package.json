@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "axios": "^1.7.2",
+        "decimal.js": "^10.4.3",
         "dotenv": "^16.4.5",
         "modbus-serial": "^8.0.17",
         "pkijs": "^3.2.1",
