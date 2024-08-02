@@ -4,6 +4,14 @@ This project aims to implement dynamic export control using Node.js/TypeScript i
 
 The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
+## Requirements
+
+- One or more SunSpec compatible solar inverter(s) (tested with Fronius Primo and Fronius Symo)
+- One or more SunSpec compatible smart meter(s) (tested with Fronius Smart Meter and Catch Power Relay)
+
+> [!IMPORTANT]
+> The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
+
 ## Architecture
 
 ```mermaid
