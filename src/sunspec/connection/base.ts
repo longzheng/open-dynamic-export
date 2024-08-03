@@ -2,12 +2,14 @@ import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
 import { commonModel } from '../models/common';
 
+const connectionTimeoutMs = 10000;
+
 export abstract class SunSpecConnection {
     public client: ModbusRTU;
     private ip: string;
     private port: number;
     private unitId: number;
-    private openPromise: Promise<boolean> | null = null;
+    private state: 'connected' | 'connecting' | 'disconnected' = 'disconnected';
 
     constructor({
         ip,
@@ -24,56 +26,60 @@ export abstract class SunSpecConnection {
         this.unitId = unitId;
 
         this.client.on('close', () => {
-            console.error('Modbus client closed');
+            this.state = 'disconnected';
+
+            console.error(
+                `Modbus client closed ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+            );
         });
 
         this.client.on('error', (err) => {
-            console.error('Modbus client error:', err);
+            this.state = 'disconnected';
+
+            console.error(
+                `Modbus client error ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                err,
+            );
         });
 
         void this.connect();
     }
 
     private async connect() {
-        if (this.client.isOpen) {
+        if (this.state !== 'disconnected') {
             return;
         }
 
+        this.state = 'connecting';
+
         try {
-            await this.client.connectTCP(this.ip, { port: this.port });
-            this.client.setID(this.unitId);
-            this.client.setTimeout(1000);
-            console.log('Modbus client connected');
-        } catch (error) {
-            console.error('Error connecting to Modbus:', error);
-        }
-    }
-
-    private openAsync() {
-        if (this.client.isOpen) {
-            return Promise.resolve(true);
-        }
-
-        if (this.openPromise) {
-            return this.openPromise;
-        }
-
-        const openPromise = new Promise<boolean>((resolve) => {
-            this.client.open(() => {
-                this.openPromise = null;
-
-                resolve(this.client.isOpen);
+            console.log(
+                `Modbus client connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+            );
+            await this.client.connectTCP(this.ip, {
+                port: this.port,
+                timeout: connectionTimeoutMs,
             });
-        });
-
-        this.openPromise = openPromise;
-
-        return openPromise;
+            this.client.setID(this.unitId);
+            this.client.setTimeout(connectionTimeoutMs);
+            console.log(
+                `Modbus client connected to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+            );
+            this.state = 'connected';
+        } catch (error) {
+            console.error(
+                `Error connecting to Modbus ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                error,
+            );
+            this.state = 'disconnected';
+        }
     }
 
+    // even though the client may be connected, we cannot send requests until it is "open"
     public async waitUntilOpen() {
-        while (!this.client.isOpen) {
-            await this.openAsync();
+        while (this.state !== 'connected') {
+            void this.connect();
+
             await scheduler.wait(1000);
         }
     }
