@@ -22,8 +22,10 @@ vi.mock('modbus-serial', async (importOriginal) => {
             // not sure if there's another way to implement the actual ModbusRTU class
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
             on: (actual as any).prototype.on,
-            // we just need to override isOpen to prevent the connection from taking place
-            isOpen: true,
+            // mock functions to allow connection state to be set
+            connectTCP: vi.fn(),
+            setID: vi.fn(),
+            setTimeout: vi.fn(),
         }),
     };
 });
