@@ -5,7 +5,9 @@
     "type": "module",
     "scripts": {
         "lint": "tsc --noEmit && npx eslint .",
-        "test": "vitest"
+        "test": "vitest",
+        "debug-sunspec-data": "tsx scripts/debugSunspecData.ts",
+        "debug-sunspec-telemetry": "tsx scripts/debugSunspecTelemetry.ts"
     },
     "keywords": [],
     "author": "Long Zheng",
