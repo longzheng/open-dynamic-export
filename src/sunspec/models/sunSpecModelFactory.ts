@@ -40,19 +40,9 @@ export function sunSpecModelFactory<
         throw new Error('Model mapping is empty');
     }
 
-    // validate mappings are contiguous
-    for (let i = 0; i < mappingEntries.length - 1; i++) {
-        const [key, mapping] = mappingEntries[i]!;
-        const [, nextMapping] = mappingEntries[i + 1]!;
-
-        if (mapping.end !== nextMapping.start) {
-            throw new Error(
-                `Invalid mapping for key ${key.toString()}. End: ${mapping.end}, next start: ${nextMapping.start}`,
-            );
-        }
-    }
-
-    const lastMapping = mappingEntries[mappingEntries.length - 1];
+    const lastMapping = mappingEntries
+        .sort((a, b) => b[1].end - a[1].end)
+        .at(0);
     const length = lastMapping![1].end;
 
     return {
