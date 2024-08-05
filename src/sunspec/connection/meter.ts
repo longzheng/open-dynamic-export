@@ -1,12 +1,15 @@
-import type { SunSpecBrand } from '../brand';
+import { getBrandByCommonModel } from '../brand';
 import { meterModel, meterModelAddressStartByBrand } from '../models/meter';
 import { SunSpecConnection } from './base';
 
 export class MeterSunSpecConnection extends SunSpecConnection {
-    async getMeterModel(brand: SunSpecBrand) {
+    async getMeterModel() {
         const data = await meterModel.read({
             modbusConnection: this,
-            addressStart: meterModelAddressStartByBrand(brand),
+            addressStart: (commonModel) =>
+                meterModelAddressStartByBrand(
+                    getBrandByCommonModel(commonModel),
+                ),
         });
 
         if (data.ID !== 201 && data.ID !== 202 && data.ID !== 203) {

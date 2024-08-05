@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { getBrandByCommonModel } from '../src/sunspec/brand';
 import { getTelemetryFromSunSpec } from '../src/coordinator.ts/telemetry';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 
@@ -18,21 +17,13 @@ async function poll() {
     try {
         const invertersData = await Promise.all(
             invertersConnections.map(async (inverter) => {
-                const common = await inverter.getCommonModel();
-
-                const brand = getBrandByCommonModel(common);
-
-                return await inverter.getInverterModel(brand);
+                return await inverter.getInverterModel();
             }),
         );
 
         const metersData = await Promise.all(
             metersConnections.map(async (meter) => {
-                const common = await meter.getCommonModel();
-
-                const brand = getBrandByCommonModel(common);
-
-                return await meter.getMeterModel(brand);
+                return await meter.getMeterModel();
             }),
         );
 

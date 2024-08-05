@@ -1,4 +1,3 @@
-import { getBrandByCommonModel } from '../sunspec/brand';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';
@@ -15,24 +14,16 @@ export async function calculateDynamicExportValues({
 }) {
     const invertersData = await Promise.all(
         invertersConnections.map(async (inverter) => {
-            const common = await inverter.getCommonModel();
-
-            const brand = getBrandByCommonModel(common);
-
             return {
-                inverter: await inverter.getInverterModel(brand),
-                controls: await inverter.getControlsModel(brand),
+                inverter: await inverter.getInverterModel(),
+                controls: await inverter.getControlsModel(),
             };
         }),
     );
 
     const metersData = await Promise.all(
         metersConnections.map(async (meter) => {
-            const common = await meter.getCommonModel();
-
-            const brand = getBrandByCommonModel(common);
-
-            return await meter.getMeterModel(brand);
+            return await meter.getMeterModel();
         }),
     );
 

@@ -1,5 +1,6 @@
 import { objectEntriesWithType } from '../../object';
 import type { SunSpecConnection } from '../connection/base';
+import type { CommonModel } from './common';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,12 +26,13 @@ export function sunSpecModelFactory<
 }): {
     read(params: {
         modbusConnection: SunSpecConnection;
-        // the starting address for different manufacturers might be different
-        addressStart: number;
+        // the starting address can be fixed or different based on the manufacturer
+        addressStart: ((commonModel: CommonModel) => number) | number;
     }): Promise<Model>;
     write(params: {
         modbusConnection: SunSpecConnection;
-        addressStart: number;
+        // the starting address can be fixed or different based on the manufacturer
+        addressStart: ((commonModel: CommonModel) => number) | number;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
 } {
@@ -49,9 +51,16 @@ export function sunSpecModelFactory<
         read: async ({ modbusConnection, addressStart }) => {
             await modbusConnection.waitUntilOpen();
 
+            const address =
+                typeof addressStart === 'number'
+                    ? addressStart
+                    : addressStart(
+                          await modbusConnection.getCachedCommonModel(),
+                      );
+
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
-                    addressStart,
+                    address,
                     length,
                 );
 
@@ -63,6 +72,13 @@ export function sunSpecModelFactory<
         write: async ({ modbusConnection, addressStart, values }) => {
             await modbusConnection.waitUntilOpen();
 
+            const address =
+                typeof addressStart === 'number'
+                    ? addressStart
+                    : addressStart(
+                          await modbusConnection.getCachedCommonModel(),
+                      );
+
             const registerValues = convertWriteRegisters({
                 values,
                 mapping: config.mapping,
@@ -70,13 +86,13 @@ export function sunSpecModelFactory<
             });
 
             await modbusConnection.client.writeRegisters(
-                addressStart,
+                address,
                 registerValues,
             );
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
-                    addressStart,
+                    address,
                     length,
                 );
 
