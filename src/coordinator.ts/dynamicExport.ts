@@ -1,3 +1,74 @@
+import { getBrandByCommonModel } from '../sunspec/brand';
+import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
+import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
+import { getAveragePowerRatio } from '../sunspec/helpers/controls';
+import { getTelemetryFromSunSpec } from './telemetry';
+
+export async function calculateDynamicExportValues({
+    exportLimitWatts,
+    invertersConnections,
+    metersConnections,
+}: {
+    exportLimitWatts: number;
+    invertersConnections: InverterSunSpecConnection[];
+    metersConnections: MeterSunSpecConnection[];
+}) {
+    const invertersData = await Promise.all(
+        invertersConnections.map(async (inverter) => {
+            const common = await inverter.getCommonModel();
+
+            const brand = getBrandByCommonModel(common);
+
+            return {
+                inverter: await inverter.getInverterModel(brand),
+                controls: await inverter.getControlsModel(brand),
+            };
+        }),
+    );
+
+    const metersData = await Promise.all(
+        metersConnections.map(async (meter) => {
+            const common = await meter.getCommonModel();
+
+            const brand = getBrandByCommonModel(common);
+
+            return await meter.getMeterModel(brand);
+        }),
+    );
+
+    const telemetry = getTelemetryFromSunSpec({
+        inverters: invertersData.map(({ inverter }) => inverter),
+        meters: metersData,
+    });
+
+    const siteWatts = telemetry.realPower.site.total;
+    const solarWatts = telemetry.realPower.der.total;
+
+    const targetSolarWatts = calculateTargetSolarWatts({
+        exportLimitWatts,
+        siteWatts,
+        solarWatts,
+    });
+
+    const currentPowerRatio = getAveragePowerRatio(
+        invertersData.map(({ controls }) => controls),
+    );
+
+    const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
+        currentPowerRatio,
+        currentSolarWatts: solarWatts,
+        targetSolarWatts,
+    });
+
+    return {
+        siteWatts,
+        solarWatts,
+        targetSolarWatts,
+        currentPowerRatio,
+        targetSolarPowerRatio,
+    };
+}
+
 export function calculateTargetSolarPowerRatio({
     currentSolarWatts,
     targetSolarWatts,
