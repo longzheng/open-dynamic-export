@@ -6,6 +6,10 @@ import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
 import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics';
 import { getInverterMetrics } from '../src/sunspec/helpers/inverterMetrics';
 
+// This debugging script dumps all the SunSpec model data
+// It polls the inverters and smart meters once
+// It logs all the SunSpec models to the console
+
 const config = getConfig();
 
 void (async () => {
