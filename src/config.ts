@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 const sunspecModbusSchema = z.object({
     ip: z.string().regex(/^(\d{1,3}\.){3}\d{1,3}$/),
@@ -37,4 +38,20 @@ export function getConfig() {
     }
 
     return result.data;
+}
+
+export function getConfigSep2CertKey(config: Config) {
+    const sep2Cert = readFileSync(resolve(config.sep2.certPath), 'utf-8');
+
+    if (!sep2Cert) {
+        throw new Error('Certificate is not found or is empty');
+    }
+
+    const sep2Key = readFileSync(resolve(config.sep2.keyPath), 'utf-8');
+
+    if (!sep2Key) {
+        throw new Error('Key is not found or is empty');
+    }
+
+    return { sep2Cert, sep2Key };
 }

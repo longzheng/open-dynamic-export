@@ -44,7 +44,7 @@ it('should assert time delta successfully', async () => {
     const mockDate = new Date(1682475024000);
     vi.setSystemTime(mockDate);
 
-    await sep2Client.assertTimeDelta('/time');
+    await sep2Client.getTime('/time');
 });
 
 it('should assert time delta with exception', async () => {
@@ -57,7 +57,7 @@ it('should assert time delta with exception', async () => {
     vi.setSystemTime(mockDate);
 
     await expect(
-        async () => await sep2Client.assertTimeDelta('/time'),
+        async () => await sep2Client.getTime('/time'),
     ).rejects.toThrowError('Clock is not synced with Utility Server');
 });
 

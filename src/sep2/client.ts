@@ -25,6 +25,7 @@ export class SEP2Client {
     private pen: string;
     private lfdi: string;
     private axiosInstance: AxiosInstance;
+    private cachedDeviceCapabilities: DeviceCapabilityResponse | null = null;
 
     constructor({
         sep2Config,
@@ -89,12 +90,10 @@ export class SEP2Client {
         return response;
     }
 
-    public async initialize() {
-        const { timeLink, endDeviceListLink } =
-            await this.getDeviceCapabilities();
+    public async discovery() {
+        this.cachedDeviceCapabilities = await this.getDeviceCapabilities();
 
-        await this.assertTimeDelta(timeLink.href);
-        await this.getEndDeviceList(endDeviceListLink.href);
+        await this.getTime(this.cachedDeviceCapabilities.timeLink.href);
     }
 
     async getDeviceCapabilities(): Promise<DeviceCapabilityResponse> {
@@ -105,7 +104,7 @@ export class SEP2Client {
     }
 
     // ensure the utility server time and the client time is not out of sync
-    async assertTimeDelta(timeHref: string) {
+    async getTime(timeHref: string) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await this.getRequest(timeHref);
 
@@ -151,30 +150,11 @@ export class SEP2Client {
     generateMeterReadingMrid() {
         return `${randomUUID().replace(/-/g, '').substring(0, 24)}${this.pen}`;
     }
-
-    // public async handleDERControl() {
-    //     // Example to get DERControl events and apply to Modbus
-    //     const derControlUri = '/path/to/dercontrol'; // Update with actual path
-    //     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    //     const xml = await this.getRequest(derControlUri);
-    //     const derControls = xml['DERControlList']['DERControl'];
-    //     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-
-    //     for (const control of derControls) {
-    //         /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //         const exportLimit =
-    //             control['DERControlBase'][0]['ns2:opModExpLimW'][0];
-    //         /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    //         // TODO Apply exportLimit to Modbus
-    //     }
-    // }
 }
 
 // default polling and post rates for resources
 // extracted from page 16 of SEP2 Client Handbook
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const defaultIntervalSeconds = {
+export const defaultIntervalSeconds = {
     DeviceCapability: 300,
     EndDeviceList: 300,
     FunctionSetAssignmentsList: 300,
