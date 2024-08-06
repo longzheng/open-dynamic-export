@@ -6,13 +6,3 @@ export type ReactivePower = {
     // power of ten multiplier
     multiplier: number;
 };
-
-export function generateReactivePowerResponse({
-    value,
-    multiplier,
-}: ReactivePower) {
-    return {
-        multiplier,
-        value,
-    };
-}

@@ -6,10 +6,3 @@ export type VoltageRMS = {
     // power of ten multiplier
     multiplier: number;
 };
-
-export function generateVoltageRmsResponse({ value, multiplier }: VoltageRMS) {
-    return {
-        multiplier,
-        value,
-    };
-}

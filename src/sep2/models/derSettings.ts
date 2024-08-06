@@ -1,16 +1,10 @@
 import { numberToHex } from '../../number';
-import { generateActivePowerResponse, type ActivePower } from './activePower';
-import {
-    generateApparentPowerResponse,
-    type ApparentPower,
-} from '../helpers/apparentPower';
+import { type ActivePower } from './activePower';
+import { type ApparentPower } from './apparentPower';
 import { dateToStringSeconds } from '../helpers/date';
 import type { DERControlType } from './derControlType';
 import { xmlns } from '../helpers/namespace';
-import {
-    generateReactivePowerResponse,
-    type ReactivePower,
-} from './reactivePower';
+import { type ReactivePower } from './reactivePower';
 
 export type DERSettings = {
     updatedTime: Date;
@@ -39,9 +33,9 @@ export function generateDerSettingsResponse({
             updatedTime: dateToStringSeconds(updatedTime),
             modesEnabled: numberToHex(modesEnabled).padStart(8, '0'),
             setGradW: setGradW.toString(),
-            setMaxVA: generateApparentPowerResponse(setMaxVA),
-            setMaxW: generateActivePowerResponse(setMaxW),
-            setMaxVar: generateReactivePowerResponse(setMaxVar),
+            setMaxVA,
+            setMaxW,
+            setMaxVar,
         },
     };
 }

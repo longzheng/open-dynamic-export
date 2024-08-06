@@ -6,13 +6,3 @@ export type ApparentPower = {
     // power of ten multiplier
     multiplier: number;
 };
-
-export function generateApparentPowerResponse({
-    value,
-    multiplier,
-}: ApparentPower) {
-    return {
-        multiplier,
-        value,
-    };
-}

@@ -22,13 +22,3 @@ export function parseActivePowerXmlObject(xmlObject: any): ActivePower {
         multiplier,
     };
 }
-
-export function generateActivePowerResponse({
-    value,
-    multiplier,
-}: ActivePower) {
-    return {
-        multiplier,
-        value,
-    };
-}

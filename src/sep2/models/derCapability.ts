@@ -1,18 +1,12 @@
 import { numberToHex } from '../../number';
-import { generateActivePowerResponse, type ActivePower } from './activePower';
-import {
-    generateApparentPowerResponse,
-    type ApparentPower,
-} from '../helpers/apparentPower';
+import { type ActivePower } from './activePower';
+import { type ApparentPower } from './apparentPower';
 import type { DERControlType } from './derControlType';
 import type { DERType } from './derType';
 import type { DOEModesSupportedType } from './doeModesSupportedType';
 import { xmlns } from '../helpers/namespace';
-import {
-    generateReactivePowerResponse,
-    type ReactivePower,
-} from './reactivePower';
-import { generateVoltageRmsResponse, type VoltageRMS } from './voltageRms';
+import { type ReactivePower } from './reactivePower';
+import { type VoltageRMS } from './voltageRms';
 
 export type DERCapabilityResponse = {
     modesSupported: DERControlType;
@@ -46,10 +40,10 @@ export function generateDerCapabilityResponse({
                 doeModesSupported,
             ).padStart(8, '0'),
             type: type.toString(),
-            rtgMaxVA: generateApparentPowerResponse(rtgMaxVA),
-            rtgMaxW: generateActivePowerResponse(rtgMaxW),
-            rtgMaxVar: generateReactivePowerResponse(rtgMaxVar),
-            rtgVNom: generateVoltageRmsResponse(rtgVNom),
+            rtgMaxVA,
+            rtgMaxW,
+            rtgMaxVar,
+            rtgVNom,
         },
     };
 }
