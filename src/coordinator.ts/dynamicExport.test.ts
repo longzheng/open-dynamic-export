@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
+    getWMaxLimPctFromTargetSolarPowerRatio,
 } from './dynamicExport';
 
 describe('calculateTargetSolarPowerRatio', () => {
@@ -97,5 +98,29 @@ describe('calculateTargetSolarWatts', () => {
         });
 
         expect(targetSolar).toBe(2.38);
+    });
+});
+
+describe('getWMaxLimPctFromTargetSolarPowerRatio', () => {
+    it('should handle WMaxLimPct_SF -2', () => {
+        const WMaxLimPct = getWMaxLimPctFromTargetSolarPowerRatio({
+            targetSolarPowerRatio: 1,
+            controlsModel: {
+                WMaxLimPct_SF: -2,
+            },
+        });
+
+        expect(WMaxLimPct).toBe(10000);
+    });
+
+    it('should handle WMaxLimPct_SF 0', () => {
+        const WMaxLimPct = getWMaxLimPctFromTargetSolarPowerRatio({
+            targetSolarPowerRatio: 0.5,
+            controlsModel: {
+                WMaxLimPct_SF: 0,
+            },
+        });
+
+        expect(WMaxLimPct).toBe(50);
     });
 });

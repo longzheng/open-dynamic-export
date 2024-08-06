@@ -1,15 +1,58 @@
 import Decimal from 'decimal.js';
 import { getTotalFromPerPhaseMeasurement } from '../power';
 import type { SunSpecTelemetry } from './telemetry/sunspec';
-import { type ControlsModelWrite } from '../sunspec/models/controls';
+import type { ControlsModel } from '../sunspec/models/controls';
+import {
+    OutPFSet_Ena,
+    VArPct_Ena,
+    WMaxLim_Ena,
+} from '../sunspec/models/controls';
+import { Conn, type ControlsModelWrite } from '../sunspec/models/controls';
 import type { DERControlBase } from '../sep2/models/derControlBase';
 import { numberWithPow10 } from '../number';
 
-export function generateControlsModelWriteFromDynamicExportValues(
-    config: DynamicExportConfig,
-): ControlsModelWrite {
-    // TODO implement
-    throw new Error('not implemented');
+export function generateControlsModelWriteFromDynamicExportConfig({
+    config,
+    controlsModel,
+}: {
+    config: DynamicExportConfig;
+    controlsModel: ControlsModel;
+}): ControlsModelWrite {
+    switch (config.type) {
+        case 'deenergize':
+            return {
+                ...controlsModel,
+                Conn: Conn.DISCONNECT,
+                WMaxLim_Ena: WMaxLim_Ena.DISABLED,
+                VArPct_Ena: VArPct_Ena.DISABLED,
+                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
+            };
+        case 'limit':
+            return {
+                ...controlsModel,
+                Conn: Conn.CONNECT,
+                WMaxLim_Ena: WMaxLim_Ena.ENABLED,
+                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
+                    targetSolarPowerRatio: config.targetSolarPowerRatio,
+                    controlsModel,
+                }),
+                VArPct_Ena: VArPct_Ena.DISABLED,
+                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
+            };
+    }
+}
+
+export function getWMaxLimPctFromTargetSolarPowerRatio({
+    targetSolarPowerRatio,
+    controlsModel,
+}: {
+    targetSolarPowerRatio: number;
+    controlsModel: Pick<ControlsModel, 'WMaxLimPct_SF'>;
+}) {
+    return numberWithPow10(
+        new Decimal(targetSolarPowerRatio).times(100).toNumber(),
+        -controlsModel.WMaxLimPct_SF,
+    );
 }
 
 type DynamicExportConfig =
