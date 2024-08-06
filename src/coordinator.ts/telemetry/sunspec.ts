@@ -5,7 +5,7 @@ import { getAggregatedMeterMetrics } from '../../sunspec/helpers/meterMetrics';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { type MeterModel } from '../../sunspec/models/meter';
 
-type Telemetry = {
+export type SunSpecTelemetry = {
     realPower: {
         site: PerPhaseMeasurement;
         der: PerPhaseMeasurement;
@@ -24,13 +24,13 @@ type Telemetry = {
     };
 };
 
-export function getTelemetryFromSunSpec({
+export function getSunSpecTelemetry({
     inverters,
     meters,
 }: {
     inverters: InverterModel[];
     meters: MeterModel[];
-}): Telemetry {
+}): SunSpecTelemetry {
     const aggregatedMeterMetrics = getAggregatedMeterMetrics(meters);
     const aggregatedInverterMetrics = getAggregatedInverterMetrics(inverters);
 

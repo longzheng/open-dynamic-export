@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { getTelemetryFromSunSpec } from '../src/coordinator.ts/telemetry/sunspec';
+import { getSunSpecTelemetry } from '../src/coordinator.ts/telemetry/sunspec';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 
 // This debugging script continously outputs telemetry data
@@ -29,7 +29,7 @@ async function poll() {
 
         console.log('telemetry');
 
-        const telemetry = getTelemetryFromSunSpec({
+        const telemetry = getSunSpecTelemetry({
             inverters: invertersData,
             meters: metersData,
         });

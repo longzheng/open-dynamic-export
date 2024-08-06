@@ -44,6 +44,17 @@ describe('calculateTargetSolarPowerRatio', () => {
 
         expect(targetPowerRatio).toBe(0);
     });
+
+    it('avoid floating point errors', () => {
+        // these values don't make sense practically but is designed to test floating point errors
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            currentSolarWatts: 3,
+            currentPowerRatio: 1,
+            targetSolarWatts: 0.27,
+        });
+
+        expect(targetPowerRatio).toBe(0.09);
+    });
 });
 
 describe('calculateTargetSolarWatts', () => {
@@ -75,5 +86,16 @@ describe('calculateTargetSolarWatts', () => {
         });
 
         expect(targetSolar).toBe(6000);
+    });
+
+    it('avoid floating point errors', () => {
+        // these values don't make sense practically but is designed to test floating point errors
+        const targetSolar = calculateTargetSolarWatts({
+            solarWatts: 8.13,
+            siteWatts: -5.75,
+            exportLimitWatts: 0,
+        });
+
+        expect(targetSolar).toBe(2.38);
     });
 });

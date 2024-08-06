@@ -1,38 +1,16 @@
+import Decimal from 'decimal.js';
 import { getTotalFromPerPhaseMeasurement } from '../power';
-import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
-import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
-import { getAveragePowerRatio } from '../sunspec/helpers/controls';
-import { getTelemetryFromSunSpec } from './telemetry/sunspec';
+import type { SunSpecTelemetry } from './telemetry/sunspec';
 
-export async function calculateDynamicExportValues({
+export function calculateDynamicExportValues({
     exportLimitWatts,
-    invertersConnections,
-    metersConnections,
+    telemetry,
+    currentPowerRatio,
 }: {
     exportLimitWatts: number;
-    invertersConnections: InverterSunSpecConnection[];
-    metersConnections: MeterSunSpecConnection[];
+    telemetry: SunSpecTelemetry;
+    currentPowerRatio: number;
 }) {
-    const invertersData = await Promise.all(
-        invertersConnections.map(async (inverter) => {
-            return {
-                inverter: await inverter.getInverterModel(),
-                controls: await inverter.getControlsModel(),
-            };
-        }),
-    );
-
-    const metersData = await Promise.all(
-        metersConnections.map(async (meter) => {
-            return await meter.getMeterModel();
-        }),
-    );
-
-    const telemetry = getTelemetryFromSunSpec({
-        inverters: invertersData.map(({ inverter }) => inverter),
-        meters: metersData,
-    });
-
     const siteWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.site);
     const solarWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.der);
 
@@ -41,10 +19,6 @@ export async function calculateDynamicExportValues({
         siteWatts,
         solarWatts,
     });
-
-    const currentPowerRatio = getAveragePowerRatio(
-        invertersData.map(({ controls }) => controls),
-    );
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         currentPowerRatio,
@@ -56,7 +30,6 @@ export async function calculateDynamicExportValues({
         siteWatts,
         solarWatts,
         targetSolarWatts,
-        currentPowerRatio,
         targetSolarPowerRatio,
     };
 }
@@ -71,11 +44,15 @@ export function calculateTargetSolarPowerRatio({
     // the current power ratio expressed as a decimal (0.0-1.0)
     currentPowerRatio: number;
 }) {
-    const estimatedSolarCapacity = currentSolarWatts / currentPowerRatio;
-    const targetPowerRatio = targetSolarWatts / estimatedSolarCapacity;
+    const estimatedSolarCapacity = new Decimal(currentSolarWatts).div(
+        currentPowerRatio,
+    );
+    const targetPowerRatio = new Decimal(targetSolarWatts).div(
+        estimatedSolarCapacity,
+    );
 
     // cap the target power ratio to 1.0
-    return Math.min(targetPowerRatio, 1);
+    return targetPowerRatio.clamp(0, 1).toNumber();
 }
 
 // calculate the target solar power to meet the export limit
@@ -93,8 +70,10 @@ export function calculateTargetSolarWatts({
     siteWatts: number;
     exportLimitWatts: number;
 }) {
-    const changeToMeetExportLimit = -siteWatts + -exportLimitWatts;
-    const solarTarget = solarWatts - changeToMeetExportLimit;
+    const changeToMeetExportLimit = new Decimal(-siteWatts).plus(
+        -exportLimitWatts,
+    );
+    const solarTarget = new Decimal(solarWatts).sub(changeToMeetExportLimit);
 
-    return solarTarget;
+    return solarTarget.toNumber();
 }

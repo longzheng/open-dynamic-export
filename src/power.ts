@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js';
+
 export type SitePhases = 'singlePhase' | 'splitPhase' | 'threePhase';
 
 export type PerPhaseMeasurement = {
@@ -11,5 +13,8 @@ export function getTotalFromPerPhaseMeasurement({
     phaseB,
     phaseC,
 }: PerPhaseMeasurement) {
-    return phaseA + (phaseB ?? 0) + (phaseC ?? 0);
+    return new Decimal(phaseA)
+        .plus(phaseB ?? 0)
+        .plus(phaseC ?? 0)
+        .toNumber();
 }
