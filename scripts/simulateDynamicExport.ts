@@ -1,15 +1,21 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
 import { getSunSpecConnections } from '../src/sunspec/connections';
-import { calculateDynamicExportValues } from '../src/coordinator.ts/dynamicExport';
+import { calculateDynamicExportConfig } from '../src/coordinator.ts/dynamicExport';
 import { getSunSpecTelemetry } from '../src/coordinator.ts/telemetry/sunspec';
 import { getAveragePowerRatio } from '../src/sunspec/helpers/controls';
+import type { DERControlBase } from '../src/sep2/models/derControlBase';
 
 // This debugging script simulates dynamic export control (without actually sending commands to inverters)
 // It polls SunSpec data and telemetry
 // It logs the the calculated target solar watts and power ratio to the console
 
-const simulatedExportLimitWatts = 10000;
+const simulatedActiveDerControlBase: DERControlBase = {
+    opModExpLimW: {
+        value: 10000,
+        multiplier: 0,
+    },
+};
 
 const config = getConfig();
 
@@ -47,26 +53,13 @@ async function poll() {
             invertersData.map(({ controls }) => controls),
         );
 
-        const {
-            siteWatts,
-            solarWatts,
-            targetSolarWatts,
-            targetSolarPowerRatio,
-        } = calculateDynamicExportValues({
-            exportLimitWatts: simulatedExportLimitWatts,
+        const dynamicExportConfig = calculateDynamicExportConfig({
+            activeDerControlBase: simulatedActiveDerControlBase,
             telemetry,
             currentPowerRatio,
         });
 
-        console.table([
-            {
-                siteWatts,
-                solarWatts,
-                targetSolarWatts,
-                currentPowerRatio,
-                targetSolarPowerRatio,
-            },
-        ]);
+        console.log(JSON.stringify(dynamicExportConfig, null, 2));
     } catch (error) {
         console.log('Failed to calculate dynamic export', error);
     } finally {

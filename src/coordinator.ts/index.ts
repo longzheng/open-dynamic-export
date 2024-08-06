@@ -6,7 +6,7 @@ import { callEveryMinutesInterval } from '../cron';
 import { getSunSpecTelemetry } from './telemetry/sunspec';
 import { TelemetryCache } from './telemetry/cache';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';
-import { calculateDynamicExportValues } from './dynamicExport';
+import { calculateDynamicExportConfig } from './dynamicExport';
 import { generateCsipAusDerMonitoring } from './telemetry/sep2';
 
 const config = getConfig();
@@ -22,8 +22,6 @@ const sep2Client = new SEP2Client({
 });
 
 const telemetryCache = new TelemetryCache();
-
-const dynamicExportLimitWatts = 1500;
 
 async function main() {
     console.log('Discovering SEP2');
@@ -82,13 +80,8 @@ async function sunSpecLoop() {
         telemetryCache.addToCache(telemetry);
 
         // calculate dynamic export values
-        const {
-            siteWatts,
-            solarWatts,
-            targetSolarWatts,
-            targetSolarPowerRatio,
-        } = calculateDynamicExportValues({
-            exportLimitWatts: dynamicExportLimitWatts,
+        const dynamicExportConfig = calculateDynamicExportConfig({
+            activeDerControlBase: null, // TODO get active DER control base
             telemetry,
             currentPowerRatio,
         });

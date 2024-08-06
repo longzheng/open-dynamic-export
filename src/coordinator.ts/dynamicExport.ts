@@ -1,18 +1,47 @@
 import Decimal from 'decimal.js';
 import { getTotalFromPerPhaseMeasurement } from '../power';
 import type { SunSpecTelemetry } from './telemetry/sunspec';
+import { type ControlsModelWrite } from '../sunspec/models/controls';
+import type { DERControlBase } from '../sep2/models/derControlBase';
+import { numberWithPow10 } from '../number';
 
-export function calculateDynamicExportValues({
-    exportLimitWatts,
+export function generateControlsModelWriteFromDynamicExportValues(
+    config: DynamicExportConfig,
+): ControlsModelWrite {
+    // TODO implement
+    throw new Error('not implemented');
+}
+
+type DynamicExportConfig =
+    | { type: 'deenergize' }
+    | {
+          type: 'limit';
+          targetSolarPowerRatio: number;
+      };
+
+export function calculateDynamicExportConfig({
+    activeDerControlBase,
     telemetry,
     currentPowerRatio,
 }: {
-    exportLimitWatts: number;
+    activeDerControlBase: DERControlBase | null;
     telemetry: SunSpecTelemetry;
     currentPowerRatio: number;
-}) {
+}): DynamicExportConfig {
+    if (activeDerControlBase?.opModEnergize === false) {
+        return { type: 'deenergize' };
+    }
+
     const siteWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.site);
     const solarWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.der);
+
+    const exportLimitWatts = activeDerControlBase?.opModExpLimW
+        ? numberWithPow10(
+              activeDerControlBase.opModExpLimW.value,
+              activeDerControlBase.opModExpLimW.multiplier,
+          )
+        : // fallback to universal default of 1500W
+          1500;
 
     const targetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
@@ -26,10 +55,16 @@ export function calculateDynamicExportValues({
         targetSolarWatts,
     });
 
-    return {
+    console.log('calculateDynamicExportConfig', {
         siteWatts,
         solarWatts,
         targetSolarWatts,
+        currentPowerRatio,
+        targetSolarPowerRatio,
+    });
+
+    return {
+        type: 'limit',
         targetSolarPowerRatio,
     };
 }
