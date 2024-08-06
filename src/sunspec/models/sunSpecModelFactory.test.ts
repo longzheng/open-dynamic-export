@@ -64,12 +64,45 @@ const mapping: Mapping<Model, keyof ModelWrite> = {
     },
 };
 
-const model = sunSpecModelFactory<Model, keyof ModelWrite>({
-    mapping,
+it('convertReadRegisters should convert registers to model', () => {
+    const registers: number[] = [
+        0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00,
+    ];
+
+    const result = convertReadRegisters({
+        registers,
+        mapping,
+    });
+
+    expect(result).toStrictEqual({
+        ID: 1,
+        Hello: 17,
+        World: 273,
+        Test: 'hello',
+    });
+});
+
+it('convertWriteRegisters should convert registers to model', () => {
+    const values = {
+        Hello: 3,
+        World: -128,
+    } satisfies ModelWrite;
+
+    const result = convertWriteRegisters({
+        values,
+        mapping,
+        length: 6,
+    });
+
+    expect(result).toEqual([0, 3, 0xff80, 0, 0, 0]);
 });
 
 describe('sunSpecModelFactory', () => {
     let inverterSunSpecConnection: InverterSunSpecConnection;
+
+    const model = sunSpecModelFactory<Model, keyof ModelWrite>({
+        mapping,
+    });
 
     beforeEach(() => {
         inverterSunSpecConnection = new InverterSunSpecConnection({
@@ -81,39 +114,6 @@ describe('sunSpecModelFactory', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
-    });
-
-    it('convertReadRegisters should convert registers to model', () => {
-        const registers: number[] = [
-            0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00,
-        ];
-
-        const result = convertReadRegisters({
-            registers,
-            mapping,
-        });
-
-        expect(result).toStrictEqual({
-            ID: 1,
-            Hello: 17,
-            World: 273,
-            Test: 'hello',
-        });
-    });
-
-    it('convertWriteRegisters should convert registers to model', () => {
-        const values = {
-            Hello: 3,
-            World: -128,
-        } satisfies ModelWrite;
-
-        const result = convertWriteRegisters({
-            values,
-            mapping,
-            length: 6,
-        });
-
-        expect(result).toEqual([0, 3, 0xff80, 0, 0, 0]);
     });
 
     it('sunSpecModelFactory.read returns correct data', async () => {
