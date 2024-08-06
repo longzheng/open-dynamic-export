@@ -1,7 +1,8 @@
+import { getTotalFromPerPhaseMeasurement } from '../power';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';
-import { getTelemetryFromSunSpec } from './telemetry';
+import { getTelemetryFromSunSpec } from './telemetry/sunspec';
 
 export async function calculateDynamicExportValues({
     exportLimitWatts,
@@ -32,8 +33,8 @@ export async function calculateDynamicExportValues({
         meters: metersData,
     });
 
-    const siteWatts = telemetry.realPower.site.total;
-    const solarWatts = telemetry.realPower.der.total;
+    const siteWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.site);
+    const solarWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.der);
 
     const targetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,

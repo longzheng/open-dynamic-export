@@ -1,15 +1,9 @@
-import { assertNonNull } from '../null';
-import { getAggregatedInverterMetrics } from '../sunspec/helpers/inverterMetrics';
-import { getAggregatedMeterMetrics } from '../sunspec/helpers/meterMetrics';
-import type { InverterModel } from '../sunspec/models/inverter';
-import { type MeterModel } from '../sunspec/models/meter';
-
-type PerPhaseMeasurement = {
-    total: number;
-    phaseA: number;
-    phaseB: number | null;
-    phaseC: number | null;
-};
+import { assertNonNull } from '../../null';
+import type { PerPhaseMeasurement } from '../../power';
+import { getAggregatedInverterMetrics } from '../../sunspec/helpers/inverterMetrics';
+import { getAggregatedMeterMetrics } from '../../sunspec/helpers/meterMetrics';
+import type { InverterModel } from '../../sunspec/models/inverter';
+import { type MeterModel } from '../../sunspec/models/meter';
 
 type Telemetry = {
     realPower: {
@@ -43,13 +37,11 @@ export function getTelemetryFromSunSpec({
     return {
         realPower: {
             site: {
-                total: aggregatedMeterMetrics.W,
                 phaseA: aggregatedMeterMetrics.WphA ?? aggregatedMeterMetrics.W,
                 phaseB: aggregatedMeterMetrics.WphB,
                 phaseC: aggregatedMeterMetrics.WphC,
             },
             der: {
-                total: aggregatedInverterMetrics.W,
                 // inverter W is only single phase
                 // we have to manually calculate per phase power using voltage * current
                 phaseA: aggregatedInverterMetrics.PhVphA
@@ -68,7 +60,6 @@ export function getTelemetryFromSunSpec({
         },
         reactivePower: {
             site: {
-                total: assertNonNull(aggregatedMeterMetrics.VAR),
                 phaseA: assertNonNull(
                     aggregatedMeterMetrics.VARphA ?? aggregatedMeterMetrics.VAR,
                 ),
@@ -79,7 +70,6 @@ export function getTelemetryFromSunSpec({
         },
         voltage: {
             site: {
-                total: assertNonNull(aggregatedMeterMetrics.PhV),
                 phaseA: assertNonNull(
                     aggregatedMeterMetrics.PhVphA ?? aggregatedMeterMetrics.PhV,
                 ),
@@ -87,7 +77,6 @@ export function getTelemetryFromSunSpec({
                 phaseC: aggregatedMeterMetrics.PhVphC,
             },
             der: {
-                total: assertNonNull(aggregatedInverterMetrics.PhVphA),
                 phaseA: assertNonNull(aggregatedInverterMetrics.PhVphA),
                 phaseB: aggregatedInverterMetrics.PhVphB,
                 phaseC: aggregatedInverterMetrics.PhVphC,

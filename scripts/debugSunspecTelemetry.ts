@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { getTelemetryFromSunSpec } from '../src/coordinator.ts/telemetry';
+import { getTelemetryFromSunSpec } from '../src/coordinator.ts/telemetry/sunspec';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 
 // This debugging script continously outputs telemetry data
