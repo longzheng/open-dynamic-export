@@ -3,14 +3,17 @@ import { scheduler } from 'timers/promises';
 import type { CommonModel } from '../models/common';
 import { commonModel } from '../models/common';
 
-const connectionTimeoutMs = 10000;
+const connectionTimeoutMs = 5000;
 
 export abstract class SunSpecConnection {
     public client: ModbusRTU;
     private ip: string;
     private port: number;
     private unitId: number;
-    private state: 'connected' | 'connecting' | 'disconnected' = 'disconnected';
+    private state:
+        | { type: 'connected' }
+        | { type: 'connecting'; connectPromise: Promise<void> }
+        | { type: 'disconnected' } = { type: 'disconnected' };
     private commonModel: CommonModel | null = null;
 
     constructor({
@@ -28,15 +31,16 @@ export abstract class SunSpecConnection {
         this.unitId = unitId;
 
         this.client.on('close', () => {
-            this.state = 'disconnected';
+            this.state = { type: 'disconnected' };
 
             console.error(
                 `SunSpec Modbus client closed ${this.ip}:${this.port} Unit ID ${this.unitId}`,
             );
         });
 
+        // This is never observed to be triggered
         this.client.on('error', (err) => {
-            this.state = 'disconnected';
+            this.state = { type: 'disconnected' };
 
             console.error(
                 `SunSpec Modbus client error ${this.ip}:${this.port} Unit ID ${this.unitId}`,
@@ -44,57 +48,62 @@ export abstract class SunSpecConnection {
             );
         });
 
-        void this.connect();
+        this.connect().catch(() => {
+            // no op
+        });
     }
 
-    private async connect() {
-        if (this.state !== 'disconnected') {
-            return;
-        }
+    async connect() {
+        switch (this.state.type) {
+            case 'connected':
+                return;
+            case 'connecting':
+                return this.state.connectPromise;
+            case 'disconnected': {
+                const connectPromise = (async () => {
+                    try {
+                        console.log(
+                            `SunSpec Modbus client connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                        );
 
-        this.state = 'connecting';
+                        await this.client.connectTCP(this.ip, {
+                            port: this.port,
+                            timeout: connectionTimeoutMs,
+                        });
 
-        try {
-            console.log(
-                `SunSpec Modbus client connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-            );
-            await this.client.connectTCP(this.ip, {
-                port: this.port,
-                timeout: connectionTimeoutMs,
-            });
+                        this.client.setID(this.unitId);
+                        this.client.setTimeout(connectionTimeoutMs);
 
-            this.client.setID(this.unitId);
-            this.client.setTimeout(connectionTimeoutMs);
+                        console.log(
+                            `SunSpec Modbus client connected to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                        );
 
-            console.log(
-                `SunSpec Modbus client connected to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-            );
+                        this.state = { type: 'connected' };
 
-            this.state = 'connected';
+                        // cache common model
+                        // this is not expected to ever change so it can be persisted
+                        if (!this.commonModel) {
+                            console.log(
+                                `Caching common model for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                            );
+                            this.commonModel = await this.getCommonModel();
+                        }
+                    } catch (error) {
+                        console.log(
+                            `SunSpec Modbus client error connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                            error,
+                        );
 
-            // cache common model
-            // this is not expected to ever change so it can be persisted
-            if (!this.commonModel) {
-                console.log(
-                    `Caching common model for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-                );
-                this.commonModel = await this.getCommonModel();
+                        this.state = { type: 'disconnected' };
+
+                        throw error;
+                    }
+                })();
+
+                this.state = { type: 'connecting', connectPromise };
+
+                return connectPromise;
             }
-        } catch (error) {
-            console.error(
-                `Error connecting to SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-                error,
-            );
-            this.state = 'disconnected';
-        }
-    }
-
-    // even though the client may be connected, we cannot send requests until it is "open"
-    public async waitUntilOpen() {
-        while (this.state !== 'connected') {
-            void this.connect();
-
-            await scheduler.wait(1000);
         }
     }
 

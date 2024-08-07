@@ -3,17 +3,24 @@ import { defaultIntervalSeconds, SEP2Client } from '../sep2/client';
 import { getConfig, getConfigSep2CertKey } from '../config';
 import { getSunSpecConnections } from '../sunspec/connections';
 import { callEveryMinutesInterval } from '../cron';
-import { getSunSpecTelemetry } from './telemetry/sunspec';
 import { TelemetryCache } from './telemetry/cache';
-import { getAveragePowerRatio } from '../sunspec/helpers/controls';
-import { calculateDynamicExportConfig } from './dynamicExport';
+import {
+    calculateDynamicExportConfig,
+    generateControlsModelWriteFromDynamicExportConfig,
+} from './dynamicExport';
 import { generateCsipAusDerMonitoring } from './telemetry/sep2';
+import { SunSpecDataEventEmitter } from './sunspecDataEventEmitter';
 
 const config = getConfig();
 const { sep2Cert, sep2Key } = getConfigSep2CertKey(config);
 
 const { invertersConnections, metersConnections } =
     getSunSpecConnections(config);
+
+const sunSpecDataEventEmitter = new SunSpecDataEventEmitter({
+    invertersConnections,
+    metersConnections,
+});
 
 const sep2Client = new SEP2Client({
     sep2Config: config.sep2,
@@ -25,6 +32,7 @@ const telemetryCache = new TelemetryCache();
 
 async function main() {
     console.log('Discovering SEP2');
+
     await sep2Client.discovery().then(() => {
         // poll at default interval
         setInterval(() => {
@@ -33,7 +41,41 @@ async function main() {
     });
 
     console.log('Starting SunSpec control loop');
-    void sunSpecLoop();
+
+    sunSpecDataEventEmitter.on(
+        'data',
+        ({ invertersData, telemetry, currentAveragePowerRatio }) => {
+            void (async () => {
+                // save telemetry to cache for SEP2 telemetry
+                telemetryCache.addToCache(telemetry);
+
+                const dynamicExportConfig = calculateDynamicExportConfig({
+                    activeDerControlBase: null, // TODO get active DER control base
+                    telemetry,
+                    currentAveragePowerRatio,
+                });
+
+                // TODO: set dynamic export value
+                await Promise.all(
+                    invertersConnections.map(async (inverter, index) => {
+                        const inverterData = invertersData[index];
+
+                        if (!inverterData) {
+                            throw new Error('Inverter data not found');
+                        }
+
+                        const writeControlsModel =
+                            generateControlsModelWriteFromDynamicExportConfig({
+                                config: dynamicExportConfig,
+                                controlsModel: inverterData.controls,
+                            });
+
+                        await inverter.writeControlsModel(writeControlsModel);
+                    }),
+                );
+            })();
+        },
+    );
 
     // send SEP2 telemetry every 5 minutes on the dot
     callEveryMinutesInterval(() => {
@@ -42,66 +84,6 @@ async function main() {
         const csipAusDerMonitoring =
             generateCsipAusDerMonitoring(telemetryList);
     }, 5);
-}
-
-async function sunSpecLoop() {
-    try {
-        // get necessary inverter data
-        const invertersData = await Promise.all(
-            invertersConnections.map(async (inverter) => {
-                return {
-                    inverter: await inverter.getInverterModel(),
-                    controls: await inverter.getControlsModel(),
-                };
-            }),
-        );
-
-        // get necessary meter data
-        const metersData = await Promise.all(
-            metersConnections.map(async (meter) => {
-                return {
-                    meter: await meter.getMeterModel(),
-                };
-            }),
-        );
-
-        // calculate telemetry data
-        const telemetry = getSunSpecTelemetry({
-            inverters: invertersData.map(({ inverter }) => inverter),
-            meters: metersData.map(({ meter }) => meter),
-        });
-
-        // calculate current average inverter power ratio
-        const currentPowerRatio = getAveragePowerRatio(
-            invertersData.map(({ controls }) => controls),
-        );
-
-        // save telemetry to cache for SEP2 telemetry
-        telemetryCache.addToCache(telemetry);
-
-        // calculate dynamic export values
-        const dynamicExportConfig = calculateDynamicExportConfig({
-            activeDerControlBase: null, // TODO get active DER control base
-            telemetry,
-            currentPowerRatio,
-        });
-
-        // TODO: set dynamic export value
-        // invertersConnections.map(async (inverter) => {
-        //     await inverter.writeControlsModel();
-        // });
-    } catch (error) {
-        console.log('Failed to calculate dynamic export', error);
-    } finally {
-        setTimeout(
-            () => {
-                void sunSpecLoop();
-            },
-            // CSIP-AUS requires average readings to be sampled at least every 5 seconds (see SA Power Networks – Dynamic Exports Utility Interconnection Handbook)
-            // we execute this loop every 1 second to meet sampling requirements and meeting dynamic export requirements
-            1000,
-        );
-    }
 }
 
 void main();

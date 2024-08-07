@@ -49,7 +49,7 @@ export function sunSpecModelFactory<
 
     return {
         read: async ({ modbusConnection, addressStart }) => {
-            await modbusConnection.waitUntilOpen();
+            await modbusConnection.connect();
 
             const address =
                 typeof addressStart === 'number'
@@ -70,7 +70,7 @@ export function sunSpecModelFactory<
             });
         },
         write: async ({ modbusConnection, addressStart, values }) => {
-            await modbusConnection.waitUntilOpen();
+            await modbusConnection.connect();
 
             const address =
                 typeof addressStart === 'number'

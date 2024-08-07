@@ -65,11 +65,11 @@ type DynamicExportConfig =
 export function calculateDynamicExportConfig({
     activeDerControlBase,
     telemetry,
-    currentPowerRatio,
+    currentAveragePowerRatio,
 }: {
     activeDerControlBase: DERControlBase | null;
     telemetry: SunSpecTelemetry;
-    currentPowerRatio: number;
+    currentAveragePowerRatio: number;
 }): DynamicExportConfig {
     if (activeDerControlBase?.opModEnergize === false) {
         return { type: 'deenergize' };
@@ -93,7 +93,7 @@ export function calculateDynamicExportConfig({
     });
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
-        currentPowerRatio,
+        currentPowerRatio: currentAveragePowerRatio,
         currentSolarWatts: solarWatts,
         targetSolarWatts,
     });
@@ -102,7 +102,7 @@ export function calculateDynamicExportConfig({
         siteWatts,
         solarWatts,
         targetSolarWatts,
-        currentPowerRatio,
+        currentPowerRatio: currentAveragePowerRatio,
         targetSolarPowerRatio,
     });
 
