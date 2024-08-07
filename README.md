@@ -72,7 +72,7 @@ The downside of a direct client approach is the registration process is manual a
   - [ ] Telemetry reporting
 - [x] SunSpec Modbus client
   - [x] Fronius inverter testing
-- [ ] Dynamic export control logic
+- [X] Dynamic export control logic
 
 Future
 - [ ] Cloud proxy mode
