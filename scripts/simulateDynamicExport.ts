@@ -17,7 +17,11 @@ const simulatedActiveDerControlBase: DERControlBase = {
         value: 10000,
         multiplier: 0,
     },
+    // opModEnergize: false,
 };
+
+// whether or not to apply the change on the inverter
+const simulateWriteControls = false;
 
 const config = getConfig();
 
@@ -56,5 +60,26 @@ sunSpecDataEventEmitter.on(
                 OutPFSet_Ena: controls.OutPFSet_Ena,
             })),
         );
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (simulateWriteControls) {
+            void invertersConnections.map(async (inverter, index) => {
+                const inverterData = invertersData[index];
+
+                if (!inverterData) {
+                    throw new Error('Inverter data not found');
+                }
+
+                const writeControlsModel =
+                    generateControlsModelWriteFromDynamicExportConfig({
+                        config: dynamicExportConfig,
+                        controlsModel: inverterData.controls,
+                    });
+
+                console.log('Writing controls model', writeControlsModel);
+
+                await inverter.writeControlsModel(writeControlsModel);
+            });
+        }
     },
 );
