@@ -46,6 +46,36 @@ describe('calculateTargetSolarPowerRatio', () => {
         expect(targetPowerRatio).toBe(0);
     });
 
+    it('should return a hard-coded power ratio of 0.01 if current power ratio is 0 and target is greater', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            currentSolarWatts: 70.52,
+            currentPowerRatio: 0,
+            targetSolarWatts: 9000,
+        });
+
+        expect(targetPowerRatio).toBe(0.01);
+    });
+
+    it('should return a hard-coded power ratio of 0.01 if current power ratio is NaN and target is greater', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            currentSolarWatts: 70.52,
+            currentPowerRatio: Number.NaN,
+            targetSolarWatts: 9000,
+        });
+
+        expect(targetPowerRatio).toBe(0.01);
+    });
+
+    it('should return a hard-coded power ratio of 0 if current power ratio is 0 and target is lower', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            currentSolarWatts: 70.52,
+            currentPowerRatio: 0,
+            targetSolarWatts: 0,
+        });
+
+        expect(targetPowerRatio).toBe(0);
+    });
+
     it('avoid floating point errors', () => {
         // these values don't make sense practically but is designed to test floating point errors
         const targetPowerRatio = calculateTargetSolarPowerRatio({

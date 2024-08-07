@@ -23,7 +23,12 @@ export function generateControlsModelWriteFromDynamicExportConfig({
             return {
                 ...controlsModel,
                 Conn: Conn.DISCONNECT,
-                WMaxLim_Ena: WMaxLim_Ena.DISABLED,
+                // some devices may not support setting Conn so we also try setting power to 0
+                WMaxLim_Ena: WMaxLim_Ena.ENABLED,
+                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
+                    targetSolarPowerRatio: 0,
+                    controlsModel,
+                }),
                 VArPct_Ena: VArPct_Ena.DISABLED,
                 OutPFSet_Ena: OutPFSet_Ena.DISABLED,
             };
@@ -122,6 +127,20 @@ export function calculateTargetSolarPowerRatio({
     // the current power ratio expressed as a decimal (0.0-1.0)
     currentPowerRatio: number;
 }) {
+    // edge case if the current power ratio is 0
+    // there is no way to calculate the target power ratio because we cannot divide by 0
+    // set a hard-coded power ratio
+    // hopefully at a future cycle then it will be able to calculate the target power ratio
+    if (currentPowerRatio === 0 || isNaN(currentPowerRatio)) {
+        if (targetSolarWatts > currentSolarWatts) {
+            // if the target is higher than the current, set a hard-coded power ratio of 0.01
+            return 0.01;
+        } else {
+            // if the target is lower than the current, set a hard-coded power ratio of 0
+            return 0;
+        }
+    }
+
     const estimatedSolarCapacity = new Decimal(currentSolarWatts).div(
         currentPowerRatio,
     );
