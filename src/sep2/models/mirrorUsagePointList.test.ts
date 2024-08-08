@@ -10,8 +10,7 @@ it('should parse end device list XML', async () => {
 
     const mirrorUsagePointList = parseMirrorUsagePointListXml(xml);
 
-    expect(mirrorUsagePointList.all).toBe(2);
-    expect(mirrorUsagePointList.results).toBe(2);
+    expect(mirrorUsagePointList.list.all).toBe(2);
     expect(mirrorUsagePointList.mirrorUsagePoints.length).toBe(2);
     expect(mirrorUsagePointList.mirrorUsagePoints[0]?.mRID).toBe(
         '4075DE6031E562ACF4D9EA4900057269',

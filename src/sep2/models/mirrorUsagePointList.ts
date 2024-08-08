@@ -1,23 +1,17 @@
-import { safeParseIntString } from '../../number';
-import { assertArray, assertString } from '../helpers/assert';
+import { assertArray } from '../helpers/assert';
+import { parseListXmlObject, type List } from './list';
 import type { MirrorUsagePoint } from './mirrorUsagePoint';
 import { parseMirrorUsagePointXmlObject } from './mirrorUsagePoint';
 
 export type MirrorUsagePointList = {
-    all: number;
-    results: number;
+    list: List;
     mirrorUsagePoints: MirrorUsagePoint[];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const all = safeParseIntString(
-        assertString(xml['MirrorUsagePointList']['$']['all']),
-    );
-    const results = safeParseIntString(
-        assertString(xml['MirrorUsagePointList']['$']['results']),
-    );
+    const list = parseListXmlObject(xml['MirrorUsagePointList']);
     const mirrorUsagePointArray = assertArray(
         xml['MirrorUsagePointList']['MirrorUsagePoint'],
     );
@@ -28,8 +22,7 @@ export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
     );
 
     return {
-        all,
-        results,
+        list,
         mirrorUsagePoints,
     };
 }
