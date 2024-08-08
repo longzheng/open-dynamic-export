@@ -119,8 +119,6 @@ it('should generate meter reading MRID', () => {
     const result = sep2Client.generateMeterReadingMrid();
     const result2 = sep2Client.generateMeterReadingMrid();
 
-    console.log(result, result2);
-
     expect(result).toContain('00012345');
     expect(result).not.toBe(result2);
 });

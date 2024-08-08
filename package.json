@@ -30,6 +30,8 @@
         "decimal.js": "^10.4.3",
         "dotenv": "^16.4.5",
         "modbus-serial": "^8.0.17",
+        "pino": "^9.3.2",
+        "pino-pretty": "^11.2.2",
         "pkijs": "^3.2.1",
         "tsx": "^4.16.2",
         "typescript": "^5.5.3",

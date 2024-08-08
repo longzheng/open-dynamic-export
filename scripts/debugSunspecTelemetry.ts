@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { getConfig } from '../src/config';
 import { getSunSpecTelemetry } from '../src/coordinator.ts/telemetry/sunspec';
 import { getSunSpecConnections } from '../src/sunspec/connections';
+import { logger } from '../src/logger';
 
 // This debugging script continously outputs telemetry data
 // It reads SunSpec data, transforms and aggregates it into telemetry model
@@ -27,16 +28,14 @@ async function poll() {
             }),
         );
 
-        console.log('telemetry');
-
         const telemetry = getSunSpecTelemetry({
             inverters: invertersData,
             meters: metersData,
         });
 
-        console.dir(telemetry);
+        logger.info(telemetry, 'telemetry');
     } catch (error) {
-        console.log('Failed to get interval telemetry', error);
+        logger.error(error, 'Failed to get interval telemetry');
     } finally {
         setTimeout(() => {
             void poll();

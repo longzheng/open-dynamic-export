@@ -10,6 +10,9 @@ import {
 import { Conn, type ControlsModelWrite } from '../sunspec/models/controls';
 import type { DERControlBase } from '../sep2/models/derControlBase';
 import { numberWithPow10 } from '../number';
+import { logger as pinoLogger } from '../logger';
+
+const logger = pinoLogger.child({ module: 'dynamic-export' });
 
 export function generateControlsModelWriteFromDynamicExportConfig({
     config,
@@ -103,13 +106,16 @@ export function calculateDynamicExportConfig({
         targetSolarWatts,
     });
 
-    console.log('calculateDynamicExportConfig', {
-        siteWatts,
-        solarWatts,
-        targetSolarWatts,
-        currentPowerRatio: currentAveragePowerRatio,
-        targetSolarPowerRatio,
-    });
+    logger.child({ module: 'calculateDynamicExportConfig' }).debug(
+        {
+            siteWatts,
+            solarWatts,
+            targetSolarWatts,
+            currentPowerRatio: currentAveragePowerRatio,
+            targetSolarPowerRatio,
+        },
+        'calculated limit',
+    );
 
     return {
         type: 'limit',

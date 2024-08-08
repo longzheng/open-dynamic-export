@@ -10,6 +10,9 @@ import {
 } from './dynamicExport';
 import { generateCsipAusDerMonitoring } from './telemetry/sep2';
 import { SunSpecDataEventEmitter } from './sunspecDataEventEmitter';
+import { logger as pinoLogger } from '../logger';
+
+const logger = pinoLogger.child({ module: 'coordinator' });
 
 const config = getConfig();
 const { sep2Cert, sep2Key } = getConfigSep2CertKey(config);
@@ -31,7 +34,7 @@ const sep2Client = new SEP2Client({
 const telemetryCache = new TelemetryCache();
 
 async function main() {
-    console.log('Discovering SEP2');
+    logger.info('Discovering SEP2');
 
     await sep2Client.discovery().then(() => {
         // poll at default interval
@@ -40,7 +43,7 @@ async function main() {
         }, defaultIntervalSeconds.DeviceCapability * 1000);
     });
 
-    console.log('Starting SunSpec control loop');
+    logger.info('Starting SunSpec control loop');
 
     sunSpecDataEventEmitter.on(
         'data',

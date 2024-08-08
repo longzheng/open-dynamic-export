@@ -4,6 +4,7 @@ import { InverterSunSpecConnection } from '../src/sunspec/connection/inverter';
 import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
 import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics';
 import { getInverterMetrics } from '../src/sunspec/helpers/inverterMetrics';
+import { logger } from '../src/logger';
 
 // This debugging script dumps all the SunSpec model data
 // It polls the inverters and smart meters once
@@ -35,8 +36,7 @@ void (async () => {
         }),
     );
 
-    console.log('inverters data');
-    console.dir(invertersData);
+    logger.info(invertersData, 'inverters data');
 
     const metersData = await Promise.all(
         metersConnections.map(async (meter) => {
@@ -47,20 +47,17 @@ void (async () => {
         }),
     );
 
-    console.log('meters data');
-    console.dir(metersData);
+    logger.info(metersData, 'meters data');
 
-    console.log('inverter metrics');
-
-    console.table(
+    logger.info(
         invertersData.map((inverterData) =>
             getInverterMetrics(inverterData.inverter),
         ),
+        'inverter metrics',
     );
 
-    console.log('meter metrics');
-
-    console.table(
+    logger.info(
         metersData.map((meterData) => getMeterMetrics(meterData.meter)),
+        'meter metrics',
     );
 })();

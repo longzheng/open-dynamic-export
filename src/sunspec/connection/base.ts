@@ -2,8 +2,11 @@ import ModbusRTU from 'modbus-serial';
 import { scheduler } from 'timers/promises';
 import type { CommonModel } from '../models/common';
 import { commonModel } from '../models/common';
+import { logger as pinoLogger } from '../../logger';
 
 const connectionTimeoutMs = 5000;
+
+const logger = pinoLogger.child({ module: 'sunspec-connection' });
 
 export abstract class SunSpecConnection {
     public client: ModbusRTU;
@@ -33,7 +36,7 @@ export abstract class SunSpecConnection {
         this.client.on('close', () => {
             this.state = { type: 'disconnected' };
 
-            console.error(
+            logger.error(
                 `SunSpec Modbus client closed ${this.ip}:${this.port} Unit ID ${this.unitId}`,
             );
         });
@@ -42,9 +45,9 @@ export abstract class SunSpecConnection {
         this.client.on('error', (err) => {
             this.state = { type: 'disconnected' };
 
-            console.error(
-                `SunSpec Modbus client error ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+            logger.error(
                 err,
+                `SunSpec Modbus client error ${this.ip}:${this.port} Unit ID ${this.unitId}`,
             );
         });
 
@@ -62,7 +65,7 @@ export abstract class SunSpecConnection {
             case 'disconnected': {
                 const connectPromise = (async () => {
                     try {
-                        console.log(
+                        logger.info(
                             `SunSpec Modbus client connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
                         );
 
@@ -74,7 +77,7 @@ export abstract class SunSpecConnection {
                         this.client.setID(this.unitId);
                         this.client.setTimeout(connectionTimeoutMs);
 
-                        console.log(
+                        logger.info(
                             `SunSpec Modbus client connected to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
                         );
 
@@ -83,15 +86,15 @@ export abstract class SunSpecConnection {
                         // cache common model
                         // this is not expected to ever change so it can be persisted
                         if (!this.commonModel) {
-                            console.log(
+                            logger.info(
                                 `Caching common model for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
                             );
                             this.commonModel = await this.getCommonModel();
                         }
                     } catch (error) {
-                        console.log(
-                            `SunSpec Modbus client error connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                        logger.error(
                             error,
+                            `SunSpec Modbus client error connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
                         );
 
                         this.state = { type: 'disconnected' };

@@ -9,6 +9,9 @@ import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';
 import EventEmitter from 'events';
+import { logger as pinoLogger } from '../logger';
+
+const logger = pinoLogger.child({ module: 'sunspec-data-event-emitter' });
 
 export class SunSpecDataEventEmitter extends EventEmitter<{
     data: [
@@ -45,6 +48,8 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
 
     async run() {
         try {
+            logger.debug('fetching data from inverter connections');
+
             // get necessary inverter data
             const invertersData = await Promise.all(
                 this.invertersConnections.map(async (inverter) => {
@@ -55,6 +60,10 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 }),
             );
 
+            logger.debug(invertersData, 'inverters data');
+
+            logger.debug('fetching data from inverter connections');
+
             // get necessary meter data
             const metersData = await Promise.all(
                 this.metersConnections.map(async (meter) => {
@@ -64,15 +73,23 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 }),
             );
 
+            logger.debug(metersData, 'meters data');
+
             // calculate telemetry data
             const telemetry = getSunSpecTelemetry({
                 inverters: invertersData.map(({ inverter }) => inverter),
                 meters: metersData.map(({ meter }) => meter),
             });
 
+            logger.debug(telemetry, 'telemetry');
+
             // calculate current average inverter power ratio
             const currentAveragePowerRatio = getAveragePowerRatio(
                 invertersData.map(({ controls }) => controls),
+            );
+
+            logger.debug(
+                `current average power ratio: ${currentAveragePowerRatio}`,
             );
 
             this.emit('data', {
@@ -82,7 +99,7 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 currentAveragePowerRatio,
             });
         } catch (error) {
-            console.log('Failed to fetch SunSpec data', error);
+            logger.error(error, 'Failed to fetch SunSpec data');
         } finally {
             setTimeout(
                 () => {

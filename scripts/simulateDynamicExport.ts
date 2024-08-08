@@ -7,6 +7,7 @@ import {
 } from '../src/coordinator.ts/dynamicExport';
 import type { DERControlBase } from '../src/sep2/models/derControlBase';
 import { SunSpecDataEventEmitter } from '../src/coordinator.ts/sunspecDataEventEmitter';
+import { logger } from '../src/logger';
 
 // This debugging script simulates dynamic export control (without actually sending commands to inverters)
 // It polls SunSpec data and telemetry
@@ -42,7 +43,7 @@ sunSpecDataEventEmitter.on(
             currentAveragePowerRatio,
         });
 
-        console.log(JSON.stringify(dynamicExportConfig, null, 2));
+        logger.info(dynamicExportConfig, 'dynamicExportConfig');
 
         const inverterControls = invertersData.map(({ controls }) =>
             generateControlsModelWriteFromDynamicExportConfig({
@@ -51,7 +52,7 @@ sunSpecDataEventEmitter.on(
             }),
         );
 
-        console.table(
+        logger.info(
             inverterControls.map((controls) => ({
                 Conn: controls.Conn,
                 WMaxLimPct: controls.WMaxLimPct,
@@ -59,6 +60,7 @@ sunSpecDataEventEmitter.on(
                 VArPct_Ena: controls.VArPct_Ena,
                 OutPFSet_Ena: controls.OutPFSet_Ena,
             })),
+            'inverterControls',
         );
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -76,7 +78,7 @@ sunSpecDataEventEmitter.on(
                         controlsModel: inverterData.controls,
                     });
 
-                console.log('Writing controls model', writeControlsModel);
+                logger.info(writeControlsModel, 'Writing controls model');
 
                 await inverter.writeControlsModel(writeControlsModel);
             });
