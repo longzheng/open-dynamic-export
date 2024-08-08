@@ -15,5 +15,5 @@
         // allow unused during dev
         "noUnusedLocals": false,
     },
-    "include": ["src/", "scripts/"]
+    "include": ["src/", "scripts/", "tests/"]
 }
