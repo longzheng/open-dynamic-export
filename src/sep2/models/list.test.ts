@@ -3,7 +3,7 @@ import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks';
 import { parseListXmlObject } from './list';
 
-it('should parse respondable resource XML object', async () => {
+it('should parse list XML object', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
@@ -13,8 +13,8 @@ it('should parse respondable resource XML object', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList'];
 
-    const respondableResource = parseListXmlObject(listXmlObject);
+    const list = parseListXmlObject(listXmlObject);
 
-    expect(respondableResource.all).toEqual(5);
-    expect(respondableResource.results).toEqual(5);
+    expect(list.all).toEqual(5);
+    expect(list.results).toEqual(5);
 });

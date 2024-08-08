@@ -12,6 +12,8 @@ it('should parse device capability XML', async () => {
         parseDeviceCapabilityXml(xml);
 
     expect(timeLink.href).toBe('/api/v2/tm');
+    expect(endDeviceListLink.all).toBe(5);
     expect(endDeviceListLink.href).toBe('/api/v2/edev');
+    expect(mirrorUsagePointListLink.all).toBe(2);
     expect(mirrorUsagePointListLink.href).toBe('/api/v2/mup');
 });
