@@ -13,6 +13,6 @@ it('should parse DERControlList XML', async () => {
     const derList = parseDerListXml(xml);
 
     expect(derList.list.all).toBe(1);
-    expect(derList.pollRate.pollRate).toBe(301);
+    expect(derList.pollRate).toBe(301);
     expect(derList.ders.length).toBe(1);
 });

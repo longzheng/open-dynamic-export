@@ -4,9 +4,12 @@ import {
     type FunctionSetAssignments,
 } from './functionSetAssignments';
 import { parseListXmlObject, type List } from './list';
+import type { PollRate } from './pollRate';
+import { parsePollRateXmlObject } from './pollRate';
 
 export type FunctionSetAssignmentsList = {
     list: List;
+    pollRate: PollRate;
     functionSetAssignments: FunctionSetAssignments[];
 };
 
@@ -16,6 +19,7 @@ export function parseFunctionSetAssignmentsListXml(
 ): FunctionSetAssignmentsList {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const list = parseListXmlObject(xml['FunctionSetAssignmentsList']);
+    const pollRate = parsePollRateXmlObject(xml['FunctionSetAssignmentsList']);
     const functionSetAssignmentsArray = assertArray(
         xml['FunctionSetAssignmentsList']['FunctionSetAssignments'],
     );
@@ -28,6 +32,7 @@ export function parseFunctionSetAssignmentsListXml(
 
     return {
         list,
+        pollRate,
         functionSetAssignments,
     };
 }

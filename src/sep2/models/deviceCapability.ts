@@ -1,7 +1,9 @@
 import type { Link } from './link';
 import { parseLinkXmlObject } from './link';
+import { parsePollRateXmlObject, type PollRate } from './pollRate';
 
 export type DeviceCapabilityResponse = {
+    pollRate: PollRate;
     timeLink: Link;
     endDeviceListLink: Link;
     mirrorUsagePointListLink: Link;
@@ -10,6 +12,7 @@ export type DeviceCapabilityResponse = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDeviceCapabilityXml(xml: any): DeviceCapabilityResponse {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    const pollRate = parsePollRateXmlObject(xml['DeviceCapability']);
     const timeLink = parseLinkXmlObject(xml['DeviceCapability']['TimeLink'][0]);
     const endDeviceListLink = parseLinkXmlObject(
         xml['DeviceCapability']['EndDeviceListLink'][0],
@@ -20,6 +23,7 @@ export function parseDeviceCapabilityXml(xml: any): DeviceCapabilityResponse {
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
+        pollRate,
         timeLink,
         endDeviceListLink,
         mirrorUsagePointListLink,

@@ -2,9 +2,12 @@ import { assertArray } from '../helpers/assert';
 import { parseListXmlObject, type List } from './list';
 import type { MirrorUsagePoint } from './mirrorUsagePoint';
 import { parseMirrorUsagePointXmlObject } from './mirrorUsagePoint';
+import type { PollRate } from './pollRate';
+import { parsePollRateXmlObject } from './pollRate';
 
 export type MirrorUsagePointList = {
     list: List;
+    pollRate: PollRate;
     mirrorUsagePoints: MirrorUsagePoint[];
 };
 
@@ -12,6 +15,7 @@ export type MirrorUsagePointList = {
 export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const list = parseListXmlObject(xml['MirrorUsagePointList']);
+    const pollRate = parsePollRateXmlObject(xml['MirrorUsagePointList']);
     const mirrorUsagePointArray = assertArray(
         xml['MirrorUsagePointList']['MirrorUsagePoint'],
     );
@@ -23,6 +27,7 @@ export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
 
     return {
         list,
+        pollRate,
         mirrorUsagePoints,
     };
 }
