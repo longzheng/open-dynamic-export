@@ -4,7 +4,6 @@ import {
     registersToUint16,
     registersToUint16Nullable,
 } from '../helpers/converters';
-import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
@@ -242,17 +241,6 @@ export const settingsModel = sunSpecModelFactory<SettingsModel>({
         },
     },
 });
-
-export function settingsModelAddressStartByBrand(brand: SunSpecBrand) {
-    switch (brand) {
-        case 'fronius':
-            return 40149;
-        case 'sma':
-            throw new Error('Not implemented');
-        case 'solaredge':
-            throw new Error('Not implemented');
-    }
-}
 
 export enum VArAct {
     SWITCH = 1,

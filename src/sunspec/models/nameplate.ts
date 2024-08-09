@@ -5,7 +5,6 @@ import {
     registersToUint16Nullable,
     registersToSunssfNullable,
 } from '../helpers/converters';
-import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
@@ -207,17 +206,6 @@ export const nameplateModel = sunSpecModelFactory<NameplateModel>({
         },
     },
 });
-
-export function nameplateModelAddressStartByBrand(brand: SunSpecBrand) {
-    switch (brand) {
-        case 'fronius':
-            return 40121;
-        case 'sma':
-            throw new Error('Not implemented');
-        case 'solaredge':
-            throw new Error('Not implemented');
-    }
-}
 
 export enum DERType {
     PV = 4,

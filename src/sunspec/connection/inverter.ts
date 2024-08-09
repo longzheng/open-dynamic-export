@@ -1,32 +1,27 @@
-import { getBrandByCommonModel } from '../brand';
 import type { ControlsModelWrite } from '../models/controls';
-import {
-    controlsModel,
-    controlsModelAddressStartByBrand,
-} from '../models/controls';
-import {
-    inverterModel,
-    inverterModelAddressStartByBrand,
-} from '../models/inverter';
-import {
-    nameplateModel,
-    nameplateModelAddressStartByBrand,
-} from '../models/nameplate';
-import {
-    settingsModel,
-    settingsModelAddressStartByBrand,
-} from '../models/settings';
-import { statusModel, statusModelAddressStartByBrand } from '../models/status';
+import { controlsModel } from '../models/controls';
+import { inverterModel } from '../models/inverter';
+import { nameplateModel } from '../models/nameplate';
+import { settingsModel } from '../models/settings';
+import { statusModel } from '../models/status';
 import { SunSpecConnection } from './base';
 
 export class InverterSunSpecConnection extends SunSpecConnection {
     async getInverterModel() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address =
+            modelAddressById.get(103) ??
+            modelAddressById.get(102) ??
+            modelAddressById.get(101);
+
+        if (!address) {
+            throw new Error('No SunSpec inverter monitoring model address');
+        }
+
         const data = await inverterModel.read({
             modbusConnection: this,
-            addressStart: (commonModel) =>
-                inverterModelAddressStartByBrand(
-                    getBrandByCommonModel(commonModel),
-                ),
+            address,
         });
 
         if (data.ID !== 101 && data.ID !== 102 && data.ID !== 103) {
@@ -37,12 +32,17 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async getNameplateModel() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(120);
+
+        if (!address) {
+            throw new Error('No SunSpec nameplate model address');
+        }
+
         const data = await nameplateModel.read({
             modbusConnection: this,
-            addressStart: (commonModel) =>
-                nameplateModelAddressStartByBrand(
-                    getBrandByCommonModel(commonModel),
-                ),
+            address,
         });
 
         if (data.ID !== 120) {
@@ -53,12 +53,17 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async getSettingsModel() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(121);
+
+        if (!address) {
+            throw new Error('No SunSpec settings model address');
+        }
+
         const data = await settingsModel.read({
             modbusConnection: this,
-            addressStart: (commonModel) =>
-                settingsModelAddressStartByBrand(
-                    getBrandByCommonModel(commonModel),
-                ),
+            address,
         });
 
         if (data.ID !== 121) {
@@ -69,12 +74,17 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async getStatusModel() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(122);
+
+        if (!address) {
+            throw new Error('No SunSpec status model address');
+        }
+
         const data = await statusModel.read({
             modbusConnection: this,
-            addressStart: (commonModel) =>
-                statusModelAddressStartByBrand(
-                    getBrandByCommonModel(commonModel),
-                ),
+            address,
         });
 
         if (data.ID !== 122) {
@@ -85,12 +95,17 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async getControlsModel() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(123);
+
+        if (!address) {
+            throw new Error('No SunSpec controls model address');
+        }
+
         const data = await controlsModel.read({
             modbusConnection: this,
-            addressStart: (commonModel) =>
-                controlsModelAddressStartByBrand(
-                    getBrandByCommonModel(commonModel),
-                ),
+            address,
         });
 
         if (data.ID !== 123) {
@@ -101,12 +116,17 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async writeControlsModel(values: ControlsModelWrite) {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(123);
+
+        if (!address) {
+            throw new Error('No SunSpec controls model address');
+        }
+
         return await controlsModel.write({
             modbusConnection: this,
-            addressStart: (commonModel) =>
-                controlsModelAddressStartByBrand(
-                    getBrandByCommonModel(commonModel),
-                ),
+            address,
             values,
         });
     }

@@ -10,7 +10,6 @@ import {
     int16NullableToRegisters,
     registersToSunssfNullable,
 } from '../helpers/converters';
-import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
@@ -253,17 +252,6 @@ export const controlsModel = sunSpecModelFactory<
         },
     },
 });
-
-export function controlsModelAddressStartByBrand(brand: SunSpecBrand) {
-    switch (brand) {
-        case 'fronius':
-            return 40227;
-        case 'sma':
-            throw new Error('Not implemented');
-        case 'solaredge':
-            throw new Error('Not implemented');
-    }
-}
 
 export enum Conn {
     DISCONNECT = 0,

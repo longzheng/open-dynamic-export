@@ -1,12 +1,17 @@
 import ModbusRTU from 'modbus-serial';
-import { scheduler } from 'timers/promises';
 import type { CommonModel } from '../models/common';
 import { commonModel } from '../models/common';
 import { logger as pinoLogger } from '../../logger';
+import { registersToUint32 } from '../helpers/converters';
 
 const connectionTimeoutMs = 5000;
 
 const logger = pinoLogger.child({ module: 'sunspec-connection' });
+
+export type ModelAddress = {
+    start: number;
+    length: number;
+};
 
 export abstract class SunSpecConnection {
     public readonly client: ModbusRTU;
@@ -18,7 +23,9 @@ export abstract class SunSpecConnection {
         | { type: 'connected' }
         | { type: 'connecting'; connectPromise: Promise<void> }
         | { type: 'disconnected' } = { type: 'disconnected' };
-    private commonModel: CommonModel | null = null;
+
+    private commonModelCache: CommonModel | null = null;
+    private modelAddressById: Map<number, ModelAddress> | null = null;
 
     constructor({
         ip,
@@ -84,13 +91,9 @@ export abstract class SunSpecConnection {
 
                         this.state = { type: 'connected' };
 
-                        // cache common model
-                        // this is not expected to ever change so it can be persisted
-                        if (!this.commonModel) {
-                            logger.info(
-                                `Caching common model for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-                            );
-                            this.commonModel = await this.getCommonModel();
+                        if (!this.modelAddressById) {
+                            this.modelAddressById =
+                                await this.scanModelAddresses();
                         }
                     } catch (error) {
                         logger.error(
@@ -111,31 +114,107 @@ export abstract class SunSpecConnection {
         }
     }
 
-    public async getCachedCommonModel() {
-        while (!this.commonModel) {
-            await scheduler.wait(1000);
+    protected async getModelAddressById() {
+        await this.connect();
+
+        if (!this.modelAddressById) {
+            throw new Error('SunSpec model address map not available');
         }
 
-        return this.commonModel;
+        return this.modelAddressById;
     }
 
-    async getCommonModel() {
+    public async getCommonModel() {
+        if (this.commonModelCache) {
+            return this.commonModelCache;
+        }
+
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(1);
+
+        if (!address) {
+            throw new Error('No SunSpec inverter monitoring model address');
+        }
+
         const data = await commonModel.read({
             modbusConnection: this,
-            addressStart: 40000,
+            address,
         });
-
-        // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
-        // assert this is the case or this isn't SunSpec
-        // 0x53756e53 ('SunS')
-        if (data.SID !== 0x53756e53) {
-            throw new Error('Not a SunSpec device');
-        }
 
         if (data.ID !== 1) {
             throw new Error('Not a SunSpec common model');
         }
 
+        // cache common model
+        // this is not expected to ever change so it can be persisted
+        this.commonModelCache = data;
+
         return data;
+    }
+
+    private async scanModelAddresses(): Promise<Map<number, ModelAddress>> {
+        logger.info(
+            `Scanning SunSpec models for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+        );
+
+        // 40002 is a well-known base address
+        let currentAddress = 40000;
+
+        // read the first two registers to get the model ID and length
+        const response = await this.client.readHoldingRegisters(
+            currentAddress,
+            2,
+        );
+
+        const SID = registersToUint32(response.data);
+
+        // SID is a well-known value. Uniquely identifies this as a SunSpec Modbus Map
+        // assert this is the case or this isn't SunSpec
+        // 0x53756e53 ('SunS')
+        if (SID !== 0x53756e53) {
+            throw new Error('Not a SunSpec device');
+        }
+
+        // Move to the first model address
+        currentAddress += 2;
+
+        const modelAddressById = new Map<number, ModelAddress>();
+
+        for (;;) {
+            await this.connect();
+
+            // read the first two registers to get the model ID and length
+            const response = await this.client.readHoldingRegisters(
+                currentAddress,
+                2,
+            );
+            const modelId = response.data.at(0);
+            const modelLength = response.data.at(1);
+
+            if (modelId === undefined || modelLength === undefined) {
+                throw new Error('Model ID or length not found');
+            }
+
+            if (modelId === 0xffff && modelLength === 0) {
+                break;
+            }
+
+            modelAddressById.set(modelId, {
+                start: currentAddress,
+                length: modelLength + 2, // +2 accounts for model ID and length fields
+            });
+
+            // Move to the next model's address
+            currentAddress += modelLength + 2; // +2 accounts for model ID and length fields
+        }
+
+        const modelIds = Array.from(modelAddressById.keys());
+
+        logger.info(
+            `Found ${modelIds.length} SunSpec models for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}: ${modelIds.join(', ')}`,
+        );
+
+        return modelAddressById;
     }
 }

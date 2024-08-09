@@ -3,14 +3,11 @@ import {
     registersToStringNullable,
     registersToUint16,
     registersToUint16Nullable,
-    registersToUint32,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type CommonModel = {
-    // Well-known value. Uniquely identifies this as a SunSpec Modbus Map
-    SID: number;
     // Length of sunspec model common (1)
     ID: number;
     // Length of sunspec model common (1)
@@ -31,49 +28,44 @@ export type CommonModel = {
 
 export const commonModel = sunSpecModelFactory<CommonModel>({
     mapping: {
-        SID: {
-            start: 0,
-            end: 2,
-            readConverter: registersToUint32,
-        },
         ID: {
-            start: 2,
-            end: 3,
+            start: 0,
+            end: 1,
             readConverter: registersToUint16,
         },
         L: {
-            start: 3,
-            end: 4,
+            start: 1,
+            end: 2,
             readConverter: registersToUint16,
         },
         Mn: {
-            start: 4,
-            end: 20,
+            start: 2,
+            end: 18,
             readConverter: registersToString,
         },
         Md: {
-            start: 20,
-            end: 36,
+            start: 18,
+            end: 34,
             readConverter: registersToString,
         },
         Opt: {
-            start: 36,
-            end: 44,
+            start: 34,
+            end: 42,
             readConverter: registersToStringNullable,
         },
         Vr: {
-            start: 44,
-            end: 52,
+            start: 42,
+            end: 50,
             readConverter: registersToStringNullable,
         },
         SN: {
-            start: 52,
-            end: 68,
+            start: 50,
+            end: 66,
             readConverter: registersToString,
         },
         DA: {
-            start: 68,
-            end: 69,
+            start: 66,
+            end: 67,
             readConverter: registersToUint16Nullable,
         },
     },

@@ -6,7 +6,6 @@ import {
     registersToUint32Nullable,
     registersToStringNullable,
 } from '../helpers/converters';
-import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
@@ -172,17 +171,6 @@ export const statusModel = sunSpecModelFactory<StatusModel>({
         },
     },
 });
-
-export function statusModelAddressStartByBrand(brand: SunSpecBrand) {
-    switch (brand) {
-        case 'fronius':
-            return 40181;
-        case 'sma':
-            throw new Error('Not implemented');
-        case 'solaredge':
-            throw new Error('Not implemented');
-    }
-}
 
 export enum PVConn {
     CONNECTED = 0,

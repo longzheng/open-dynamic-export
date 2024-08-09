@@ -125,7 +125,7 @@ describe('sunSpecModelFactory', () => {
 
         const result = await model.read({
             modbusConnection: inverterSunSpecConnection,
-            addressStart: 40000,
+            address: { start: 40000, length: 6 },
         });
 
         expect(result).toEqual({
@@ -154,7 +154,7 @@ describe('sunSpecModelFactory', () => {
         await model.write({
             values,
             modbusConnection: inverterSunSpecConnection,
-            addressStart: 40000,
+            address: { start: 40000, length: 6 },
         });
 
         expect(writeRegistersMock).toHaveBeenCalledOnce();

@@ -1,6 +1,5 @@
 import { objectEntriesWithType } from '../../object';
-import type { SunSpecConnection } from '../connection/base';
-import type { CommonModel } from './common';
+import type { ModelAddress, SunSpecConnection } from '../connection/base';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,42 +25,22 @@ export function sunSpecModelFactory<
 }): {
     read(params: {
         modbusConnection: SunSpecConnection;
-        // the starting address can be fixed or different based on the manufacturer
-        addressStart: ((commonModel: CommonModel) => number) | number;
+        address: ModelAddress;
     }): Promise<Model>;
     write(params: {
         modbusConnection: SunSpecConnection;
-        // the starting address can be fixed or different based on the manufacturer
-        addressStart: ((commonModel: CommonModel) => number) | number;
+        address: ModelAddress;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
 } {
-    const mappingEntries = objectEntriesWithType(config.mapping);
-
-    if (mappingEntries.length === 0) {
-        throw new Error('Model mapping is empty');
-    }
-
-    const lastMapping = mappingEntries
-        .sort((a, b) => b[1].end - a[1].end)
-        .at(0);
-    const length = lastMapping![1].end;
-
     return {
-        read: async ({ modbusConnection, addressStart }) => {
+        read: async ({ modbusConnection, address }) => {
             await modbusConnection.connect();
-
-            const address =
-                typeof addressStart === 'number'
-                    ? addressStart
-                    : addressStart(
-                          await modbusConnection.getCachedCommonModel(),
-                      );
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
-                    address,
-                    length,
+                    address.start,
+                    address.length,
                 );
 
             return convertReadRegisters({
@@ -69,31 +48,24 @@ export function sunSpecModelFactory<
                 mapping: config.mapping,
             });
         },
-        write: async ({ modbusConnection, addressStart, values }) => {
+        write: async ({ modbusConnection, address, values }) => {
             await modbusConnection.connect();
-
-            const address =
-                typeof addressStart === 'number'
-                    ? addressStart
-                    : addressStart(
-                          await modbusConnection.getCachedCommonModel(),
-                      );
 
             const registerValues = convertWriteRegisters({
                 values,
                 mapping: config.mapping,
-                length,
+                length: address.length,
             });
 
             await modbusConnection.client.writeRegisters(
-                address,
+                address.start,
                 registerValues,
             );
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
-                    address,
-                    length,
+                    address.start,
+                    address.length,
                 );
 
             // confirm the registers were written correctly

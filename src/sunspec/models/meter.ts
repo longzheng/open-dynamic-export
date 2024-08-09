@@ -6,7 +6,6 @@ import {
     registersToSunssfNullable,
     registersToAcc32,
 } from '../helpers/converters';
-import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
@@ -550,15 +549,4 @@ export enum MeterEvent {
     OEM13 = 28,
     OEM14 = 29,
     OEM15 = 30,
-}
-
-export function meterModelAddressStartByBrand(brand: SunSpecBrand) {
-    switch (brand) {
-        case 'fronius':
-            return 40069;
-        case 'sma':
-            throw new Error('Not implemented');
-        case 'solaredge':
-            throw new Error('Not implemented');
-    }
 }

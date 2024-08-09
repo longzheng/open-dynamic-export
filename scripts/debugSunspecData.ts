@@ -26,7 +26,7 @@ void (async () => {
     const invertersData = await Promise.all(
         invertersConnections.map(async (inverter) => {
             return {
-                common: await inverter.getCachedCommonModel(),
+                common: await inverter.getCommonModel(),
                 inverter: await inverter.getInverterModel(),
                 nameplate: await inverter.getNameplateModel(),
                 settings: await inverter.getSettingsModel(),
@@ -41,7 +41,7 @@ void (async () => {
     const metersData = await Promise.all(
         metersConnections.map(async (meter) => {
             return {
-                common: await meter.getCachedCommonModel(),
+                common: await meter.getCommonModel(),
                 meter: await meter.getMeterModel(),
             };
         }),

@@ -9,7 +9,6 @@ import {
     registersToSunssfNullable,
     registersToUint32Nullable,
 } from '../helpers/converters';
-import type { SunSpecBrand } from '../brand';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
@@ -325,17 +324,6 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         },
     },
 });
-
-export function inverterModelAddressStartByBrand(brand: SunSpecBrand) {
-    switch (brand) {
-        case 'fronius':
-            return 40069;
-        case 'sma':
-            throw new Error('Not implemented');
-        case 'solaredge':
-            throw new Error('Not implemented');
-    }
-}
 
 export enum InverterState {
     // Off
