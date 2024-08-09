@@ -22,6 +22,12 @@ void (async () => {
     );
 
     for (const inverterConnection of invertersConnections) {
+        const inverterLogger = logger.child({
+            ip: inverterConnection.ip,
+            port: inverterConnection.port,
+            unitId: inverterConnection.unitId,
+        });
+
         let currentAddress = 40002;
 
         for (;;) {
@@ -36,11 +42,11 @@ void (async () => {
             const modelLength = response.data[1]!;
 
             if (modelId === 0xffff && modelLength === 0) {
-                logger.info('End of model list');
+                inverterLogger.info('End of model list');
                 break;
             }
 
-            logger.info(
+            inverterLogger.info(
                 `Model ID: ${modelId} at Address: ${currentAddress}, length ${modelLength}`,
             );
 
@@ -50,6 +56,12 @@ void (async () => {
     }
 
     for (const meterConnection of metersConnections) {
+        const meterLogger = logger.child({
+            ip: meterConnection.ip,
+            port: meterConnection.port,
+            unitId: meterConnection.unitId,
+        });
+
         let currentAddress = 40002;
 
         for (;;) {
@@ -63,11 +75,11 @@ void (async () => {
             const modelLength = response.data[1]!;
 
             if (modelId === 0xffff && modelLength === 0) {
-                logger.info('End of model list');
+                meterLogger.info('End of model list');
                 break;
             }
 
-            logger.info(
+            meterLogger.info(
                 `Model ID: ${modelId} at Address: ${currentAddress}, length ${modelLength}`,
             );
 

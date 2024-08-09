@@ -9,10 +9,11 @@ const connectionTimeoutMs = 5000;
 const logger = pinoLogger.child({ module: 'sunspec-connection' });
 
 export abstract class SunSpecConnection {
-    public client: ModbusRTU;
-    private ip: string;
-    private port: number;
-    private unitId: number;
+    public readonly client: ModbusRTU;
+    public readonly ip: string;
+    public readonly port: number;
+    public readonly unitId: number;
+
     private state:
         | { type: 'connected' }
         | { type: 'connecting'; connectPromise: Promise<void> }
