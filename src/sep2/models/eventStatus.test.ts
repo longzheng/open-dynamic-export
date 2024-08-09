@@ -20,6 +20,8 @@ it('should parse event status XML', async () => {
     expect(eventStatus.currentStatus).toBe(CurrentStatus.Scheduled);
     expect(eventStatus.dateTime.getTime()).toBe(1682511010000);
     expect(eventStatus.potentiallySuperseded).toBe(false);
-    expect(eventStatus.potentiallySupersededTime.getTime()).toBe(1682511010000);
+    expect(eventStatus.potentiallySupersededTime?.getTime()).toBe(
+        1682511010000,
+    );
     expect(eventStatus.reason).toBe('');
 });

@@ -25,7 +25,7 @@ it('should parse DER Control XML', async () => {
     expect(derControl.eventStatus.currentStatus).toBe(CurrentStatus.Scheduled);
     expect(derControl.eventStatus.dateTime.getTime()).toBe(1682511010000);
     expect(derControl.eventStatus.potentiallySuperseded).toBe(false);
-    expect(derControl.eventStatus.potentiallySupersededTime.getTime()).toBe(
+    expect(derControl.eventStatus.potentiallySupersededTime?.getTime()).toBe(
         1682511010000,
     );
     expect(derControl.interval.start.getTime()).toBe(1682475300000);
