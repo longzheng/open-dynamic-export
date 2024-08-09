@@ -2,6 +2,11 @@ import { safeParseStringToEnumType, stringHexToEnumType } from '../../enum';
 import { numberToHex } from '../../number';
 import { assertString } from '../helpers/assert';
 import { xmlns } from '../helpers/namespace';
+import {
+    parseIdentifiedObjectXmlObject,
+    type IdentifiedObject,
+} from './identifiedObject';
+import { parsePostRateXmlObject, type PostRate } from './postRate';
 import { type RoleFlagsType } from './roleFlagsType';
 import { ServiceKind } from './serviceKind';
 
@@ -11,22 +16,23 @@ export enum MirrorUsagePointStatus {
 }
 
 export type MirrorUsagePoint = {
+    postRate?: PostRate;
     // A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN.
-    mRID: string;
-    description: string;
     roleFlags: RoleFlagsType;
     serviceCategoryKind: ServiceKind;
     status: MirrorUsagePointStatus;
     deviceLFDI: string;
-};
+} & IdentifiedObject; // TODO this should be UsagePointBase
 
 export function parseMirrorUsagePointXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mirrorUsagePointObject: any,
 ): MirrorUsagePoint {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const mRID = assertString(mirrorUsagePointObject['mRID'][0]);
-    const description = assertString(mirrorUsagePointObject['description'][0]);
+    const identifiedObject = parseIdentifiedObjectXmlObject(
+        mirrorUsagePointObject,
+    );
+    const postRate = parsePostRateXmlObject(mirrorUsagePointObject);
     const roleFlags = stringHexToEnumType<RoleFlagsType>(
         assertString(mirrorUsagePointObject['roleFlags'][0]),
     );
@@ -42,8 +48,8 @@ export function parseMirrorUsagePointXmlObject(
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
-        mRID,
-        description,
+        ...identifiedObject,
+        postRate,
         roleFlags,
         serviceCategoryKind,
         status,

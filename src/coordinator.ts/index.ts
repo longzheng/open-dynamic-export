@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { defaultIntervalSeconds, SEP2Client } from '../sep2/client';
+import { defaultPollPushRates, SEP2Client } from '../sep2/client';
 import { getConfig, getConfigSep2CertKey } from '../config';
 import { getSunSpecConnections } from '../sunspec/connections';
 import { callEveryMinutesInterval } from '../cron';
@@ -11,6 +11,9 @@ import {
 import { generateCsipAusDerMonitoring } from './telemetry/sep2';
 import { SunSpecDataEventEmitter } from './sunspecDataEventEmitter';
 import { logger as pinoLogger } from '../logger';
+import { TimeHelper } from '../sep2/helpers/time';
+import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
+import { DerListHelper } from '../sep2/helpers/derList';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -31,16 +34,69 @@ const sep2Client = new SEP2Client({
     key: sep2Key,
 });
 
+const timeResource: TimeHelper = new TimeHelper();
+const endDeviceListResource: EndDeviceListHelper = new EndDeviceListHelper();
+const derListResource = new DerListHelper();
+
 const telemetryCache = new TelemetryCache();
 
-async function main() {
+function main() {
+    endDeviceListResource.on('data', (endDeviceList) => {
+        logger.info(endDeviceList, 'Received SEP2 end device list');
+
+        // as a direct client, we expect only one end device that matches the LFDI of our certificate
+        const endDevice = endDeviceList.endDevices.find(
+            (endDevice) => endDevice.lFDI === sep2Client.lfdi,
+        );
+
+        if (!endDevice) {
+            throw new Error('End device not found');
+        }
+
+        if (endDevice.enabled !== true) {
+            throw new Error('End device is not enabled');
+        }
+
+        if (endDevice.derListLink) {
+            derListResource.init({
+                client: sep2Client,
+                href: endDevice.derListLink.href,
+                defaultPollRateSeconds: defaultPollPushRates.endDeviceListPoll,
+            });
+        }
+    });
+
+    derListResource.on('data', (derList) => {
+        logger.info(derList, 'Received SEP2 end device DER list');
+
+        if (derList.ders.length !== 1) {
+            throw new Error(
+                `DERS list length is not 1, actual length ${derList.ders.length}`,
+            );
+        }
+
+        const der = derList.ders.at(0)!;
+
+        // https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf
+        // For DERCapability and DERSettings, the Aggregator posts these resources at device start-up and on any changes.
+        // For DERStatus, the Aggregator posts at the rate specified in DERList:pollRate.
+    });
+
     logger.info('Discovering SEP2');
 
-    await sep2Client.discovery().then(() => {
-        // poll at default interval
-        setInterval(() => {
-            void sep2Client.discovery();
-        }, defaultIntervalSeconds.DeviceCapability * 1000);
+    sep2Client.discover().on('data', (deviceCapability) => {
+        logger.info(deviceCapability, 'Received SEP2 device capability');
+
+        timeResource.init({
+            client: sep2Client,
+            href: deviceCapability.timeLink.href,
+            defaultPollRateSeconds: defaultPollPushRates.deviceCapabilityPoll,
+        });
+
+        endDeviceListResource.init({
+            client: sep2Client,
+            href: deviceCapability.endDeviceListLink.href,
+        });
     });
 
     logger.info('Starting SunSpec control loop');

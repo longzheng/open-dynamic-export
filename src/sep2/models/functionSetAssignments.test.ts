@@ -19,9 +19,7 @@ it('should parse FunctionSetAssignmentsList XML', async () => {
         functionSetAssignmentsXmlObject,
     );
 
-    expect(functionSetAssignments.link.href).toBe(
-        '/api/v2/edev/_EQLDEV3/fsa/2',
-    );
+    expect(functionSetAssignments.href).toBe('/api/v2/edev/_EQLDEV3/fsa/2');
     expect(functionSetAssignments.derProgramListLink.href).toBe(
         '/api/v2/edev/_EQLDEV3/fsa/2/derp',
     );

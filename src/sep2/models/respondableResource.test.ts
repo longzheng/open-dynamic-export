@@ -18,6 +18,9 @@ it('should parse respondable resource XML object', async () => {
         respondableResourceXmlObject,
     );
 
+    expect(respondableResource.href).toEqual(
+        '/api/v2/derp/TESTPRG3/derc/DC1B27AC943B44AC87DAF7E162B6F6D4',
+    );
     expect(respondableResource.replyToHref).toEqual('/api/v2/rsps/res-ms/rsp');
     expect(respondableResource.responseRequired).toEqual(
         ResponseRequiredType.MessageReceived |

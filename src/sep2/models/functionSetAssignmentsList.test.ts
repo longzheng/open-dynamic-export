@@ -12,6 +12,6 @@ it('should parse FunctionSetAssignmentsList XML', async () => {
 
     const functionSetAssignmentsList = parseFunctionSetAssignmentsListXml(xml);
 
-    expect(functionSetAssignmentsList.list.all).toBe(2);
+    expect(functionSetAssignmentsList.all).toBe(2);
     expect(functionSetAssignmentsList.functionSetAssignments.length).toBe(2);
 });

@@ -6,10 +6,9 @@ import type { PollRate } from './pollRate';
 import { parsePollRateXmlObject } from './pollRate';
 
 export type MirrorUsagePointList = {
-    list: List;
     pollRate: PollRate;
     mirrorUsagePoints: MirrorUsagePoint[];
-};
+} & List;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
@@ -26,7 +25,7 @@ export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
     );
 
     return {
-        list,
+        ...list,
         pollRate,
         mirrorUsagePoints,
     };

@@ -4,6 +4,14 @@ import {
     parseDERControlBaseXmlObject,
     type DERControlBase,
 } from './derControlBase';
+import {
+    parseIdentifiedObjectXmlObject,
+    type IdentifiedObject,
+} from './identifiedObject';
+import {
+    parseSubscribableResourceXmlObject,
+    type SubscribableResource,
+} from './subscribableResource';
 
 export type RampRate =
     | { type: 'noLimit' }
@@ -13,21 +21,24 @@ export type RampRate =
       };
 
 export type DefaultDERControl = {
-    mRID: string;
-    version: number;
     derControlBase: DERControlBase;
-    setGradW?: RampRate;
-    setSoftGradW?: RampRate;
-};
+    // Set default rate of change (ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a default ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setGradW).
+    setGradW: RampRate | undefined;
+    // Set soft-start rate of change (soft-start ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setSoftGradW).
+    setSoftGradW: RampRate | undefined;
+} & IdentifiedObject &
+    SubscribableResource;
 
 export function parseDefaultDERControlXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xml: any,
 ): DefaultDERControl {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-    const mRID = assertString(xml['DefaultDERControl']['mRID'][0]);
-    const version = safeParseIntString(
-        assertString(xml['DefaultDERControl']['version'][0]),
+    const subscribableResource = parseSubscribableResourceXmlObject(
+        xml['DefaultDERControl'],
+    );
+    const identifiedObject = parseIdentifiedObjectXmlObject(
+        xml['DefaultDERControl'],
     );
     const derControlBase = parseDERControlBaseXmlObject(
         xml['DefaultDERControl']['DERControlBase'][0],
@@ -41,8 +52,8 @@ export function parseDefaultDERControlXml(
     /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
     return {
-        mRID,
-        version,
+        ...subscribableResource,
+        ...identifiedObject,
         derControlBase,
         setGradW,
         setSoftGradW,
@@ -59,6 +70,7 @@ function parseRampRateXmlObject(xmlObject: any): RampRate | undefined {
     const percent = safeParseIntString(assertString(xmlObject[0]));
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
+    // A value of 0 means there is no limit.
     if (percent === 0) {
         return { type: 'noLimit' };
     }

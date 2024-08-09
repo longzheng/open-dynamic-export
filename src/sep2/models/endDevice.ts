@@ -1,30 +1,23 @@
 import { assertString } from '../helpers/assert';
-import { stringIntToBoolean, stringToBoolean } from '../helpers/boolean';
+import { stringToBoolean } from '../helpers/boolean';
 import { stringIntToDate } from '../helpers/date';
 import { parseLinkXmlObject, type Link } from './link';
+import {
+    parseSubscribableResourceXmlObject,
+    type SubscribableResource,
+} from './subscribableResource';
 
-export type EndDevice = EndDeviceBase & (EndDeviceDer | EndDeviceAggregator);
-
-type EndDeviceBase = {
-    subscribeable: boolean;
-    lFDI: string;
-    logEventListLink: Link;
+export type EndDevice = {
+    lFDI?: string;
     sFDI: string;
     changedTime: Date;
-    registrationLink: Link;
-};
-
-type EndDeviceDer = {
-    type: 'der';
-    derListLink: Link;
     enabled: boolean;
-    functionSetAssignmentsListLink: Link;
-};
-
-type EndDeviceAggregator = {
-    type: 'aggregator';
-    subscriptionListLink: Link;
-};
+    derListLink: Link | undefined;
+    logEventListLink: Link | undefined;
+    registrationLink: Link | undefined;
+    functionSetAssignmentsListLink: Link | undefined;
+    subscriptionListLink: Link | undefined;
+} & SubscribableResource;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceXml(xml: any): EndDevice {
@@ -38,10 +31,11 @@ export function parseEndDeviceXml(xml: any): EndDevice {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const subscribeable = stringIntToBoolean(
-        assertString(endDeviceObject['$']['subscribable']),
-    );
-    const lFDI = assertString(endDeviceObject['lFDI'][0]);
+    const subscribeableResource =
+        parseSubscribableResourceXmlObject(endDeviceObject);
+    const lFDI = endDeviceObject['lFDI']
+        ? assertString(endDeviceObject['lFDI'][0])
+        : undefined;
     const logEventListLink = parseLinkXmlObject(
         endDeviceObject['LogEventListLink'][0],
     );
@@ -52,59 +46,35 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     const registrationLink = parseLinkXmlObject(
         endDeviceObject['RegistrationLink'][0],
     );
+    const enabled = endDeviceObject['enabled']
+        ? stringToBoolean(assertString(endDeviceObject['enabled'][0]))
+        : true;
+    const derListLink = endDeviceObject['DERListLink']
+        ? parseLinkXmlObject(endDeviceObject['DERListLink'][0])
+        : undefined;
+
+    const functionSetAssignmentsListLink = endDeviceObject[
+        'FunctionSetAssignmentsListLink'
+    ]
+        ? parseLinkXmlObject(
+              endDeviceObject['FunctionSetAssignmentsListLink'][0],
+          )
+        : undefined;
+    const subscriptionListLink = endDeviceObject['SubscriptionListLink']
+        ? parseLinkXmlObject(endDeviceObject['SubscriptionListLink'][0])
+        : undefined;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
-    const endDeviceType: EndDeviceDer | EndDeviceAggregator = (() => {
-        // DER devices have DERListLink
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        const derListLinkObject = endDeviceObject['DERListLink'];
-        if (derListLinkObject) {
-            /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-            const derListLink = parseLinkXmlObject(derListLinkObject[0]);
-            const enabled = stringToBoolean(
-                assertString(endDeviceObject['enabled'][0]),
-            );
-            const functionSetAssignmentsListLink = parseLinkXmlObject(
-                endDeviceObject['FunctionSetAssignmentsListLink'][0],
-            );
-            /* eslint-enable @typescript-eslint/no-unsafe-member-access */
-
-            return {
-                type: 'der',
-                derListLink,
-                enabled,
-                functionSetAssignmentsListLink,
-            };
-        }
-
-        // Aggregator devices have SubscriptionListLink
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const subscriptionListLinkObject =
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            endDeviceObject['SubscriptionListLink'];
-        if (subscriptionListLinkObject) {
-            /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-            const subscriptionListLink = parseLinkXmlObject(
-                subscriptionListLinkObject[0],
-            );
-            /* eslint-enable @typescript-eslint/no-unsafe-member-access */
-
-            return {
-                type: 'aggregator',
-                subscriptionListLink,
-            };
-        }
-
-        throw new Error('unknown end device type');
-    })();
-
     return {
-        subscribeable,
+        ...subscribeableResource,
         lFDI,
         logEventListLink,
         sFDI,
         changedTime,
         registrationLink,
-        ...endDeviceType,
+        enabled,
+        derListLink,
+        functionSetAssignmentsListLink,
+        subscriptionListLink,
     };
 }

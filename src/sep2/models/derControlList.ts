@@ -1,20 +1,19 @@
-import { assertArray, assertString } from '../helpers/assert';
-import { stringIntToBoolean } from '../helpers/boolean';
+import { assertArray } from '../helpers/assert';
 import { parseDERControlXmlObject, type DERControl } from './derControl';
-import { parseListXmlObject, type List } from './list';
+import {
+    parseSubscribableListXmlObject,
+    type SubscribableList,
+} from './subscribableList';
 
 export type DERControlList = {
-    list: List;
-    subscribable: boolean;
     derControls: DERControl[];
-};
+} & SubscribableList;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerControlListXml(xml: any): DERControlList {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const list = parseListXmlObject(xml['DERControlList']);
-    const subscribable = stringIntToBoolean(
-        assertString(xml['DERControlList']['$']['subscribable']),
+    const subscribableList = parseSubscribableListXmlObject(
+        xml['DERControlList'],
     );
     const derControlArray = assertArray(xml['DERControlList']['DERControl']);
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -24,8 +23,7 @@ export function parseDerControlListXml(xml: any): DERControlList {
     );
 
     return {
-        list,
-        subscribable,
+        ...subscribableList,
         derControls,
     };
 }

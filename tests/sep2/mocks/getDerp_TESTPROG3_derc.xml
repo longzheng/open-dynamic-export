@@ -1,7 +1,9 @@
-<DERControlList xmlns="urn:ieee:std:2030.5:ns"
+<DERControlList href="/api/v2/derp/TESTPRG3/derc"
+    xmlns="urn:ieee:std:2030.5:ns"
     xmlns:ns2="https://csipaus.org/ns" all="5" results="5" subscribable="1">
     <DERControl subscribable="0" replyTo="/api/v2/rsps/res-ms/rsp" responseRequired="03" href="/api/v2/derp/TESTPRG3/derc/DC1B27AC943B44AC87DAF7E162B6F6D4">
         <mRID>DC1B27AC943B44AC87DAF7E162B6F6D4</mRID>
+        <description>Scheduled DERC</description>
         <version>0</version>
         <creationTime>1682511010</creationTime>
         <EventStatus>

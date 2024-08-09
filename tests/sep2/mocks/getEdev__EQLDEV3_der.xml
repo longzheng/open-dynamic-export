@@ -1,5 +1,5 @@
-<DERList xmlns="urn:ieee:std:2030.5:ns"
-    xmlns:ns2="https://csipaus.org/ns" pollRate="301" all="1" results="1">
+<DERList href="/api/v2/edev/_EQLDEV3/der" xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:ns2="https://csipaus.org/ns" pollRate="301" all="1" results="1" >
     <DER subscribable="0" href="/api/v2/edev/_EQLDEV3/der/_EQLDEV3">
         <DERAvailabilityLink href="/api/v2/edev/_EQLDEV3/der/_EQLDEV3/dera"/>
         <DERCapabilityLink href="/api/v2/edev/_EQLDEV3/der/_EQLDEV3/dercap"/>

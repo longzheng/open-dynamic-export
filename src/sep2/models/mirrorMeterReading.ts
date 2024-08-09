@@ -8,14 +8,12 @@ import { xmlns } from '../helpers/namespace';
 import type { PhaseCode } from './phaseCode';
 import type { QualityFlags } from './qualityFlags';
 import type { UomType } from './uomType';
+import type { IdentifiedObject } from './identifiedObject';
 
 export type MirrorMeterReading = {
     // reading MRID should be a random UUIDv4 with the PEN
-    mRID: string;
-    description: string;
     lastUpdateTime: Date;
     nextUpdateTime: Date;
-    version: number;
     Reading: {
         qualityFlags: QualityFlags;
         value: number;
@@ -31,7 +29,7 @@ export type MirrorMeterReading = {
         intervalLength: number;
         uom: UomType;
     };
-};
+} & IdentifiedObject; // TODO this should be MeterReadingBase
 
 export function generateMirrorMeterReadingResponse({
     mRID,

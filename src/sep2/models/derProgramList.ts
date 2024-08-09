@@ -1,21 +1,25 @@
 import { assertArray } from '../helpers/assert';
-import { parseListXmlObject, type List } from './list';
 import { parsePollRateXmlObject, type PollRate } from './pollRate';
 import type { DERProgram } from './derProgram';
 import { parseDERProgramXmlObject } from './derProgram';
+import {
+    parseSubscribableListXmlObject,
+    type SubscribableList,
+} from './subscribableList';
 
 export type DERProgramList = {
-    list: List;
     pollRate: PollRate;
     derPrograms: DERProgram[];
-};
+} & SubscribableList;
 
 export function parseDerProgramListXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xml: any,
 ): DERProgramList {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const list = parseListXmlObject(xml['DERProgramList']);
+    const subscribableList = parseSubscribableListXmlObject(
+        xml['DERProgramList'],
+    );
     const pollRate = parsePollRateXmlObject(xml['DERProgramList']);
     const derProgramArray = assertArray(xml['DERProgramList']['DERProgram']);
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -25,7 +29,7 @@ export function parseDerProgramListXml(
     );
 
     return {
-        list,
+        ...subscribableList,
         pollRate,
         derPrograms,
     };

@@ -10,7 +10,7 @@ it('should parse end device list XML', async () => {
 
     const endDeviceList = parseEndDeviceListXml(xml);
 
-    expect(endDeviceList.list.all).toBe(5);
+    expect(endDeviceList.all).toBe(5);
     expect(endDeviceList.subscribable).toBe(true);
     expect(endDeviceList.endDevices.length).toBe(3);
     expect(endDeviceList.endDevices[0]?.lFDI).toBe(

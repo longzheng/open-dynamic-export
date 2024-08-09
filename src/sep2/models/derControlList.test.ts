@@ -12,7 +12,7 @@ it('should parse DERControlList XML', async () => {
 
     const endDeviceList = parseDerControlListXml(xml);
 
-    expect(endDeviceList.list.all).toBe(5);
+    expect(endDeviceList.all).toBe(5);
     expect(endDeviceList.subscribable).toBe(true);
     expect(endDeviceList.derControls.length).toBe(5);
 });
@@ -26,7 +26,7 @@ it('should parse DERControlList XML empty', async () => {
 
     const endDeviceList = parseDerControlListXml(xml);
 
-    expect(endDeviceList.list.all).toBe(0);
+    expect(endDeviceList.all).toBe(0);
     expect(endDeviceList.subscribable).toBe(true);
     expect(endDeviceList.derControls.length).toBe(0);
 });

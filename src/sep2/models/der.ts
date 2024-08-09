@@ -1,17 +1,20 @@
 import { parseLinkXmlObject, type Link } from './link';
+import {
+    parseSubscribableResourceXmlObject,
+    type SubscribableResource,
+} from './subscribableResource';
 
 export type DER = {
-    link: Link;
     derAvailabilityLink: Link;
     derCapabilityLink: Link;
     derSettingsLink: Link;
     derStatusLink: Link;
-};
+} & SubscribableResource;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerXmlObject(xmlObject: any): DER {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const link = parseLinkXmlObject(xmlObject);
+    const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const derAvailabilityLink = parseLinkXmlObject(
         xmlObject['DERAvailabilityLink'][0],
     );
@@ -23,7 +26,7 @@ export function parseDerXmlObject(xmlObject: any): DER {
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
     return {
-        link,
+        ...subscribableResource,
         derAvailabilityLink,
         derCapabilityLink,
         derSettingsLink,

@@ -12,7 +12,7 @@ it('should parse DERProgramList XML', async () => {
 
     const derProgramList = parseDerProgramListXml(xml);
 
-    expect(derProgramList.list.all).toBe(1);
+    expect(derProgramList.all).toBe(1);
     expect(derProgramList.pollRate).toBe(301);
     expect(derProgramList.derPrograms.length).toBe(1);
 });

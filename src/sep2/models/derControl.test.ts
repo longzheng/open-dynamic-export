@@ -1,12 +1,10 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks';
-import {
-    DERControlEventStatusCurrentStatus,
-    parseDERControlXmlObject,
-} from './derControl';
+import { parseDERControlXmlObject } from './derControl';
+import { CurrentStatus } from './eventStatus';
 
-it('should parse Default DER Control XML', async () => {
+it('should parse DER Control XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
@@ -20,15 +18,11 @@ it('should parse Default DER Control XML', async () => {
 
     const derControl = parseDERControlXmlObject(derControlXmlObject);
 
-    expect(derControl.respondableResource.replyToHref).toBe(
-        '/api/v2/rsps/res-ms/rsp',
-    );
+    expect(derControl.replyToHref).toBe('/api/v2/rsps/res-ms/rsp');
     expect(derControl.mRID).toBe('DC1B27AC943B44AC87DAF7E162B6F6D4');
     expect(derControl.version).toBe(0);
     expect(derControl.creationTime.getTime()).toBe(1682511010000);
-    expect(derControl.eventStatus.currentStatus).toBe(
-        DERControlEventStatusCurrentStatus.Scheduled,
-    );
+    expect(derControl.eventStatus.currentStatus).toBe(CurrentStatus.Scheduled);
     expect(derControl.eventStatus.dateTime.getTime()).toBe(1682511010000);
     expect(derControl.eventStatus.potentiallySuperseded).toBe(false);
     expect(derControl.eventStatus.potentiallySupersededTime.getTime()).toBe(

@@ -5,11 +5,10 @@ import { parseListXmlObject, type List } from './list';
 import { parsePollRateXmlObject, type PollRate } from './pollRate';
 
 export type DERList = {
-    list: List;
     pollRate: PollRate;
     // link to the end device
     ders: DER[];
-};
+} & List;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerListXml(xml: any): DERList {
@@ -24,7 +23,7 @@ export function parseDerListXml(xml: any): DERList {
     );
 
     return {
-        list,
+        ...list,
         pollRate,
         ders,
     };

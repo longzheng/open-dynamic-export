@@ -1,6 +1,7 @@
 <DefaultDERControl xmlns="urn:ieee:std:2030.5:ns"
     xmlns:ns2="https://csipaus.org/ns" subscribable="0" href="/api/v2/derp/TESTPRG3/dderc">
     <mRID>E6F3A83FC1E64929BB4502AA0CEA0FDB</mRID>
+    <description>Default DERC</description>
     <version>0</version>
     <DERControlBase>
         <ns2:opModImpLimW>

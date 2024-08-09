@@ -1,3 +1,4 @@
-<DERControlList xmlns="urn:ieee:std:2030.5:ns"
+<DERControlList href="/api/v2/derp/P-_EQLDEV3/derc"
+    xmlns="urn:ieee:std:2030.5:ns"
     xmlns:ns2="https://csipaus.org/ns" all="0" results="0" subscribable="1"/>
  

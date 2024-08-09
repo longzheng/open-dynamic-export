@@ -17,6 +17,7 @@ it('should parse DER XML object', async () => {
 
     const der = parseDerXmlObject(derXmlObject);
 
+    expect(der.subscribable).toBe(false);
     expect(der.derAvailabilityLink.href).toBe(
         '/api/v2/edev/_EQLDEV3/der/_EQLDEV3/dera',
     );

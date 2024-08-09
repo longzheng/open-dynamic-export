@@ -109,6 +109,7 @@ I got in touch with Energy Queensland who was surprisingly helpful (for a govern
 ## Resources
 
 - [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf)
+- [IEEE 2030.5 standard](https://standards.ieee.org/ieee/2030.5/5897/)
 - [IEEE 2030.5 Data Model](https://zepben.github.io/evolve/docs/2030-5/)
 - [SEP2 Common Library](https://github.com/ethanndickson/sep2_common) Rust library
 - [SEP2-Tools](https://github.com/aguinane/SEP2-Tools) Python library

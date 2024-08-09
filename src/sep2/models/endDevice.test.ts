@@ -11,16 +11,17 @@ it('should parse end device DER with XML', async () => {
     const endDevice = parseEndDeviceXml(xml);
 
     expect(endDevice).toStrictEqual({
-        subscribeable: false,
+        href: '/api/v2/edev/_EQLDEV3',
+        subscribable: false,
         lFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
         logEventListLink: { href: '/api/v2/edev/_EQLDEV3/lel' },
         sFDI: '173034634270',
         changedTime: new Date(1682464970000),
-        type: 'der',
         enabled: true,
         functionSetAssignmentsListLink: { href: '/api/v2/edev/_EQLDEV3/fsa' },
         registrationLink: { href: '/api/v2/edev/_EQLDEV3/rg' },
         derListLink: { href: '/api/v2/edev/_EQLDEV3/der' },
+        subscriptionListLink: undefined,
     } satisfies EndDevice);
 });
 
@@ -31,13 +32,16 @@ it('should parse end device aggregator with XML', async () => {
     const endDevice = parseEndDeviceXml(xml);
 
     expect(endDevice).toStrictEqual({
-        subscribeable: false,
+        href: '/api/v2/edev/E-AGGREQL',
+        subscribable: false,
         lFDI: 'B1857F74B5DA25E82E78BE34877221CB89D55F45',
         logEventListLink: { href: '/api/v2/edev/E-AGGREQL/lel' },
         sFDI: '476530583793',
         changedTime: new Date(1682464920000),
-        type: 'aggregator',
         registrationLink: { href: '/api/v2/edev/E-AGGREQL/rg' },
         subscriptionListLink: { href: '/api/v2/edev/E-AGGREQL/sub' },
+        derListLink: undefined,
+        enabled: true,
+        functionSetAssignmentsListLink: undefined,
     } satisfies EndDevice);
 });

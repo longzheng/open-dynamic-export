@@ -1,4 +1,5 @@
-<FunctionSetAssignmentsList xmlns="urn:ieee:std:2030.5:ns"
+<FunctionSetAssignmentsList href="/api/v2/edev/_EQLDEV3/fsa"
+    xmlns="urn:ieee:std:2030.5:ns"
     xmlns:ns2="https://csipaus.org/ns" all="2" results="2" subscribable="1">
     <FunctionSetAssignments subscribable="1" href="/api/v2/edev/_EQLDEV3/fsa/2">
         <DERProgramListLink all="1" href="/api/v2/edev/_EQLDEV3/fsa/2/derp"/>

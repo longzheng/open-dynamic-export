@@ -1,25 +1,28 @@
 import { assertString } from '../helpers/assert';
 import { parseLinkXmlObject, type Link } from './link';
 import { safeParseIntString } from '../../number';
+import {
+    parseSubscribableResourceXmlObject,
+    type SubscribableResource,
+} from './subscribableResource';
+import {
+    parseIdentifiedObjectXmlObject,
+    type IdentifiedObject,
+} from './identifiedObject';
 
 export type DERProgram = {
-    link: Link;
-    mRID: string;
-    description: string;
-    version: number;
-    defaultDERControlLink?: Link;
-    derControlListLink: Link;
-    derCurveListLink: Link;
+    defaultDERControlLink: Link | undefined;
+    derControlListLink: Link | undefined;
+    derCurveListLink: Link | undefined;
     primacy: number;
-};
+} & SubscribableResource &
+    IdentifiedObject;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    const link = parseLinkXmlObject(xmlObject);
-    const mRID = assertString(xmlObject['mRID'][0]);
-    const description = assertString(xmlObject['description'][0]);
-    const version = safeParseIntString(assertString(xmlObject['version'][0]));
+    const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
+    const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
     const defaultDERControlLink = xmlObject['DefaultDERControlLink']
         ? parseLinkXmlObject(xmlObject['DefaultDERControlLink'][0])
         : undefined;
@@ -33,10 +36,8 @@ export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
     return {
-        link,
-        mRID,
-        description,
-        version,
+        ...subscribableResource,
+        ...identifiedObject,
         defaultDERControlLink,
         derControlListLink,
         derCurveListLink,

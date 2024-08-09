@@ -19,7 +19,7 @@ export type DERCapabilityResponse = {
     // Maximum continuous reactive power delivered by the DER, in var.
     rtgMaxVar: ReactivePower;
     // AC voltage nominal rating.
-    rtgVNom: VoltageRMS;
+    rtgVNom: VoltageRMS | undefined;
     // TODO: partially implemented
 };
 
@@ -32,7 +32,8 @@ export function generateDerCapabilityResponse({
     rtgMaxVar,
     rtgVNom,
 }: DERCapabilityResponse) {
-    return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response: { DERCapability: any } = {
         DERCapability: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             modesSupported: numberToHex(modesSupported).padStart(8, '0'),
@@ -43,7 +44,13 @@ export function generateDerCapabilityResponse({
             rtgMaxVA,
             rtgMaxW,
             rtgMaxVar,
-            rtgVNom,
         },
     };
+
+    if (rtgVNom) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        response.DERCapability.rtgVNom = rtgVNom;
+    }
+
+    return response;
 }
