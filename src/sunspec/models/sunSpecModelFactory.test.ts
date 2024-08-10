@@ -13,6 +13,7 @@ import {
     uint16ToRegisters,
 } from '../helpers/converters';
 import { InverterSunSpecConnection } from '../connection/inverter';
+import { SunSpecConnection } from '../connection/base';
 
 vi.mock('modbus-serial', async (importOriginal) => {
     const actual = await importOriginal();
@@ -26,6 +27,8 @@ vi.mock('modbus-serial', async (importOriginal) => {
             connectTCP: vi.fn(),
             setID: vi.fn(),
             setTimeout: vi.fn(),
+            readHoldingRegisters: vi.fn(),
+            writeRegisters: vi.fn(),
         }),
     };
 });
@@ -110,6 +113,13 @@ describe('sunSpecModelFactory', () => {
             port: 502,
             unitId: 1,
         });
+
+        // intercept SunSpecConnection scanModelAddresses to prevent actual scanning
+        vi.spyOn(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            SunSpecConnection.prototype as any,
+            'scanModelAddresses',
+        ).mockResolvedValue(new Map());
     });
 
     afterEach(() => {
@@ -117,11 +127,12 @@ describe('sunSpecModelFactory', () => {
     });
 
     it('sunSpecModelFactory.read returns correct data', async () => {
-        const readHoldingRegistersMock = vi.fn().mockResolvedValue({
-            data: [0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00],
-        });
-        inverterSunSpecConnection.client.readHoldingRegisters =
-            readHoldingRegistersMock;
+        const readHoldingRegistersMock = vi
+            .spyOn(inverterSunSpecConnection.client, 'readHoldingRegisters')
+            .mockResolvedValue({
+                data: [0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00],
+                buffer: Buffer.from([]), // buffer value is not used
+            });
 
         const result = await model.read({
             modbusConnection: inverterSunSpecConnection,
@@ -134,33 +145,78 @@ describe('sunSpecModelFactory', () => {
             World: 273,
             Test: 'hello',
         });
+
+        expect(readHoldingRegistersMock).toHaveBeenCalledOnce();
+        expect(readHoldingRegistersMock).toHaveBeenCalledWith(40000, 6);
     });
 
-    it('sunSpecModelFactory.write returns true if data updated', async () => {
-        const readHoldingRegistersMock = vi.fn().mockResolvedValue({
-            data: [0x0001, 0x0003, 0xff80, 0x6865, 0x6c6c, 0x6f00],
-        });
-        inverterSunSpecConnection.client.readHoldingRegisters =
-            readHoldingRegistersMock;
+    it('sunSpecModelFactory.write returns if data updated', async () => {
+        const writeRegistersMock = vi
+            .spyOn(inverterSunSpecConnection.client, 'writeRegisters')
+            .mockResolvedValue({ address: 40000, length: 6 });
 
-        const writeRegistersMock = vi.fn();
-        inverterSunSpecConnection.client.writeRegisters = writeRegistersMock;
+        // after write
+        const readHoldingRegistersMock = vi
+            .spyOn(inverterSunSpecConnection.client, 'readHoldingRegisters')
+            .mockResolvedValue({
+                data: [0x0001, 0x00003, 0xff80, 0x6865, 0x6c6c, 0x6f00],
+                buffer: Buffer.from([]), // buffer value is not used
+            });
 
         const values = {
             Hello: 3,
             World: -128,
         } satisfies ModelWrite;
 
-        await model.write({
-            values,
-            modbusConnection: inverterSunSpecConnection,
-            address: { start: 40000, length: 6 },
-        });
+        await expect(
+            model.write({
+                values,
+                modbusConnection: inverterSunSpecConnection,
+                address: { start: 40000, length: 6 },
+            }),
+        ).resolves.toBeUndefined();
 
         expect(writeRegistersMock).toHaveBeenCalledOnce();
         expect(writeRegistersMock).toHaveBeenCalledWith(
             40000,
             [0, 3, 0xff80, 0, 0, 0],
         );
+        expect(readHoldingRegistersMock).toHaveBeenCalledOnce();
+        expect(readHoldingRegistersMock).toHaveBeenCalledWith(40000, 6);
+    });
+
+    it('sunSpecModelFactory.write throw if data is not updated', async () => {
+        const writeRegistersMock = vi
+            .spyOn(inverterSunSpecConnection.client, 'writeRegisters')
+            .mockResolvedValue({ address: 40000, length: 6 });
+
+        // after write
+        const readHoldingRegistersMock = vi
+            .spyOn(inverterSunSpecConnection.client, 'readHoldingRegisters')
+            .mockResolvedValue({
+                data: [0x0001, 0x000011, 0xff80, 0x6865, 0x6c6c, 0x6f00],
+                buffer: Buffer.from([]), // buffer value is not used
+            });
+
+        const values = {
+            Hello: 3,
+            World: -128,
+        } satisfies ModelWrite;
+
+        await expect(
+            model.write({
+                values,
+                modbusConnection: inverterSunSpecConnection,
+                address: { start: 40000, length: 6 },
+            }),
+        ).rejects.toThrowError('Failed to write value for key Hello.');
+
+        expect(writeRegistersMock).toHaveBeenCalledOnce();
+        expect(writeRegistersMock).toHaveBeenCalledWith(
+            40000,
+            [0, 3, 0xff80, 0, 0, 0],
+        );
+        expect(readHoldingRegistersMock).toHaveBeenCalledOnce();
+        expect(readHoldingRegistersMock).toHaveBeenCalledWith(40000, 6);
     });
 });

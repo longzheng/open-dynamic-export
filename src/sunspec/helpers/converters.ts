@@ -23,7 +23,9 @@ export function registersToStringNullable(registers: number[]) {
 
 export function registersToUint32(registers: number[]) {
     if (registers.length !== 2) {
-        throw new Error('Invalid register length');
+        throw new Error(
+            `registersToUint32 invalid register length, should be 2, is ${registers.length}`,
+        );
     }
 
     return (registers[0]! << 16) | registers[1]!;
