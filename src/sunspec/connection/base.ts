@@ -134,7 +134,7 @@ export abstract class SunSpecConnection {
         const address = modelAddressById.get(1);
 
         if (!address) {
-            throw new Error('No SunSpec inverter monitoring model address');
+            throw new Error('No SunSpec inverter common model address');
         }
 
         const data = await commonModel.read({
