@@ -58,6 +58,7 @@ export type StatusModel = {
 };
 
 export const statusModel = sunSpecModelFactory<StatusModel>({
+    name: 'status',
     mapping: {
         ID: {
             start: 0,

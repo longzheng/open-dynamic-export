@@ -152,6 +152,7 @@ export type MeterModel = {
 };
 
 export const meterModel = sunSpecModelFactory<MeterModel>({
+    name: 'meter',
     mapping: {
         ID: {
             start: 0,

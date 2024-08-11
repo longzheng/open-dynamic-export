@@ -104,6 +104,7 @@ describe('sunSpecModelFactory', () => {
     let inverterSunSpecConnection: InverterSunSpecConnection;
 
     const model = sunSpecModelFactory<Model, keyof ModelWrite>({
+        name: 'test',
         mapping,
     });
 

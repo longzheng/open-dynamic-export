@@ -68,6 +68,7 @@ export type NameplateModel = {
 };
 
 export const nameplateModel = sunSpecModelFactory<NameplateModel>({
+    name: 'nameplate',
     mapping: {
         ID: {
             start: 0,

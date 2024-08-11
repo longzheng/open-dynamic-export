@@ -96,6 +96,7 @@ export type InverterModel = {
 };
 
 export const inverterModel = sunSpecModelFactory<InverterModel>({
+    name: 'inverter',
     mapping: {
         ID: {
             start: 0,

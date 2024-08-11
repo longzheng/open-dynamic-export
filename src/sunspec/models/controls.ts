@@ -98,6 +98,7 @@ export const controlsModel = sunSpecModelFactory<
     ControlsModel,
     keyof ControlsModelWrite
 >({
+    name: 'controls',
     mapping: {
         ID: {
             start: 0,

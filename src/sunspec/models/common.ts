@@ -27,6 +27,7 @@ export type CommonModel = {
 };
 
 export const commonModel = sunSpecModelFactory<CommonModel>({
+    name: 'common',
     mapping: {
         ID: {
             start: 0,

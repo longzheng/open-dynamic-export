@@ -78,6 +78,7 @@ export type SettingsModel = {
 };
 
 export const settingsModel = sunSpecModelFactory<SettingsModel>({
+    name: 'settings',
     mapping: {
         ID: {
             start: 0,

@@ -1,3 +1,4 @@
+import { logger as pinoLogger } from '../../logger';
 import { objectEntriesWithType } from '../../object';
 import type { ModelAddress, SunSpecConnection } from '../connection/base';
 
@@ -21,6 +22,7 @@ export function sunSpecModelFactory<
     Model extends Record<string, any>,
     WriteableKeys extends keyof Model = never,
 >(config: {
+    name: string;
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
@@ -33,8 +35,12 @@ export function sunSpecModelFactory<
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
 } {
+    const logger = pinoLogger.child({ module: `sunspec-model-${config.name}` });
+
     return {
         read: async ({ modbusConnection, address }) => {
+            logger.trace({ address }, 'Reading model');
+
             await modbusConnection.connect();
 
             const registers =
@@ -43,12 +49,16 @@ export function sunSpecModelFactory<
                     address.length,
                 );
 
+            logger.trace({ registers }, 'Read registers');
+
             return convertReadRegisters({
                 registers: registers.data,
                 mapping: config.mapping,
             });
         },
         write: async ({ modbusConnection, address, values }) => {
+            logger.trace({ address, values }, 'Writing model');
+
             await modbusConnection.connect();
 
             const registerValues = convertWriteRegisters({
@@ -57,16 +67,22 @@ export function sunSpecModelFactory<
                 length: address.length,
             });
 
+            logger.trace({ registerValues }, 'Converted write registers');
+
             await modbusConnection.client.writeRegisters(
                 address.start,
                 registerValues,
             );
+
+            logger.trace({ registerValues }, 'Validating written registers');
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
                     address.start,
                     address.length,
                 );
+
+            logger.trace({ registers }, 'Read registers');
 
             // confirm the registers were written correctly
             const writtenValues = convertReadRegisters({
@@ -76,7 +92,7 @@ export function sunSpecModelFactory<
 
             objectEntriesWithType(values).forEach(([key, value]) => {
                 if (writtenValues[key] !== value) {
-                    throw new Error(
+                    logger.error(
                         `Failed to write value for key ${key.toString()}. Expected ${value}, got ${writtenValues[key]}`,
                     );
                 }
