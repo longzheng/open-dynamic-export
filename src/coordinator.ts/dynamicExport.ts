@@ -44,6 +44,11 @@ export function generateControlsModelWriteFromDynamicExportConfig({
                     targetSolarPowerRatio: config.targetSolarPowerRatio,
                     controlsModel,
                 }),
+                // revert WMaxLimtPct in 60 seconds
+                // this is a safety measure in case the SunSpec connection is lost
+                // we want to revert the inverter to the default which is assumed to be safe
+                // we assume we will write another dynamic export config witin 60 seconds to reset this timeout
+                WMaxLimPct_RvrtTms: 60,
                 VArPct_Ena: VArPct_Ena.DISABLED,
                 OutPFSet_Ena: OutPFSet_Ena.DISABLED,
             };
