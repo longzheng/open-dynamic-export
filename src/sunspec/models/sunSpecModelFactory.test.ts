@@ -186,7 +186,7 @@ describe('sunSpecModelFactory', () => {
         expect(readHoldingRegistersMock).toHaveBeenCalledWith(40000, 6);
     });
 
-    it('sunSpecModelFactory.write throw if data is not updated', async () => {
+    it('sunSpecModelFactory.write returns even if data is not updated', async () => {
         const writeRegistersMock = vi
             .spyOn(inverterSunSpecConnection.client, 'writeRegisters')
             .mockResolvedValue({ address: 40000, length: 6 });
@@ -210,7 +210,7 @@ describe('sunSpecModelFactory', () => {
                 modbusConnection: inverterSunSpecConnection,
                 address: { start: 40000, length: 6 },
             }),
-        ).rejects.toThrowError('Failed to write value for key Hello.');
+        ).resolves.toBeUndefined();
 
         expect(writeRegistersMock).toHaveBeenCalledOnce();
         expect(writeRegistersMock).toHaveBeenCalledWith(
