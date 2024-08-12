@@ -14,6 +14,9 @@ import { logger as pinoLogger } from '../logger';
 import { TimeHelper } from '../sep2/helpers/time';
 import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
 import { DerListHelper } from '../sep2/helpers/derList';
+import { generateDerCapabilityResponse } from '../sep2/models/derCapability';
+import { getDerCapabilityResponseFromSunSpecArray } from './derCapability';
+import { postDerCapability } from '../sep2/helpers/derCapability';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -67,19 +70,42 @@ function main() {
     });
 
     derListResource.on('data', (derList) => {
-        logger.info(derList, 'Received SEP2 end device DER list');
+        void (async () => {
+            logger.info(derList, 'Received SEP2 end device DER list');
 
-        if (derList.ders.length !== 1) {
-            throw new Error(
-                `DERS list length is not 1, actual length ${derList.ders.length}`,
+            if (derList.ders.length !== 1) {
+                throw new Error(
+                    `DERS list length is not 1, actual length ${derList.ders.length}`,
+                );
+            }
+
+            const der = derList.ders.at(0)!;
+
+            const inverterDerData = await Promise.all(
+                invertersConnections.map(async (inverter) => {
+                    return {
+                        nameplate: await inverter.getNameplateModel(),
+                        settings: await inverter.getSettingsModel(),
+                    };
+                }),
             );
-        }
 
-        const der = derList.ders.at(0)!;
+            // https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf
+            // For DERCapability and DERSettings, the Aggregator posts these resources at device start-up and on any changes.
+            // For DERStatus, the Aggregator posts at the rate specified in DERList:pollRate.
 
-        // https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf
-        // For DERCapability and DERSettings, the Aggregator posts these resources at device start-up and on any changes.
-        // For DERStatus, the Aggregator posts at the rate specified in DERList:pollRate.
+            const derCapability = getDerCapabilityResponseFromSunSpecArray(
+                inverterDerData.map((data) => data.nameplate),
+            );
+
+            await postDerCapability({
+                der,
+                derCapability,
+                client: sep2Client,
+            });
+
+            // TODO post DERSettings and DERStatus
+        })();
     });
 
     logger.info('Discovering SEP2');

@@ -4,6 +4,7 @@ import {
     registersToInt16,
     registersToUint16Nullable,
     registersToSunssfNullable,
+    registersToInt16Nullable,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
@@ -28,9 +29,9 @@ export type NameplateModel = {
     // Continuous VAR capability of the inverter in quadrant 1.
     VArRtgQ1: number;
     // Continuous VAR capability of the inverter in quadrant 2.
-    VArRtgQ2: number;
+    VArRtgQ2: number | null;
     // Continuous VAR capability of the inverter in quadrant 3.
-    VArRtgQ3: number;
+    VArRtgQ3: number | null;
     // Continuous VAR capability of the inverter in quadrant 4.
     VArRtgQ4: number;
     // Scale factor
@@ -42,9 +43,9 @@ export type NameplateModel = {
     // Minimum power factor capability of the inverter in quadrant 1.
     PFRtgQ1: number;
     // Minimum power factor capability of the inverter in quadrant 2.
-    PFRtgQ2: number;
+    PFRtgQ2: number | null;
     // Minimum power factor capability of the inverter in quadrant 3.
-    PFRtgQ3: number;
+    PFRtgQ3: number | null;
     // Minimum power factor capability of the inverter in quadrant 4.
     PFRtgQ4: number;
     // Scale factor
@@ -113,12 +114,12 @@ export const nameplateModel = sunSpecModelFactory<NameplateModel>({
         VArRtgQ2: {
             start: 8,
             end: 9,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         VArRtgQ3: {
             start: 9,
             end: 10,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         VArRtgQ4: {
             start: 10,
@@ -148,12 +149,12 @@ export const nameplateModel = sunSpecModelFactory<NameplateModel>({
         PFRtgQ2: {
             start: 15,
             end: 16,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         PFRtgQ3: {
             start: 16,
             end: 17,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         PFRtgQ4: {
             start: 17,

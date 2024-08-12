@@ -62,7 +62,7 @@ export class SEP2Client {
         return await parseStringPromise(response.data);
     }
 
-    private async postResponse(
+    async postResponse(
         link: string,
         data: unknown,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +72,7 @@ export class SEP2Client {
         return response;
     }
 
-    private async putResponse(
+    async putResponse(
         link: string,
         data: unknown,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

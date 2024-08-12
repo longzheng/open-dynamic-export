@@ -9,8 +9,11 @@ import { type ReactivePower } from './reactivePower';
 import { type VoltageRMS } from './voltageRms';
 
 export type DERCapabilityResponse = {
+    // Bitmap indicating the DER Controls implemented by the device
     modesSupported: DERControlType;
+    // Bitmap indicating the CSIP-AUS controls implemented
     doeModesSupported: DOEModesSupportedType;
+    // Type of DER
     type: DERType;
     // Maximum continuous apparent power output capability of the DER, in voltamperes
     rtgMaxVA: ApparentPower;

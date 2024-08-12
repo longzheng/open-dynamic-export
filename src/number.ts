@@ -57,3 +57,31 @@ export function averageNumbersNullableArray(numbers: (number | null)[]) {
 
     return averageNumbersArray(numbers as number[]);
 }
+
+export function convertNumberToBaseAndPow10Exponent(number: number): {
+    base: number;
+    pow10: number;
+} {
+    let decimal = new Decimal(number);
+
+    // Special case for 0
+    if (decimal.equals(0)) {
+        return { base: 0, pow10: 0 };
+    }
+
+    let pow10 = 0;
+
+    // Handle decimals by multiplying until the number becomes an integer
+    while (!decimal.isInteger()) {
+        decimal = decimal.mul(10);
+        pow10 -= 1;
+    }
+
+    // Handle trailing zeros
+    while (decimal.mod(10).equals(0)) {
+        decimal = decimal.div(10);
+        pow10 += 1;
+    }
+
+    return { base: decimal.toNumber(), pow10 };
+}

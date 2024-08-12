@@ -69,14 +69,14 @@ export type InverterModel = {
     DCW: number | null;
     DCW_SF: number | null;
     // Cabinet Temperature
-    TmpCab: number;
+    TmpCab: number | null;
     // Heat Sink Temperature
     TmpSnk: number | null;
     // Transformer Temperature
     TmpTrns: number | null;
     // Other Temperature
     TmpOt: number | null;
-    Tmp_SF: number;
+    Tmp_SF: number | null;
     // Operating State
     St: InverterState;
     // Vendor Operating State
@@ -261,7 +261,7 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         TmpCab: {
             start: 33,
             end: 34,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         TmpSnk: {
             start: 34,
@@ -281,7 +281,7 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         Tmp_SF: {
             start: 37,
             end: 38,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         St: {
             start: 38,
