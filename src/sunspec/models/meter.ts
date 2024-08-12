@@ -113,7 +113,7 @@ export type MeterModel = {
     TotVAhImpPhB: number | null;
     // Apparent Energy Imported phase C
     TotVAhImpPhC: number | null;
-    TotVAh_SF: number;
+    TotVAh_SF: number | null;
     // Total Reactive Energy Imported Quadrant 1
     TotVArhImpQ1: number;
     // Reactive Energy Imported Q1 phase A
@@ -146,7 +146,7 @@ export type MeterModel = {
     TotVArhExpQ4PhB: number | null;
     // Reactive Power Exported Q4 phase C
     TotVArhExpQ4PhC: number | null;
-    TotVArh_SF: number;
+    TotVArh_SF: number | null;
     // Meter Event Flags
     Evt: MeterEvent;
 };
@@ -432,7 +432,7 @@ export const meterModel = sunSpecModelFactory<MeterModel>({
         TotVAh_SF: {
             start: 71,
             end: 72,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         TotVArhImpQ1: {
             start: 72,
@@ -517,7 +517,7 @@ export const meterModel = sunSpecModelFactory<MeterModel>({
         TotVArh_SF: {
             start: 104,
             end: 105,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         Evt: {
             start: 105,
@@ -528,26 +528,25 @@ export const meterModel = sunSpecModelFactory<MeterModel>({
 });
 
 export enum MeterEvent {
-    None = 0,
-    PowerFailure = 2,
-    UnderVoltage = 3,
-    LowPF = 4,
-    OverCurrent = 5,
-    OverVoltage = 6,
-    MissingSensor = 7,
-    OEM01 = 16,
-    OEM02 = 17,
-    OEM03 = 18,
-    OEM04 = 19,
-    OEM05 = 20,
-    OEM06 = 21,
-    OEM07 = 22,
-    OEM08 = 23,
-    OEM09 = 24,
-    OEM10 = 25,
-    OEM11 = 26,
-    OEM12 = 27,
-    OEM13 = 28,
-    OEM14 = 29,
-    OEM15 = 30,
+    PowerFailure = 1 << 2,
+    UnderVoltage = 1 << 3,
+    LowPF = 1 << 4,
+    OverCurrent = 1 << 5,
+    OverVoltage = 1 << 6,
+    MissingSensor = 1 << 7,
+    OEM01 = 1 << 16,
+    OEM02 = 1 << 17,
+    OEM03 = 1 << 18,
+    OEM04 = 1 << 19,
+    OEM05 = 1 << 20,
+    OEM06 = 1 << 21,
+    OEM07 = 1 << 22,
+    OEM08 = 1 << 23,
+    OEM09 = 1 << 24,
+    OEM10 = 1 << 25,
+    OEM11 = 1 << 26,
+    OEM12 = 1 << 27,
+    OEM13 = 1 << 28,
+    OEM14 = 1 << 29,
+    OEM15 = 1 << 30,
 }

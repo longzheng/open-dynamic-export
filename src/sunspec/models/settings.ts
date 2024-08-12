@@ -1,4 +1,6 @@
 import {
+    registersToInt16,
+    registersToInt16Nullable,
     registersToSunssf,
     registersToSunssfNullable,
     registersToUint16,
@@ -28,23 +30,23 @@ export type SettingsModel = {
     // Setpoint for maximum apparent power. Default to VARtg.
     VAMax: number | null;
     // Setting for maximum reactive power in quadrant 1. Default to VArRtgQ1.
-    VArMaxQ1: number | null;
+    VArMaxQ1: number;
     // Setting for maximum reactive power in quadrant 2. Default to VArRtgQ2.
     VArMaxQ2: number | null;
     // Setting for maximum reactive power in quadrant 3. Default to VArRtgQ3.
     VArMaxQ3: number | null;
     // Setting for maximum reactive power in quadrant 4. Default to VArRtgQ4.
-    VArMaxQ4: number | null;
+    VArMaxQ4: number;
     // Default ramp rate of change of active power due to command or internal action.
     WGra: number | null;
     // Setpoint for minimum power factor value in quadrant 1. Default to PFRtgQ1.
-    PFMinQ1: number | null;
+    PFMinQ1: number;
     // Setpoint for minimum power factor value in quadrant 2. Default to PFRtgQ2.
     PFMinQ2: number | null;
     // Setpoint for minimum power factor value in quadrant 3. Default to PFRtgQ3.
     PFMinQ3: number | null;
     // Setpoint for minimum power factor value in quadrant 4. Default to PFRtgQ4.
-    PFMinQ4: number | null;
+    PFMinQ4: number;
     // VAR action on change between charging and discharging: 1=switch 2=maintain VAR characterization.
     VArAct: VArAct | null;
     // Calculation method for total apparent power. 1=vector 2=arithmetic.
@@ -123,22 +125,22 @@ export const settingsModel = sunSpecModelFactory<SettingsModel>({
         VArMaxQ1: {
             start: 8,
             end: 9,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16,
         },
         VArMaxQ2: {
             start: 9,
             end: 10,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16Nullable,
         },
         VArMaxQ3: {
             start: 10,
             end: 11,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16Nullable,
         },
         VArMaxQ4: {
             start: 11,
             end: 12,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16,
         },
         WGra: {
             start: 12,
@@ -148,22 +150,22 @@ export const settingsModel = sunSpecModelFactory<SettingsModel>({
         PFMinQ1: {
             start: 13,
             end: 14,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16,
         },
         PFMinQ2: {
             start: 14,
             end: 15,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16Nullable,
         },
         PFMinQ3: {
             start: 15,
             end: 16,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16Nullable,
         },
         PFMinQ4: {
             start: 16,
             end: 17,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16,
         },
         VArAct: {
             start: 17,

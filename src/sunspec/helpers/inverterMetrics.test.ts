@@ -1,9 +1,6 @@
 import { expect, it } from 'vitest';
-import {
-    InverterEvent1,
-    InverterState,
-    type InverterModel,
-} from '../models/inverter';
+import type { InverterEvent1 } from '../models/inverter';
+import { InverterState, type InverterModel } from '../models/inverter';
 import { getInverterMetrics } from './inverterMetrics';
 
 it('getInverterMetrics returns data', () => {
@@ -40,14 +37,14 @@ it('getInverterMetrics returns data', () => {
         DCV_SF: null,
         DCW: 7347,
         DCW_SF: 0,
-        TmpCab: -32768,
+        TmpCab: null,
         TmpSnk: null,
         TmpTrns: null,
         TmpOt: null,
-        Tmp_SF: -32768,
+        Tmp_SF: null,
         St: InverterState.I_STATUS_MPPT,
         StVnd: 4,
-        Evt1: InverterEvent1.NONE,
+        Evt1: 0 as InverterEvent1,
         Evt2: 0,
         EvtVnd1: 0,
         EvtVnd2: 0,

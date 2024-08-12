@@ -174,57 +174,57 @@ export const statusModel = sunSpecModelFactory<StatusModel>({
 });
 
 export enum PVConn {
-    CONNECTED = 0,
-    AVAILABLE = 1,
-    OPERATING = 2,
-    TEST = 3,
+    CONNECTED = 1 << 0,
+    AVAILABLE = 1 << 1,
+    OPERATING = 1 << 2,
+    TEST = 1 << 3,
 }
 
 export enum StorConn {
-    CONNECTED = 0,
-    AVAILABLE = 1,
-    OPERATING = 2,
-    TEST = 3,
+    CONNECTED = 1 << 0,
+    AVAILABLE = 1 << 1,
+    OPERATING = 1 << 2,
+    TEST = 1 << 3,
 }
 
 export enum ECPConn {
-    CONNECTED = 0,
+    CONNECTED = 1 << 0,
 }
 
 export enum StSetLimMsk {
-    WMax = 0,
-    VAMax = 1,
-    VArAval = 2,
-    VArMaxQ1 = 3,
-    VArMaxQ2 = 4,
-    VArMaxQ3 = 5,
-    VArMaxQ4 = 6,
-    PFMinQ1 = 7,
-    PFMinQ2 = 8,
-    PFMinQ3 = 9,
-    PFMinQ4 = 10,
+    WMax = 1 << 0,
+    VAMax = 1 << 1,
+    VArAval = 1 << 2,
+    VArMaxQ1 = 1 << 3,
+    VArMaxQ2 = 1 << 4,
+    VArMaxQ3 = 1 << 5,
+    VArMaxQ4 = 1 << 6,
+    PFMinQ1 = 1 << 7,
+    PFMinQ2 = 1 << 8,
+    PFMinQ3 = 1 << 9,
+    PFMinQ4 = 1 << 10,
 }
 
 export enum StActCtl {
-    FixedW = 0,
-    FixedVAR = 1,
-    FixedPF = 2,
-    VoltVAr = 3,
-    FreqWattParam = 4,
-    FreqWattCurve = 5,
-    DynReactiveCurrent = 6,
-    LVRT = 7,
-    HVRT = 8,
-    WattPF = 9,
-    VoltWatt = 10,
-    Scheduled = 12,
-    LFRT = 13,
-    HFRT = 14,
+    FixedW = 1 << 0,
+    FixedVAR = 1 << 1,
+    FixedPF = 1 << 2,
+    VoltVAr = 1 << 3,
+    FreqWattParam = 1 << 4,
+    FreqWattCurve = 1 << 5,
+    DynReactiveCurrent = 1 << 6,
+    LVRT = 1 << 7,
+    HVRT = 1 << 8,
+    WattPF = 1 << 9,
+    VoltWatt = 1 << 10,
+    Scheduled = 1 << 12,
+    LFRT = 1 << 13,
+    HFRT = 1 << 14,
 }
 
 export enum RtSt {
-    LVRT_ACTIVE = 0,
-    HVRT_ACTIVE = 1,
-    LFRT_ACTIVE = 2,
-    HFRT_ACTIVE = 3,
+    LVRT_ACTIVE = 1 << 0,
+    HVRT_ACTIVE = 1 << 1,
+    LFRT_ACTIVE = 1 << 2,
+    HFRT_ACTIVE = 1 << 3,
 }

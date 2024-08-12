@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
-import { MeterEvent, type MeterModel } from '../models/meter';
+import type { MeterEvent } from '../models/meter';
+import { type MeterModel } from '../models/meter';
 import { getMeterMetrics } from './meterMetrics';
 
 it('getMeterMetrics returns data', () => {
@@ -59,7 +60,7 @@ it('getMeterMetrics returns data', () => {
         TotVAhImpPhA: 0,
         TotVAhImpPhB: 0,
         TotVAhImpPhC: 0,
-        TotVAh_SF: -32768,
+        TotVAh_SF: null,
         TotVArhImpQ1: 0,
         TotVArhImpQ1PhA: 0,
         TotVArhImpQ1PhB: 0,
@@ -76,8 +77,8 @@ it('getMeterMetrics returns data', () => {
         TotVArhExpQ4PhA: 0,
         TotVArhExpQ4PhB: 0,
         TotVArhExpQ4PhC: 0,
-        TotVArh_SF: -32768,
-        Evt: MeterEvent.None,
+        TotVArh_SF: null,
+        Evt: 0 as MeterEvent,
     };
 
     const result = getMeterMetrics(meter);
