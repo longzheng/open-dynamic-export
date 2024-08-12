@@ -85,3 +85,7 @@ export function convertNumberToBaseAndPow10Exponent(number: number): {
 
     return { base: decimal.toNumber(), pow10 };
 }
+
+export function sumBigIntArray(numbers: bigint[]) {
+    return numbers.reduce((acc, number) => number + acc, BigInt(0));
+}

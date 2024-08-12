@@ -4,6 +4,7 @@ import {
     averageNumbersNullableArray,
     convertNumberToBaseAndPow10Exponent,
     numberWithPow10,
+    sumBigIntArray,
     sumNumbersArray,
     sumNumbersNullableArray,
 } from './number';
@@ -113,5 +114,12 @@ describe('convertNumberToBaseAndPow10Exponent', () => {
     it('should convert number 0.0', () => {
         const result = convertNumberToBaseAndPow10Exponent(0.0);
         expect(result).toEqual({ base: 0, pow10: 0 });
+    });
+});
+
+describe('sumBigIntArray', () => {
+    it('should sum bigints', () => {
+        const result = sumBigIntArray([BigInt(1), 2n, BigInt(3)]);
+        expect(result).toBe(6n);
     });
 });

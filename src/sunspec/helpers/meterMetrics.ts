@@ -184,7 +184,9 @@ export function getMeterMetrics(meter: MeterModel) {
     }
 }
 
-export function getAggregatedMeterMetrics(meters: MeterModel[]) {
+export function getAggregatedMeterMetrics(
+    meters: MeterModel[],
+): ReturnType<typeof getMeterMetrics> {
     const metrics = meters.map(getMeterMetrics);
 
     const firstMeter = metrics.at(0);

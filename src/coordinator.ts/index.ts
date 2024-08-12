@@ -15,8 +15,16 @@ import { TimeHelper } from '../sep2/helpers/time';
 import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
 import { DerListHelper } from '../sep2/helpers/derList';
 import { generateDerCapabilityResponse } from '../sep2/models/derCapability';
-import { getDerCapabilityResponseFromSunSpecArray } from './derCapability';
-import { postDerCapability } from '../sep2/helpers/derCapability';
+import {
+    getDerCapabilityResponseFromSunSpecArray,
+    getDerSettingsResponseFromSunSpecArray,
+    getDerStatusResponseFromSunSpecArray,
+} from './der';
+import {
+    postDerCapability,
+    postDerSettings,
+    postDerStatus,
+} from '../sep2/helpers/der';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -86,6 +94,7 @@ function main() {
                     return {
                         nameplate: await inverter.getNameplateModel(),
                         settings: await inverter.getSettingsModel(),
+                        status: await inverter.getStatusModel(),
                     };
                 }),
             );
@@ -98,13 +107,31 @@ function main() {
                 inverterDerData.map((data) => data.nameplate),
             );
 
-            await postDerCapability({
-                der,
-                derCapability,
-                client: sep2Client,
-            });
+            const derSettings = getDerSettingsResponseFromSunSpecArray(
+                inverterDerData.map((data) => data.settings),
+            );
 
-            // TODO post DERSettings and DERStatus
+            const derStatus = getDerStatusResponseFromSunSpecArray(
+                inverterDerData.map((data) => data.status),
+            );
+
+            await Promise.all([
+                postDerCapability({
+                    der,
+                    derCapability,
+                    client: sep2Client,
+                }),
+                postDerSettings({
+                    der,
+                    derSettings,
+                    client: sep2Client,
+                }),
+                postDerStatus({
+                    der,
+                    derStatus,
+                    client: sep2Client,
+                }),
+            ]);
         })();
     });
 

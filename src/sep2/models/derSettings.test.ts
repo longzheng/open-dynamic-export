@@ -33,14 +33,14 @@ it('should generate DERSettings XML', () => {
     <updatedTime>1682475029</updatedTime>
     <modesEnabled>00500088</modesEnabled>
     <setGradW>1</setGradW>
-    <setMaxVA>
-        <multiplier>3</multiplier>
-        <value>52.5</value>
-    </setMaxVA>
     <setMaxW>
         <multiplier>3</multiplier>
         <value>50</value>
     </setMaxW>
+    <setMaxVA>
+        <multiplier>3</multiplier>
+        <value>52.5</value>
+    </setMaxVA>
     <setMaxVar>
         <multiplier>3</multiplier>
         <value>2.5</value>

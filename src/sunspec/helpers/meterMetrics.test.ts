@@ -114,5 +114,5 @@ it('getMeterMetrics returns data', () => {
         WphA: -739.2,
         WphB: 0,
         WphC: -11.6,
-    });
+    } satisfies ReturnType<typeof getMeterMetrics>);
 });

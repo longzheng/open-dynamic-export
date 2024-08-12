@@ -5,6 +5,7 @@ import {
     registersToUint16Nullable,
     registersToUint32Nullable,
     registersToStringNullable,
+    registersToInt16Nullable,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
@@ -118,7 +119,7 @@ export const statusModel = sunSpecModelFactory<StatusModel>({
         VArAval: {
             start: 29,
             end: 30,
-            readConverter: registersToUint16Nullable,
+            readConverter: registersToInt16Nullable,
         },
         VArAval_SF: {
             start: 30,

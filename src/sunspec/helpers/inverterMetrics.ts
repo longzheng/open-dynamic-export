@@ -129,7 +129,9 @@ export function getInverterMetrics(inverter: InverterModel) {
     }
 }
 
-export function getAggregatedInverterMetrics(inverters: InverterModel[]) {
+export function getAggregatedInverterMetrics(
+    inverters: InverterModel[],
+): ReturnType<typeof getInverterMetrics> {
     const metrics = inverters.map(getInverterMetrics);
 
     const firstInverter = metrics.at(0);

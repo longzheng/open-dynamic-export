@@ -48,7 +48,9 @@ export function getNameplateMetrics(nameplate: NameplateModel) {
     };
 }
 
-export function getAggregatedNameplateMetrics(nameplates: NameplateModel[]) {
+export function getAggregatedNameplateMetrics(
+    nameplates: NameplateModel[],
+): ReturnType<typeof getNameplateMetrics> {
     const metrics = nameplates.map(getNameplateMetrics);
 
     const firstNameplate = metrics.at(0);

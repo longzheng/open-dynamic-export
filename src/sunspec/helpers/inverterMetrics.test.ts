@@ -75,5 +75,5 @@ it('getInverterMetrics returns data', () => {
         W: 6990,
         WH: 77877496,
         phases: 'threePhase',
-    });
+    } satisfies ReturnType<typeof getInverterMetrics>);
 });
