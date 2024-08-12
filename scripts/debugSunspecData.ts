@@ -60,4 +60,6 @@ void (async () => {
         metersData.map((meterData) => getMeterMetrics(meterData.meter)),
         'meter metrics',
     );
+
+    process.exit();
 })();
