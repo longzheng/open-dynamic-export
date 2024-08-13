@@ -14,17 +14,7 @@ import { logger as pinoLogger } from '../logger';
 import { TimeHelper } from '../sep2/helpers/time';
 import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
 import { DerListHelper } from '../sep2/helpers/derList';
-import { generateDerCapabilityResponse } from '../sep2/models/derCapability';
-import {
-    getDerCapabilityResponseFromSunSpecArray,
-    getDerSettingsResponseFromSunSpecArray,
-    getDerStatusResponseFromSunSpecArray,
-} from './der';
-import {
-    postDerCapability,
-    postDerSettings,
-    postDerStatus,
-} from '../sep2/helpers/der';
+import { DerHelper } from '../sep2/helpers/der';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -48,6 +38,10 @@ const sep2Client = new SEP2Client({
 const timeResource: TimeHelper = new TimeHelper();
 const endDeviceListResource: EndDeviceListHelper = new EndDeviceListHelper();
 const derListResource = new DerListHelper();
+const derHelper = new DerHelper({
+    client: sep2Client,
+    invertersConnections,
+});
 
 const telemetryCache = new TelemetryCache();
 
@@ -78,61 +72,20 @@ function main() {
     });
 
     derListResource.on('data', (derList) => {
-        void (async () => {
-            logger.info(derList, 'Received SEP2 end device DER list');
+        logger.info(derList, 'Received SEP2 end device DER list');
 
-            if (derList.ders.length !== 1) {
-                throw new Error(
-                    `DERS list length is not 1, actual length ${derList.ders.length}`,
-                );
-            }
-
-            const der = derList.ders.at(0)!;
-
-            const inverterDerData = await Promise.all(
-                invertersConnections.map(async (inverter) => {
-                    return {
-                        nameplate: await inverter.getNameplateModel(),
-                        settings: await inverter.getSettingsModel(),
-                        status: await inverter.getStatusModel(),
-                    };
-                }),
+        if (derList.ders.length !== 1) {
+            throw new Error(
+                `DERS list length is not 1, actual length ${derList.ders.length}`,
             );
+        }
 
-            // https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf
-            // For DERCapability and DERSettings, the Aggregator posts these resources at device start-up and on any changes.
-            // For DERStatus, the Aggregator posts at the rate specified in DERList:pollRate.
+        const der = derList.ders.at(0)!;
 
-            const derCapability = getDerCapabilityResponseFromSunSpecArray(
-                inverterDerData.map((data) => data.nameplate),
-            );
-
-            const derSettings = getDerSettingsResponseFromSunSpecArray(
-                inverterDerData.map((data) => data.settings),
-            );
-
-            const derStatus = getDerStatusResponseFromSunSpecArray(
-                inverterDerData.map((data) => data.status),
-            );
-
-            await Promise.all([
-                postDerCapability({
-                    der,
-                    derCapability,
-                    client: sep2Client,
-                }),
-                postDerSettings({
-                    der,
-                    derSettings,
-                    client: sep2Client,
-                }),
-                postDerStatus({
-                    der,
-                    derStatus,
-                    client: sep2Client,
-                }),
-            ]);
-        })();
+        derHelper.configureDer({
+            der,
+            pollRate: derList.pollRate,
+        });
     });
 
     logger.info('Discovering SEP2');
