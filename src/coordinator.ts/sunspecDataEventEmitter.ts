@@ -10,6 +10,9 @@ import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';
 import EventEmitter from 'events';
 import { logger as pinoLogger } from '../logger';
+import type { NameplateModel } from '../sunspec/models/nameplate';
+import type { SettingsModel } from '../sunspec/models/settings';
+import type { StatusModel } from '../sunspec/models/status';
 
 const logger = pinoLogger.child({ module: 'sunspec-data-event-emitter' });
 
@@ -18,6 +21,9 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
         {
             invertersData: {
                 inverter: InverterModel;
+                nameplate: NameplateModel;
+                settings: SettingsModel;
+                status: StatusModel;
                 controls: ControlsModel;
             }[];
             metersData: {
@@ -55,6 +61,9 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 this.invertersConnections.map(async (inverter) => {
                     return {
                         inverter: await inverter.getInverterModel(),
+                        nameplate: await inverter.getNameplateModel(),
+                        settings: await inverter.getSettingsModel(),
+                        status: await inverter.getStatusModel(),
                         controls: await inverter.getControlsModel(),
                     };
                 }),

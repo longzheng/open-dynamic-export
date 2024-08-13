@@ -111,6 +111,8 @@ function main() {
         'data',
         ({ invertersData, telemetry, currentAveragePowerRatio }) => {
             void (async () => {
+                derHelper.onInverterData(invertersData);
+
                 // save telemetry to cache for SEP2 telemetry
                 telemetryCache.addToCache(telemetry);
 

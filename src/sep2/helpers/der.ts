@@ -148,7 +148,7 @@ export class DerHelper {
         );
     }
 
-    public async postDerSettings({
+    private async postDerSettings({
         derSettings,
     }: {
         derSettings: DERSettings;
@@ -168,7 +168,7 @@ export class DerHelper {
         );
     }
 
-    public async postDerStatus({ derStatus }: { derStatus: DERStatus }) {
+    private async postDerStatus({ derStatus }: { derStatus: DERStatus }) {
         if (!this.config?.der) {
             this.logger.info('DER not initialised, skipping postDerStatus');
 
