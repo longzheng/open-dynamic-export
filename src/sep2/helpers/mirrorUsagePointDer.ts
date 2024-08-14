@@ -180,7 +180,7 @@ export class MirrorUsagePointDerHelper {
         reading: DerReading;
         nextUpdateTime: Date;
     }) {
-        const averageRealPowerPhaseAValue = convertNumberToBaseAndPow10Exponent(
+        const phaseAValue = convertNumberToBaseAndPow10Exponent(
             reading.realPowerAverage.phaseA,
         );
 
@@ -191,7 +191,7 @@ export class MirrorUsagePointDerHelper {
                 lastUpdateTime: new Date(),
                 nextUpdateTime,
                 Reading: {
-                    value: averageRealPowerPhaseAValue.base,
+                    value: phaseAValue.base,
                     qualityFlags: QualityFlags.Valid,
                 },
                 ReadingType: {
@@ -201,17 +201,16 @@ export class MirrorUsagePointDerHelper {
                     flowDirection: FlowDirectionType.Forward,
                     intervalLength: reading.intervalSeconds,
                     phase: PhaseCode.PhaseA,
-                    powerOfTenMultiplier: averageRealPowerPhaseAValue.pow10,
+                    powerOfTenMultiplier: phaseAValue.pow10,
                     uom: UomType.W,
                 },
             },
         });
 
         if (reading.realPowerAverage.phaseB) {
-            const averageRealPowerPhaseBValue =
-                convertNumberToBaseAndPow10Exponent(
-                    reading.realPowerAverage.phaseB,
-                );
+            const phaseBValue = convertNumberToBaseAndPow10Exponent(
+                reading.realPowerAverage.phaseB,
+            );
 
             void this.postMirrorMeterReading({
                 mirrorMeterReading: {
@@ -220,7 +219,7 @@ export class MirrorUsagePointDerHelper {
                     lastUpdateTime: new Date(),
                     nextUpdateTime,
                     Reading: {
-                        value: averageRealPowerPhaseBValue.base,
+                        value: phaseBValue.base,
                         qualityFlags: QualityFlags.Valid,
                     },
                     ReadingType: {
@@ -231,7 +230,7 @@ export class MirrorUsagePointDerHelper {
                         flowDirection: FlowDirectionType.Forward,
                         intervalLength: reading.intervalSeconds,
                         phase: PhaseCode.PhaseB,
-                        powerOfTenMultiplier: averageRealPowerPhaseBValue.pow10,
+                        powerOfTenMultiplier: phaseBValue.pow10,
                         uom: UomType.W,
                     },
                 },
@@ -239,10 +238,9 @@ export class MirrorUsagePointDerHelper {
         }
 
         if (reading.realPowerAverage.phaseC) {
-            const averageRealPowerPhaseCValue =
-                convertNumberToBaseAndPow10Exponent(
-                    reading.realPowerAverage.phaseC,
-                );
+            const phaseCValue = convertNumberToBaseAndPow10Exponent(
+                reading.realPowerAverage.phaseC,
+            );
 
             void this.postMirrorMeterReading({
                 mirrorMeterReading: {
@@ -251,7 +249,7 @@ export class MirrorUsagePointDerHelper {
                     lastUpdateTime: new Date(),
                     nextUpdateTime,
                     Reading: {
-                        value: averageRealPowerPhaseCValue.base,
+                        value: phaseCValue.base,
                         qualityFlags: QualityFlags.Valid,
                     },
                     ReadingType: {
@@ -262,7 +260,7 @@ export class MirrorUsagePointDerHelper {
                         flowDirection: FlowDirectionType.Forward,
                         intervalLength: reading.intervalSeconds,
                         phase: PhaseCode.PhaseC,
-                        powerOfTenMultiplier: averageRealPowerPhaseCValue.pow10,
+                        powerOfTenMultiplier: phaseCValue.pow10,
                         uom: UomType.W,
                     },
                 },
