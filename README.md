@@ -66,8 +66,8 @@ The downside of a direct client approach is the registration process is manual a
 - [x] SEP2 client
   - [x] XML response parsing
   - [x] XML request generation
-  - [ ] Scheduled polling and pushing
-  - [ ] DER status/capability/settings reporting
+  - [x] Scheduled polling and pushing
+  - [x] DER status/capability/settings reporting
   - [ ] DER control events acknowledgement
   - [ ] Telemetry reporting
 - [x] SunSpec Modbus client

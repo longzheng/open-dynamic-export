@@ -77,19 +77,23 @@ type DynamicExportConfig =
 
 export function calculateDynamicExportConfig({
     activeDerControlBase,
-    telemetry,
+    monitoringSample,
     currentAveragePowerRatio,
 }: {
     activeDerControlBase: DERControlBase | null;
-    telemetry: MonitoringSample;
+    monitoringSample: MonitoringSample;
     currentAveragePowerRatio: number;
 }): DynamicExportConfig {
     if (activeDerControlBase?.opModEnergize === false) {
         return { type: 'deenergize' };
     }
 
-    const siteWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.site);
-    const solarWatts = getTotalFromPerPhaseMeasurement(telemetry.realPower.der);
+    const siteWatts = getTotalFromPerPhaseMeasurement(
+        monitoringSample.realPower.site,
+    );
+    const solarWatts = getTotalFromPerPhaseMeasurement(
+        monitoringSample.realPower.der,
+    );
 
     const exportLimitWatts = activeDerControlBase?.opModExpLimW
         ? numberWithPow10(

@@ -35,8 +35,8 @@ export class MonitoringHelper {
         );
     }
 
-    public addSample(telemetry: MonitoringSample) {
-        this.samples.push(telemetry);
+    public addSample(sample: MonitoringSample) {
+        this.samples.push(sample);
     }
 
     private getSamplesAndClear(): MonitoringSample[] {

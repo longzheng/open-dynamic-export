@@ -115,7 +115,7 @@ function main() {
 
                 const dynamicExportConfig = calculateDynamicExportConfig({
                     activeDerControlBase: null, // TODO get active DER control base
-                    telemetry: monitoringSample,
+                    monitoringSample,
                     currentAveragePowerRatio,
                 });
 
