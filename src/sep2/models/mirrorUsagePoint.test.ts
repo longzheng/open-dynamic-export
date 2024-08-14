@@ -1,4 +1,4 @@
-import { it, expect } from 'vitest';
+import { it, expect, describe } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks';
 import {
@@ -36,26 +36,55 @@ it('should parse end device DER with XML', async () => {
     );
 });
 
-it('should generate MirrorUsagePoint XML', () => {
-    const response = generateMirrorUsagePointResponse({
-        mRID: '4075DE6031E562ACF4D9EA0B00057269',
-        description: 'Site Measurement',
-        roleFlags:
-            RoleFlagsType.isPremisesAggregationPoint | RoleFlagsType.isMirror,
-        serviceCategoryKind: ServiceKind.Electricity,
-        status: MirrorUsagePointStatus.On,
-        deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
-    });
+describe('generateMirrorUsagePointResponse', () => {
+    it('should generate MirrorUsagePoint XML for site', () => {
+        const response = generateMirrorUsagePointResponse({
+            mRID: '01E0F2357FF85E4B7EE6C60300057269',
+            description: 'Site Measurement',
+            roleFlags:
+                RoleFlagsType.isPremisesAggregationPoint |
+                RoleFlagsType.isMirror,
+            serviceCategoryKind: ServiceKind.Electricity,
+            status: MirrorUsagePointStatus.On,
+            deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
+        });
 
-    const xml = objectToXml(response);
+        const xml = objectToXml(response);
 
-    expect(xml).toBe(`<?xml version="1.0"?>
+        expect(xml).toBe(`<?xml version="1.0"?>
 <MirrorUsagePoint xmlns="urn:ieee:std:2030.5:ns">
-    <mRID>4075DE6031E562ACF4D9EA0B00057269</mRID>
+    <mRID>01E0F2357FF85E4B7EE6C60300057269</mRID>
     <description>Site Measurement</description>
     <roleFlags>03</roleFlags>
     <serviceCategoryKind>0</serviceCategoryKind>
     <status>1</status>
     <deviceLFDI>4075DE6031E562ACF4D9EAA765A5B2ED00057269</deviceLFDI>
 </MirrorUsagePoint>`);
+    });
+
+    it('should generate MirrorUsagePoint XML for DER', () => {
+        const response = generateMirrorUsagePointResponse({
+            mRID: '01E0F2357FF85E4B7EE6C64900057269',
+            description: 'DER Measurement',
+            roleFlags:
+                RoleFlagsType.isDER |
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isSubmeter,
+            serviceCategoryKind: ServiceKind.Electricity,
+            status: MirrorUsagePointStatus.On,
+            deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
+        });
+
+        const xml = objectToXml(response);
+
+        expect(xml).toBe(`<?xml version="1.0"?>
+<MirrorUsagePoint xmlns="urn:ieee:std:2030.5:ns">
+    <mRID>01E0F2357FF85E4B7EE6C64900057269</mRID>
+    <description>DER Measurement</description>
+    <roleFlags>49</roleFlags>
+    <serviceCategoryKind>0</serviceCategoryKind>
+    <status>1</status>
+    <deviceLFDI>4075DE6031E562ACF4D9EAA765A5B2ED00057269</deviceLFDI>
+</MirrorUsagePoint>`);
+    });
 });
