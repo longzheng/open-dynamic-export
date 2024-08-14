@@ -8,16 +8,23 @@ export class DerListHelper extends EventEmitter<{
     data: [DERList];
 }> {
     private href: string | null = null;
+    private client: SEP2Client;
     private derListPollableResource: DerListPollableResource | null = null;
 
-    public init({ client, href }: { client: SEP2Client; href: string }) {
+    constructor({ client }: { client: SEP2Client }) {
+        super();
+
+        this.client = client;
+    }
+
+    public updateHref({ href }: { href: string }) {
         if (this.href !== href) {
             this.href = href;
 
             this.destroy();
 
             this.derListPollableResource = new DerListPollableResource({
-                client,
+                client: this.client,
                 url: href,
                 defaultPollRateSeconds: defaultPollPushRates.endDeviceListPoll,
             }).on('data', (data) => {

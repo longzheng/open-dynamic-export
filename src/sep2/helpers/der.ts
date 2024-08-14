@@ -35,7 +35,7 @@ export class DerHelper {
     private lastSentDerSettings: DERSettings | null = null;
     private lastSentDerStatus: DERStatus | null = null;
     private invertersConnections: InverterSunSpecConnection[];
-    private pollTimeout: NodeJS.Timeout | null = null;
+    private pollTimer: NodeJS.Timeout | null = null;
 
     constructor({
         client,
@@ -54,7 +54,9 @@ export class DerHelper {
         this.logger.info(config, 'Updated DerHelper with config');
         this.config = config;
 
-        void this.poll();
+        if (!this.pollTimer) {
+            void this.poll();
+        }
     }
 
     public onInverterData(
@@ -96,10 +98,15 @@ export class DerHelper {
     }
 
     private async poll() {
-        // if polling is already set up, don't start another one
-        if (this.pollTimeout) {
-            return;
-        }
+        this.pollTimer = setTimeout(
+            () => {
+                void this.poll();
+            },
+            this.config?.pollRate
+                ? this.config.pollRate * 1000
+                : // fallback to default poll rate for EndDeviceList
+                  defaultPollPushRates.endDeviceListPoll * 1000,
+        );
 
         const inverterData = await Promise.all(
             this.invertersConnections.map(async (inverter) => {
@@ -116,16 +123,6 @@ export class DerHelper {
         void this.postDerStatus({ derStatus });
 
         this.lastSentDerStatus = derStatus;
-
-        this.pollTimeout = setTimeout(
-            () => {
-                void this.poll();
-            },
-            this.config?.pollRate
-                ? this.config.pollRate * 1000
-                : // fallback to default poll rate for EndDeviceList
-                  defaultPollPushRates.endDeviceListPoll * 1000,
-        );
     }
 
     private async postDerCapability({

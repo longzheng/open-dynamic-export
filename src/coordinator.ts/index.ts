@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { SEP2Client } from '../sep2/client';
 import { getConfig, getConfigSep2CertKey } from '../config';
 import { getSunSpecConnections } from '../sunspec/connections';
-import { MonitoringHelper } from './monitoring/helper';
 import {
     calculateDynamicExportConfig,
     generateControlsModelWriteFromDynamicExportConfig,
@@ -13,6 +12,7 @@ import { TimeHelper } from '../sep2/helpers/time';
 import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
 import { DerListHelper } from '../sep2/helpers/derList';
 import { DerHelper } from '../sep2/helpers/der';
+import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -33,17 +33,25 @@ const sep2Client = new SEP2Client({
     key: sep2Key,
 });
 
-const timeResource: TimeHelper = new TimeHelper();
-const endDeviceListResource: EndDeviceListHelper = new EndDeviceListHelper();
-const derListResource = new DerListHelper();
+const timeHelper: TimeHelper = new TimeHelper({
+    client: sep2Client,
+});
+const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
+    client: sep2Client,
+});
+const derListHelper = new DerListHelper({
+    client: sep2Client,
+});
 const derHelper = new DerHelper({
     client: sep2Client,
     invertersConnections,
 });
-const monitoringHelper = new MonitoringHelper();
+const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
+    client: sep2Client,
+});
 
 function main() {
-    endDeviceListResource.on('data', (endDeviceList) => {
+    endDeviceListHelper.on('data', (endDeviceList) => {
         logger.info(endDeviceList, 'Received SEP2 end device list');
 
         // as a direct client, we expect only one end device that matches the LFDI of our certificate
@@ -60,14 +68,13 @@ function main() {
         }
 
         if (endDevice.derListLink) {
-            derListResource.init({
-                client: sep2Client,
+            derListHelper.updateHref({
                 href: endDevice.derListLink.href,
             });
         }
     });
 
-    derListResource.on('data', (derList) => {
+    derListHelper.on('data', (derList) => {
         logger.info(derList, 'Received SEP2 end device DER list');
 
         if (derList.ders.length !== 1) {
@@ -89,14 +96,16 @@ function main() {
     sep2Client.discover().on('data', (deviceCapability) => {
         logger.info(deviceCapability, 'Received SEP2 device capability');
 
-        timeResource.init({
-            client: sep2Client,
+        timeHelper.updateHref({
             href: deviceCapability.timeLink.href,
         });
 
-        endDeviceListResource.init({
-            client: sep2Client,
+        endDeviceListHelper.updateHref({
             href: deviceCapability.endDeviceListLink.href,
+        });
+
+        mirrorUsagePointListHelper.updateHref({
+            href: deviceCapability.mirrorUsagePointListLink.href,
         });
     });
 
@@ -107,7 +116,7 @@ function main() {
         ({ invertersData, monitoringSample, currentAveragePowerRatio }) => {
             void (async () => {
                 derHelper.onInverterData(invertersData);
-                monitoringHelper.addSample(monitoringSample);
+                mirrorUsagePointListHelper.addSample(monitoringSample);
 
                 const dynamicExportConfig = calculateDynamicExportConfig({
                     activeDerControlBase: null, // TODO get active DER control base

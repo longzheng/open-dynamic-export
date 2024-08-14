@@ -34,13 +34,12 @@ describe('TimeHelper', () => {
     });
 
     it('should not should if clock is in sync', async () => {
-        const time = new TimeHelper();
+        const time = new TimeHelper({ client: sep2Client });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
 
-        time.init({
-            client: sep2Client,
+        time.updateHref({
             href: '/api/v2/tm',
         });
 
@@ -59,13 +58,12 @@ describe('TimeHelper', () => {
 
         process.once('unhandledRejection', fn);
 
-        const time = new TimeHelper();
+        const time = new TimeHelper({ client: sep2Client });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
 
-        time.init({
-            client: sep2Client,
+        time.updateHref({
             href: '/api/v2/tm',
         });
 
@@ -80,15 +78,14 @@ describe('TimeHelper', () => {
     });
 
     it('should not change pollable resource if initialised again with same URL', async () => {
-        const time = new TimeHelper();
+        const time = new TimeHelper({ client: sep2Client });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const destroySpy = vi.spyOn(time, 'destroy' as any);
 
-        time.init({
-            client: sep2Client,
+        time.updateHref({
             href: '/api/v2/tm',
         });
 
@@ -101,8 +98,7 @@ describe('TimeHelper', () => {
         expect(destroySpy).toHaveBeenCalledOnce();
         expect(assertTimeSpy).toHaveBeenCalledOnce();
 
-        time.init({
-            client: sep2Client,
+        time.updateHref({
             href: '/api/v2/tm',
         });
 
@@ -116,15 +112,14 @@ describe('TimeHelper', () => {
             .onGet('http://example.com/api/v2/tm2')
             .reply(200, getMockFile('getTm.xml'));
 
-        const time = new TimeHelper();
+        const time = new TimeHelper({ client: sep2Client });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const destroySpy = vi.spyOn(time, 'destroy' as any);
 
-        time.init({
-            client: sep2Client,
+        time.updateHref({
             href: '/api/v2/tm',
         });
 
@@ -137,8 +132,7 @@ describe('TimeHelper', () => {
         expect(destroySpy).toHaveBeenCalledTimes(1);
         expect(assertTimeSpy).toHaveBeenCalledOnce();
 
-        time.init({
-            client: sep2Client,
+        time.updateHref({
             href: '/api/v2/tm2',
         });
 

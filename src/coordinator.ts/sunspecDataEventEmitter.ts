@@ -1,10 +1,7 @@
 import type { ControlsModel } from '../sunspec/models/controls';
 import type { InverterModel } from '../sunspec/models/inverter';
 import type { MeterModel } from '../sunspec/models/meter';
-import {
-    generateMonitoringSample,
-    type MonitoringSample,
-} from './monitoring/sample';
+import { generateMonitoringSample, type MonitoringSample } from './monitoring';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';

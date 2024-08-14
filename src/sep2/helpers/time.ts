@@ -7,21 +7,24 @@ import { logger as pinoLogger } from '../../logger';
 
 export class TimeHelper {
     private href: string | null = null;
+    private client: SEP2Client;
     private timePollableResource: TimePollableResource | null = null;
     private logger: Logger;
 
-    constructor() {
+    constructor({ client }: { client: SEP2Client }) {
+        this.client = client;
+
         this.logger = pinoLogger.child({ module: 'TimeHelper' });
     }
 
-    public init({ client, href }: { client: SEP2Client; href: string }) {
+    public updateHref({ href }: { href: string }) {
         if (this.href !== href) {
             this.href = href;
 
             this.destroy();
 
             this.timePollableResource = new TimePollableResource({
-                client,
+                client: this.client,
                 url: href,
                 defaultPollRateSeconds:
                     defaultPollPushRates.deviceCapabilityPoll,

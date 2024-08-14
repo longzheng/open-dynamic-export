@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { getTotalFromPerPhaseMeasurement } from '../power';
-import type { MonitoringSample } from './monitoring/sample';
+import type { MonitoringSample } from './monitoring';
 import type { ControlsModel } from '../sunspec/models/controls';
 import {
     OutPFSet_Ena,
@@ -89,10 +89,10 @@ export function calculateDynamicExportConfig({
     }
 
     const siteWatts = getTotalFromPerPhaseMeasurement(
-        monitoringSample.realPower.site,
+        monitoringSample.site.realPower,
     );
     const solarWatts = getTotalFromPerPhaseMeasurement(
-        monitoringSample.realPower.der,
+        monitoringSample.der.realPower,
     );
 
     const exportLimitWatts = activeDerControlBase?.opModExpLimW

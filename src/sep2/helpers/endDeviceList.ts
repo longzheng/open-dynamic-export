@@ -11,10 +11,17 @@ export class EndDeviceListHelper extends EventEmitter<{
     data: [EndDeviceList];
 }> {
     private href: string | null = null;
+    private client: SEP2Client;
     private endDeviceListPollableResource: EndDeviceListPollableResource | null =
         null;
 
-    init({ client, href }: { client: SEP2Client; href: string }) {
+    constructor({ client }: { client: SEP2Client }) {
+        super();
+
+        this.client = client;
+    }
+
+    updateHref({ href }: { href: string }) {
         if (this.href !== href) {
             this.href = href;
 
@@ -22,7 +29,7 @@ export class EndDeviceListHelper extends EventEmitter<{
 
             this.endDeviceListPollableResource =
                 new EndDeviceListPollableResource({
-                    client,
+                    client: this.client,
                     url: href,
                     defaultPollRateSeconds:
                         defaultPollPushRates.endDeviceListPoll,
