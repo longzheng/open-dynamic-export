@@ -31,40 +31,6 @@ beforeAll(() => {
     });
 });
 
-// it('discover should get device capabilities and childs', async () => {
-//     sep2Client.discover();
-
-//     expect(timeLink.href).toBe('/api/v2/tm');
-//     expect(endDeviceListLink.href).toBe('/api/v2/edev');
-//     expect(mirrorUsagePointListLink.href).toBe('/api/v2/mup');
-// });
-
-// it('should assert time delta successfully', async () => {
-//     mockAxios
-//         .onGet('http://example.com/time')
-//         .reply(200, getMockFile('getTm.xml'));
-
-//     // mock system date to match the time in the mock file
-//     const mockDate = new Date(1682475024000);
-//     vi.setSystemTime(mockDate);
-
-//     await sep2Client.getTime('/time');
-// });
-
-// it('should assert time delta with exception', async () => {
-//     mockAxios
-//         .onGet('http://example.com/time')
-//         .reply(200, getMockFile('getTm.xml'));
-
-//     // mock system date to not match the time in the mock file
-//     const mockDate = new Date(1582475024000);
-//     vi.setSystemTime(mockDate);
-
-//     await expect(
-//         async () => await sep2Client.getTime('/time'),
-//     ).rejects.toThrowError('Clock is not synced with Utility Server');
-// });
-
 // it('should get end device list', async () => {
 //     mockAxios
 //         .onGet('http://example.com/edev')

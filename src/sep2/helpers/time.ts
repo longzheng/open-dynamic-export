@@ -2,10 +2,17 @@ import { type SEP2Client } from '../client';
 import { PollableResource } from './pollableResource';
 import type { Time } from '../models/time';
 import { parseTimeXml } from '../models/time';
+import type { Logger } from 'pino';
+import { logger as pinoLogger } from '../../logger';
 
 export class TimeHelper {
     private href: string | null = null;
     private timePollableResource: TimePollableResource | null = null;
+    private logger: Logger;
+
+    constructor() {
+        this.logger = pinoLogger.child({ module: 'TimeHelper' });
+    }
 
     public init({
         client,
@@ -37,12 +44,16 @@ export class TimeHelper {
         const now = new Date();
         const delta = now.getTime() - time.currentTime.getTime();
 
-        if (Math.abs(delta) > 60000) {
-            // 1 minute in milliseconds
+        // 1 minute tolerance
+        if (Math.abs(delta) > 60 * 1_000) {
             throw new Error(
                 `Clock is not synced with Utility Server, delta ${delta}ms`,
             );
         }
+
+        this.logger.info(
+            `Clock is synced with Utility Server, delta ${delta}ms`,
+        );
     }
 
     public destroy() {
