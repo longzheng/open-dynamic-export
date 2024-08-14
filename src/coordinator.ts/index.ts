@@ -109,8 +109,6 @@ function main() {
         ({ invertersData, monitoringSample, currentAveragePowerRatio }) => {
             void (async () => {
                 derHelper.onInverterData(invertersData);
-
-                // save telemetry to cache for SEP2 telemetry
                 monitoringHelper.addSample(monitoringSample);
 
                 const dynamicExportConfig = calculateDynamicExportConfig({
