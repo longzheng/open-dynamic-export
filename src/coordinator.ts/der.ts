@@ -99,16 +99,9 @@ export function getDerStatusResponseFromSunSpecArray(
         (metrics.PVConn & PVConn.OPERATING) !== 0
             ? OperationalModeStatus.OperationalMode
             : OperationalModeStatus.Off;
-    const genConnectStatus: ConnectStatus =
-        (metrics.PVConn & PVConn.TEST) !== 0
-            ? ConnectStatus.Test
-            : (metrics.PVConn & PVConn.OPERATING) !== 0
-              ? ConnectStatus.Operating
-              : (metrics.PVConn & PVConn.AVAILABLE) !== 0
-                ? ConnectStatus.Available
-                : (metrics.PVConn & PVConn.CONNECTED) !== 0
-                  ? ConnectStatus.Connected
-                  : (0 as ConnectStatus);
+    const genConnectStatus: ConnectStatus = getConnectStatusFromPVConn(
+        metrics.PVConn,
+    );
 
     return {
         readingTime: now,
@@ -121,4 +114,26 @@ export function getDerStatusResponseFromSunSpecArray(
             value: genConnectStatus,
         },
     };
+}
+
+export function getConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
+    let result: ConnectStatus = 0 as ConnectStatus;
+
+    if (pvConn & PVConn.CONNECTED) {
+        result += ConnectStatus.Connected;
+    }
+
+    if (pvConn & PVConn.AVAILABLE) {
+        result += ConnectStatus.Available;
+    }
+
+    if (pvConn & PVConn.OPERATING) {
+        result += ConnectStatus.Operating;
+    }
+
+    if (pvConn & PVConn.TEST) {
+        result += ConnectStatus.Test;
+    }
+
+    return result;
 }
