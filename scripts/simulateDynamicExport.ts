@@ -36,7 +36,7 @@ const sunSpecDataEventEmitter = new SunSpecDataEventEmitter({
 
 sunSpecDataEventEmitter.on(
     'data',
-    ({ invertersData, telemetry, currentAveragePowerRatio }) => {
+    ({ invertersData, monitoringSample: telemetry, currentAveragePowerRatio }) => {
         const dynamicExportConfig = calculateDynamicExportConfig({
             activeDerControlBase: simulatedActiveDerControlBase,
             telemetry,

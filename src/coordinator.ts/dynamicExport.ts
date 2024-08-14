@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { getTotalFromPerPhaseMeasurement } from '../power';
-import type { SunSpecTelemetry } from './telemetry/sunspec';
+import type { MonitoringSample } from './monitoring/sample';
 import type { ControlsModel } from '../sunspec/models/controls';
 import {
     OutPFSet_Ena,
@@ -81,7 +81,7 @@ export function calculateDynamicExportConfig({
     currentAveragePowerRatio,
 }: {
     activeDerControlBase: DERControlBase | null;
-    telemetry: SunSpecTelemetry;
+    telemetry: MonitoringSample;
     currentAveragePowerRatio: number;
 }): DynamicExportConfig {
     if (activeDerControlBase?.opModEnergize === false) {

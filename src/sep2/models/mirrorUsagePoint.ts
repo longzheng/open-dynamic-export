@@ -15,9 +15,9 @@ export enum MirrorUsagePointStatus {
     On = '1',
 }
 
+// A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN.
 export type MirrorUsagePoint = {
     postRate?: PostRate;
-    // A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN.
     roleFlags: RoleFlagsType;
     serviceCategoryKind: ServiceKind;
     status: MirrorUsagePointStatus;

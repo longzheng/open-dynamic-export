@@ -2,9 +2,9 @@ import type { ControlsModel } from '../sunspec/models/controls';
 import type { InverterModel } from '../sunspec/models/inverter';
 import type { MeterModel } from '../sunspec/models/meter';
 import {
-    getSunSpecTelemetry,
-    type SunSpecTelemetry,
-} from './telemetry/sunspec';
+    generateMonitoringSample,
+    type MonitoringSample,
+} from './monitoring/sample';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
 import { getAveragePowerRatio } from '../sunspec/helpers/controls';
@@ -29,7 +29,7 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
             metersData: {
                 meter: MeterModel;
             }[];
-            telemetry: SunSpecTelemetry;
+            monitoringSample: MonitoringSample;
             currentAveragePowerRatio: number;
         },
     ];
@@ -84,13 +84,12 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
 
             logger.debug(metersData, 'meters data');
 
-            // calculate telemetry data
-            const telemetry = getSunSpecTelemetry({
+            const monitoringSample = generateMonitoringSample({
                 inverters: invertersData.map(({ inverter }) => inverter),
                 meters: metersData.map(({ meter }) => meter),
             });
 
-            logger.debug(telemetry, 'telemetry');
+            logger.debug(monitoringSample, 'monitoring sample');
 
             // calculate current average inverter power ratio
             const currentAveragePowerRatio = getAveragePowerRatio(
@@ -104,7 +103,7 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
             this.emit('data', {
                 invertersData,
                 metersData,
-                telemetry,
+                monitoringSample,
                 currentAveragePowerRatio,
             });
         } catch (error) {

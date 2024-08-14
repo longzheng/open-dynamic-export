@@ -5,7 +5,7 @@ import { getAggregatedMeterMetrics } from '../../sunspec/helpers/meterMetrics';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { type MeterModel } from '../../sunspec/models/meter';
 
-export type SunSpecTelemetry = {
+export type MonitoringSample = {
     realPower: {
         site: PerPhaseMeasurement;
         der: PerPhaseMeasurement;
@@ -24,13 +24,13 @@ export type SunSpecTelemetry = {
     };
 };
 
-export function getSunSpecTelemetry({
+export function generateMonitoringSample({
     inverters,
     meters,
 }: {
     inverters: InverterModel[];
     meters: MeterModel[];
-}): SunSpecTelemetry {
+}): MonitoringSample {
     const aggregatedMeterMetrics = getAggregatedMeterMetrics(meters);
     const aggregatedInverterMetrics = getAggregatedInverterMetrics(inverters);
 

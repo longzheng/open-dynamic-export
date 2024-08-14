@@ -1,12 +1,11 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { getSunSpecTelemetry } from '../src/coordinator.ts/telemetry/sunspec';
+import { generateMonitoringSample } from '../src/coordinator.ts/monitoring/sample';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 import { logger } from '../src/logger';
 
-// This debugging script continously outputs telemetry data
-// It reads SunSpec data, transforms and aggregates it into telemetry model
-// It logs the telemetry data to the console
+// This debugging script continously outputs SEP2 monitoring samples
+// It reads SunSpec data, transforms it into monitoring sample, and logs to console
 // It polls the inverters and smart meters every 100ms (after the previous poll)
 
 const config = getConfig();
@@ -28,14 +27,14 @@ async function poll() {
             }),
         );
 
-        const telemetry = getSunSpecTelemetry({
+        const monitoringSample = generateMonitoringSample({
             inverters: invertersData,
             meters: metersData,
         });
 
-        logger.info(telemetry, 'telemetry');
+        logger.info(monitoringSample, 'monitoring sample');
     } catch (error) {
-        logger.error(error, 'Failed to get interval telemetry');
+        logger.error(error, 'Failed to get monitoring sample');
     } finally {
         setTimeout(() => {
             void poll();

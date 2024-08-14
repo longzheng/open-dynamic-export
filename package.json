@@ -7,7 +7,7 @@
         "lint": "tsc --noEmit && npx eslint .",
         "test": "vitest",
         "debug-sunspec-data": "tsx scripts/debugSunspecData.ts",
-        "debug-sunspec-telemetry": "tsx scripts/debugSunspecTelemetry.ts"
+        "debug-sep2-monitoring": "tsx scripts/debugSep2Monitoring.ts"
     },
     "keywords": [],
     "author": "Long Zheng",

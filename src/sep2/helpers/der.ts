@@ -124,7 +124,7 @@ export class DerHelper {
             this.config?.pollRate
                 ? this.config.pollRate * 1000
                 : // fallback to default poll rate for EndDeviceList
-                  defaultPollPushRates.endDeviceListPoll,
+                  defaultPollPushRates.endDeviceListPoll * 1000,
         );
     }
 

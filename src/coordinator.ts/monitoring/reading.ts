@@ -1,8 +1,8 @@
 import { averageNumbersArray, averageNumbersNullableArray } from '../../number';
 import type { PerPhaseMeasurement } from '../../power';
-import type { SunSpecTelemetry } from './sunspec';
+import type { MonitoringSample } from './sample';
 
-type CsipAusDerMonitoring = {
+type MonitoringReading = {
     realPower: {
         siteAverage: PerPhaseMeasurement;
         derAverage: PerPhaseMeasurement;
@@ -27,88 +27,85 @@ type CsipAusDerMonitoring = {
     };
 };
 
+// average an array of samples over a time period to generate a reading with averages/max/min
 // note: this function will loop through the array many times for each value
 // it does not bother with optimising the calculation of the values as we will not be dealing with big lists
-export function generateCsipAusDerMonitoring(
-    telemetryList: SunSpecTelemetry[],
-): CsipAusDerMonitoring {
+export function generateMonitoringReading(
+    samples: MonitoringSample[],
+): MonitoringReading {
     return {
         realPower: {
             siteAverage: {
                 phaseA: averageNumbersArray(
-                    telemetryList.map((t) => t.realPower.site.phaseA),
+                    samples.map((t) => t.realPower.site.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.realPower.site.phaseB),
+                    samples.map((t) => t.realPower.site.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.realPower.site.phaseC),
+                    samples.map((t) => t.realPower.site.phaseC),
                 ),
             },
             derAverage: {
                 phaseA: averageNumbersArray(
-                    telemetryList.map((t) => t.realPower.der.phaseA),
+                    samples.map((t) => t.realPower.der.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.realPower.der.phaseB),
+                    samples.map((t) => t.realPower.der.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.realPower.der.phaseC),
+                    samples.map((t) => t.realPower.der.phaseC),
                 ),
             },
         },
         reactivePower: {
             siteAverage: {
                 phaseA: averageNumbersArray(
-                    telemetryList.map((t) => t.reactivePower.site.phaseA),
+                    samples.map((t) => t.reactivePower.site.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.reactivePower.site.phaseB),
+                    samples.map((t) => t.reactivePower.site.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.reactivePower.site.phaseC),
+                    samples.map((t) => t.reactivePower.site.phaseC),
                 ),
             },
             derAverage: averageNumbersArray(
-                telemetryList.map((t) => t.reactivePower.der),
+                samples.map((t) => t.reactivePower.der),
             ),
         },
         voltage: {
             siteAverage: {
                 phaseA: averageNumbersArray(
-                    telemetryList.map((t) => t.voltage.site.phaseA),
+                    samples.map((t) => t.voltage.site.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.voltage.site.phaseB),
+                    samples.map((t) => t.voltage.site.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.voltage.site.phaseC),
+                    samples.map((t) => t.voltage.site.phaseC),
                 ),
             },
             derAverage: {
                 phaseA: averageNumbersArray(
-                    telemetryList.map((t) => t.voltage.der.phaseA),
+                    samples.map((t) => t.voltage.der.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.voltage.der.phaseB),
+                    samples.map((t) => t.voltage.der.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    telemetryList.map((t) => t.voltage.der.phaseC),
+                    samples.map((t) => t.voltage.der.phaseC),
                 ),
             },
         },
         frequency: {
             site: {
-                maximum: Math.max(
-                    ...telemetryList.map((t) => t.frequency.site),
-                ),
-                minimum: Math.min(
-                    ...telemetryList.map((t) => t.frequency.site),
-                ),
+                maximum: Math.max(...samples.map((t) => t.frequency.site)),
+                minimum: Math.min(...samples.map((t) => t.frequency.site)),
             },
             der: {
-                maximum: Math.max(...telemetryList.map((t) => t.frequency.der)),
-                minimum: Math.min(...telemetryList.map((t) => t.frequency.der)),
+                maximum: Math.max(...samples.map((t) => t.frequency.der)),
+                minimum: Math.min(...samples.map((t) => t.frequency.der)),
             },
         },
     };

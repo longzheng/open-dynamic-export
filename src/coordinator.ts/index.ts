@@ -2,13 +2,11 @@ import 'dotenv/config';
 import { defaultPollPushRates, SEP2Client } from '../sep2/client';
 import { getConfig, getConfigSep2CertKey } from '../config';
 import { getSunSpecConnections } from '../sunspec/connections';
-import { callEveryMinutesInterval } from '../cron';
-import { TelemetryCache } from './telemetry/cache';
+import { MonitoringHelper } from './monitoring/helper';
 import {
     calculateDynamicExportConfig,
     generateControlsModelWriteFromDynamicExportConfig,
 } from './dynamicExport';
-import { generateCsipAusDerMonitoring } from './telemetry/sep2';
 import { SunSpecDataEventEmitter } from './sunspecDataEventEmitter';
 import { logger as pinoLogger } from '../logger';
 import { TimeHelper } from '../sep2/helpers/time';
@@ -42,8 +40,7 @@ const derHelper = new DerHelper({
     client: sep2Client,
     invertersConnections,
 });
-
-const telemetryCache = new TelemetryCache();
+const monitoringHelper = new MonitoringHelper();
 
 function main() {
     endDeviceListResource.on('data', (endDeviceList) => {
@@ -109,16 +106,16 @@ function main() {
 
     sunSpecDataEventEmitter.on(
         'data',
-        ({ invertersData, telemetry, currentAveragePowerRatio }) => {
+        ({ invertersData, monitoringSample, currentAveragePowerRatio }) => {
             void (async () => {
                 derHelper.onInverterData(invertersData);
 
                 // save telemetry to cache for SEP2 telemetry
-                telemetryCache.addToCache(telemetry);
+                monitoringHelper.addSample(monitoringSample);
 
                 const dynamicExportConfig = calculateDynamicExportConfig({
                     activeDerControlBase: null, // TODO get active DER control base
-                    telemetry,
+                    telemetry: monitoringSample,
                     currentAveragePowerRatio,
                 });
 
@@ -143,14 +140,6 @@ function main() {
             })();
         },
     );
-
-    // send SEP2 telemetry every 5 minutes on the dot
-    callEveryMinutesInterval(() => {
-        // TODO: send telemetry
-        const telemetryList = telemetryCache.getCacheAndClear();
-        const csipAusDerMonitoring =
-            generateCsipAusDerMonitoring(telemetryList);
-    }, 5);
 }
 
 void main();

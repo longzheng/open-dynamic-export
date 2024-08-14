@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { PollRate } from '../models/pollRate';
 import { PollableResource } from './pollableResource';
 import { SEP2Client } from '../client';
@@ -20,6 +20,16 @@ const sep2Client = new SEP2Client({
 });
 
 describe('PollableResource', () => {
+    beforeEach(() => {
+        // tell vitest we use mocked time
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        // restoring date after each test run
+        vi.useRealTimers();
+    });
+
     it('should emit data event with response', async () => {
         const mockResponse: MockResponse = {
             hello: 'world',
@@ -41,8 +51,6 @@ describe('PollableResource', () => {
 
         const dataHandler = vi.fn();
         pollableResource.on('data', dataHandler);
-
-        vi.useFakeTimers();
 
         // Initial poll
         await vi.advanceTimersByTimeAsync(0);
@@ -79,8 +87,6 @@ describe('PollableResource', () => {
         const dataHandler = vi.fn();
         pollableResource.on('data', dataHandler);
 
-        vi.useFakeTimers();
-
         // Initial poll
         await vi.advanceTimersByTimeAsync(0);
         expect(dataHandler).toHaveBeenCalledTimes(1);
@@ -115,8 +121,6 @@ describe('PollableResource', () => {
 
         const dataHandler = vi.fn();
         pollableResource.on('data', dataHandler);
-
-        vi.useFakeTimers();
 
         // Initial poll
         await vi.advanceTimersByTimeAsync(0);
