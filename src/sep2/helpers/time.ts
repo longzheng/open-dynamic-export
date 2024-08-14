@@ -56,7 +56,7 @@ export class TimeHelper {
         );
     }
 
-    public destroy() {
+    private destroy() {
         this.timePollableResource?.destroy();
     }
 }
