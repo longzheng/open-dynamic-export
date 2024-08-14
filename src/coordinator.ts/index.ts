@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { defaultPollPushRates, SEP2Client } from '../sep2/client';
+import { SEP2Client } from '../sep2/client';
 import { getConfig, getConfigSep2CertKey } from '../config';
 import { getSunSpecConnections } from '../sunspec/connections';
 import { MonitoringHelper } from './monitoring/helper';
@@ -63,7 +63,6 @@ function main() {
             derListResource.init({
                 client: sep2Client,
                 href: endDevice.derListLink.href,
-                defaultPollRateSeconds: defaultPollPushRates.endDeviceListPoll,
             });
         }
     });
@@ -93,7 +92,6 @@ function main() {
         timeResource.init({
             client: sep2Client,
             href: deviceCapability.timeLink.href,
-            defaultPollRateSeconds: defaultPollPushRates.deviceCapabilityPoll,
         });
 
         endDeviceListResource.init({

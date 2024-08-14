@@ -1,20 +1,14 @@
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeAll,
-    afterEach,
-    beforeEach,
-} from 'vitest';
-import { SEP2Client } from '../client';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { defaultPollPushRates, SEP2Client } from '../client';
 import { mockCert, mockKey } from '../../../tests/sep2/cert';
 import { DeviceCapabilityHelper } from './deviceCapability';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { getMockFile } from './mocks';
 
-const mockAxios = new MockAdapter(axios);
+new MockAdapter(axios)
+    .onGet('http://example.com/dcap')
+    .reply(200, getMockFile('getDcap.xml'));
 
 const sep2Client = new SEP2Client({
     sep2Config: {
@@ -24,12 +18,6 @@ const sep2Client = new SEP2Client({
     },
     cert: mockCert,
     key: mockKey,
-});
-
-beforeAll(() => {
-    mockAxios
-        .onGet('http://example.com/dcap')
-        .reply(200, getMockFile('getDcap.xml'));
 });
 
 describe('DeviceCapabilityHelper', () => {
@@ -49,7 +37,6 @@ describe('DeviceCapabilityHelper', () => {
         new DeviceCapabilityHelper({
             client: sep2Client,
             href: '/dcap',
-            defaultPollRateSeconds: 30,
         }).on('data', eventSpy);
 
         await vi.waitFor(() => expect(eventSpy).toHaveBeenCalled());
@@ -63,11 +50,12 @@ describe('DeviceCapabilityHelper', () => {
         new DeviceCapabilityHelper({
             client: sep2Client,
             href: '/dcap',
-            defaultPollRateSeconds: 30,
         }).on('data', eventSpy);
 
         // wait after two polls
-        await vi.advanceTimersByTimeAsync(60_000);
+        await vi.advanceTimersByTimeAsync(
+            defaultPollPushRates.deviceCapabilityPoll * 1000 * 2,
+        );
 
         // called once on init, then twice after polling
         expect(eventSpy).toHaveBeenCalledTimes(3);

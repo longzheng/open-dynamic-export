@@ -1,4 +1,4 @@
-import { type SEP2Client } from '../client';
+import { defaultPollPushRates, type SEP2Client } from '../client';
 import { PollableResource } from './pollableResource';
 import type { Time } from '../models/time';
 import { parseTimeXml } from '../models/time';
@@ -14,15 +14,7 @@ export class TimeHelper {
         this.logger = pinoLogger.child({ module: 'TimeHelper' });
     }
 
-    public init({
-        client,
-        href,
-        defaultPollRateSeconds,
-    }: {
-        client: SEP2Client;
-        href: string;
-        defaultPollRateSeconds: number;
-    }) {
+    public init({ client, href }: { client: SEP2Client; href: string }) {
         if (this.href !== href) {
             this.href = href;
 
@@ -31,7 +23,8 @@ export class TimeHelper {
             this.timePollableResource = new TimePollableResource({
                 client,
                 url: href,
-                defaultPollRateSeconds,
+                defaultPollRateSeconds:
+                    defaultPollPushRates.deviceCapabilityPoll,
             }).on('data', (data) => {
                 this.assertTime(data);
             });
@@ -46,6 +39,7 @@ export class TimeHelper {
 
         // 1 minute tolerance
         if (Math.abs(delta) > 60 * 1_000) {
+            console.log('test');
             throw new Error(
                 `Clock is not synced with Utility Server, delta ${delta}ms`,
             );

@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { type SEP2Client } from '../client';
+import { defaultPollPushRates, type SEP2Client } from '../client';
 import { PollableResource } from './pollableResource';
 import {
     parseDeviceCapabilityXml,
@@ -9,21 +9,13 @@ import {
 export class DeviceCapabilityHelper extends EventEmitter<{
     data: [DeviceCapability];
 }> {
-    constructor({
-        client,
-        href,
-        defaultPollRateSeconds,
-    }: {
-        client: SEP2Client;
-        href: string;
-        defaultPollRateSeconds: number;
-    }) {
+    constructor({ client, href }: { client: SEP2Client; href: string }) {
         super();
 
         const resource = new DeviceCapabilityPollableResource({
             client,
             url: href,
-            defaultPollRateSeconds,
+            defaultPollRateSeconds: defaultPollPushRates.deviceCapabilityPoll,
         });
 
         resource.on('data', (data) => {

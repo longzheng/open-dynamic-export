@@ -87,7 +87,6 @@ export class SEP2Client {
         return new DeviceCapabilityHelper({
             client: this,
             href: this.dcapUri,
-            defaultPollRateSeconds: defaultPollPushRates.deviceCapabilityPoll,
         });
     }
 

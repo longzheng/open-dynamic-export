@@ -1,5 +1,5 @@
 import EventEmitter from 'node:events';
-import type { SEP2Client } from '../client';
+import { defaultPollPushRates, type SEP2Client } from '../client';
 import { PollableResource } from './pollableResource';
 import type { DERList } from '../models/derList';
 import { parseDerListXml } from '../models/derList';
@@ -10,15 +10,7 @@ export class DerListHelper extends EventEmitter<{
     private href: string | null = null;
     private derListPollableResource: DerListPollableResource | null = null;
 
-    public init({
-        client,
-        href,
-        defaultPollRateSeconds,
-    }: {
-        client: SEP2Client;
-        href: string;
-        defaultPollRateSeconds: number;
-    }) {
+    public init({ client, href }: { client: SEP2Client; href: string }) {
         if (this.href !== href) {
             this.href = href;
 
@@ -27,7 +19,7 @@ export class DerListHelper extends EventEmitter<{
             this.derListPollableResource = new DerListPollableResource({
                 client,
                 url: href,
-                defaultPollRateSeconds,
+                defaultPollRateSeconds: defaultPollPushRates.endDeviceListPoll,
             }).on('data', (data) => {
                 this.emit('data', data);
             });
