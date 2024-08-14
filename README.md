@@ -21,9 +21,10 @@ sequenceDiagram
     participant U as Utility<br>(SEP2 server)
     participant SC as SEP2 client
     participant C as Coordinator
-    participant MC as Modbus client
-    participant D as DER<br>(SunSpec/Modbus server)
-    loop every 5 minutes
+    participant MC as SunSpec client
+    participant D as DER<br>(SunSpec compatible device)
+
+    loop
     SC->>U: Get API responses
     U->>SC: Devices, programs, DER controls
     SC->>U: Acknowledge DER controls
@@ -31,7 +32,7 @@ sequenceDiagram
 
     SC->>C: Export limit, ramp rate
 
-    loop every 1 second
+    loop
     MC->>D: Read Modbus registers
     D->>MC: Inverter metrics
     end
@@ -44,7 +45,7 @@ sequenceDiagram
 
     MC->>D: Write Modbus registers
 
-    loop every 5 minutes
+    loop
     SC->>U: Send DER status/capability/settings
     SC->>U: Send site and DER telemetry
     end
