@@ -8,7 +8,8 @@
         "test": "vitest",
         "debug-sunspec-data": "tsx scripts/debugSunspecData.ts",
         "debug-sep2-monitoring": "tsx scripts/debugSep2Monitoring.ts",
-        "certificate-lfdi": "tsx scripts/certificateLfdi.ts"
+        "device-cert-request": "tsx scripts/deviceCertRequest.ts",
+        "device-cert-lfdi": "tsx scripts/deviceCertLfdi.ts"
     },
     "keywords": [],
     "author": "Long Zheng",
@@ -16,6 +17,7 @@
     "description": "",
     "devDependencies": {
         "@tsconfig/strictest": "^2.0.5",
+        "@types/jsrsasign": "^10.5.14",
         "@types/node": "^20.14.11",
         "@types/xml2js": "^0.4.14",
         "@typescript-eslint/eslint-plugin": "^7.16.1",
@@ -30,6 +32,7 @@
         "axios": "^1.7.2",
         "decimal.js": "^10.4.3",
         "dotenv": "^16.4.5",
+        "jsrsasign": "^11.1.0",
         "modbus-serial": "^8.0.17",
         "pino": "^9.3.2",
         "pino-pretty": "^11.2.2",

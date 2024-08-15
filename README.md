@@ -88,29 +88,35 @@ The SEP2 server uses PKI certificates to authorise and identify clients.
 
 As a direct client, there needs to be two certificates, one for the "manufacturer" and one for the "device". The "manufacturer" certificate needs to be signed by the utility Smart Energy Root CA (SERCA). Then the "device" certificate is signed with the "manufacturer" certificate & key.
 
-To generate a key and certificate signing request for either the manufacturer or device.
+To generate a device certificate key and certificate signing request.
 
 ```bash
-openssl ecparam -name secp256r1 -genkey -noout -out key.pem
-openssl req -new -key key.pem -out cert_req.csr -sha256 -subj "/CN= /O= "
+npm run device-cert-request
 ```
 
 For local testing, generate a valid self signed certificate using
 
 ```bash
-openssl req -x509 -new -key key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
+openssl req -x509 -new -key key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/"
 ```
 
 For live testing, generate a valid device certificate by signing it with the manufacturer certificate.
 
 ```bash
-openssl x509 -req -in device_cert_req.csr -CA mica_certificate.pem -CAkey mica_key.pem -CAcreateserial -out device_certificate.pem -days 3650 -sha256
+npm run device-cert-sign
 ```
 
-Then concatenate the device certificate with the MICA (and SERCA certificate) to form the certificate chain.
+To view the device certificate LFDI
 
 ```bash
-cat device_certificate.pem mica_certificate.pem > cert.pem
+npm run device-cert-lfdi
+```
+
+The manufacturer certificate is signed manually by the utility. The certificate key and certificate signing request can be generated with
+
+```bash
+openssl ecparam -name secp256r1 -genkey -noout -out mica_key.pem
+openssl req -new -key mica_key.pem -out mica_cert_req.csr -sha256 -subj "/"
 ```
 
 ## Motivation
