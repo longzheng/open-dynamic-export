@@ -14,8 +14,6 @@ const USER_AGENT = 'open-dynamic-export';
 export class SEP2Client {
     private host: string;
     private dcapUri: string;
-    private cert: string;
-    private key: string;
     private pen: string;
     public lfdi: string;
     private axiosInstance: AxiosInstance;
@@ -31,10 +29,8 @@ export class SEP2Client {
     }) {
         this.host = sep2Config.host;
         this.dcapUri = sep2Config.dcapUri;
-        this.cert = cert;
-        this.key = key;
         this.pen = sep2Config.pen.toString().padStart(8, '0');
-        this.lfdi = getCertificateLfdi(this.cert);
+        this.lfdi = getCertificateLfdi(cert);
 
         this.axiosInstance = axios.create({
             baseURL: this.host,
@@ -44,9 +40,9 @@ export class SEP2Client {
                 'Content-Type': 'application/sep+xml',
             },
             httpsAgent: new https.Agent({
-                cert: this.cert,
-                key: this.key,
-                rejectUnauthorized: false, // Skip certificate check for now
+                cert,
+                key,
+                rejectUnauthorized: false,
             }),
         });
     }
