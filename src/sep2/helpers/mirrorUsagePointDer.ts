@@ -45,6 +45,7 @@ type DerReading = {
     };
 };
 
+// TODO: refactor MirrorUsagePointSiteHelper and MirrorUsagePointSiteHelper to use a common base class with abstracts
 export class MirrorUsagePointDerHelper {
     private client: SEP2Client;
     private mirrorUsagePointListHref: string | null = null;
@@ -138,7 +139,7 @@ export class MirrorUsagePointDerHelper {
         }
     }
 
-    private postRealPowerAverage({
+    private postReactivePowerAverage({
         reading,
         nextUpdateTime,
     }: {
@@ -173,7 +174,7 @@ export class MirrorUsagePointDerHelper {
         });
     }
 
-    private postReactivePowerAverage({
+    private postRealPowerAverage({
         reading,
         nextUpdateTime,
     }: {

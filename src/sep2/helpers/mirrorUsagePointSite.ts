@@ -45,6 +45,7 @@ type SiteReading = {
     };
 };
 
+// TODO: refactor MirrorUsagePointSiteHelper and MirrorUsagePointSiteHelper to use a common base class with abstracts
 export class MirrorUsagePointSiteHelper {
     private client: SEP2Client;
     private mirrorUsagePointListHref: string | null = null;
