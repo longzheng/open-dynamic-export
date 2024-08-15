@@ -104,7 +104,7 @@ export class MirrorUsagePointSiteHelper {
         this.samples.push(sample);
     }
 
-    public async post() {
+    public post() {
         const nextUpdateMilliseconds = getMillisecondsToNextHourMinutesInterval(
             // convert seconds to minutes
             (this.mirrorUsagePoint?.postRate ??
@@ -121,25 +121,45 @@ export class MirrorUsagePointSiteHelper {
         if (samples.length > 0) {
             const reading = this.getReadingFromSamples(samples);
 
+            const lastUpdateTime = new Date();
+
             const nextUpdateTime = new Date(
                 Date.now() + nextUpdateMilliseconds,
             );
 
-            await Promise.all([
-                this.postRealPowerAverage({
-                    reading,
-                    nextUpdateTime,
-                }),
-                // TODO post other data
-            ]);
+            this.postRealPowerAverage({
+                reading,
+                lastUpdateTime,
+                nextUpdateTime,
+            });
+
+            this.postReactivePowerAverage({
+                reading,
+                lastUpdateTime,
+                nextUpdateTime,
+            });
+
+            this.postVoltageAverage({
+                reading,
+                lastUpdateTime,
+                nextUpdateTime,
+            });
+
+            this.postFrequency({
+                reading,
+                lastUpdateTime,
+                nextUpdateTime,
+            });
         }
     }
 
     private postRealPowerAverage({
         reading,
+        lastUpdateTime,
         nextUpdateTime,
     }: {
         reading: SiteReading;
+        lastUpdateTime: Date;
         nextUpdateTime: Date;
     }) {
         const phaseAValue = convertNumberToBaseAndPow10Exponent(
@@ -150,7 +170,7 @@ export class MirrorUsagePointSiteHelper {
             mirrorMeterReading: {
                 mRID: this.client.generateMeterReadingMrid(),
                 description: 'Average Real Power (W) - Phase A',
-                lastUpdateTime: new Date(),
+                lastUpdateTime,
                 nextUpdateTime,
                 Reading: {
                     value: phaseAValue.base,
@@ -178,7 +198,7 @@ export class MirrorUsagePointSiteHelper {
                 mirrorMeterReading: {
                     mRID: this.client.generateMeterReadingMrid(),
                     description: 'Average Real Power (W) - Phase B',
-                    lastUpdateTime: new Date(),
+                    lastUpdateTime,
                     nextUpdateTime,
                     Reading: {
                         value: phaseBValue.base,
@@ -208,7 +228,7 @@ export class MirrorUsagePointSiteHelper {
                 mirrorMeterReading: {
                     mRID: this.client.generateMeterReadingMrid(),
                     description: 'Average Real Power (W) - Phase C',
-                    lastUpdateTime: new Date(),
+                    lastUpdateTime,
                     nextUpdateTime,
                     Reading: {
                         value: phaseCValue.base,
@@ -228,6 +248,263 @@ export class MirrorUsagePointSiteHelper {
                 },
             });
         }
+    }
+
+    private postReactivePowerAverage({
+        reading,
+        lastUpdateTime,
+        nextUpdateTime,
+    }: {
+        reading: SiteReading;
+        lastUpdateTime: Date;
+        nextUpdateTime: Date;
+    }) {
+        const phaseAValue = convertNumberToBaseAndPow10Exponent(
+            reading.reactivePowerAverage.phaseA,
+        );
+
+        void this.postMirrorMeterReading({
+            mirrorMeterReading: {
+                mRID: this.client.generateMeterReadingMrid(),
+                description: 'Average Reactive Power (VAR) - Phase A',
+                lastUpdateTime,
+                nextUpdateTime,
+                Reading: {
+                    value: phaseAValue.base,
+                    qualityFlags: QualityFlags.Valid,
+                },
+                ReadingType: {
+                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
+                    kind: KindType.Power,
+                    dataQualifier: DataQualifierType.Average,
+                    flowDirection: FlowDirectionType.Forward,
+                    intervalLength: reading.intervalSeconds,
+                    phase: PhaseCode.PhaseA,
+                    powerOfTenMultiplier: phaseAValue.pow10,
+                    uom: UomType.var,
+                },
+            },
+        });
+
+        if (reading.reactivePowerAverage.phaseB) {
+            const phaseBValue = convertNumberToBaseAndPow10Exponent(
+                reading.reactivePowerAverage.phaseB,
+            );
+
+            void this.postMirrorMeterReading({
+                mirrorMeterReading: {
+                    mRID: this.client.generateMeterReadingMrid(),
+                    description: 'Average Reactive Power (VAR) - Phase B',
+                    lastUpdateTime,
+                    nextUpdateTime,
+                    Reading: {
+                        value: phaseBValue.base,
+                        qualityFlags: QualityFlags.Valid,
+                    },
+                    ReadingType: {
+                        commodity:
+                            CommodityType.ElectricitySecondaryMeteredValue,
+                        kind: KindType.Power,
+                        dataQualifier: DataQualifierType.Average,
+                        flowDirection: FlowDirectionType.Forward,
+                        intervalLength: reading.intervalSeconds,
+                        phase: PhaseCode.PhaseB,
+                        powerOfTenMultiplier: phaseBValue.pow10,
+                        uom: UomType.var,
+                    },
+                },
+            });
+        }
+
+        if (reading.reactivePowerAverage.phaseC) {
+            const phaseCValue = convertNumberToBaseAndPow10Exponent(
+                reading.reactivePowerAverage.phaseC,
+            );
+
+            void this.postMirrorMeterReading({
+                mirrorMeterReading: {
+                    mRID: this.client.generateMeterReadingMrid(),
+                    description: 'Average Reactive Power (VAR) - Phase C',
+                    lastUpdateTime,
+                    nextUpdateTime,
+                    Reading: {
+                        value: phaseCValue.base,
+                        qualityFlags: QualityFlags.Valid,
+                    },
+                    ReadingType: {
+                        commodity:
+                            CommodityType.ElectricitySecondaryMeteredValue,
+                        kind: KindType.Power,
+                        dataQualifier: DataQualifierType.Average,
+                        flowDirection: FlowDirectionType.Forward,
+                        intervalLength: reading.intervalSeconds,
+                        phase: PhaseCode.PhaseC,
+                        powerOfTenMultiplier: phaseCValue.pow10,
+                        uom: UomType.var,
+                    },
+                },
+            });
+        }
+    }
+
+    private postVoltageAverage({
+        reading,
+        lastUpdateTime,
+        nextUpdateTime,
+    }: {
+        reading: SiteReading;
+        lastUpdateTime: Date;
+        nextUpdateTime: Date;
+    }) {
+        const phaseAValue = convertNumberToBaseAndPow10Exponent(
+            reading.voltageAverage.phaseA,
+        );
+
+        void this.postMirrorMeterReading({
+            mirrorMeterReading: {
+                mRID: this.client.generateMeterReadingMrid(),
+                description: 'Average Voltage (V) - Phase A',
+                lastUpdateTime,
+                nextUpdateTime,
+                Reading: {
+                    value: phaseAValue.base,
+                    qualityFlags: QualityFlags.Valid,
+                },
+                ReadingType: {
+                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
+                    kind: KindType.Power,
+                    dataQualifier: DataQualifierType.Average,
+                    flowDirection: FlowDirectionType.Forward,
+                    intervalLength: reading.intervalSeconds,
+                    phase: PhaseCode.PhaseA,
+                    powerOfTenMultiplier: phaseAValue.pow10,
+                    uom: UomType.Voltage,
+                },
+            },
+        });
+
+        if (reading.voltageAverage.phaseB) {
+            const phaseBValue = convertNumberToBaseAndPow10Exponent(
+                reading.voltageAverage.phaseB,
+            );
+
+            void this.postMirrorMeterReading({
+                mirrorMeterReading: {
+                    mRID: this.client.generateMeterReadingMrid(),
+                    description: 'Average Voltage (V) - Phase B',
+                    lastUpdateTime,
+                    nextUpdateTime,
+                    Reading: {
+                        value: phaseBValue.base,
+                        qualityFlags: QualityFlags.Valid,
+                    },
+                    ReadingType: {
+                        commodity:
+                            CommodityType.ElectricitySecondaryMeteredValue,
+                        kind: KindType.Power,
+                        dataQualifier: DataQualifierType.Average,
+                        flowDirection: FlowDirectionType.Forward,
+                        intervalLength: reading.intervalSeconds,
+                        phase: PhaseCode.PhaseB,
+                        powerOfTenMultiplier: phaseBValue.pow10,
+                        uom: UomType.Voltage,
+                    },
+                },
+            });
+        }
+
+        if (reading.voltageAverage.phaseC) {
+            const phaseCValue = convertNumberToBaseAndPow10Exponent(
+                reading.voltageAverage.phaseC,
+            );
+
+            void this.postMirrorMeterReading({
+                mirrorMeterReading: {
+                    mRID: this.client.generateMeterReadingMrid(),
+                    description: 'Average Voltage (V) - Phase C',
+                    lastUpdateTime,
+                    nextUpdateTime,
+                    Reading: {
+                        value: phaseCValue.base,
+                        qualityFlags: QualityFlags.Valid,
+                    },
+                    ReadingType: {
+                        commodity:
+                            CommodityType.ElectricitySecondaryMeteredValue,
+                        kind: KindType.Power,
+                        dataQualifier: DataQualifierType.Average,
+                        flowDirection: FlowDirectionType.Forward,
+                        intervalLength: reading.intervalSeconds,
+                        phase: PhaseCode.PhaseC,
+                        powerOfTenMultiplier: phaseCValue.pow10,
+                        uom: UomType.Voltage,
+                    },
+                },
+            });
+        }
+    }
+
+    private postFrequency({
+        reading,
+        lastUpdateTime,
+        nextUpdateTime,
+    }: {
+        reading: SiteReading;
+        lastUpdateTime: Date;
+        nextUpdateTime: Date;
+    }) {
+        const maximumValue = convertNumberToBaseAndPow10Exponent(
+            reading.frequency.maximum,
+        );
+        const minimumValue = convertNumberToBaseAndPow10Exponent(
+            reading.frequency.minimum,
+        );
+
+        void this.postMirrorMeterReading({
+            mirrorMeterReading: {
+                mRID: this.client.generateMeterReadingMrid(),
+                description: 'Maximum Frequency (Hz)',
+                lastUpdateTime,
+                nextUpdateTime,
+                Reading: {
+                    value: maximumValue.base,
+                    qualityFlags: QualityFlags.Valid,
+                },
+                ReadingType: {
+                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
+                    kind: KindType.Power,
+                    dataQualifier: DataQualifierType.Maximum,
+                    flowDirection: FlowDirectionType.Forward,
+                    intervalLength: reading.intervalSeconds,
+                    phase: PhaseCode.NotApplicable,
+                    powerOfTenMultiplier: maximumValue.pow10,
+                    uom: UomType.Hz,
+                },
+            },
+        });
+
+        void this.postMirrorMeterReading({
+            mirrorMeterReading: {
+                mRID: this.client.generateMeterReadingMrid(),
+                description: 'Minimum Frequency (Hz)',
+                lastUpdateTime,
+                nextUpdateTime,
+                Reading: {
+                    value: minimumValue.base,
+                    qualityFlags: QualityFlags.Valid,
+                },
+                ReadingType: {
+                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
+                    kind: KindType.Power,
+                    dataQualifier: DataQualifierType.Minimum,
+                    flowDirection: FlowDirectionType.Forward,
+                    intervalLength: reading.intervalSeconds,
+                    phase: PhaseCode.NotApplicable,
+                    powerOfTenMultiplier: minimumValue.pow10,
+                    uom: UomType.Hz,
+                },
+            },
+        });
     }
 
     private getReadingFromSamples(
