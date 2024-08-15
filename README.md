@@ -86,17 +86,31 @@ Future
 
 The SEP2 server uses PKI certificates to authorise and identify clients.
 
-To generate a key and certificate signing request.
+As a direct client, there needs to be two certificates, one for the "manufacturer" and one for the "device". The "manufacturer" certificate needs to be signed by the utility Smart Energy Root CA (SERCA). Then the "device" certificate is signed with the "manufacturer" certificate & key.
+
+To generate a key and certificate signing request for either the manufacturer or device.
 
 ```bash
 openssl ecparam -name secp256r1 -genkey -noout -out key.pem
 openssl req -new -key key.pem -out cert_req.csr -sha256 -subj "/CN= /O= "
 ```
 
-For testing, generate a self signed certificate using
+For local testing, generate a valid self signed certificate using
 
 ```bash
 openssl req -x509 -new -key key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
+```
+
+For live testing, generate a valid device certificate by signing it with the manufacturer certificate.
+
+```bash
+openssl x509 -req -in device_cert_req.csr -CA mica_certificate.pem -CAkey mica_private_key.key -CAcreateserial -out device_certificate.pem -days 3650 -sha256
+```
+
+Then concatenate the device certificate with the MICA (and SERCA certificate) to form the certificate chain.
+
+```bash
+cat device_certificate.pem mica_certificate.pem > cert.pem
 ```
 
 ## Motivation
