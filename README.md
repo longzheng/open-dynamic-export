@@ -72,7 +72,7 @@ The downside of a direct client approach is the registration process is manual a
   - [x] Scheduled polling and pushing
   - [x] DER status/capability/settings reporting
   - [ ] DER control events acknowledgement
-  - [ ] Telemetry reporting
+  - [x] Telemetry reporting
 - [x] SunSpec Modbus client
   - [x] Fronius inverter testing
 - [X] Dynamic export control logic
