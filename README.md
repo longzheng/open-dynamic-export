@@ -104,7 +104,7 @@ openssl req -x509 -new -key key.pem -out cert.pem -sha256 -days 3650 -nodes -sub
 For live testing, generate a valid device certificate by signing it with the manufacturer certificate.
 
 ```bash
-openssl x509 -req -in device_cert_req.csr -CA mica_certificate.pem -CAkey mica_private_key.key -CAcreateserial -out device_certificate.pem -days 3650 -sha256
+openssl x509 -req -in device_cert_req.csr -CA mica_certificate.pem -CAkey mica_key.pem -CAcreateserial -out device_certificate.pem -days 3650 -sha256
 ```
 
 Then concatenate the device certificate with the MICA (and SERCA certificate) to form the certificate chain.
