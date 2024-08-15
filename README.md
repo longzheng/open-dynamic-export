@@ -116,6 +116,7 @@ I got in touch with Energy Queensland who was surprisingly helpful (for a govern
 - [IEEE 2030.5 Data Model](https://zepben.github.io/evolve/docs/2030-5/)
 - [SEP2 Common Library](https://github.com/ethanndickson/sep2_common) Rust library
 - [SEP2-Tools](https://github.com/aguinane/SEP2-Tools) Python library
-- [CSIP spec](https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf)
-- [CSIP-AUS spec](https://arena.gov.au/assets/2021/09/common-smart-inverter-profile-australia.pdf)
-- [Dynamic Exports Test Procedure](https://www.talkingpower.com.au/71619/widgets/376925/documents/239206)
+- [Common Smart Inverter Profile - IEEE 2030.5 Implementation Guide for Smart Inverters v2.1](https://sunspec.org/wp-content/uploads/2019/08/CSIPImplementationGuidev2.103-15-2018.pdf)
+- [Common Smart Inverter Profile – Australia v1.1a](https://arena.gov.au/assets/2021/09/common-smart-inverter-profile-australia.pdf)
+- [Common Smart Inverter Profile - Australia - Test Procedures v1.0](https://bsgip.com/wp-content/uploads/2023/09/CSIP-AUS-Comms-Client-Test-Procedures-v1.0-final.pdf)
+- [SA Power Networks - Dynamic Exports Test Procedure v1.2](https://www.talkingpower.com.au/71619/widgets/376925/documents/239206)
