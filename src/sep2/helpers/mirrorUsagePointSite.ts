@@ -79,6 +79,8 @@ export class MirrorUsagePointSiteHelper {
 
         if (existingMirrorUsagePoint) {
             this.mirrorUsagePoint = existingMirrorUsagePoint;
+
+            this.startPosting();
             return;
         }
 
@@ -94,14 +96,20 @@ export class MirrorUsagePointSiteHelper {
             },
         });
 
-        // start posting
-        if (!this.postTimer) {
-            void this.post();
-        }
+        this.startPosting();
     }
 
     public addSample(sample: SiteMonitoringSimple) {
         this.samples.push(sample);
+    }
+
+    private startPosting() {
+        // if there's already a post timer, do nothing
+        if (this.postTimer) {
+            return;
+        }
+
+        void this.post();
     }
 
     public post() {
