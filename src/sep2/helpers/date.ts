@@ -6,5 +6,5 @@ export function stringIntToDate(value: string): Date {
 }
 
 export function dateToStringSeconds(date: Date): string {
-    return (date.getTime() / 1000).toString();
+    return Math.round(date.getTime() / 1000).toString();
 }
