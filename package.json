@@ -6,6 +6,7 @@
     "scripts": {
         "lint": "tsc --noEmit && npx eslint .",
         "test": "vitest",
+        "start": "tsx src/coordinator/index.ts",
         "debug-sunspec-data": "tsx scripts/debugSunspecData.ts",
         "debug-sep2-monitoring": "tsx scripts/debugSep2Monitoring.ts",
         "device-cert-request": "tsx scripts/deviceCertRequest.ts",

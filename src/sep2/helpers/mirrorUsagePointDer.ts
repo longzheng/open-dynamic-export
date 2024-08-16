@@ -17,7 +17,7 @@ import {
 import {
     getSamplesIntervalSeconds,
     type MonitoringSample,
-} from '../../coordinator.ts/monitoring';
+} from '../../coordinator/monitoring';
 import type { PerPhaseMeasurement } from '../../power';
 import {
     averageNumbersArray,

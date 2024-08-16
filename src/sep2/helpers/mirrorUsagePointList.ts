@@ -4,7 +4,7 @@ import { PollableResource } from './pollableResource';
 import type { MirrorUsagePointList } from '../models/mirrorUsagePointList';
 import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList';
 import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite';
-import type { MonitoringSample } from '../../coordinator.ts/monitoring';
+import type { MonitoringSample } from '../../coordinator/monitoring';
 import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer';
 
 export class MirrorUsagePointListHelper {

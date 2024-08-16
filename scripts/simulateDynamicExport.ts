@@ -4,9 +4,9 @@ import { getSunSpecConnections } from '../src/sunspec/connections';
 import {
     calculateDynamicExportConfig,
     generateControlsModelWriteFromDynamicExportConfig,
-} from '../src/coordinator.ts/dynamicExport';
+} from '../src/coordinator/dynamicExport';
 import type { DERControlBase } from '../src/sep2/models/derControlBase';
-import { SunSpecDataEventEmitter } from '../src/coordinator.ts/sunspecDataEventEmitter';
+import { SunSpecDataEventEmitter } from '../src/coordinator/sunspecDataEventEmitter';
 import { logger } from '../src/logger';
 
 // This debugging script simulates dynamic export control (without actually sending commands to inverters)

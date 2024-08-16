@@ -12,7 +12,7 @@ import {
     getDerCapabilityResponseFromSunSpecArray,
     getDerSettingsResponseFromSunSpecArray,
     getDerStatusResponseFromSunSpecArray,
-} from '../../coordinator.ts/der';
+} from '../../coordinator/der';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import type { StatusModel } from '../../sunspec/models/status';

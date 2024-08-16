@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../src/config';
-import { generateMonitoringSample } from '../src/coordinator.ts/monitoring';
+import { generateMonitoringSample } from '../src/coordinator/monitoring';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 import { logger } from '../src/logger';
 
