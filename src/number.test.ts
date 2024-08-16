@@ -4,6 +4,7 @@ import {
     averageNumbersNullableArray,
     convertNumberToBaseAndPow10Exponent,
     numberWithPow10,
+    safeParseIntString,
     sumBigIntArray,
     sumNumbersArray,
     sumNumbersNullableArray,
@@ -121,5 +122,17 @@ describe('sumBigIntArray', () => {
     it('should sum bigints', () => {
         const result = sumBigIntArray([BigInt(1), 2n, BigInt(3)]);
         expect(result).toBe(6n);
+    });
+});
+
+describe('safeParseIntString', () => {
+    it('should parse integer string', () => {
+        const result = safeParseIntString('123');
+        expect(result).toBe(123);
+    });
+
+    it('should parse negative integer string', () => {
+        const result = safeParseIntString('-123');
+        expect(result).toBe(-123);
     });
 });

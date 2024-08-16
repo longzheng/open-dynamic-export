@@ -16,8 +16,8 @@ import {
 } from './subscribableResource';
 
 type Interval = {
-    end: Date;
-    durationSeconds: number;
+    // duration in seconds
+    duration: number;
     start: Date;
 };
 
@@ -63,11 +63,8 @@ function parseIntervalXmlObject(xmlObject: any): Interval {
     );
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
-    const end = new Date(start.getTime() + durationSeconds * 1000);
-
     return {
         start,
-        durationSeconds,
-        end,
+        duration: durationSeconds,
     };
 }
