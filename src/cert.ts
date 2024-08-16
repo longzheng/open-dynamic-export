@@ -34,7 +34,12 @@ const DEFAULT_POLICIES = [
 
 export function getCertificateLfdi(certPem: string): string {
     const cert = new rs.X509();
-    cert.readCertPEM(certPem);
+    cert.readCertPEM(
+        certPem
+            // the certificate might be a chain
+            // only use the first part of the certificate
+            .split('-----END CERTIFICATE-----')[0]!,
+    );
 
     // Get the DER encoded certificate
     const derEncoded = cert.hex;
