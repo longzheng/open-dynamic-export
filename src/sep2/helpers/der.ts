@@ -66,12 +66,14 @@ export class DerHelper {
             status: StatusModel;
         }[],
     ) {
+        this.logger.debug(data, 'onInverterData');
+
         const derCapability = getDerCapabilityResponseFromSunSpecArray(
             data.map((data) => data.nameplate),
         );
 
         if (derCapability !== this.lastSentDerCapability) {
-            void this.postDerCapability({ derCapability });
+            void this.putDerCapability({ derCapability });
 
             this.lastSentDerCapability = derCapability;
         }
@@ -81,7 +83,7 @@ export class DerHelper {
         );
 
         if (derSettings !== this.lastSentDerSettings) {
-            void this.postDerSettings({ derSettings });
+            void this.putDerSettings({ derSettings });
 
             this.lastSentDerSettings = derSettings;
         }
@@ -91,13 +93,15 @@ export class DerHelper {
         );
 
         if (derStatus !== this.lastSentDerStatus) {
-            void this.postDerStatus({ derStatus });
+            void this.putDerStatus({ derStatus });
 
             this.lastSentDerStatus = derStatus;
         }
     }
 
     private async poll() {
+        this.logger.debug('poll');
+
         this.pollTimer = setTimeout(
             () => {
                 void this.poll();
@@ -120,12 +124,12 @@ export class DerHelper {
             inverterData.map((data) => data.status),
         );
 
-        void this.postDerStatus({ derStatus });
+        void this.putDerStatus({ derStatus });
 
         this.lastSentDerStatus = derStatus;
     }
 
-    private async postDerCapability({
+    private async putDerCapability({
         derCapability,
     }: {
         derCapability: DERCapabilityResponse;
@@ -136,16 +140,18 @@ export class DerHelper {
             return;
         }
 
+        this.logger.debug(derCapability, 'putDerCapability');
+
         const response = generateDerCapabilityResponse(derCapability);
         const xml = objectToXml(response);
 
-        await this.client.postResponse(
+        await this.client.putResponse(
             this.config.der.derCapabilityLink.href,
             xml,
         );
     }
 
-    private async postDerSettings({
+    private async putDerSettings({
         derSettings,
     }: {
         derSettings: DERSettings;
@@ -156,25 +162,29 @@ export class DerHelper {
             return;
         }
 
+        this.logger.debug(derSettings, 'putDerSettings');
+
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
 
-        await this.client.postResponse(
+        await this.client.putResponse(
             this.config.der.derSettingsLink.href,
             xml,
         );
     }
 
-    private async postDerStatus({ derStatus }: { derStatus: DERStatus }) {
+    private async putDerStatus({ derStatus }: { derStatus: DERStatus }) {
         if (!this.config?.der) {
             this.logger.info('DER not initialised, skipping postDerStatus');
 
             return;
         }
 
+        this.logger.debug(derStatus, 'putDerStatus');
+
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);
 
-        await this.client.postResponse(this.config.der.derStatusLink.href, xml);
+        await this.client.putResponse(this.config.der.derStatusLink.href, xml);
     }
 }
