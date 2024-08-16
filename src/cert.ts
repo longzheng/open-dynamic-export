@@ -1,32 +1,34 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { KEYUTIL, KJUR } from 'jsrsasign';
 import { randomBytes, createHash, randomUUID } from 'crypto';
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from 'fs';
 import rs from 'jsrsasign';
 
-// ported from https://github.com/aguinane/SEP2-Tools/blob/2eb5d58be73b17f2ecd31af1389ad28973551399/sep2tools/cert_create.py
+// ported from https://github.com/aguinane/SEP2-Tools/blob/213b19d8c1ebd4144fc8c4a226e7f02f702ff337/sep2tools/cert_create.py
+// SEP2 requires certificates that don't expire
+const INDEF_EXPIRY = new Date('9999-12-31T23:59:59Z');
+
 // OID for "X509v3 Any Policy"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ANY_POLICY_OID = '2.5.29.32.0';
 
 // IEEE 2030.5 device type assignments (Section 6.11.7.2)
 const SEP2_DEV_GENERIC = '1.3.6.1.4.1.40732.1.1';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SEP2_DEV_MOBILE = '1.3.6.1.4.1.40732.1.2';
 const SEP2_DEV_POSTMANUF = '1.3.6.1.4.1.40732.1.3';
 
 // IEEE 2030.5 policy assignments (Section 6.11.7.3)
 const SEP2_TEST_CERT = '1.3.6.1.4.1.40732.2.1';
 const SEP2_SELFSIGNED = '1.3.6.1.4.1.40732.2.2';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SEP2_SERVPROV = '1.3.6.1.4.1.40732.2.3';
 const SEP2_BULK_CERT = '1.3.6.1.4.1.40732.2.4';
 
 // HardwareModuleName (Section 6.11.7.4)
 const SEP2_HARDWARE_MODULE_NAME = '1.3.6.1.5.5.7.8.4';
 
-const DEFAULT_POLICIES = [
+const DEFAULT_MICA_POLICIES = [SEP2_DEV_GENERIC, SEP2_TEST_CERT];
+
+const DEFAULT_DEV_POLICIES = [
     SEP2_DEV_GENERIC,
-    SEP2_DEV_POSTMANUF,
     SEP2_TEST_CERT,
     SEP2_SELFSIGNED,
     SEP2_BULK_CERT,
@@ -149,8 +151,7 @@ export function generateDeviceCertificate({
         serial: { hex: randomSerialNumberHex() },
         issuer: micaCert.getSubject(),
         notbefore: formatDateToYYMMDDhhmmssZ(new Date()),
-        // hardcoded to 9999-12-31 23:59:59 UTC which server requires
-        notafter: formatDateToYYMMDDhhmmssZ(new Date('9999-12-31T23:59:59Z')),
+        notafter: formatDateToYYMMDDhhmmssZ(INDEF_EXPIRY),
         // server requires subject must be blank
         subject: { str: '' },
         sbjpubkey: csrPublicKey,
@@ -186,7 +187,7 @@ export function generateDeviceCertificate({
             {
                 extname: 'certificatePolicies',
                 critical: true,
-                array: DEFAULT_POLICIES.map((policyoid) => ({
+                array: DEFAULT_DEV_POLICIES.map((policyoid) => ({
                     policyoid,
                 })),
             },
