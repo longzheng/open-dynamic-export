@@ -52,10 +52,25 @@ export class SEP2Client {
         params?: Record<string, string>,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any> {
-        const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.get<string>(url, { params });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return await parseStringPromise(response.data);
+        try {
+            const url = `${this.host}${link}`;
+            const response = await this.axiosInstance.get<string>(url, {
+                params,
+            });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return await parseStringPromise(response.data);
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                throw new Error(
+                    `SEP2Client GET error
+url: ${error.config?.url}
+response status: ${error.response?.status}
+response data: ${JSON.stringify(error.response?.data, null, 2)}`,
+                );
+            }
+
+            throw error;
+        }
     }
 
     async post(
@@ -63,9 +78,23 @@ export class SEP2Client {
         data: unknown,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<AxiosResponse> {
-        const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.post<string>(url, data);
-        return response;
+        try {
+            const url = `${this.host}${link}`;
+            const response = await this.axiosInstance.post<string>(url, data);
+            return response;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                throw new Error(
+                    `SEP2Client POST error
+url: ${error.config?.url}
+request data: ${JSON.stringify(data, null, 2)}
+response status: ${error.response?.status}
+response data: ${JSON.stringify(error.response?.data, null, 2)}`,
+                );
+            }
+
+            throw error;
+        }
     }
 
     async put(
@@ -73,10 +102,24 @@ export class SEP2Client {
         data: unknown,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<AxiosResponse> {
-        const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.put<string>(url, data);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return response;
+        try {
+            const url = `${this.host}${link}`;
+            const response = await this.axiosInstance.put<string>(url, data);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return response;
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                throw new Error(
+                    `SEP2Client PUT error
+url: ${error.config?.url}
+request data: ${JSON.stringify(data, null, 2)}
+response status: ${error.response?.status}
+response data: ${JSON.stringify(error.response?.data, null, 2)}`,
+                );
+            }
+
+            throw error;
+        }
     }
 
     public discover() {
