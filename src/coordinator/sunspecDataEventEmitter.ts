@@ -51,7 +51,7 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
 
     async run() {
         try {
-            logger.debug('fetching data from inverter connections');
+            logger.trace('fetching data from inverter connections');
 
             // get necessary inverter data
             const invertersData = await Promise.all(
@@ -66,9 +66,9 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 }),
             );
 
-            logger.debug(invertersData, 'inverters data');
+            logger.trace(invertersData, 'inverters data');
 
-            logger.debug('fetching data from inverter connections');
+            logger.trace('fetching data from meters connections');
 
             // get necessary meter data
             const metersData = await Promise.all(
@@ -79,21 +79,21 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 }),
             );
 
-            logger.debug(metersData, 'meters data');
+            logger.trace(metersData, 'meters data');
 
             const monitoringSample = generateMonitoringSample({
                 inverters: invertersData.map(({ inverter }) => inverter),
                 meters: metersData.map(({ meter }) => meter),
             });
 
-            logger.debug(monitoringSample, 'monitoring sample');
+            logger.trace(monitoringSample, 'monitoring sample');
 
             // calculate current average inverter power ratio
             const currentAveragePowerRatio = getAveragePowerRatio(
                 invertersData.map(({ controls }) => controls),
             );
 
-            logger.debug(
+            logger.trace(
                 `current average power ratio: ${currentAveragePowerRatio}`,
             );
 

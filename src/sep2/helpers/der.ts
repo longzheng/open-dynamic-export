@@ -67,7 +67,7 @@ export class DerHelper {
             status: StatusModel;
         }[],
     ) {
-        this.logger.debug(data, 'onInverterData');
+        this.logger.trace(data, 'onInverterData');
 
         const derCapability = getDerCapabilityResponseFromSunSpecArray(
             data.map((data) => data.nameplate),
