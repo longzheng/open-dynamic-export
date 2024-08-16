@@ -3,7 +3,7 @@
 // for example, 30 will return the delay until XX:30 or XX:00
 export function getMillisecondsToNextHourMinutesInterval(
     minutesInterval: number,
-) {
+): number {
     if (minutesInterval <= 0) {
         throw new Error('Interval must be greater than 0 minutes');
     }
@@ -13,15 +13,12 @@ export function getMillisecondsToNextHourMinutesInterval(
     }
 
     const now = new Date();
-    const nextIntervalMark = new Date(now);
-    const currentSeconds = now.getSeconds();
-    const currentMinutes =
-        currentSeconds > 0
-            ? // if the current time is not exactly on the minute, we need to assume we are in the next minute
-              now.getMinutes() + 1
-            : now.getMinutes();
+    const currentMinutes = now.getMinutes();
     const nextIntervalMinutes =
-        Math.ceil(currentMinutes / minutesInterval) * minutesInterval;
+        Math.ceil((currentMinutes + 1) / minutesInterval) * minutesInterval;
+
+    const nextIntervalMark = new Date(now);
     nextIntervalMark.setMinutes(nextIntervalMinutes, 0, 0);
+
     return nextIntervalMark.getTime() - now.getTime();
 }

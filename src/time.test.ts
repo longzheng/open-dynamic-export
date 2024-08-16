@@ -56,10 +56,10 @@ describe('getMillisecondsToNextHourInterval', () => {
         );
     });
 
-    it('should handle edge case where current time is exactly on the interval', () => {
+    it('should handle edge case where current time is exactly on the interval, return next interval', () => {
         const now = new Date('2023-01-01T10:15:00Z');
         vi.setSystemTime(now);
         const result = getMillisecondsToNextHourMinutesInterval(15);
-        expect(result).toBe(0);
+        expect(result).toBe(15 * 60 * 1_000); // in 15 minutes
     });
 });
