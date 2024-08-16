@@ -5,7 +5,7 @@ import { dateToStringSeconds } from '../helpers/date';
 import type { FlowDirectionType } from './flowDirectionType';
 import type { KindType } from './kindType';
 import { xmlns } from '../helpers/namespace';
-import type { PhaseCode } from './phaseCode';
+import { PhaseCode } from './phaseCode';
 import type { QualityFlags } from './qualityFlags';
 import type { UomType } from './uomType';
 import type { IdentifiedObject } from './identifiedObject';
@@ -40,7 +40,8 @@ export function generateMirrorMeterReadingResponse({
     Reading,
     ReadingType,
 }: MirrorMeterReading) {
-    return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response: { MirrorMeterReading: any } = {
         MirrorMeterReading: {
             $: { xmlns: xmlns._ },
             mRID,
@@ -60,11 +61,24 @@ export function generateMirrorMeterReadingResponse({
                 kind: ReadingType.kind,
                 dataQualifier: ReadingType.dataQualifier,
                 flowDirection: ReadingType.flowDirection,
-                phase: ReadingType.phase,
                 powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
                 intervalLength: ReadingType.intervalLength,
                 uom: ReadingType.uom,
             },
         },
     };
+
+    // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
+    // conditionally set phase if it's not 0
+    // {
+    //     "error": true,
+    //     "statusCode": "ERR-MONITOR-0000",
+    //     "statusMessage": "Unknown 0 Phase Code!"
+    //   }
+    if (ReadingType.phase !== PhaseCode.NotApplicable) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        response.MirrorMeterReading.ReadingType.phase = ReadingType.phase;
+    }
+
+    return response;
 }
