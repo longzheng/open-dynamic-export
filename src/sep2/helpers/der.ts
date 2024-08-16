@@ -82,7 +82,7 @@ export class DerHelper {
             data.map((data) => data.settings),
         );
 
-        if (derSettings !== this.lastSentDerSettings) {
+        if (!this.isDerSettingsEqual(derSettings, this.lastSentDerSettings)) {
             void this.putDerSettings({ derSettings });
 
             this.lastSentDerSettings = derSettings;
@@ -92,7 +92,7 @@ export class DerHelper {
             data.map((data) => data.status),
         );
 
-        if (derStatus !== this.lastSentDerStatus) {
+        if (!this.isDerStatusEqual(derStatus, this.lastSentDerStatus)) {
             void this.putDerStatus({ derStatus });
 
             this.lastSentDerStatus = derStatus;
@@ -186,5 +186,27 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         await this.client.putResponse(this.config.der.derStatusLink.href, xml);
+    }
+
+    // check if the DERStatus has changed
+    // can't directly compare the object because it has time data which will always be different
+    private isDerStatusEqual(current: DERStatus, last: DERStatus | null) {
+        return (
+            current.genConnectStatus.value === last?.genConnectStatus.value &&
+            current.operationalModeStatus.value ===
+                last.operationalModeStatus.value
+        );
+    }
+
+    // check if the DERStatus has changed
+    // can't directly compare the object because it has time data which will always be different
+    private isDerSettingsEqual(current: DERSettings, last: DERSettings | null) {
+        return (
+            current.modesEnabled === last?.modesEnabled &&
+            current.setGradW === last.setGradW &&
+            current.setMaxVA === last.setMaxVA &&
+            current.setMaxW === last.setMaxW &&
+            current.setMaxVar === last.setMaxVar
+        );
     }
 }
