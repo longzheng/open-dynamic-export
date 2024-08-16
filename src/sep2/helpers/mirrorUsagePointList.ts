@@ -6,6 +6,7 @@ import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList';
 import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite';
 import type { MonitoringSample } from '../../coordinator/monitoring';
 import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer';
+import { getListAll } from './pagination';
 
 export class MirrorUsagePointListHelper {
     private href: string | null = null;
@@ -67,14 +68,14 @@ export class MirrorUsagePointListHelper {
 
 class MirrorUsagePointListPollableResource extends PollableResource<MirrorUsagePointList> {
     async get({ client, url }: { client: SEP2Client; url: string }) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await client.get(
+        return getListAll({
+            client,
             url,
-            // get all records
-            // TODO: handle pagination more elegantly
-            { s: '0', l: '255' },
-        );
-
-        return parseMirrorUsagePointListXml(xml);
+            parseXml: parseMirrorUsagePointListXml,
+            addItems: (allResults, result) => {
+                allResults.mirrorUsagePoints.push(...result.mirrorUsagePoints);
+            },
+            getItems: (result) => result.mirrorUsagePoints,
+        });
     }
 }

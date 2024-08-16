@@ -3,6 +3,7 @@ import { defaultPollPushRates, type SEP2Client } from '../client';
 import { PollableResource } from './pollableResource';
 import type { DERList } from '../models/derList';
 import { parseDerListXml } from '../models/derList';
+import { getListAll } from './pagination';
 
 export class DerListHelper extends EventEmitter<{
     data: [DERList];
@@ -42,14 +43,14 @@ export class DerListHelper extends EventEmitter<{
 
 class DerListPollableResource extends PollableResource<DERList> {
     async get({ client, url }: { client: SEP2Client; url: string }) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await client.get(
+        return getListAll({
+            client,
             url,
-            // get all records
-            // TODO: handle pagination more elegantly
-            { s: '0', l: '255' },
-        );
-
-        return parseDerListXml(xml);
+            parseXml: parseDerListXml,
+            addItems: (allResults, result) => {
+                allResults.ders.push(...result.ders);
+            },
+            getItems: (result) => result.ders,
+        });
     }
 }

@@ -6,6 +6,7 @@ import {
     parseEndDeviceListXml,
     type EndDeviceList,
 } from '../models/endDeviceList';
+import { getListAll } from './pagination';
 
 export class EndDeviceListHelper extends EventEmitter<{
     data: [EndDeviceList];
@@ -48,14 +49,14 @@ export class EndDeviceListHelper extends EventEmitter<{
 
 class EndDeviceListPollableResource extends PollableResource<EndDeviceList> {
     async get({ client, url }: { client: SEP2Client; url: string }) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await client.get(
+        return getListAll({
+            client,
             url,
-            // get all records
-            // TODO: handle pagination more elegantly
-            { s: '0', l: '255' },
-        );
-
-        return parseEndDeviceListXml(xml);
+            parseXml: parseEndDeviceListXml,
+            addItems: (allResults, result) => {
+                allResults.endDevices.push(...result.endDevices);
+            },
+            getItems: (result) => result.endDevices,
+        });
     }
 }
