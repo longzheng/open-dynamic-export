@@ -185,6 +185,7 @@ export function generateDeviceCertificate({
             },
             {
                 extname: 'certificatePolicies',
+                critical: true,
                 array: DEFAULT_POLICIES.map((policyoid) => ({
                     policyoid,
                 })),
@@ -200,6 +201,8 @@ export function generateDeviceCertificate({
 
     // append the MICA and SERCA certificates to the device certificate to make the full certificate chain
     appendFileSync(certPath, micaCertPem);
+
+    console.log(`Device certificate file "${certPath}" created`);
 }
 
 function formatDateToYYMMDDhhmmssZ(date: Date): string {
