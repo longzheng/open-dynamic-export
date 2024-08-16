@@ -2,6 +2,7 @@ import { assertString } from '../helpers/assert';
 import { stringToBoolean } from '../helpers/boolean';
 import { stringIntToDate } from '../helpers/date';
 import { parseLinkXmlObject, type Link } from './link';
+import { parseListLinkXmlObject, type ListLink } from './listLink';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
@@ -12,11 +13,11 @@ export type EndDevice = {
     sFDI: string;
     changedTime: Date;
     enabled: boolean;
-    derListLink: Link | undefined;
-    logEventListLink: Link | undefined;
+    derListLink: ListLink | undefined;
+    logEventListLink: ListLink | undefined;
     registrationLink: Link | undefined;
-    functionSetAssignmentsListLink: Link | undefined;
-    subscriptionListLink: Link | undefined;
+    functionSetAssignmentsListLink: ListLink | undefined;
+    subscriptionListLink: ListLink | undefined;
 } & SubscribableResource;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,7 +37,7 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     const lFDI = endDeviceObject['lFDI']
         ? assertString(endDeviceObject['lFDI'][0])
         : undefined;
-    const logEventListLink = parseLinkXmlObject(
+    const logEventListLink = parseListLinkXmlObject(
         endDeviceObject['LogEventListLink'][0],
     );
     const sFDI = assertString(endDeviceObject['sFDI'][0]);
@@ -50,18 +51,18 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
         ? stringToBoolean(assertString(endDeviceObject['enabled'][0]))
         : true;
     const derListLink = endDeviceObject['DERListLink']
-        ? parseLinkXmlObject(endDeviceObject['DERListLink'][0])
+        ? parseListLinkXmlObject(endDeviceObject['DERListLink'][0])
         : undefined;
 
     const functionSetAssignmentsListLink = endDeviceObject[
         'FunctionSetAssignmentsListLink'
     ]
-        ? parseLinkXmlObject(
+        ? parseListLinkXmlObject(
               endDeviceObject['FunctionSetAssignmentsListLink'][0],
           )
         : undefined;
     const subscriptionListLink = endDeviceObject['SubscriptionListLink']
-        ? parseLinkXmlObject(endDeviceObject['SubscriptionListLink'][0])
+        ? parseListLinkXmlObject(endDeviceObject['SubscriptionListLink'][0])
         : undefined;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
