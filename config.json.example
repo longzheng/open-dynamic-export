@@ -7,6 +7,7 @@
         "pen": 12345
     },
     "sunSpec": {
+        "control": true,
         "inverters": [
             {
                 "ip": "192.168.1.6",

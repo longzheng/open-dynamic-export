@@ -139,7 +139,11 @@ function main() {
                                 controlsModel: inverterData.controls,
                             });
 
-                        await inverter.writeControlsModel(writeControlsModel);
+                        if (config.sunSpec.control) {
+                            await inverter.writeControlsModel(
+                                writeControlsModel,
+                            );
+                        }
                     }),
                 );
             })();

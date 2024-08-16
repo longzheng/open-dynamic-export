@@ -19,6 +19,7 @@ const configSchema = z.object({
     sunSpec: z.object({
         inverters: z.array(sunspecModbusSchema),
         meters: z.array(sunspecModbusSchema),
+        control: z.boolean(),
     }),
 });
 

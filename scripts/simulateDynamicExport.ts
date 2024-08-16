@@ -21,9 +21,6 @@ const simulatedActiveDerControlBase: DERControlBase = {
     // opModEnergize: false,
 };
 
-// whether or not to apply the change on the inverter
-const simulateWriteControls = false;
-
 const config = getConfig();
 
 const { invertersConnections, metersConnections } =
@@ -63,25 +60,24 @@ sunSpecDataEventEmitter.on(
             'inverterControls',
         );
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (simulateWriteControls) {
-            void invertersConnections.map(async (inverter, index) => {
-                const inverterData = invertersData[index];
+        void invertersConnections.map(async (inverter, index) => {
+            const inverterData = invertersData[index];
 
-                if (!inverterData) {
-                    throw new Error('Inverter data not found');
-                }
+            if (!inverterData) {
+                throw new Error('Inverter data not found');
+            }
 
-                const writeControlsModel =
-                    generateControlsModelWriteFromDynamicExportConfig({
-                        config: dynamicExportConfig,
-                        controlsModel: inverterData.controls,
-                    });
+            const writeControlsModel =
+                generateControlsModelWriteFromDynamicExportConfig({
+                    config: dynamicExportConfig,
+                    controlsModel: inverterData.controls,
+                });
 
+            if (!config.sunSpec.control) {
                 logger.info(writeControlsModel, 'Writing controls model');
 
                 await inverter.writeControlsModel(writeControlsModel);
-            });
-        }
+            }
+        });
     },
 );
