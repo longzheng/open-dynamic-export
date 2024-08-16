@@ -13,6 +13,8 @@ export type ModelAddress = {
     length: number;
 };
 
+type ModelAddressById = Map<number, ModelAddress>;
+
 export abstract class SunSpecConnection {
     public readonly client: ModbusRTU;
     public readonly ip: string;
@@ -24,8 +26,12 @@ export abstract class SunSpecConnection {
         | { type: 'connecting'; connectPromise: Promise<void> }
         | { type: 'disconnected' } = { type: 'disconnected' };
 
+    private modelAddressById:
+        | { type: 'cached'; cache: ModelAddressById }
+        | { type: 'caching'; cachePromise: Promise<ModelAddressById> }
+        | { type: 'notCached' } = { type: 'notCached' };
+
     private commonModelCache: CommonModel | null = null;
-    private modelAddressById: Map<number, ModelAddress> | null = null;
 
     constructor({
         ip,
@@ -90,11 +96,6 @@ export abstract class SunSpecConnection {
                         );
 
                         this.state = { type: 'connected' };
-
-                        if (!this.modelAddressById) {
-                            this.modelAddressById =
-                                await this.scanModelAddresses();
-                        }
                     } catch (error) {
                         logger.error(
                             error,
@@ -115,13 +116,40 @@ export abstract class SunSpecConnection {
     }
 
     protected async getModelAddressById() {
-        await this.connect();
+        switch (this.modelAddressById.type) {
+            case 'cached':
+                return this.modelAddressById.cache;
+            case 'caching':
+                return this.modelAddressById.cachePromise;
+            case 'notCached': {
+                const cachePromise = (async () => {
+                    try {
+                        const modelAddressById =
+                            await this.scanModelAddresses();
 
-        if (!this.modelAddressById) {
-            throw new Error('SunSpec model address map not available');
+                        this.modelAddressById = {
+                            type: 'cached',
+                            cache: modelAddressById,
+                        };
+
+                        return modelAddressById;
+                    } catch (error) {
+                        logger.error(
+                            error,
+                            `SunSpec Modbus client error caching model addresses ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                        );
+
+                        this.modelAddressById = { type: 'notCached' };
+
+                        throw error;
+                    }
+                })();
+
+                this.modelAddressById = { type: 'caching', cachePromise };
+
+                return cachePromise;
+            }
         }
-
-        return this.modelAddressById;
     }
 
     public async getCommonModel() {
@@ -154,6 +182,8 @@ export abstract class SunSpecConnection {
     }
 
     private async scanModelAddresses(): Promise<Map<number, ModelAddress>> {
+        await this.connect();
+
         logger.info(
             `Scanning SunSpec models for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
         );
