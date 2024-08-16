@@ -18,6 +18,7 @@ import type { SettingsModel } from '../../sunspec/models/settings';
 import type { StatusModel } from '../../sunspec/models/status';
 import type { PollRate } from '../models/pollRate';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
+import deepEqual from 'fast-deep-equal';
 
 type Config = {
     der: DER;
@@ -72,7 +73,7 @@ export class DerHelper {
             data.map((data) => data.nameplate),
         );
 
-        if (derCapability !== this.lastSentDerCapability) {
+        if (!deepEqual(derCapability, this.lastSentDerCapability)) {
             void this.putDerCapability({ derCapability });
 
             this.lastSentDerCapability = derCapability;
@@ -204,9 +205,9 @@ export class DerHelper {
         return (
             current.modesEnabled === last?.modesEnabled &&
             current.setGradW === last.setGradW &&
-            current.setMaxVA === last.setMaxVA &&
-            current.setMaxW === last.setMaxW &&
-            current.setMaxVar === last.setMaxVar
+            deepEqual(current.setMaxVA, last.setMaxVA) &&
+            deepEqual(current.setMaxW, last.setMaxW) &&
+            deepEqual(current.setMaxVar, last.setMaxVar)
         );
     }
 }
