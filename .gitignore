@@ -132,4 +132,5 @@ dist
 /cert.pem
 /key.pem
 /cert_req.csr
+/mica_*.pem
 /config*.json

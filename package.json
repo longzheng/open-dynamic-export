@@ -9,6 +9,7 @@
         "debug-sunspec-data": "tsx scripts/debugSunspecData.ts",
         "debug-sep2-monitoring": "tsx scripts/debugSep2Monitoring.ts",
         "device-cert-request": "tsx scripts/deviceCertRequest.ts",
+        "device-cert-generate": "tsx scripts/deviceCertGenerate.ts",
         "device-cert-lfdi": "tsx scripts/deviceCertLfdi.ts"
     },
     "keywords": [],
@@ -36,7 +37,6 @@
         "modbus-serial": "^8.0.17",
         "pino": "^9.3.2",
         "pino-pretty": "^11.2.2",
-        "pkijs": "^3.2.1",
         "tsx": "^4.16.2",
         "typescript": "^5.5.3",
         "xml2js": "^0.6.2",
