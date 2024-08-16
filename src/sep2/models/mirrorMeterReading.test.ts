@@ -50,10 +50,10 @@ it('should generate MirrorMeterReading XML', () => {
         <kind>37</kind>
         <dataQualifier>2</dataQualifier>
         <flowDirection>19</flowDirection>
-        <phase>128</phase>
         <powerOfTenMultiplier>0</powerOfTenMultiplier>
         <intervalLength>300</intervalLength>
         <uom>38</uom>
+        <phase>128</phase>
     </ReadingType>
 </MirrorMeterReading>`);
 });
