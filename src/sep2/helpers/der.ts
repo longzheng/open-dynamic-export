@@ -1,7 +1,7 @@
 import { defaultPollPushRates, type SEP2Client } from '../client';
 import type { DER } from '../models/der';
-import type { DERCapabilityResponse } from '../models/derCapability';
-import { generateDerCapabilityResponse } from '../models/derCapability';
+import type { DERCapability } from '../models/derCapability';
+import { generateDerCapability } from '../models/derCapability';
 import type { DERSettings } from '../models/derSettings';
 import { generateDerSettingsResponse } from '../models/derSettings';
 import { generateDerStatusResponse, type DERStatus } from '../models/derStatus';
@@ -32,7 +32,7 @@ export class DerHelper {
     private client: SEP2Client;
     private config: Config | null = null;
     private logger: Logger;
-    private lastSentDerCapability: DERCapabilityResponse | null = null;
+    private lastSentDerCapability: DERCapability | null = null;
     private lastSentDerSettings: DERSettings | null = null;
     private lastSentDerStatus: DERStatus | null = null;
     private invertersConnections: InverterSunSpecConnection[];
@@ -133,7 +133,7 @@ export class DerHelper {
     private async putDerCapability({
         derCapability,
     }: {
-        derCapability: DERCapabilityResponse;
+        derCapability: DERCapability;
     }) {
         if (!this.config?.der) {
             this.logger.info('DER not initialised, skipping postDerCapability');
@@ -143,13 +143,10 @@ export class DerHelper {
 
         this.logger.debug(derCapability, 'putDerCapability');
 
-        const response = generateDerCapabilityResponse(derCapability);
+        const response = generateDerCapability(derCapability);
         const xml = objectToXml(response);
 
-        await this.client.putResponse(
-            this.config.der.derCapabilityLink.href,
-            xml,
-        );
+        await this.client.put(this.config.der.derCapabilityLink.href, xml);
     }
 
     private async putDerSettings({
@@ -168,10 +165,7 @@ export class DerHelper {
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
 
-        await this.client.putResponse(
-            this.config.der.derSettingsLink.href,
-            xml,
-        );
+        await this.client.put(this.config.der.derSettingsLink.href, xml);
     }
 
     private async putDerStatus({ derStatus }: { derStatus: DERStatus }) {
@@ -186,7 +180,7 @@ export class DerHelper {
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);
 
-        await this.client.putResponse(this.config.der.derStatusLink.href, xml);
+        await this.client.put(this.config.der.derStatusLink.href, xml);
     }
 
     // check if the DERStatus has changed

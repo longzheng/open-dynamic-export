@@ -43,7 +43,7 @@ export class DerListHelper extends EventEmitter<{
 class DerListPollableResource extends PollableResource<DERList> {
     async get({ client, url }: { client: SEP2Client; url: string }) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const xml = await client.getRequest(
+        const xml = await client.get(
             url,
             // get all records
             // TODO: handle pagination more elegantly

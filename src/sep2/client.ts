@@ -1,5 +1,5 @@
 import type { AxiosInstance, AxiosResponse } from 'axios';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
 import { getCertificateLfdi } from '../cert';
@@ -47,7 +47,7 @@ export class SEP2Client {
         });
     }
 
-    async getRequest(
+    async get(
         link: string,
         params?: Record<string, string>,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,7 +58,7 @@ export class SEP2Client {
         return await parseStringPromise(response.data);
     }
 
-    async postResponse(
+    async post(
         link: string,
         data: unknown,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,7 +68,7 @@ export class SEP2Client {
         return response;
     }
 
-    async putResponse(
+    async put(
         link: string,
         data: unknown,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

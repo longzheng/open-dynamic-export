@@ -8,7 +8,7 @@ import { xmlns } from '../helpers/namespace';
 import { type ReactivePower } from './reactivePower';
 import { type VoltageRMS } from './voltageRms';
 
-export type DERCapabilityResponse = {
+export type DERCapability = {
     // Bitmap indicating the DER Controls implemented by the device
     modesSupported: DERControlType;
     // Bitmap indicating the CSIP-AUS controls implemented
@@ -26,7 +26,7 @@ export type DERCapabilityResponse = {
     // TODO: partially implemented
 };
 
-export function generateDerCapabilityResponse({
+export function generateDerCapability({
     modesSupported,
     doeModesSupported,
     type,
@@ -34,7 +34,7 @@ export function generateDerCapabilityResponse({
     rtgMaxW,
     rtgMaxVar,
     rtgVNom,
-}: DERCapabilityResponse) {
+}: DERCapability) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response: { DERCapability: any } = {
         DERCapability: {

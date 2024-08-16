@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { type NameplateModel } from '../sunspec/models/nameplate';
-import type { DERCapabilityResponse } from '../sep2/models/derCapability';
+import type { DERCapability } from '../sep2/models/derCapability';
 import { DERControlType } from '../sep2/models/derControlType';
 import { DOEModesSupportedType } from '../sep2/models/doeModesSupportedType';
 import {
@@ -45,7 +45,7 @@ describe('getDerCapabilityResponseFromSunSpecArray', () => {
             },
         ];
 
-        const result: DERCapabilityResponse =
+        const result: DERCapability =
             getDerCapabilityResponseFromSunSpecArray(nameplateModels);
 
         expect(result).toEqual({
@@ -133,7 +133,7 @@ describe('getDerCapabilityResponseFromSunSpecArray', () => {
             },
         ];
 
-        const result: DERCapabilityResponse =
+        const result: DERCapability =
             getDerCapabilityResponseFromSunSpecArray(nameplateModels);
 
         expect(result).toEqual({

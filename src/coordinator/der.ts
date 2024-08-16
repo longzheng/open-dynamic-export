@@ -1,6 +1,6 @@
 import { convertNumberToBaseAndPow10Exponent } from '../number';
 import { ConnectStatus } from '../sep2/models/connectStatus';
-import type { DERCapabilityResponse } from '../sep2/models/derCapability';
+import type { DERCapability } from '../sep2/models/derCapability';
 import { DERControlType } from '../sep2/models/derControlType';
 import type { DERSettings } from '../sep2/models/derSettings';
 import type { DERStatus } from '../sep2/models/derStatus';
@@ -16,7 +16,7 @@ import { PVConn, type StatusModel } from '../sunspec/models/status';
 
 export function getDerCapabilityResponseFromSunSpecArray(
     nameplateModels: NameplateModel[],
-): DERCapabilityResponse {
+): DERCapability {
     const metrics = getAggregatedNameplateMetrics(nameplateModels);
     const rtgMaxVA = convertNumberToBaseAndPow10Exponent(metrics.VARtg);
     const rtgMaxW = convertNumberToBaseAndPow10Exponent(metrics.WRtg);

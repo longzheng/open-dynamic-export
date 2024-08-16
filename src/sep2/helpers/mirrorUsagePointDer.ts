@@ -500,7 +500,7 @@ export class MirrorUsagePointDerHelper {
         const data = generateMirrorUsagePointResponse(mirrorUsagePoint);
         const xml = objectToXml(data);
 
-        const response = await this.client.postResponse(
+        const response = await this.client.post(
             this.mirrorUsagePointListHref,
             xml,
         );
@@ -527,6 +527,6 @@ export class MirrorUsagePointDerHelper {
         const data = generateMirrorMeterReadingResponse(mirrorMeterReading);
         const xml = objectToXml(data);
 
-        await this.client.postResponse(this.mirrorUsagePoint.href, xml);
+        await this.client.post(this.mirrorUsagePoint.href, xml);
     }
 }

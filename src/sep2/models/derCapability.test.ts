@@ -1,12 +1,12 @@
 import { it, expect } from 'vitest';
 import { objectToXml } from '../helpers/xml';
-import { generateDerCapabilityResponse } from './derCapability';
+import { generateDerCapability } from './derCapability';
 import { DERControlType } from './derControlType';
 import { DOEModesSupportedType } from './doeModesSupportedType';
 import { DERType } from './derType';
 
 it('should generate DERCapability XML', () => {
-    const response = generateDerCapabilityResponse({
+    const response = generateDerCapability({
         modesSupported:
             DERControlType.opModEnergize |
             DERControlType.opModFixedW |
@@ -63,7 +63,7 @@ it('should generate DERCapability XML', () => {
 });
 
 it('should generate DERCapability XML without optional fields', () => {
-    const response = generateDerCapabilityResponse({
+    const response = generateDerCapability({
         modesSupported:
             DERControlType.opModEnergize |
             DERControlType.opModFixedW |
