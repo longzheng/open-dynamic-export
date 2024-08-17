@@ -13,6 +13,7 @@ import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
 import { DerListHelper } from '../sep2/helpers/derList';
 import { DerHelper } from '../sep2/helpers/der';
 import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList';
+import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAssignmentsList';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -46,13 +47,16 @@ const derHelper = new DerHelper({
     client: sep2Client,
     invertersConnections,
 });
+const functionSetAssignmentsListHelper = new FunctionSetAssignmentsListHelper({
+    client: sep2Client,
+});
 const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
     client: sep2Client,
 });
 
 function main() {
     endDeviceListHelper.on('data', (endDeviceList) => {
-        logger.info(endDeviceList, 'Received SEP2 end device list');
+        logger.info({ endDeviceList }, 'Received SEP2 end device list');
 
         // as a direct client, we expect only one end device that matches the LFDI of our certificate
         const endDevice = endDeviceList.endDevices.find(
@@ -72,10 +76,16 @@ function main() {
                 href: endDevice.derListLink.href,
             });
         }
+
+        if (endDevice.functionSetAssignmentsListLink) {
+            functionSetAssignmentsListHelper.updateHref({
+                href: endDevice.functionSetAssignmentsListLink.href,
+            });
+        }
     });
 
     derListHelper.on('data', (derList) => {
-        logger.info(derList, 'Received SEP2 end device DER list');
+        logger.info({ derList }, 'Received SEP2 end device DER list');
 
         if (derList.ders.length !== 1) {
             throw new Error(
@@ -91,10 +101,20 @@ function main() {
         });
     });
 
+    functionSetAssignmentsListHelper.on(
+        'data',
+        (functionSetAssignmentsList) => {
+            logger.info(
+                { functionSetAssignmentsList },
+                'Received SEP2 function set assignments list',
+            );
+        },
+    );
+
     logger.info('Discovering SEP2');
 
     sep2Client.discover().on('data', (deviceCapability) => {
-        logger.info(deviceCapability, 'Received SEP2 device capability');
+        logger.info({ deviceCapability }, 'Received SEP2 device capability');
 
         timeHelper.updateHref({
             href: deviceCapability.timeLink.href,
