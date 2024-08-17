@@ -93,7 +93,12 @@ export function sunSpecModelFactory<
             objectEntriesWithType(values).forEach(([key, value]) => {
                 if (writtenValues[key] !== value) {
                     logger.error(
-                        `Failed to write value for key ${key.toString()}. Expected ${value}, got ${writtenValues[key]}`,
+                        {
+                            key: key.toString(),
+                            value,
+                            read: writtenValues[key],
+                        },
+                        `Failed to write value for key`,
                     );
                 }
             });

@@ -32,9 +32,9 @@ async function poll() {
             meters: metersData,
         });
 
-        logger.info(monitoringSample, 'monitoring sample');
+        logger.info({ monitoringSample }, 'calculated monitoring sample');
     } catch (error) {
-        logger.error(error, 'Failed to get monitoring sample');
+        logger.error({ error }, 'Failed to get monitoring sample');
     } finally {
         setTimeout(() => {
             void poll();

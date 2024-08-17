@@ -66,7 +66,7 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 }),
             );
 
-            logger.trace(invertersData, 'inverters data');
+            logger.trace({ invertersData }, 'received inverters data');
 
             logger.trace('fetching data from meters connections');
 
@@ -79,14 +79,14 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 }),
             );
 
-            logger.trace(metersData, 'meters data');
+            logger.trace({ metersData }, 'received meters data');
 
             const monitoringSample = generateMonitoringSample({
                 inverters: invertersData.map(({ inverter }) => inverter),
                 meters: metersData.map(({ meter }) => meter),
             });
 
-            logger.trace(monitoringSample, 'monitoring sample');
+            logger.trace({ monitoringSample }, 'generated monitoring sample');
 
             // calculate current average inverter power ratio
             const currentAveragePowerRatio = getAveragePowerRatio(
@@ -104,7 +104,7 @@ export class SunSpecDataEventEmitter extends EventEmitter<{
                 currentAveragePowerRatio,
             });
         } catch (error) {
-            logger.error(error, 'Failed to fetch SunSpec data');
+            logger.error({ error }, 'Failed to fetch SunSpec data');
         } finally {
             setTimeout(
                 () => {

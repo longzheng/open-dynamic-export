@@ -47,7 +47,8 @@ void (async () => {
             }
 
             inverterLogger.info(
-                `Model ID: ${modelId} at Address: ${currentAddress}, length ${modelLength}`,
+                { modelId, currentAddress, modelLength },
+                `Found model`,
             );
 
             // Move to the next model's address
@@ -80,7 +81,8 @@ void (async () => {
             }
 
             meterLogger.info(
-                `Model ID: ${modelId} at Address: ${currentAddress}, length ${modelLength}`,
+                { modelId, currentAddress, modelLength },
+                `Found model`,
             );
 
             // Move to the next model's address

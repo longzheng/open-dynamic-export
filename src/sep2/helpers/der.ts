@@ -52,7 +52,7 @@ export class DerHelper {
     }
 
     configureDer(config: Config) {
-        this.logger.info(config, 'Updated DerHelper with config');
+        this.logger.info({ config }, 'Updated DerHelper with config');
         this.config = config;
 
         if (!this.pollTimer) {
@@ -67,7 +67,7 @@ export class DerHelper {
             status: StatusModel;
         }[],
     ) {
-        this.logger.trace(data, 'onInverterData');
+        this.logger.trace({ data }, 'onInverterData');
 
         const derCapability = getDerCapabilityResponseFromSunSpecArray(
             data.map((data) => data.nameplate),
@@ -141,7 +141,7 @@ export class DerHelper {
             return;
         }
 
-        this.logger.debug(derCapability, 'putDerCapability');
+        this.logger.debug({ derCapability }, 'putDerCapability');
 
         const response = generateDerCapability(derCapability);
         const xml = objectToXml(response);
@@ -160,7 +160,7 @@ export class DerHelper {
             return;
         }
 
-        this.logger.debug(derSettings, 'putDerSettings');
+        this.logger.debug({ derSettings }, 'putDerSettings');
 
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
@@ -175,7 +175,7 @@ export class DerHelper {
             return;
         }
 
-        this.logger.debug(derStatus, 'putDerStatus');
+        this.logger.debug({ derStatus }, 'putDerStatus');
 
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);

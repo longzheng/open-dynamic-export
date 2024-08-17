@@ -3,10 +3,9 @@ import type { CommonModel } from '../models/common';
 import { commonModel } from '../models/common';
 import { logger as pinoLogger } from '../../logger';
 import { registersToUint32 } from '../helpers/converters';
+import type { Logger } from 'pino';
 
 const connectionTimeoutMs = 5000;
-
-const logger = pinoLogger.child({ module: 'sunspec-connection' });
 
 export type ModelAddress = {
     start: number;
@@ -20,6 +19,7 @@ export abstract class SunSpecConnection {
     public readonly ip: string;
     public readonly port: number;
     public readonly unitId: number;
+    private logger: Logger;
 
     private state:
         | { type: 'connected' }
@@ -46,23 +46,24 @@ export abstract class SunSpecConnection {
         this.ip = ip;
         this.port = port;
         this.unitId = unitId;
+        this.logger = pinoLogger.child({
+            module: 'sunspec-connection',
+            ip,
+            port,
+            unitId,
+        });
 
         this.client.on('close', () => {
             this.state = { type: 'disconnected' };
 
-            logger.error(
-                `SunSpec Modbus client closed ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-            );
+            this.logger.error(`SunSpec Modbus client closed`);
         });
 
         // This is never observed to be triggered
-        this.client.on('error', (err) => {
+        this.client.on('error', (error) => {
             this.state = { type: 'disconnected' };
 
-            logger.error(
-                err,
-                `SunSpec Modbus client error ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-            );
+            this.logger.error({ error }, `SunSpec Modbus client error`);
         });
 
         this.connect().catch(() => {
@@ -79,9 +80,7 @@ export abstract class SunSpecConnection {
             case 'disconnected': {
                 const connectPromise = (async () => {
                     try {
-                        logger.info(
-                            `SunSpec Modbus client connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-                        );
+                        this.logger.info(`SunSpec Modbus client connecting`);
 
                         await this.client.connectTCP(this.ip, {
                             port: this.port,
@@ -91,15 +90,15 @@ export abstract class SunSpecConnection {
                         this.client.setID(this.unitId);
                         this.client.setTimeout(connectionTimeoutMs);
 
-                        logger.info(
-                            `SunSpec Modbus client connected to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-                        );
+                        this.logger.info(`SunSpec Modbus client connected`);
 
                         this.state = { type: 'connected' };
                     } catch (error) {
-                        logger.error(
-                            error,
-                            `SunSpec Modbus client error connecting to ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                        this.logger.error(
+                            {
+                                error,
+                            },
+                            `SunSpec Modbus client error connecting`,
                         );
 
                         this.state = { type: 'disconnected' };
@@ -134,9 +133,11 @@ export abstract class SunSpecConnection {
 
                         return modelAddressById;
                     } catch (error) {
-                        logger.error(
-                            error,
-                            `SunSpec Modbus client error caching model addresses ${this.ip}:${this.port} Unit ID ${this.unitId}`,
+                        this.logger.error(
+                            {
+                                error,
+                            },
+                            `SunSpec Modbus client error caching model addresses`,
                         );
 
                         this.modelAddressById = { type: 'notCached' };
@@ -184,9 +185,7 @@ export abstract class SunSpecConnection {
     private async scanModelAddresses(): Promise<Map<number, ModelAddress>> {
         await this.connect();
 
-        logger.info(
-            `Scanning SunSpec models for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}`,
-        );
+        this.logger.info(`Scanning SunSpec models for SunSpec Modbus client`);
 
         // 40002 is a well-known base address
         let currentAddress = 40000;
@@ -241,8 +240,12 @@ export abstract class SunSpecConnection {
 
         const modelIds = Array.from(modelAddressById.keys());
 
-        logger.info(
-            `Found ${modelIds.length} SunSpec models for SunSpec Modbus client ${this.ip}:${this.port} Unit ID ${this.unitId}: ${modelIds.join(', ')}`,
+        this.logger.info(
+            {
+                count: modelIds.length,
+                modelIds,
+            },
+            `Found SunSpec models for SunSpec Modbus client`,
         );
 
         return modelAddressById;

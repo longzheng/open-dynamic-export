@@ -36,8 +36,6 @@ void (async () => {
         }),
     );
 
-    logger.info(invertersData, 'inverters data');
-
     const metersData = await Promise.all(
         metersConnections.map(async (meter) => {
             return {
@@ -47,19 +45,16 @@ void (async () => {
         }),
     );
 
-    logger.info(metersData, 'meters data');
-
-    logger.info(
-        invertersData.map((inverterData) =>
+    logger.info({
+        invertersData,
+        metersData,
+        inverterMetrics: invertersData.map((inverterData) =>
             getInverterMetrics(inverterData.inverter),
         ),
-        'inverter metrics',
-    );
-
-    logger.info(
-        metersData.map((meterData) => getMeterMetrics(meterData.meter)),
-        'meter metrics',
-    );
+        meterMetrics: metersData.map((meterData) =>
+            getMeterMetrics(meterData.meter),
+        ),
+    });
 
     process.exit();
 })();

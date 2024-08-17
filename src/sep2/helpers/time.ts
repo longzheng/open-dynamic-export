@@ -42,7 +42,6 @@ export class TimeHelper {
 
         // 1 minute tolerance
         if (Math.abs(delta) > 60 * 1_000) {
-            console.log('test');
             throw new Error(
                 `Clock is not synced with Utility Server, delta ${delta}ms`,
             );

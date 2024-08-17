@@ -40,8 +40,6 @@ sunSpecDataEventEmitter.on(
             currentAveragePowerRatio,
         });
 
-        logger.info(dynamicExportConfig, 'dynamicExportConfig');
-
         const inverterControls = invertersData.map(({ controls }) =>
             generateControlsModelWriteFromDynamicExportConfig({
                 config: dynamicExportConfig,
@@ -50,14 +48,17 @@ sunSpecDataEventEmitter.on(
         );
 
         logger.info(
-            inverterControls.map((controls) => ({
-                Conn: controls.Conn,
-                WMaxLimPct: controls.WMaxLimPct,
-                WMaxLim_Ena: controls.WMaxLim_Ena,
-                VArPct_Ena: controls.VArPct_Ena,
-                OutPFSet_Ena: controls.OutPFSet_Ena,
-            })),
-            'inverterControls',
+            {
+                dynamicExportConfig,
+                inverterControls: inverterControls.map((controls) => ({
+                    Conn: controls.Conn,
+                    WMaxLimPct: controls.WMaxLimPct,
+                    WMaxLim_Ena: controls.WMaxLim_Ena,
+                    VArPct_Ena: controls.VArPct_Ena,
+                    OutPFSet_Ena: controls.OutPFSet_Ena,
+                })),
+            },
+            'Calculated dynamic export config',
         );
 
         void invertersConnections.map(async (inverter, index) => {
@@ -74,7 +75,10 @@ sunSpecDataEventEmitter.on(
                 });
 
             if (!config.sunSpec.control) {
-                logger.info(writeControlsModel, 'Writing controls model');
+                logger.info(
+                    { model: writeControlsModel },
+                    'Writing controls model',
+                );
 
                 await inverter.writeControlsModel(writeControlsModel);
             }
