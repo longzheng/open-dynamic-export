@@ -21,7 +21,7 @@ it('should parse DERProgram XML object with DefaultDERControlLink', async () => 
     expect(der.mRID).toBe('C7170E2F587E43EE98E51043FECDBA09');
     expect(der.description).toBe('Test Program 3');
     expect(der.version).toBe(1);
-    expect(der.defaultDERControlLink?.href).toBe('/api/v2/derp/TESTPRG3/dderc');
+    expect(der.defaultDerControlLink?.href).toBe('/api/v2/derp/TESTPRG3/dderc');
     expect(der.derControlListLink?.href).toBe('/api/v2/derp/TESTPRG3/derc');
     expect(der.derCurveListLink?.href).toBe('/api/v2/derp/TESTPRG3/dc');
     expect(der.primacy).toBe(1);
@@ -45,7 +45,7 @@ it('should parse DERProgram XML object without DefaultDERControlLink', async () 
     expect(der.mRID).toBe('C882D1F83246441786FB8278FECDBA09');
     expect(der.description).toBe('_EQLDEV3 Program');
     expect(der.version).toBe(1);
-    expect(der.defaultDERControlLink?.href).toBe(undefined);
+    expect(der.defaultDerControlLink?.href).toBe(undefined);
     expect(der.derControlListLink?.href).toBe('/api/v2/derp/P-_EQLDEV3/derc');
     expect(der.derCurveListLink?.href).toBe('/api/v2/derp/P-_EQLDEV3/dc');
     expect(der.primacy).toBe(102);

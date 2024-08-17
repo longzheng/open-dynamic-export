@@ -12,7 +12,7 @@ import {
 import { parseListLinkXmlObject, type ListLink } from './listLink';
 
 export type DERProgram = {
-    defaultDERControlLink: Link | undefined;
+    defaultDerControlLink: Link | undefined;
     derControlListLink: ListLink | undefined;
     derCurveListLink: ListLink | undefined;
     primacy: number;
@@ -24,7 +24,7 @@ export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
-    const defaultDERControlLink = xmlObject['DefaultDERControlLink']
+    const defaultDerControlLink = xmlObject['DefaultDERControlLink']
         ? parseLinkXmlObject(xmlObject['DefaultDERControlLink'][0])
         : undefined;
     const derControlListLink = parseListLinkXmlObject(
@@ -39,7 +39,7 @@ export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
     return {
         ...subscribableResource,
         ...identifiedObject,
-        defaultDERControlLink,
+        defaultDerControlLink,
         derControlListLink,
         derCurveListLink,
         primacy,
