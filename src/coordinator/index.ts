@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import { SEP2Client } from '../sep2/client';
-import { getConfig, getConfigSep2CertKey } from '../config';
+import { getConfig, getConfigSep2CertKey } from '../helpers/config';
 import { getSunSpecConnections } from '../sunspec/connections';
 import {
     calculateDynamicExportConfig,
     generateControlsModelWriteFromDynamicExportConfig,
-} from './dynamicExport';
-import { SunSpecDataEventEmitter } from './sunspecDataEventEmitter';
-import { logger as pinoLogger } from '../logger';
+} from './helpers/dynamicExport';
+import { SunSpecDataEventEmitter } from './helpers/sunspecDataEventEmitter';
+import { logger as pinoLogger } from '../helpers/logger';
 import { TimeHelper } from '../sep2/helpers/time';
 import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
 import { DerListHelper } from '../sep2/helpers/derList';

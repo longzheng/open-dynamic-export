@@ -9,7 +9,7 @@ import {
 import { RoleFlagsType } from '../models/roleFlagsType';
 import { objectToXml } from './xml';
 import { ServiceKind } from '../models/serviceKind';
-import { getMillisecondsToNextHourMinutesInterval } from '../../time';
+import { getMillisecondsToNextHourMinutesInterval } from '../../helpers/time';
 import {
     generateMirrorMeterReadingResponse,
     type MirrorMeterReading,
@@ -17,13 +17,13 @@ import {
 import {
     getSamplesIntervalSeconds,
     type MonitoringSample,
-} from '../../coordinator/monitoring';
-import type { PerPhaseMeasurement } from '../../power';
+} from '../../coordinator/helpers/monitoring';
+import type { PerPhaseMeasurement } from '../../helpers/power';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
     convertNumberToBaseAndPow10Exponent,
-} from '../../number';
+} from '../../helpers/number';
 import { QualityFlags } from '../models/qualityFlags';
 import { CommodityType } from '../models/commodityType';
 import { KindType } from '../models/kindType';

@@ -3,7 +3,7 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../number';
+} from '../../helpers/number';
 import { type NameplateModel } from '../models/nameplate';
 
 export function getNameplateMetrics(nameplate: NameplateModel) {

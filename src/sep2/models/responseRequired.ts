@@ -1,4 +1,4 @@
-import { mapEnumValueToEnumFlagsObject } from '../../enum';
+import { mapEnumValueToEnumFlagsObject } from '../../helpers/enum';
 
 // 0 - End device shall indicate that message was received
 // 1 - End device shall indicate specific response.

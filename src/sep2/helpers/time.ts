@@ -3,7 +3,7 @@ import { PollableResource } from './pollableResource';
 import type { Time } from '../models/time';
 import { parseTimeXml } from '../models/time';
 import type { Logger } from 'pino';
-import { logger as pinoLogger } from '../../logger';
+import { logger as pinoLogger } from '../../helpers/logger';
 
 export class TimeHelper {
     private href: string | null = null;

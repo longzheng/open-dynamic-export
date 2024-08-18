@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { getConfig } from '../src/config';
+import { getConfig } from '../src/helpers/config';
 import { InverterSunSpecConnection } from '../src/sunspec/connection/inverter';
-import { logger } from '../src/logger';
+import { logger } from '../src/helpers/logger';
 import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
 
 // This debugging script dumps all the SunSpec models

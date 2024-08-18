@@ -1,6 +1,6 @@
 import { assertString } from '../helpers/assert';
 import { parseLinkXmlObject, type Link } from './link';
-import { safeParseIntString } from '../../number';
+import { safeParseIntString } from '../../helpers/number';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,

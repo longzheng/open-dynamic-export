@@ -1,4 +1,4 @@
-import type { SitePhases } from '../../power';
+import type { SitePhases } from '../../helpers/power';
 import type { InverterModel } from '../models/inverter';
 import { type MeterModel } from '../models/meter';
 

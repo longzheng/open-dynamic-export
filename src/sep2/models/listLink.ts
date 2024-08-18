@@ -1,4 +1,4 @@
-import { safeParseIntString } from '../../number';
+import { safeParseIntString } from '../../helpers/number';
 import { assertString } from '../helpers/assert';
 import { parseLinkXmlObject, type Link } from './link';
 

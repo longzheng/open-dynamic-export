@@ -1,4 +1,4 @@
-import { mapEnumValueToEnumFlagsObject } from '../../enum';
+import { mapEnumValueToEnumFlagsObject } from '../../helpers/enum';
 
 // Bit 0 - isMirror - SHALL be set if the server is not the measurement device
 // Bit 1 - isPremisesAggregationPoint - SHALL be set if the UsagePoint is the point of delivery for a premises

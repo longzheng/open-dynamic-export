@@ -1,7 +1,7 @@
 import ModbusRTU from 'modbus-serial';
 import type { CommonModel } from '../models/common';
 import { commonModel } from '../models/common';
-import { logger as pinoLogger } from '../../logger';
+import { logger as pinoLogger } from '../../helpers/logger';
 import { registersToUint32 } from '../helpers/converters';
 import type { Logger } from 'pino';
 

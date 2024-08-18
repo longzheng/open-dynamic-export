@@ -1,13 +1,13 @@
 import 'dotenv/config';
-import { getConfig } from '../src/config';
+import { getConfig } from '../src/helpers/config';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 import {
     calculateDynamicExportConfig,
     generateControlsModelWriteFromDynamicExportConfig,
-} from '../src/coordinator/dynamicExport';
+} from '../src/coordinator/helpers/dynamicExport';
 import type { DERControlBase } from '../src/sep2/models/derControlBase';
-import { SunSpecDataEventEmitter } from '../src/coordinator/sunspecDataEventEmitter';
-import { logger } from '../src/logger';
+import { SunSpecDataEventEmitter } from '../src/coordinator/helpers/sunspecDataEventEmitter';
+import { logger } from '../src/helpers/logger';
 
 // This debugging script simulates dynamic export control (without actually sending commands to inverters)
 // It polls SunSpec data and telemetry

@@ -6,13 +6,13 @@ import type { DERSettings } from '../models/derSettings';
 import { generateDerSettingsResponse } from '../models/derSettings';
 import { generateDerStatusResponse, type DERStatus } from '../models/derStatus';
 import { objectToXml } from './xml';
-import { logger as pinoLogger } from '../../logger';
+import { logger as pinoLogger } from '../../helpers/logger';
 import type { Logger } from 'pino';
 import {
     getDerCapabilityResponseFromSunSpecArray,
     getDerSettingsResponseFromSunSpecArray,
     getDerStatusResponseFromSunSpecArray,
-} from '../../coordinator/der';
+} from '../../coordinator/helpers/der';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import type { StatusModel } from '../../sunspec/models/status';

@@ -1,7 +1,7 @@
 import type { ConnectStatus } from './connectStatus';
 import { dateToStringSeconds } from '../helpers/date';
 import { xmlns } from '../helpers/namespace';
-import { numberToHex } from '../../number';
+import { numberToHex } from '../../helpers/number';
 
 /// DER OperationalModeStatus value:
 /// 0 - Not applicable / Unknown

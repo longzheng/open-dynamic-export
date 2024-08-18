@@ -1,4 +1,4 @@
-import type { Config } from '../config';
+import type { Config } from '../helpers/config';
 import { InverterSunSpecConnection } from './connection/inverter';
 import { MeterSunSpecConnection } from './connection/meter';
 

@@ -1,5 +1,5 @@
-import { logger as pinoLogger } from '../../logger';
-import { objectEntriesWithType } from '../../object';
+import { logger as pinoLogger } from '../../helpers/logger';
+import { objectEntriesWithType } from '../../helpers/object';
 import type { ModelAddress, SunSpecConnection } from '../connection/base';
 
 export type Mapping<

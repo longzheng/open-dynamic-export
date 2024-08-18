@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import { getConfig } from '../src/config';
-import { generateMonitoringSample } from '../src/coordinator/monitoring';
+import { getConfig } from '../src/helpers/config';
+import { generateMonitoringSample } from '../src/coordinator/helpers/monitoring';
 import { getSunSpecConnections } from '../src/sunspec/connections';
-import { logger } from '../src/logger';
+import { logger } from '../src/helpers/logger';
 
 // This debugging script continously outputs SEP2 monitoring samples
 // It reads SunSpec data, transforms it into monitoring sample, and logs to console

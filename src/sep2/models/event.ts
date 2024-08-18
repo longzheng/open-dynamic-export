@@ -1,4 +1,4 @@
-import { safeParseIntString } from '../../number';
+import { safeParseIntString } from '../../helpers/number';
 import { assertString } from '../helpers/assert';
 import { stringIntToDate } from '../helpers/date';
 import { parseEventStatusXmlObject, type EventStatus } from './eventStatus';

@@ -1,16 +1,16 @@
 import Decimal from 'decimal.js';
-import { getTotalFromPerPhaseMeasurement } from '../power';
+import { getTotalFromPerPhaseMeasurement } from '../../helpers/power';
 import type { MonitoringSample } from './monitoring';
-import type { ControlsModel } from '../sunspec/models/controls';
+import type { ControlsModel } from '../../sunspec/models/controls';
 import {
     OutPFSet_Ena,
     VArPct_Ena,
     WMaxLim_Ena,
-} from '../sunspec/models/controls';
-import { Conn, type ControlsModelWrite } from '../sunspec/models/controls';
-import type { DERControlBase } from '../sep2/models/derControlBase';
-import { numberWithPow10 } from '../number';
-import { logger as pinoLogger } from '../logger';
+} from '../../sunspec/models/controls';
+import { Conn, type ControlsModelWrite } from '../../sunspec/models/controls';
+import type { DERControlBase } from '../../sep2/models/derControlBase';
+import { numberWithPow10 } from '../../helpers/number';
+import { logger as pinoLogger } from '../../helpers/logger';
 
 const logger = pinoLogger.child({ module: 'dynamic-export' });
 

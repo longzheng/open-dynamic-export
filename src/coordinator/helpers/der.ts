@@ -1,18 +1,18 @@
-import { convertNumberToBaseAndPow10Exponent } from '../number';
-import { ConnectStatus } from '../sep2/models/connectStatus';
-import type { DERCapability } from '../sep2/models/derCapability';
-import { DERControlType } from '../sep2/models/derControlType';
-import type { DERSettings } from '../sep2/models/derSettings';
-import type { DERStatus } from '../sep2/models/derStatus';
-import { OperationalModeStatus } from '../sep2/models/derStatus';
-import { DERType } from '../sep2/models/derType';
-import { DOEModesSupportedType } from '../sep2/models/doeModesSupportedType';
-import { getAggregatedNameplateMetrics } from '../sunspec/helpers/nameplateMetrics';
-import { getAggregatedSettingsMetrics } from '../sunspec/helpers/settingsMetrics';
-import { getAggregatedStatusMetrics } from '../sunspec/helpers/statusMetrics';
-import { type NameplateModel } from '../sunspec/models/nameplate';
-import type { SettingsModel } from '../sunspec/models/settings';
-import { PVConn, type StatusModel } from '../sunspec/models/status';
+import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number';
+import { ConnectStatus } from '../../sep2/models/connectStatus';
+import type { DERCapability } from '../../sep2/models/derCapability';
+import { DERControlType } from '../../sep2/models/derControlType';
+import type { DERSettings } from '../../sep2/models/derSettings';
+import type { DERStatus } from '../../sep2/models/derStatus';
+import { OperationalModeStatus } from '../../sep2/models/derStatus';
+import { DERType } from '../../sep2/models/derType';
+import { DOEModesSupportedType } from '../../sep2/models/doeModesSupportedType';
+import { getAggregatedNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics';
+import { getAggregatedSettingsMetrics } from '../../sunspec/helpers/settingsMetrics';
+import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics';
+import { type NameplateModel } from '../../sunspec/models/nameplate';
+import type { SettingsModel } from '../../sunspec/models/settings';
+import { PVConn, type StatusModel } from '../../sunspec/models/status';
 
 export function getDerCapabilityResponseFromSunSpecArray(
     nameplateModels: NameplateModel[],

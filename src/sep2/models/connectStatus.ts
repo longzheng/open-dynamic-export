@@ -1,4 +1,4 @@
-import { mapEnumValueToEnumFlagsObject } from '../../enum';
+import { mapEnumValueToEnumFlagsObject } from '../../helpers/enum';
 
 // DER ConnectStatus value (bitmap):
 // 0 - Connected

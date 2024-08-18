@@ -1,4 +1,4 @@
-import { averageNumbersArray, numberWithPow10 } from '../../number';
+import { averageNumbersArray, numberWithPow10 } from '../../helpers/number';
 import { WMaxLim_Ena, type ControlsModel } from '../models/controls';
 
 export function getAveragePowerRatio(controls: ControlsModel[]) {

@@ -1,5 +1,8 @@
-import { safeParseStringToEnumType, stringHexToEnumType } from '../../enum';
-import { numberToHex } from '../../number';
+import {
+    safeParseStringToEnumType,
+    stringHexToEnumType,
+} from '../../helpers/enum';
+import { numberToHex } from '../../helpers/number';
 import { assertString } from '../helpers/assert';
 import { xmlns } from '../helpers/namespace';
 import {

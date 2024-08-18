@@ -1,4 +1,4 @@
-import type { SitePhases } from '../../power';
+import type { SitePhases } from '../../helpers/power';
 
 // ensure the expected phase readings match the site's phases
 export function assertPhaseReadings({

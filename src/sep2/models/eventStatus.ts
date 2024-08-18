@@ -1,4 +1,4 @@
-import { safeParseStringToEnumType } from '../../enum';
+import { safeParseStringToEnumType } from '../../helpers/enum';
 import { assertString } from '../helpers/assert';
 import { stringToBoolean } from '../helpers/boolean';
 import { stringIntToDate } from '../helpers/date';

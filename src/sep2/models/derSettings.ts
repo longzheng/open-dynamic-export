@@ -1,4 +1,4 @@
-import { numberToHex } from '../../number';
+import { numberToHex } from '../../helpers/number';
 import { type ActivePower } from './activePower';
 import { type ApparentPower } from './apparentPower';
 import { dateToStringSeconds } from '../helpers/date';

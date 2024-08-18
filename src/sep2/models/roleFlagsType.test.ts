@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import type { RoleFlagsTypeObject } from './roleFlagsType';
 import { mapEnumNumberToRoleFlagsObject, RoleFlagsType } from './roleFlagsType';
-import { numberToHex } from '../../number';
+import { numberToHex } from '../../helpers/number';
 
 it('site is 3 hex', () => {
     const value =

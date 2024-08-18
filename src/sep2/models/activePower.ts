@@ -1,4 +1,4 @@
-import { safeParseIntString } from '../../number';
+import { safeParseIntString } from '../../helpers/number';
 import { assertString } from '../helpers/assert';
 
 // The active (real) power P (in W) is the product of root-mean-square (RMS) voltage, RMS current, and cos(theta) where theta is the phase angle of current relative to voltage. It is the primary measure of the rate of flow of energy.

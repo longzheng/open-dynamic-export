@@ -3,7 +3,7 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../number';
+} from '../../helpers/number';
 import type { SettingsModel } from '../models/settings';
 
 export function getSettingsMetrics(settings: SettingsModel) {

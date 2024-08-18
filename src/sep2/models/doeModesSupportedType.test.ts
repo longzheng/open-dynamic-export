@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { numberToHex } from '../../number';
+import { numberToHex } from '../../helpers/number';
 import { DOEModesSupportedType } from './doeModesSupportedType';
 
 it('value is expected', () => {

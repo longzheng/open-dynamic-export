@@ -1,5 +1,5 @@
-import { generateDeviceCertificate } from '../src/cert';
-import { getConfig } from '../src/config';
+import { generateDeviceCertificate } from '../src/helpers/cert';
+import { getConfig } from '../src/helpers/config';
 
 const config = getConfig();
 

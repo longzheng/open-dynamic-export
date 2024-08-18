@@ -1,15 +1,15 @@
-import type { ControlsModel } from '../sunspec/models/controls';
-import type { InverterModel } from '../sunspec/models/inverter';
-import type { MeterModel } from '../sunspec/models/meter';
+import type { ControlsModel } from '../../sunspec/models/controls';
+import type { InverterModel } from '../../sunspec/models/inverter';
+import type { MeterModel } from '../../sunspec/models/meter';
 import { generateMonitoringSample, type MonitoringSample } from './monitoring';
-import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
-import type { MeterSunSpecConnection } from '../sunspec/connection/meter';
-import { getAveragePowerRatio } from '../sunspec/helpers/controls';
+import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
+import type { MeterSunSpecConnection } from '../../sunspec/connection/meter';
+import { getAveragePowerRatio } from '../../sunspec/helpers/controls';
 import EventEmitter from 'events';
-import { logger as pinoLogger } from '../logger';
-import type { NameplateModel } from '../sunspec/models/nameplate';
-import type { SettingsModel } from '../sunspec/models/settings';
-import type { StatusModel } from '../sunspec/models/status';
+import { logger as pinoLogger } from '../../helpers/logger';
+import type { NameplateModel } from '../../sunspec/models/nameplate';
+import type { SettingsModel } from '../../sunspec/models/settings';
+import type { StatusModel } from '../../sunspec/models/status';
 
 const logger = pinoLogger.child({ module: 'sunspec-data-event-emitter' });
 

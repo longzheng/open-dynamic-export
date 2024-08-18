@@ -1,4 +1,4 @@
-import { assertNonNull } from '../../null';
+import { assertNonNull } from '../../helpers/null';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
@@ -6,7 +6,7 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../number';
+} from '../../helpers/number';
 import type { InverterModel } from '../models/inverter';
 import { getSitePhasesFromInverter } from './sitePhases';
 

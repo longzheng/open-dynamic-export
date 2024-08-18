@@ -1,4 +1,4 @@
-import { numberToHex } from '../../number';
+import { numberToHex } from '../../helpers/number';
 import type { CommodityType } from './commodityType';
 import type { DataQualifierType } from './dataQualifierType';
 import { dateToStringSeconds } from '../helpers/date';

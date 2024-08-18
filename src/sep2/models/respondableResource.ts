@@ -1,4 +1,4 @@
-import { stringHexToEnumType } from '../../enum';
+import { stringHexToEnumType } from '../../helpers/enum';
 import { assertString } from '../helpers/assert';
 import { parseResourceXmlObject, type Resource } from './resource';
 import { type ResponseRequiredType } from './responseRequired';

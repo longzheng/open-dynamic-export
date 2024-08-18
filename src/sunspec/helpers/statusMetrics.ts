@@ -2,7 +2,7 @@ import {
     numberWithPow10,
     sumBigIntArray,
     sumNumbersNullableArray,
-} from '../../number';
+} from '../../helpers/number';
 import type { StatusModel } from '../models/status';
 
 export function getStatusMetrics(status: StatusModel) {
