@@ -6,7 +6,7 @@ import {
     generateControlsModelWriteFromDynamicExportConfig,
 } from '../src/coordinator/helpers/dynamicExport';
 import type { DERControlBase } from '../src/sep2/models/derControlBase';
-import { SunSpecDataEventEmitter } from '../src/coordinator/helpers/sunspecDataEventEmitter';
+import { SunSpecDataHelper } from '../src/coordinator/helpers/sunspecData';
 import { logger } from '../src/helpers/logger';
 
 // This debugging script simulates dynamic export control (without actually sending commands to inverters)
@@ -26,7 +26,7 @@ const config = getConfig();
 const { invertersConnections, metersConnections } =
     getSunSpecConnections(config);
 
-const sunSpecDataEventEmitter = new SunSpecDataEventEmitter({
+const sunSpecDataEventEmitter = new SunSpecDataHelper({
     invertersConnections,
     metersConnections,
 });

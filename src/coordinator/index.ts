@@ -6,7 +6,7 @@ import {
     calculateDynamicExportConfig,
     generateControlsModelWriteFromDynamicExportConfig,
 } from './helpers/dynamicExport';
-import { SunSpecDataEventEmitter } from './helpers/sunspecDataEventEmitter';
+import { SunSpecDataHelper } from './helpers/sunspecData';
 import { logger as pinoLogger } from '../helpers/logger';
 import { TimeHelper } from '../sep2/helpers/time';
 import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
@@ -23,7 +23,7 @@ const { sep2Cert, sep2Key } = getConfigSep2CertKey(config);
 const { invertersConnections, metersConnections } =
     getSunSpecConnections(config);
 
-const sunSpecDataEventEmitter = new SunSpecDataEventEmitter({
+const sunSpecDataEventEmitter = new SunSpecDataHelper({
     invertersConnections,
     metersConnections,
 });

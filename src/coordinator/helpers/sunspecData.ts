@@ -11,9 +11,9 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import type { StatusModel } from '../../sunspec/models/status';
 
-const logger = pinoLogger.child({ module: 'sunspec-data-event-emitter' });
+const logger = pinoLogger.child({ module: 'SunSpecDataHelper' });
 
-export class SunSpecDataEventEmitter extends EventEmitter<{
+export class SunSpecDataHelper extends EventEmitter<{
     data: [
         {
             invertersData: {
