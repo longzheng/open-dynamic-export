@@ -89,3 +89,7 @@ export function convertNumberToBaseAndPow10Exponent(number: number): {
 export function sumBigIntArray(numbers: bigint[]) {
     return numbers.reduce((acc, number) => number + acc, BigInt(0));
 }
+
+export function randomNumber(min: number, max: number) {
+    return Math.random() * (max - min) + min;
+}

@@ -14,6 +14,7 @@ import { DerListHelper } from '../sep2/helpers/derList';
 import { DerHelper } from '../sep2/helpers/der';
 import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList';
 import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAssignmentsList';
+import { DerControlsHelper } from '../sep2/helpers/derControls';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -52,6 +53,10 @@ const functionSetAssignmentsListHelper = new FunctionSetAssignmentsListHelper({
 });
 const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
     client: sep2Client,
+});
+const derControlsHelper = new DerControlsHelper({
+    client: sep2Client,
+    eligibleControls: ['opModEnergize', 'opModExpLimW', 'opModGenLimW'],
 });
 
 function main() {
@@ -108,6 +113,8 @@ function main() {
                 { functionSetAssignmentsList },
                 'Received SEP2 function set assignments list',
             );
+
+            derControlsHelper.updateFsaData(functionSetAssignmentsList);
         },
     );
 
