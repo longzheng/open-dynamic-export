@@ -1,3 +1,4 @@
+import { enumHasValue } from '../../helpers/enum';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number';
 import { ConnectStatus } from '../../sep2/models/connectStatus';
 import type { DERCapability } from '../../sep2/models/derCapability';
@@ -95,10 +96,12 @@ export function getDerStatusResponseFromSunSpecArray(
 ): DERStatus {
     const metrics = getAggregatedStatusMetrics(statusModels);
     const now = new Date();
-    const operationalModeStatus: OperationalModeStatus =
-        (metrics.PVConn & PVConn.OPERATING) !== 0
-            ? OperationalModeStatus.OperationalMode
-            : OperationalModeStatus.Off;
+    const operationalModeStatus: OperationalModeStatus = enumHasValue(
+        metrics.PVConn,
+        PVConn.OPERATING,
+    )
+        ? OperationalModeStatus.OperationalMode
+        : OperationalModeStatus.Off;
     const genConnectStatus: ConnectStatus = getConnectStatusFromPVConn(
         metrics.PVConn,
     );

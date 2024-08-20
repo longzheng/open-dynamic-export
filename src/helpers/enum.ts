@@ -36,3 +36,10 @@ export function safeParseStringToEnumType<T extends EnumType>(
 
     return enumObject[enumName];
 }
+
+export function enumHasValue<T extends number>(
+    enumValue: T,
+    value: T,
+): boolean {
+    return (enumValue & value) !== 0;
+}
