@@ -13,6 +13,8 @@ export type DERControlBase = {
     opModLoadLimW?: ActivePower;
     // energize
     opModEnergize?: boolean;
+    // connect
+    opModConnect?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,13 +32,13 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
     const opModLoadLimW = parseLimitWattsXmlObjectOptional(
         xmlObject['ns2:opModLoadLimW'],
     );
-    const opModEnergizeXmlObject = xmlObject['opModEnergize'];
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-
-    const opModEnergize = opModEnergizeXmlObject
-        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          stringToBoolean(assertString(opModEnergizeXmlObject[0]))
+    const opModEnergize = xmlObject['opModEnergize']
+        ? stringToBoolean(assertString(xmlObject['opModEnergize'][0]))
         : undefined;
+    const opModConnect = xmlObject['opModConnect']
+        ? stringToBoolean(assertString(xmlObject['opModConnect'][0]))
+        : undefined;
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
     return {
         opModImpLimW,
@@ -44,6 +46,7 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
         opModGenLimW,
         opModLoadLimW,
         opModEnergize,
+        opModConnect,
     };
 }
 

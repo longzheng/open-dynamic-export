@@ -22,6 +22,7 @@ it('should parse DERControlBase XML from DefaultDERControl', async () => {
     expect(derControlBase.opModGenLimW).toBe(undefined);
     expect(derControlBase.opModLoadLimW).toBe(undefined);
     expect(derControlBase.opModEnergize).toBe(true);
+    expect(derControlBase.opModConnect).toBe(undefined);
 });
 
 it('should parse DERControlBase XML from DERControlList', async () => {
@@ -43,4 +44,5 @@ it('should parse DERControlBase XML from DERControlList', async () => {
     expect(derControlBase.opModGenLimW?.value).toBe(3);
     expect(derControlBase.opModLoadLimW?.value).toBe(3);
     expect(derControlBase.opModEnergize).toBe(undefined);
+    expect(derControlBase.opModConnect).toBe(undefined);
 });
