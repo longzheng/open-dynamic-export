@@ -90,6 +90,8 @@ export class ControlSchedulerHelper<
             controls: controlsOfType,
         });
 
+        // TODO: randomization of schedules
+
         const activeControlSchedule = this.findActiveScheduleForNow();
 
         if (
