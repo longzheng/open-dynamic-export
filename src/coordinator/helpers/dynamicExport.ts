@@ -11,6 +11,7 @@ import { Conn, type ControlsModelWrite } from '../../sunspec/models/controls';
 import type { DERControlBase } from '../../sep2/models/derControlBase';
 import { numberWithPow10 } from '../../helpers/number';
 import { logger as pinoLogger } from '../../helpers/logger';
+import { getAveragePowerRatio } from '../../sunspec/helpers/controls';
 
 const logger = pinoLogger.child({ module: 'dynamic-export' });
 
@@ -84,12 +85,12 @@ type DynamicExportConfig =
 
 export function calculateDynamicExportConfig({
     activeDerControlBase,
+    inverterControlsData,
     monitoringSample,
-    currentAveragePowerRatio,
 }: {
     activeDerControlBase: DERControlBase | null;
+    inverterControlsData: ControlsModel[];
     monitoringSample: MonitoringSample;
-    currentAveragePowerRatio: number;
 }): DynamicExportConfig {
     if (activeDerControlBase?.opModEnergize === false) {
         return { type: 'deenergize' };
@@ -115,6 +116,8 @@ export function calculateDynamicExportConfig({
         siteWatts,
         solarWatts,
     });
+
+    const currentAveragePowerRatio = getAveragePowerRatio(inverterControlsData);
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         currentPowerRatio: currentAveragePowerRatio,

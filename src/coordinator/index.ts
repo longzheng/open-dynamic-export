@@ -161,7 +161,7 @@ function main() {
 
     sunSpecDataEventEmitter.on(
         'data',
-        ({ invertersData, monitoringSample, currentAveragePowerRatio }) => {
+        ({ invertersData, monitoringSample }) => {
             void (async () => {
                 derHelper.onInverterData(invertersData);
                 mirrorUsagePointListHelper.addSample(monitoringSample);
@@ -169,8 +169,10 @@ function main() {
                 const dynamicExportConfig = calculateDynamicExportConfig({
                     activeDerControlBase: null, // TODO get active DER control base
                     // exportControl: exportLimitControlScheduler.getActiveScheduleDerControlBaseValue()
+                    inverterControlsData: invertersData.map(
+                        ({ controls }) => controls,
+                    ),
                     monitoringSample,
-                    currentAveragePowerRatio,
                 });
 
                 // TODO: set dynamic export value

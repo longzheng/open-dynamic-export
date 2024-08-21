@@ -4,7 +4,6 @@ import type { MeterModel } from '../../sunspec/models/meter';
 import { generateMonitoringSample, type MonitoringSample } from './monitoring';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../../sunspec/connection/meter';
-import { getAveragePowerRatio } from '../../sunspec/helpers/controls';
 import EventEmitter from 'events';
 import { logger as pinoLogger } from '../../helpers/logger';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
@@ -27,7 +26,6 @@ export class SunSpecDataHelper extends EventEmitter<{
                 meter: MeterModel;
             }[];
             monitoringSample: MonitoringSample;
-            currentAveragePowerRatio: number;
         },
     ];
 }> {
@@ -88,20 +86,10 @@ export class SunSpecDataHelper extends EventEmitter<{
 
             logger.trace({ monitoringSample }, 'generated monitoring sample');
 
-            // calculate current average inverter power ratio
-            const currentAveragePowerRatio = getAveragePowerRatio(
-                invertersData.map(({ controls }) => controls),
-            );
-
-            logger.trace(
-                `current average power ratio: ${currentAveragePowerRatio}`,
-            );
-
             this.emit('data', {
                 invertersData,
                 metersData,
                 monitoringSample,
-                currentAveragePowerRatio,
             });
         } catch (error) {
             logger.error({ error }, 'Failed to fetch SunSpec data');
