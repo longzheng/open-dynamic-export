@@ -14,6 +14,13 @@ import { logger as pinoLogger } from '../../helpers/logger';
 
 const logger = pinoLogger.child({ module: 'dynamic-export' });
 
+const defaultValues = {
+    opModExpLimW: 0,
+    opModImpLimW: 0,
+    opModEnergize: true,
+    opModConnect: true,
+};
+
 export function generateControlsModelWriteFromDynamicExportConfig({
     config,
     controlsModel,
@@ -101,7 +108,7 @@ export function calculateDynamicExportConfig({
               activeDerControlBase.opModExpLimW.multiplier,
           )
         : // fallback to universal default of 1500W
-          1500;
+          defaultValues.opModExpLimW;
 
     const targetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,

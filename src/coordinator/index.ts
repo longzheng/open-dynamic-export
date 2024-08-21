@@ -15,6 +15,7 @@ import { DerHelper } from '../sep2/helpers/der';
 import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList';
 import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAssignmentsList';
 import { DerControlsHelper } from '../sep2/helpers/derControls';
+import { ControlSchedulerHelper } from '../sep2/helpers/controlScheduler';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -54,9 +55,29 @@ const functionSetAssignmentsListHelper = new FunctionSetAssignmentsListHelper({
 const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
     client: sep2Client,
 });
+
+const exportLimitControlScheduler = new ControlSchedulerHelper({
+    client: sep2Client,
+    controlType: 'opModExpLimW',
+}).on('changed', (data) => {
+    // TODO immediately apply to inverter
+
+    switch (data.type) {
+        case 'schedule': {
+            data.onStart();
+            break;
+        }
+        case 'fallback':
+            break;
+    }
+});
+
 const derControlsHelper = new DerControlsHelper({
     client: sep2Client,
-    eligibleControls: ['opModEnergize', 'opModExpLimW', 'opModGenLimW'],
+}).on('data', (data) => {
+    logger.info(data, 'DER controls data changed');
+
+    exportLimitControlScheduler.updateControlsData(data);
 });
 
 function main() {
@@ -147,6 +168,7 @@ function main() {
 
                 const dynamicExportConfig = calculateDynamicExportConfig({
                     activeDerControlBase: null, // TODO get active DER control base
+                    // exportControl: exportLimitControlScheduler.getActiveScheduleDerControlBaseValue()
                     monitoringSample,
                     currentAveragePowerRatio,
                 });
