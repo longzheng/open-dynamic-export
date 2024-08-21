@@ -16,8 +16,10 @@ import { getAveragePowerRatio } from '../../sunspec/helpers/controls';
 const logger = pinoLogger.child({ module: 'dynamic-export' });
 
 const defaultValues = {
-    opModExpLimW: 0,
-    opModImpLimW: 0,
+    opModGenLimW: null,
+    opModLoadLimW: null,
+    opModExpLimW: 1500,
+    opModImpLimW: 1500,
     opModEnergize: true,
     opModConnect: true,
 };
