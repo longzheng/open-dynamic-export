@@ -130,8 +130,11 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy0,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:06Z'),
-                duration: 4,
+                interval: {
+                    start: new Date('2024-01-01T00:00:06Z'),
+                    duration: 4,
+                },
+
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -165,8 +168,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy0,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:06Z'),
-                duration: 4,
+                interval: {
+                    start: new Date('2024-01-01T00:00:06Z'),
+                    duration: 4,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -184,8 +189,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy1,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:10Z'),
-                duration: 5,
+                interval: {
+                    start: new Date('2024-01-01T00:00:10Z'),
+                    duration: 5,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -203,8 +210,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy0,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:20Z'),
-                duration: 5,
+                interval: {
+                    start: new Date('2024-01-01T00:00:20Z'),
+                    duration: 5,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -254,8 +263,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy2,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:00Z'),
-                duration: 10,
+                interval: {
+                    start: new Date('2024-01-01T00:00:00Z'),
+                    duration: 10,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -273,8 +284,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy1,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:02Z'),
-                duration: 2,
+                interval: {
+                    start: new Date('2024-01-01T00:00:02Z'),
+                    duration: 2,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -292,8 +305,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy0,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:03Z'),
-                duration: 3,
+                interval: {
+                    start: new Date('2024-01-01T00:00:03Z'),
+                    duration: 3,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,
@@ -311,8 +326,10 @@ describe('generateControlsSchedule', () => {
             fsa,
             program: programPrimacy1,
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:05Z'),
-                duration: 2,
+                interval: {
+                    start: new Date('2024-01-01T00:00:05Z'),
+                    duration: 2,
+                },
                 derControlBase: {
                     opModImpLimW: {
                         value: 0,

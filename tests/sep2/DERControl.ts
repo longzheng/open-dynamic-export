@@ -7,13 +7,16 @@ import type { DERControlBase } from '../../src/sep2/models/derControlBase';
 export function generateMockDERControl({
     creationTime,
     derControlBase,
-    intervalStart,
-    duration,
+    interval,
+    eventStatus,
 }: {
     creationTime?: Date;
     derControlBase?: DERControlBase;
-    intervalStart?: Date;
-    duration?: number;
+    interval?: {
+        start?: Date;
+        duration?: number;
+    };
+    eventStatus?: { currentStatus?: CurrentStatus };
 }): DERControl {
     const mrid = randomUUID();
 
@@ -28,11 +31,12 @@ export function generateMockDERControl({
         replyToHref: '/api/v2/rsps/res-ms/rsp',
         version: 0,
         interval: {
-            start: intervalStart ?? new Date(),
-            duration: duration ?? 1800,
+            start: interval?.start ?? new Date(),
+            duration: interval?.duration ?? 1800,
         },
         eventStatus: {
-            currentStatus: CurrentStatus.Scheduled,
+            currentStatus:
+                eventStatus?.currentStatus ?? CurrentStatus.Scheduled,
             dateTime: new Date(),
             potentiallySuperseded: false,
             potentiallySupersededTime: new Date(),

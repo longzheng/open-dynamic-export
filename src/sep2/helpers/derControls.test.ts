@@ -7,10 +7,10 @@ import {
     sortMergedControlsDataByStartTimeAscending,
 } from './derControls';
 import { CurrentStatus } from '../models/eventStatus';
-import { ResponseRequiredType } from '../models/responseRequired';
 import { generateMockDERControl } from '../../../tests/sep2/DERControl';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments';
+import type { DERControl } from '../models/derControl';
 
 const sep2Client = new SEP2Client({
     sep2Config: {
@@ -39,47 +39,117 @@ describe('DerControlsHelper', () => {
                 functionSetAssignments: generateMockFunctionSetAssignments({}),
                 derProgramList: [
                     {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
                         program: generateMockDERProgram({}),
                         derControls: [
-                            {
-                                href: '/api/v2/derp/TESTPRG2/derc/DB71668E668F4EC9BABAA70AC8598B7D',
-                                replyToHref: '/api/v2/rsps/res-ms/rsp',
-                                responseRequired:
-                                    ResponseRequiredType.MessageReceived |
-                                    ResponseRequiredType.SpecificResponse,
-                                subscribable: false,
-                                description: undefined,
-                                mRID: 'DERC A',
-                                version: 0,
-                                creationTime: new Date('2024-01-01T00:00:00Z'),
-                                interval: {
-                                    start: new Date('2024-01-01T00:00:06Z'),
-                                    duration: 3,
-                                },
+                            generateMockDERControl({
                                 eventStatus: {
                                     currentStatus: CurrentStatus.Scheduled,
-                                    dateTime: new Date('2024-01-01T00:00:00Z'),
-                                    potentiallySuperseded: false,
-                                    potentiallySupersededTime: new Date(
-                                        '2024-01-01T00:00:00Z',
-                                    ),
-                                    reason: '',
                                 },
-                                randomizeStart: undefined,
-                                randomizeDuration: undefined,
-                                derControlBase: {
-                                    opModImpLimW: {
-                                        value: 0,
-                                        multiplier: 0,
-                                    },
-                                    opModExpLimW: {
-                                        value: 0,
-                                        multiplier: 0,
-                                    },
-                                },
-                            },
+                                derControlBase: {},
+                            }),
                         ],
+                        defaultDerControl: undefined,
+                    },
+                ],
+            },
+        ]);
+
+        expect(respondDerControlSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not respond to existing DERControls unchanged status', () => {
+        const derControlsHelper = new DerControlsHelper({
+            client: sep2Client,
+        });
+
+        const control1 = generateMockDERControl({
+            eventStatus: {
+                currentStatus: CurrentStatus.Scheduled,
+            },
+            derControlBase: {},
+        });
+
+        derControlsHelper.updateFsaData([
+            {
+                functionSetAssignments: generateMockFunctionSetAssignments({}),
+                derProgramList: [
+                    {
+                        program: generateMockDERProgram({}),
+                        derControls: [control1],
+                        defaultDerControl: undefined,
+                    },
+                ],
+            },
+        ]);
+
+        const respondDerControlSpy = vi.spyOn(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+            (derControlsHelper as any).derControlResponseHelper,
+            'respondDerControl',
+        );
+
+        derControlsHelper.updateFsaData([
+            {
+                functionSetAssignments: generateMockFunctionSetAssignments({}),
+                derProgramList: [
+                    {
+                        program: generateMockDERProgram({}),
+                        derControls: [control1],
+                        defaultDerControl: undefined,
+                    },
+                ],
+            },
+        ]);
+
+        expect(respondDerControlSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should respond to existing DERControls changed status', () => {
+        const derControlsHelper = new DerControlsHelper({
+            client: sep2Client,
+        });
+
+        const control1 = generateMockDERControl({
+            eventStatus: {
+                currentStatus: CurrentStatus.Scheduled,
+            },
+            derControlBase: {},
+        });
+
+        derControlsHelper.updateFsaData([
+            {
+                functionSetAssignments: generateMockFunctionSetAssignments({}),
+                derProgramList: [
+                    {
+                        program: generateMockDERProgram({}),
+                        derControls: [control1],
+                        defaultDerControl: undefined,
+                    },
+                ],
+            },
+        ]);
+
+        const respondDerControlSpy = vi.spyOn(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+            (derControlsHelper as any).derControlResponseHelper,
+            'respondDerControl',
+        );
+
+        const control1Cancelled: DERControl = {
+            ...control1,
+            eventStatus: {
+                ...control1.eventStatus,
+                currentStatus: CurrentStatus.Cancelled,
+            },
+        };
+
+        derControlsHelper.updateFsaData([
+            {
+                functionSetAssignments: generateMockFunctionSetAssignments({}),
+                derProgramList: [
+                    {
+                        program: generateMockDERProgram({}),
+                        derControls: [control1Cancelled],
                         defaultDerControl: undefined,
                     },
                 ],
@@ -96,7 +166,7 @@ describe('sortMergedControlsDataByStartTimeAscending', () => {
             fsa: generateMockFunctionSetAssignments({}),
             program: generateMockDERProgram({}),
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:06Z'),
+                interval: { start: new Date('2024-01-01T00:00:06Z') },
             }),
         };
 
@@ -104,7 +174,7 @@ describe('sortMergedControlsDataByStartTimeAscending', () => {
             fsa: generateMockFunctionSetAssignments({}),
             program: generateMockDERProgram({}),
             control: generateMockDERControl({
-                intervalStart: new Date('2024-01-01T00:00:03Z'),
+                interval: { start: new Date('2024-01-01T00:00:03Z') },
             }),
         };
 
