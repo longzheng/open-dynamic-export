@@ -154,7 +154,7 @@ export class InverterController {
     private async updateInverterControlValues() {
         if (!this.cachedInvertersData) {
             this.logger.warn(
-                'Inverter data is not avaialble, cannot update inverter controls',
+                'Inverter data is not cached, cannot update inverter controls yet. Wait for next loop.',
             );
             return;
         }
