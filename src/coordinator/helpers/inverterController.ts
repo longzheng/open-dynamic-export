@@ -81,25 +81,45 @@ export class InverterController {
             opModExpLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModExpLimW',
-            }).on('changed', (data) => {
+            }).on('activeScheduleChanged', (data) => {
+                this.logger.debug(
+                    { data },
+                    'New active schedule for opModExpLimW',
+                );
+
                 void this.onControlSchedulerChanged(data);
             }),
             opModEnergize: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModEnergize',
-            }).on('changed', (data) => {
+            }).on('activeScheduleChanged', (data) => {
+                this.logger.debug(
+                    { data },
+                    'New active schedule for opModEnergize',
+                );
+
                 void this.onControlSchedulerChanged(data);
             }),
             opModConnect: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModConnect',
-            }).on('changed', (data) => {
+            }).on('activeScheduleChanged', (data) => {
+                this.logger.debug(
+                    { data },
+                    'New active schedule for opModConnect',
+                );
+
                 void this.onControlSchedulerChanged(data);
             }),
             opModGenLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModGenLimW',
-            }).on('changed', (data) => {
+            }).on('activeScheduleChanged', (data) => {
+                this.logger.debug(
+                    { data },
+                    'New active schedule for opModGenLimW',
+                );
+
                 void this.onControlSchedulerChanged(data);
             }),
         };

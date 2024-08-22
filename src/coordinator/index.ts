@@ -142,11 +142,14 @@ function main() {
         });
     });
 
-    logger.info('Starting SunSpec control loop');
-
     sunSpecDataEventEmitter.on(
         'data',
         ({ invertersData, monitoringSample }) => {
+            logger.trace(
+                { invertersData, monitoringSample },
+                'Received SunSpec data',
+            );
+
             derHelper.onInverterData(invertersData);
             mirrorUsagePointListHelper.addSample(monitoringSample);
             inverterController.updateSunSpecInverterData({

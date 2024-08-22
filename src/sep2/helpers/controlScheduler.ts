@@ -39,7 +39,7 @@ export type ChangedEventData =
 export class ControlSchedulerHelper<
     ControlKey extends ControlType,
 > extends EventEmitter<{
-    changed: [ChangedEventData];
+    activeScheduleChanged: [ChangedEventData];
 }> {
     private client: SEP2Client;
     private derControlResponseHelper: DerControlResponseHelper;
@@ -69,7 +69,10 @@ export class ControlSchedulerHelper<
         this.derControlResponseHelper = new DerControlResponseHelper({
             client,
         });
-        this.logger = pinoLogger.child({ module: 'ControlSchedulerHelper' });
+        this.logger = pinoLogger.child({
+            module: 'ControlSchedulerHelper',
+            controlType,
+        });
     }
 
     updateControlsData(data: DerControlsHelperChangedData) {
@@ -90,16 +93,38 @@ export class ControlSchedulerHelper<
             controls: controlsOfType,
         });
 
+        this.logger.debug(
+            { controlSchedules: this.controlSchedules },
+            'Updated control schedules',
+        );
+
         // TODO: randomization of schedules
 
-        const activeControlSchedule = this.findActiveScheduleForNow();
+        // there is a chance of a race condition between SEP2 DerControls data being updated
+        // and the control schedule ending
+        // check if the active control is ending in the next 5 seconds, if so just let it run its course
+        const activeControlEndingMilliseconds = this.activeControlSchedule
+            ? this.activeControlSchedule.controlSchedule.end.getTime() -
+              new Date().getTime()
+            : null;
+        if (
+            activeControlEndingMilliseconds &&
+            activeControlEndingMilliseconds < 5000
+        ) {
+            this.logger.info(
+                { activeControlEndingMilliseconds },
+                'Active control schedule ending soon, waiting for it to complete',
+            );
+            return;
+        }
 
+        const activeControlSchedule = this.findActiveScheduleForNow();
         if (
             activeControlSchedule?.data.control.mRID !==
             this.activeControlSchedule?.controlSchedule.data.control.mRID
         ) {
             this.emit(
-                'changed',
+                'activeScheduleChanged',
                 this.getChangedEventData(activeControlSchedule),
             );
         }
@@ -123,6 +148,11 @@ export class ControlSchedulerHelper<
 
     private getOnCompleteTimer(controlSchedule: ControlSchedule) {
         return setTimeout(() => {
+            this.logger.info(
+                { controlSchedule },
+                'Active control schedule completed',
+            );
+
             // respond to
             void this.derControlResponseHelper.respondDerControl({
                 derControl: controlSchedule.data.control,
@@ -138,7 +168,10 @@ export class ControlSchedulerHelper<
 
             const activeSchedule = this.findActiveScheduleForNow();
 
-            this.emit('changed', this.getChangedEventData(activeSchedule));
+            this.emit(
+                'activeScheduleChanged',
+                this.getChangedEventData(activeSchedule),
+            );
         }, controlSchedule.end.getTime() - new Date().getTime());
     }
 
@@ -169,12 +202,17 @@ export class ControlSchedulerHelper<
     }
 
     private onActiveScheduleStarted(controlSchedule: ControlSchedule) {
-        // ignore if this is the same schedule as the active one
-        if (this.activeControlSchedule?.controlSchedule === controlSchedule) {
-            return;
-        }
+        this.logger.info(
+            { controlSchedule },
+            'Active control schedule started',
+        );
 
         if (this.activeControlSchedule) {
+            this.logger.info(
+                { activeControlSchedule: this.activeControlSchedule },
+                'Aborting existing active control schedule',
+            );
+
             // aborted early
             // stop the existing onCompleteTimer scheduled for when the event was suppose to stop
             clearTimeout(this.activeControlSchedule.onCompleteTimer);
