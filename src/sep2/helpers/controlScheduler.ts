@@ -111,7 +111,7 @@ export class ControlSchedulerHelper<
             activeControlEndingMilliseconds &&
             activeControlEndingMilliseconds < 5000
         ) {
-            this.logger.info(
+            this.logger.debug(
                 { activeControlEndingMilliseconds },
                 'Active control schedule ending soon, waiting for it to complete',
             );
@@ -123,7 +123,7 @@ export class ControlSchedulerHelper<
             newActiveControlSchedule?.data.control.mRID !==
             this.activeControlSchedule?.controlSchedule.data.control.mRID
         ) {
-            this.logger.info(
+            this.logger.debug(
                 {
                     newActiveControlSchedule,
                     currentActiveControlSchedule: this.activeControlSchedule,
@@ -177,7 +177,7 @@ export class ControlSchedulerHelper<
 
             const newActiveSchedule = this.findActiveScheduleForNow();
 
-            this.logger.info(
+            this.logger.debug(
                 {
                     newActiveSchedule,
                 },

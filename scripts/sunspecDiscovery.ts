@@ -42,13 +42,13 @@ void (async () => {
             const modelLength = response.data[1]!;
 
             if (modelId === 0xffff && modelLength === 0) {
-                inverterLogger.info('End of model list');
+                inverterLogger.trace('End of model list');
                 break;
             }
 
-            inverterLogger.info(
+            inverterLogger.trace(
                 { modelId, currentAddress, modelLength },
-                `Found model`,
+                `Found inverter model`,
             );
 
             // Move to the next model's address
@@ -76,13 +76,13 @@ void (async () => {
             const modelLength = response.data[1]!;
 
             if (modelId === 0xffff && modelLength === 0) {
-                meterLogger.info('End of model list');
+                meterLogger.trace('End of model list');
                 break;
             }
 
-            meterLogger.info(
+            meterLogger.trace(
                 { modelId, currentAddress, modelLength },
-                `Found model`,
+                `Found meter model`,
             );
 
             // Move to the next model's address

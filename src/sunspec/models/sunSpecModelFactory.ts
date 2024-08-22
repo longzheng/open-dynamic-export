@@ -74,6 +74,8 @@ export function sunSpecModelFactory<
                 registerValues,
             );
 
+            logger.trace('Wrote registers');
+
             logger.trace({ registerValues }, 'Validating written registers');
 
             const registers =
@@ -81,8 +83,6 @@ export function sunSpecModelFactory<
                     address.start,
                     address.length,
                 );
-
-            logger.trace({ registers }, 'Read registers');
 
             // confirm the registers were written correctly
             const writtenValues = convertReadRegisters({
@@ -102,6 +102,8 @@ export function sunSpecModelFactory<
                     );
                 }
             });
+
+            logger.trace('Validated written registers');
         },
     };
 }

@@ -185,7 +185,7 @@ export abstract class SunSpecConnection {
     private async scanModelAddresses(): Promise<Map<number, ModelAddress>> {
         await this.connect();
 
-        this.logger.info(`Scanning SunSpec models for SunSpec Modbus client`);
+        this.logger.debug(`Scanning SunSpec models for SunSpec Modbus client`);
 
         // 40002 is a well-known base address
         let currentAddress = 40000;
@@ -240,7 +240,7 @@ export abstract class SunSpecConnection {
 
         const modelIds = Array.from(modelAddressById.keys());
 
-        this.logger.info(
+        this.logger.debug(
             {
                 count: modelIds.length,
                 modelIds,

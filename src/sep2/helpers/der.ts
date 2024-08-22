@@ -52,7 +52,7 @@ export class DerHelper {
     }
 
     configureDer(config: Config) {
-        this.logger.info({ config }, 'Updated DerHelper with config');
+        this.logger.debug({ config }, 'Updated DerHelper with config');
         this.config = config;
 
         if (!this.pollTimer) {
@@ -67,10 +67,16 @@ export class DerHelper {
             status: StatusModel;
         }[],
     ) {
-        this.logger.trace({ data }, 'onInverterData');
-
         const derCapability = getDerCapabilityResponseFromSunSpecArray(
             data.map((data) => data.nameplate),
+        );
+
+        this.logger.trace(
+            {
+                derCapability,
+                lastSentDerCapability: this.lastSentDerCapability,
+            },
+            'DER capability',
         );
 
         if (!deepEqual(derCapability, this.lastSentDerCapability)) {
@@ -83,6 +89,14 @@ export class DerHelper {
             data.map((data) => data.settings),
         );
 
+        this.logger.trace(
+            {
+                derSettings,
+                lastSentDerSettings: this.lastSentDerSettings,
+            },
+            'DER settings',
+        );
+
         if (!this.isDerSettingsEqual(derSettings, this.lastSentDerSettings)) {
             void this.putDerSettings({ derSettings });
 
@@ -93,6 +107,14 @@ export class DerHelper {
             data.map((data) => data.status),
         );
 
+        this.logger.trace(
+            {
+                derStatus,
+                lastSentDerStatus: this.lastSentDerStatus,
+            },
+            'DER status',
+        );
+
         if (!this.isDerStatusEqual(derStatus, this.lastSentDerStatus)) {
             void this.putDerStatus({ derStatus });
 
@@ -101,8 +123,6 @@ export class DerHelper {
     }
 
     private async poll() {
-        this.logger.debug('poll');
-
         this.pollTimer = setTimeout(
             () => {
                 void this.poll();
@@ -136,7 +156,7 @@ export class DerHelper {
         derCapability: DERCapability;
     }) {
         if (!this.config?.der) {
-            this.logger.info('DER not initialised, skipping postDerCapability');
+            this.logger.warn('DER not initialised, skipping postDerCapability');
 
             return;
         }
@@ -155,7 +175,7 @@ export class DerHelper {
         derSettings: DERSettings;
     }) {
         if (!this.config?.der) {
-            this.logger.info('DER not initialised, skipping postDerSettings');
+            this.logger.warn('DER not initialised, skipping postDerSettings');
 
             return;
         }
@@ -170,7 +190,7 @@ export class DerHelper {
 
     private async putDerStatus({ derStatus }: { derStatus: DERStatus }) {
         if (!this.config?.der) {
-            this.logger.info('DER not initialised, skipping postDerStatus');
+            this.logger.warn('DER not initialised, skipping postDerStatus');
 
             return;
         }

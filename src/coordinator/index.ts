@@ -60,14 +60,14 @@ const inverterController = new InverterController({
 const derControlsHelper = new DerControlsHelper({
     client: sep2Client,
 }).on('data', (data) => {
-    logger.info(data, 'DER controls data changed');
+    logger.debug(data, 'DER controls data changed');
 
     inverterController.updateSep2ControlsData(data);
 });
 
 function main() {
     endDeviceListHelper.on('data', (endDeviceList) => {
-        logger.info({ endDeviceList }, 'Received SEP2 end device list');
+        logger.debug({ endDeviceList }, 'Received SEP2 end device list');
 
         // as a direct client, we expect only one end device that matches the LFDI of our certificate
         const endDevice = endDeviceList.endDevices.find(
@@ -96,7 +96,7 @@ function main() {
     });
 
     derListHelper.on('data', (derList) => {
-        logger.info({ derList }, 'Received SEP2 end device DER list');
+        logger.debug({ derList }, 'Received SEP2 end device DER list');
 
         if (derList.ders.length !== 1) {
             throw new Error(
@@ -115,7 +115,7 @@ function main() {
     functionSetAssignmentsListHelper.on(
         'data',
         (functionSetAssignmentsList) => {
-            logger.info(
+            logger.debug(
                 { functionSetAssignmentsList },
                 'Received SEP2 function set assignments list',
             );
@@ -124,10 +124,10 @@ function main() {
         },
     );
 
-    logger.info('Discovering SEP2');
+    logger.debug('Discovering SEP2');
 
     sep2Client.discover().on('data', (deviceCapability) => {
-        logger.info({ deviceCapability }, 'Received SEP2 device capability');
+        logger.debug({ deviceCapability }, 'Received SEP2 device capability');
 
         timeHelper.updateHref({
             href: deviceCapability.timeLink.href,

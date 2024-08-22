@@ -52,7 +52,7 @@ export class DerControlResponseHelper {
 
         this.logger.debug(
             { derControl, response },
-            'respondReceivedDerControl',
+            'sending DER Control response',
         );
 
         const xml = objectToXml(response);

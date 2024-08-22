@@ -6,12 +6,15 @@ export const logger = pino({
         targets: [
             {
                 target: 'pino/file',
-                level: 'trace',
+                level: 'debug',
                 options: { destination: `app.log` },
             },
             {
                 target: 'pino-pretty',
-                level: 'debug',
+                level: 'info',
+                options: {
+                    singleLine: true,
+                },
             },
         ],
         options: {},

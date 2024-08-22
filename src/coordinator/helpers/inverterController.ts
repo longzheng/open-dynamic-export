@@ -167,12 +167,12 @@ export class InverterController {
             monitoringSample: this.cachedInvertersData.monitoringSample,
         });
 
-        this.logger.debug(
+        this.logger.info(
             {
                 activeDerControlBaseValues,
                 inverterConfiguration,
             },
-            'calculated inverterConfiguration',
+            'Updating inverter control values',
         );
 
         await Promise.all(
@@ -199,10 +199,6 @@ export class InverterController {
     }
 
     private async onControlSchedulerChanged(data: ChangedEventData) {
-        this.logger.debug(
-            'control schedule changed, updating inverter controls',
-        );
-
         await this.updateInverterControlValues();
 
         switch (data.type) {
@@ -240,7 +236,6 @@ export function calculateInverterConfiguration({
         activeDerControlBaseValues.opModConnect ?? defaultValues.opModConnect;
 
     if (energize === false || connect === false) {
-        logger.trace('return deenergize');
         return { type: 'deenergize' };
     }
 
@@ -294,7 +289,7 @@ export function calculateInverterConfiguration({
             currentAveragePowerRatio,
             targetSolarPowerRatio,
         },
-        'return limit',
+        'calculated values',
     );
 
     return {

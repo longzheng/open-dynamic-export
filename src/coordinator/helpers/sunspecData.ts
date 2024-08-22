@@ -49,8 +49,6 @@ export class SunSpecDataHelper extends EventEmitter<{
 
     async run() {
         try {
-            logger.trace('fetching data from inverter connections');
-
             // get necessary inverter data
             const invertersData = await Promise.all(
                 this.invertersConnections.map(async (inverter) => {
@@ -65,8 +63,6 @@ export class SunSpecDataHelper extends EventEmitter<{
             );
 
             logger.trace({ invertersData }, 'received inverters data');
-
-            logger.trace('fetching data from meters connections');
 
             // get necessary meter data
             const metersData = await Promise.all(
