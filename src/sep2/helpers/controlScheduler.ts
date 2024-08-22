@@ -160,7 +160,7 @@ export class ControlSchedulerHelper<
             });
 
             // remove schedule from list
-            this.controlSchedules.filter(
+            this.controlSchedules = this.controlSchedules.filter(
                 (schedule) =>
                     schedule.data.control.mRID !==
                     controlSchedule.data.control.mRID,
