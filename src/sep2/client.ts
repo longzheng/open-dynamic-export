@@ -63,6 +63,7 @@ export class SEP2Client {
             if (error instanceof AxiosError) {
                 throw new Error(
                     `SEP2Client GET error
+message: ${error.message}
 url: ${error.config?.url}
 response status: ${error.response?.status}
 response data: ${JSON.stringify(error.response?.data, null, 2)}`,
@@ -86,6 +87,7 @@ response data: ${JSON.stringify(error.response?.data, null, 2)}`,
             if (error instanceof AxiosError) {
                 throw new Error(
                     `SEP2Client POST error
+message: ${error.message}
 url: ${error.config?.url}
 request data: ${JSON.stringify(data, null, 2)}
 response status: ${error.response?.status}
@@ -111,6 +113,7 @@ response data: ${JSON.stringify(error.response?.data, null, 2)}`,
             if (error instanceof AxiosError) {
                 throw new Error(
                     `SEP2Client PUT error
+message: ${error.message}
 url: ${error.config?.url}
 request data: ${JSON.stringify(data, null, 2)}
 response status: ${error.response?.status}
