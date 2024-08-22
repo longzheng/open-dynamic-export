@@ -129,8 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-/cert.pem
-/key.pem
-/cert_req.csr
-/mica_*.pem
+/*.pem
+/*.csr
 /config*.json
