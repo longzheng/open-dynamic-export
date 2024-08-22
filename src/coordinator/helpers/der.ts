@@ -26,11 +26,11 @@ export function getDerCapabilityResponseFromSunSpecArray(
     return {
         // hard-coded modes
         modesSupported:
-            DERControlType.opModEnergize |
-            DERControlType.opModMaxLimW |
-            DERControlType.opModTargetW,
+            DERControlType.opModConnect | DERControlType.opModEnergize,
         // hard-coded DOE modes
-        doeModesSupported: DOEModesSupportedType.opModExpLimW,
+        doeModesSupported:
+            DOEModesSupportedType.opModExpLimW |
+            DOEModesSupportedType.opModGenLimW,
         // assume PV for now
         type: DERType.PhotovoltaicSystem,
         rtgMaxVA: {

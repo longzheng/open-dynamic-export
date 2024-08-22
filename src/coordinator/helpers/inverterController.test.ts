@@ -3,7 +3,7 @@ import {
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
     getWMaxLimPctFromTargetSolarPowerRatio,
-} from './dynamicExport';
+} from './inverterController';
 
 describe('calculateTargetSolarPowerRatio', () => {
     it('should calculate higher target ratio', () => {

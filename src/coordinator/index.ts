@@ -2,10 +2,6 @@ import 'dotenv/config';
 import { SEP2Client } from '../sep2/client';
 import { getConfig, getConfigSep2CertKey } from '../helpers/config';
 import { getSunSpecConnections } from '../sunspec/connections';
-import {
-    calculateDynamicExportConfig,
-    generateControlsModelWriteFromDynamicExportConfig,
-} from './helpers/dynamicExport';
 import { SunSpecDataHelper } from './helpers/sunspecData';
 import { logger as pinoLogger } from '../helpers/logger';
 import { TimeHelper } from '../sep2/helpers/time';
@@ -15,7 +11,7 @@ import { DerHelper } from '../sep2/helpers/der';
 import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList';
 import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAssignmentsList';
 import { DerControlsHelper } from '../sep2/helpers/derControls';
-import { ControlSchedulerHelper } from '../sep2/helpers/controlScheduler';
+import { InverterController } from './helpers/inverterController';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -55,21 +51,10 @@ const functionSetAssignmentsListHelper = new FunctionSetAssignmentsListHelper({
 const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
     client: sep2Client,
 });
-
-const exportLimitControlScheduler = new ControlSchedulerHelper({
+const inverterController = new InverterController({
     client: sep2Client,
-    controlType: 'opModExpLimW',
-}).on('changed', (data) => {
-    // TODO immediately apply to inverter
-
-    switch (data.type) {
-        case 'schedule': {
-            data.onStart();
-            break;
-        }
-        case 'fallback':
-            break;
-    }
+    invertersConnections,
+    applyControl: config.sunSpec.control,
 });
 
 const derControlsHelper = new DerControlsHelper({
@@ -77,7 +62,7 @@ const derControlsHelper = new DerControlsHelper({
 }).on('data', (data) => {
     logger.info(data, 'DER controls data changed');
 
-    exportLimitControlScheduler.updateControlsData(data);
+    inverterController.updateSep2ControlsData(data);
 });
 
 function main() {
@@ -162,42 +147,14 @@ function main() {
     sunSpecDataEventEmitter.on(
         'data',
         ({ invertersData, monitoringSample }) => {
-            void (async () => {
-                derHelper.onInverterData(invertersData);
-                mirrorUsagePointListHelper.addSample(monitoringSample);
-
-                const dynamicExportConfig = calculateDynamicExportConfig({
-                    activeDerControlBase: null, // TODO get active DER control base
-                    // exportControl: exportLimitControlScheduler.getActiveScheduleDerControlBaseValue()
-                    inverterControlsData: invertersData.map(
-                        ({ controls }) => controls,
-                    ),
-                    monitoringSample,
-                });
-
-                // TODO: set dynamic export value
-                await Promise.all(
-                    invertersConnections.map(async (inverter, index) => {
-                        const inverterData = invertersData[index];
-
-                        if (!inverterData) {
-                            throw new Error('Inverter data not found');
-                        }
-
-                        const writeControlsModel =
-                            generateControlsModelWriteFromDynamicExportConfig({
-                                config: dynamicExportConfig,
-                                controlsModel: inverterData.controls,
-                            });
-
-                        if (config.sunSpec.control) {
-                            await inverter.writeControlsModel(
-                                writeControlsModel,
-                            );
-                        }
-                    }),
-                );
-            })();
+            derHelper.onInverterData(invertersData);
+            mirrorUsagePointListHelper.addSample(monitoringSample);
+            inverterController.updateSunSpecInverterData({
+                inverterControlsData: invertersData.map(
+                    ({ controls }) => controls,
+                ),
+                monitoringSample,
+            });
         },
     );
 }

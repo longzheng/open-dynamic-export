@@ -1,12 +1,12 @@
 import pino from 'pino';
 
 export const logger = pino({
-    level: 'debug',
+    level: 'trace',
     transport: {
         targets: [
             {
                 target: 'pino/file',
-                level: 'debug',
+                level: 'trace',
                 options: { destination: `app.log` },
             },
             {

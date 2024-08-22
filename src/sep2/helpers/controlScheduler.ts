@@ -16,7 +16,7 @@ import {
 } from './derControl';
 import { CurrentStatus } from '../models/eventStatus';
 
-type ControlType = keyof DERControlBase;
+export type ControlType = keyof DERControlBase;
 
 type DERControlBaseValueOfType<ControlKey extends ControlType> =
     DERControlBase[ControlKey];
@@ -27,7 +27,7 @@ export type ControlSchedule = {
     data: MergedControlsData;
 };
 
-type ChangedEventData =
+export type ChangedEventData =
     | {
           type: 'schedule';
           onStart: () => void;
@@ -105,7 +105,7 @@ export class ControlSchedulerHelper<
         }
     }
 
-    public getActiveScheduleDerControlBaseValue(): DERControlBaseValueOfType<ControlKey> | null {
+    public getActiveScheduleDerControlBaseValue(): DERControlBaseValueOfType<ControlKey> {
         if (this.activeControlSchedule) {
             return this.activeControlSchedule.controlSchedule.data.control
                 .derControlBase[this.controlType];
@@ -117,7 +117,7 @@ export class ControlSchedulerHelper<
                     this.controlType
                 ];
             case 'none':
-                return null;
+                return undefined;
         }
     }
 

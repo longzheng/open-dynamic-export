@@ -50,10 +50,10 @@ describe('getDerCapabilityResponseFromSunSpecArray', () => {
 
         expect(result).toEqual({
             modesSupported:
-                DERControlType.opModEnergize |
-                DERControlType.opModMaxLimW |
-                DERControlType.opModTargetW,
-            doeModesSupported: DOEModesSupportedType.opModExpLimW,
+                DERControlType.opModEnergize | DERControlType.opModConnect,
+            doeModesSupported:
+                DOEModesSupportedType.opModExpLimW |
+                DOEModesSupportedType.opModGenLimW,
             type: DERType.PhotovoltaicSystem,
             rtgMaxVA: {
                 value: 5,
@@ -138,10 +138,10 @@ describe('getDerCapabilityResponseFromSunSpecArray', () => {
 
         expect(result).toEqual({
             modesSupported:
-                DERControlType.opModEnergize |
-                DERControlType.opModMaxLimW |
-                DERControlType.opModTargetW,
-            doeModesSupported: DOEModesSupportedType.opModExpLimW,
+                DERControlType.opModEnergize | DERControlType.opModConnect,
+            doeModesSupported:
+                DOEModesSupportedType.opModExpLimW |
+                DOEModesSupportedType.opModGenLimW,
             type: DERType.PhotovoltaicSystem,
             rtgMaxVA: {
                 value: 1,
