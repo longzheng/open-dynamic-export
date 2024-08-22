@@ -118,14 +118,21 @@ export class ControlSchedulerHelper<
             return;
         }
 
-        const activeControlSchedule = this.findActiveScheduleForNow();
+        const newActiveControlSchedule = this.findActiveScheduleForNow();
         if (
-            activeControlSchedule?.data.control.mRID !==
+            newActiveControlSchedule?.data.control.mRID !==
             this.activeControlSchedule?.controlSchedule.data.control.mRID
         ) {
+            this.logger.info(
+                {
+                    newActiveControlSchedule,
+                    currentActiveControlSchedule: this.activeControlSchedule,
+                },
+                'New schedule has different active schedule, trigger activeScheduleChanged',
+            );
             this.emit(
                 'activeScheduleChanged',
-                this.getChangedEventData(activeControlSchedule),
+                this.getChangedEventData(newActiveControlSchedule),
             );
         }
     }
@@ -166,22 +173,39 @@ export class ControlSchedulerHelper<
                     controlSchedule.data.control.mRID,
             );
 
-            const activeSchedule = this.findActiveScheduleForNow();
+            this.activeControlSchedule = null;
+
+            const newActiveSchedule = this.findActiveScheduleForNow();
+
+            this.logger.info(
+                {
+                    newActiveSchedule,
+                },
+                'Moving to next schedule, trigger activeScheduleChanged',
+            );
 
             this.emit(
                 'activeScheduleChanged',
-                this.getChangedEventData(activeSchedule),
+                this.getChangedEventData(newActiveSchedule),
             );
         }, controlSchedule.end.getTime() - new Date().getTime());
     }
 
     private findActiveScheduleForNow(): ControlSchedule | null {
-        return (
-            this.controlSchedules.find(
-                (control) =>
-                    control.start <= new Date() && control.end > new Date(),
-            ) ?? null
+        const nowSchedules = this.controlSchedules.filter(
+            (control) =>
+                control.start <= new Date() && control.end > new Date(),
         );
+
+        if (nowSchedules.length === 0) {
+            return null;
+        }
+
+        if (nowSchedules.length > 1) {
+            throw new Error('Multiple schedules found');
+        }
+
+        return nowSchedules[0]!;
     }
 
     private getChangedEventData(
@@ -278,10 +302,10 @@ export function generateControlsSchedule({
         );
     }
 
-    // build schedule from datetime events
+    // build schedule from datetime events from earliest to latest
     const sortedDatetimeEvents = Array.from(datetimeUniqueValues)
-        .map((value) => new Date(value))
-        .sort();
+        .sort()
+        .map((value) => new Date(value));
     for (let i = 0; i < sortedDatetimeEvents.length; i++) {
         const datetimeEvent = sortedDatetimeEvents[i]!;
         const nextdateTimeEvent = sortedDatetimeEvents[i + 1] ?? null;
