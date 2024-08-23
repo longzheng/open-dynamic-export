@@ -161,7 +161,7 @@ export class DerHelper {
             return;
         }
 
-        this.logger.debug({ derCapability }, 'putDerCapability');
+        this.logger.info({ derCapability }, 'Sending DER capability');
 
         const response = generateDerCapability(derCapability);
         const xml = objectToXml(response);
@@ -180,7 +180,7 @@ export class DerHelper {
             return;
         }
 
-        this.logger.debug({ derSettings }, 'putDerSettings');
+        this.logger.info({ derSettings }, 'Sending DER settings');
 
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
@@ -195,7 +195,7 @@ export class DerHelper {
             return;
         }
 
-        this.logger.debug({ derStatus }, 'putDerStatus');
+        this.logger.info({ derStatus }, 'Sending DER status');
 
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);

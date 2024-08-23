@@ -124,7 +124,7 @@ function main() {
         },
     );
 
-    logger.debug('Discovering SEP2');
+    logger.info('Discovering SEP2');
 
     sep2Client.discover().on('data', (deviceCapability) => {
         logger.debug({ deviceCapability }, 'Received SEP2 device capability');
