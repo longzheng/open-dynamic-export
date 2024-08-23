@@ -2,7 +2,6 @@ import type { Logger } from 'pino';
 import type { SEP2Client } from '../client';
 import { logger as pinoLogger } from '../../helpers/logger';
 import { ResponseStatus } from '../models/derControlResponse';
-import EventEmitter from 'events';
 import type { DERControlBase } from '../models/derControlBase';
 import type {
     DerControlsHelperChangedData,
@@ -27,20 +26,7 @@ export type ControlSchedule = {
     data: MergedControlsData;
 };
 
-export type ChangedEventData =
-    | {
-          type: 'schedule';
-          onStart: () => void;
-      }
-    | {
-          type: 'fallback';
-      };
-
-export class ControlSchedulerHelper<
-    ControlKey extends ControlType,
-> extends EventEmitter<{
-    activeScheduleChanged: [ChangedEventData];
-}> {
+export class ControlSchedulerHelper<ControlKey extends ControlType> {
     private client: SEP2Client;
     private derControlResponseHelper: DerControlResponseHelper;
     private logger: Logger;
@@ -49,11 +35,7 @@ export class ControlSchedulerHelper<
         type: 'none',
     };
     private controlSchedules: ControlSchedule[] = [];
-
-    private activeControlSchedule: {
-        controlSchedule: ControlSchedule;
-        onCompleteTimer: NodeJS.Timeout;
-    } | null = null;
+    private activeControlSchedule: ControlSchedule | null = null;
 
     constructor({
         client,
@@ -62,8 +44,6 @@ export class ControlSchedulerHelper<
         client: SEP2Client;
         controlType: ControlKey;
     }) {
-        super();
-
         this.client = client;
         this.controlType = controlType;
         this.derControlResponseHelper = new DerControlResponseHelper({
@@ -99,48 +79,99 @@ export class ControlSchedulerHelper<
         );
 
         // TODO: randomization of schedules
-
-        // there is a chance of a race condition between SEP2 DerControls data being updated
-        // and the control schedule ending
-        // check if the active control is ending in the next 5 seconds, if so just let it run its course
-        const activeControlEndingMilliseconds = this.activeControlSchedule
-            ? this.activeControlSchedule.controlSchedule.end.getTime() -
-              new Date().getTime()
-            : null;
-        if (
-            activeControlEndingMilliseconds &&
-            activeControlEndingMilliseconds < 5000
-        ) {
-            this.logger.debug(
-                { activeControlEndingMilliseconds },
-                'Active control schedule ending soon, waiting for it to complete',
-            );
-            return;
-        }
-
-        const newActiveControlSchedule = this.findActiveScheduleForNow();
-        if (
-            newActiveControlSchedule?.data.control.mRID !==
-            this.activeControlSchedule?.controlSchedule.data.control.mRID
-        ) {
-            this.logger.debug(
-                {
-                    newActiveControlSchedule,
-                    currentActiveControlSchedule: this.activeControlSchedule,
-                },
-                'New schedule has different active schedule, trigger activeScheduleChanged',
-            );
-            this.emit(
-                'activeScheduleChanged',
-                this.getChangedEventData(newActiveControlSchedule),
-            );
-        }
     }
 
     public getActiveScheduleDerControlBaseValue(): DERControlBaseValueOfType<ControlKey> {
+        // calculate the active control schedule from the schedule
+        const newActiveControlSchedule = this.findActiveControlScheduleForNow();
+
+        if (
+            this.activeControlSchedule?.data.control.mRID !==
+            newActiveControlSchedule?.data.control.mRID
+        ) {
+            // if the schedule should be changed
+            if (this.activeControlSchedule) {
+                const activeControlScheduleEnd = this.activeControlSchedule.end;
+                const activeControlScheduleEndedSuccessfully =
+                    activeControlScheduleEnd < new Date();
+
+                if (activeControlScheduleEndedSuccessfully) {
+                    this.logger.info(
+                        { activeControlSchedule: this.activeControlSchedule },
+                        'Active control schedule completed',
+                    );
+
+                    // send event completed response
+                    void this.derControlResponseHelper.respondDerControl({
+                        derControl: this.activeControlSchedule.data.control,
+                        status: ResponseStatus.EventCompleted,
+                    });
+                } else {
+                    this.logger.warn(
+                        { activeControlSchedule: this.activeControlSchedule },
+                        'Active control schedule aborted before end time',
+                    );
+
+                    // we don't need to worry about cancelled or superseded events here because they are handled by the DerControlsHelper
+                    // we only need to worry about aborted by another program
+                    if (
+                        newActiveControlSchedule &&
+                        this.activeControlSchedule.data.program.mRID !==
+                            newActiveControlSchedule.data.program.mRID
+                    ) {
+                        this.logger.warn(
+                            {
+                                activeControlScheduleProgramMrid:
+                                    this.activeControlSchedule.data.program
+                                        .mRID,
+                                newActiveControlScheduleProgramMrid:
+                                    newActiveControlSchedule.data.program.mRID,
+                            },
+                            'Active control schedule aborted by another program',
+                        );
+
+                        // send event aborted by another program response
+                        void this.derControlResponseHelper.respondDerControl({
+                            derControl: this.activeControlSchedule.data.control,
+                            status: ResponseStatus.EventAbortedProgram,
+                        });
+                    }
+                }
+
+                // remove the active control schedule from the schedule list
+                this.controlSchedules = this.controlSchedules.filter(
+                    (schedule) =>
+                        schedule.data.control.mRID !==
+                        this.activeControlSchedule?.data.control.mRID,
+                );
+            }
+
+            if (newActiveControlSchedule) {
+                this.logger.info(
+                    { newActiveControlSchedule },
+                    'Active control schedule started',
+                );
+
+                // send event started response
+                void this.derControlResponseHelper.respondDerControl({
+                    derControl: newActiveControlSchedule.data.control,
+                    status: ResponseStatus.EventStarted,
+                });
+            } else {
+                this.logger.info(
+                    { defaultControl: this.fallbackControl },
+                    'Default control started',
+                );
+            }
+
+            // set the new active control schedule
+            this.activeControlSchedule = newActiveControlSchedule;
+        }
+
         if (this.activeControlSchedule) {
-            return this.activeControlSchedule.controlSchedule.data.control
-                .derControlBase[this.controlType];
+            return this.activeControlSchedule.data.control.derControlBase[
+                this.controlType
+            ];
         }
 
         switch (this.fallbackControl.type) {
@@ -153,45 +184,7 @@ export class ControlSchedulerHelper<
         }
     }
 
-    private getOnCompleteTimer(controlSchedule: ControlSchedule) {
-        return setTimeout(() => {
-            this.logger.info(
-                { controlSchedule },
-                'Active control schedule completed',
-            );
-
-            // respond to
-            void this.derControlResponseHelper.respondDerControl({
-                derControl: controlSchedule.data.control,
-                status: ResponseStatus.EventCompleted,
-            });
-
-            // remove schedule from list
-            this.controlSchedules = this.controlSchedules.filter(
-                (schedule) =>
-                    schedule.data.control.mRID !==
-                    controlSchedule.data.control.mRID,
-            );
-
-            this.activeControlSchedule = null;
-
-            const newActiveSchedule = this.findActiveScheduleForNow();
-
-            this.logger.debug(
-                {
-                    newActiveSchedule,
-                },
-                'Moving to next schedule, trigger activeScheduleChanged',
-            );
-
-            this.emit(
-                'activeScheduleChanged',
-                this.getChangedEventData(newActiveSchedule),
-            );
-        }, controlSchedule.end.getTime() - new Date().getTime());
-    }
-
-    private findActiveScheduleForNow(): ControlSchedule | null {
+    private findActiveControlScheduleForNow(): ControlSchedule | null {
         const nowSchedules = this.controlSchedules.filter(
             (control) =>
                 control.start <= new Date() && control.end > new Date(),
@@ -206,64 +199,6 @@ export class ControlSchedulerHelper<
         }
 
         return nowSchedules[0]!;
-    }
-
-    private getChangedEventData(
-        activeSchedule: ControlSchedule | null,
-    ): ChangedEventData {
-        if (!activeSchedule) {
-            return {
-                type: 'fallback',
-            };
-        }
-
-        return {
-            type: 'schedule',
-            onStart: () => {
-                this.onActiveScheduleStarted(activeSchedule);
-            },
-        };
-    }
-
-    private onActiveScheduleStarted(controlSchedule: ControlSchedule) {
-        this.logger.info(
-            { controlSchedule },
-            'Active control schedule started',
-        );
-
-        if (this.activeControlSchedule) {
-            this.logger.info(
-                { activeControlSchedule: this.activeControlSchedule },
-                'Aborting existing active control schedule',
-            );
-
-            // aborted early
-            // stop the existing onCompleteTimer scheduled for when the event was suppose to stop
-            clearTimeout(this.activeControlSchedule.onCompleteTimer);
-
-            // if the new event is from a different program event, send a response
-            if (
-                this.activeControlSchedule.controlSchedule.data.program.mRID !==
-                controlSchedule.data.program.mRID
-            ) {
-                void this.derControlResponseHelper.respondDerControl({
-                    derControl:
-                        this.activeControlSchedule.controlSchedule.data.control,
-                    status: ResponseStatus.EventAbortedProgram,
-                });
-            }
-        }
-
-        // send event started response
-        void this.derControlResponseHelper.respondDerControl({
-            derControl: controlSchedule.data.control,
-            status: ResponseStatus.EventStarted,
-        });
-
-        this.activeControlSchedule = {
-            controlSchedule,
-            onCompleteTimer: this.getOnCompleteTimer(controlSchedule),
-        };
     }
 }
 

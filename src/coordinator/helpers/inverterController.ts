@@ -1,8 +1,5 @@
 import type { SEP2Client } from '../../sep2/client';
-import type {
-    ChangedEventData,
-    ControlType,
-} from '../../sep2/helpers/controlScheduler';
+import type { ControlType } from '../../sep2/helpers/controlScheduler';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler';
 import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls';
 import {
@@ -81,46 +78,18 @@ export class InverterController {
             opModExpLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModExpLimW',
-            }).on('activeScheduleChanged', (data) => {
-                this.logger.debug(
-                    { data },
-                    'New active schedule for opModExpLimW',
-                );
-
-                void this.onControlSchedulerChanged(data);
             }),
             opModEnergize: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModEnergize',
-            }).on('activeScheduleChanged', (data) => {
-                this.logger.debug(
-                    { data },
-                    'New active schedule for opModEnergize',
-                );
-
-                void this.onControlSchedulerChanged(data);
             }),
             opModConnect: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModConnect',
-            }).on('activeScheduleChanged', (data) => {
-                this.logger.debug(
-                    { data },
-                    'New active schedule for opModConnect',
-                );
-
-                void this.onControlSchedulerChanged(data);
             }),
             opModGenLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModGenLimW',
-            }).on('activeScheduleChanged', (data) => {
-                this.logger.debug(
-                    { data },
-                    'New active schedule for opModGenLimW',
-                );
-
-                void this.onControlSchedulerChanged(data);
             }),
         };
     }
@@ -129,6 +98,8 @@ export class InverterController {
         for (const scheduler of Object.values(this.schedulerByControlType)) {
             scheduler.updateControlsData(data);
         }
+
+        void this.updateInverterControlValues();
     }
 
     updateSunSpecInverterData(data: InvertersData) {
@@ -196,19 +167,6 @@ export class InverterController {
                 }
             }),
         );
-    }
-
-    private async onControlSchedulerChanged(data: ChangedEventData) {
-        await this.updateInverterControlValues();
-
-        switch (data.type) {
-            case 'schedule': {
-                data.onStart();
-                break;
-            }
-            case 'fallback':
-                break;
-        }
     }
 }
 
