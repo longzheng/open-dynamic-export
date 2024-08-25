@@ -1,13 +1,32 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ControlSchedule } from './controlScheduler';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type {
+    ControlSchedule,
+    RandomizedControlSchedule,
+} from './controlScheduler';
 import {
     generateControlsSchedule,
     filterControlsOfType,
+    getSortedUniqueDatetimesFromControls,
+    applyRandomizationToControlSchedule,
+    applyRandomizationToDatetime,
 } from './controlScheduler';
 import type { MergedControlsData } from './derControls';
 import { generateMockDERControl } from '../../../tests/sep2/DERControl';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments';
+import { randomInt } from 'crypto';
+
+vi.mock(import('crypto'), async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        randomInt: vi.fn(actual.randomInt),
+    };
+});
+
+beforeEach(() => {
+    vi.restoreAllMocks();
+});
 
 describe('filterControlsOfType', () => {
     it('should return controls of type', () => {
@@ -99,10 +118,6 @@ describe('filterControlsOfType', () => {
 });
 
 describe('generateControlsSchedule', () => {
-    afterEach(() => {
-        vi.getRealSystemTime();
-    });
-
     const fsa = generateMockFunctionSetAssignments({});
 
     const programPrimacy0 = generateMockDERProgram({
@@ -119,7 +134,7 @@ describe('generateControlsSchedule', () => {
 
     it('should generate schedule from no controls', () => {
         const result = generateControlsSchedule({
-            controls: [],
+            activeOrScheduledControls: [],
         });
 
         expect(result).toStrictEqual([] satisfies ControlSchedule[]);
@@ -149,7 +164,7 @@ describe('generateControlsSchedule', () => {
         };
 
         const result = generateControlsSchedule({
-            controls: [controlA],
+            activeOrScheduledControls: [controlA],
         });
 
         expect(result.length).toStrictEqual(1);
@@ -157,10 +172,12 @@ describe('generateControlsSchedule', () => {
         expect(result[0]?.data.control.mRID).toStrictEqual(
             controlA.control.mRID,
         );
-        expect(result[0]?.start).toStrictEqual(
+        expect(result[0]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
-        expect(result[0]?.end).toStrictEqual(new Date('2024-01-01T00:00:10Z'));
+        expect(result[0]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:10Z'),
+        );
     });
 
     it('should generate schedule from multiple non-overlapping control', () => {
@@ -228,7 +245,7 @@ describe('generateControlsSchedule', () => {
         };
 
         const result = generateControlsSchedule({
-            controls: [controlA, controlB, controlC],
+            activeOrScheduledControls: [controlA, controlB, controlC],
         });
 
         expect(result.length).toStrictEqual(3);
@@ -236,26 +253,32 @@ describe('generateControlsSchedule', () => {
         expect(result[0]?.data.control.mRID).toStrictEqual(
             controlA.control.mRID,
         );
-        expect(result[0]?.start).toStrictEqual(
+        expect(result[0]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
-        expect(result[0]?.end).toStrictEqual(new Date('2024-01-01T00:00:10Z'));
+        expect(result[0]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:10Z'),
+        );
 
         expect(result[1]?.data.control.mRID).toStrictEqual(
             controlB.control.mRID,
         );
-        expect(result[1]?.start).toStrictEqual(
+        expect(result[1]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:10Z'),
         );
-        expect(result[1]?.end).toStrictEqual(new Date('2024-01-01T00:00:15Z'));
+        expect(result[1]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:15Z'),
+        );
 
         expect(result[2]?.data.control.mRID).toStrictEqual(
             controlC.control.mRID,
         );
-        expect(result[2]?.start).toStrictEqual(
+        expect(result[2]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:20Z'),
         );
-        expect(result[2]?.end).toStrictEqual(new Date('2024-01-01T00:00:25Z'));
+        expect(result[2]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:25Z'),
+        );
     });
 
     it('should generate schedule from multiple overlapping control', () => {
@@ -344,7 +367,7 @@ describe('generateControlsSchedule', () => {
         };
 
         const result = generateControlsSchedule({
-            controls: [controlA, controlB, controlC, controlD],
+            activeOrScheduledControls: [controlA, controlB, controlC, controlD],
         });
 
         expect(result.length).toStrictEqual(5);
@@ -352,41 +375,361 @@ describe('generateControlsSchedule', () => {
         expect(result[0]?.data.control.mRID).toStrictEqual(
             controlA.control.mRID,
         );
-        expect(result[0]?.start).toStrictEqual(
+        expect(result[0]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:00Z'),
         );
-        expect(result[0]?.end).toStrictEqual(new Date('2024-01-01T00:00:02Z'));
+        expect(result[0]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:02Z'),
+        );
 
         expect(result[1]?.data.control.mRID).toStrictEqual(
             controlB.control.mRID,
         );
-        expect(result[1]?.start).toStrictEqual(
+        expect(result[1]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:02Z'),
         );
-        expect(result[1]?.end).toStrictEqual(new Date('2024-01-01T00:00:03Z'));
+        expect(result[1]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:03Z'),
+        );
 
         expect(result[2]?.data.control.mRID).toStrictEqual(
             controlC.control.mRID,
         );
-        expect(result[2]?.start).toStrictEqual(
+        expect(result[2]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:03Z'),
         );
-        expect(result[2]?.end).toStrictEqual(new Date('2024-01-01T00:00:06Z'));
+        expect(result[2]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:06Z'),
+        );
 
         expect(result[3]?.data.control.mRID).toStrictEqual(
             controlD.control.mRID,
         );
-        expect(result[3]?.start).toStrictEqual(
+        expect(result[3]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
-        expect(result[3]?.end).toStrictEqual(new Date('2024-01-01T00:00:07Z'));
+        expect(result[3]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:07Z'),
+        );
 
         expect(result[4]?.data.control.mRID).toStrictEqual(
             controlA.control.mRID,
         );
-        expect(result[4]?.start).toStrictEqual(
+        expect(result[4]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:07Z'),
         );
-        expect(result[4]?.end).toStrictEqual(new Date('2024-01-01T00:00:10Z'));
+        expect(result[4]?.endExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:10Z'),
+        );
+    });
+});
+
+describe('getUniqueDatetimesFromControls', () => {
+    it('should return unique date times', () => {
+        type Data = Parameters<
+            typeof getSortedUniqueDatetimesFromControls
+        >[0][number];
+
+        const control1: Data = {
+            control: {
+                interval: {
+                    start: new Date('2024-01-01T00:00:00Z'),
+                    duration: 10,
+                },
+            },
+        };
+
+        const control2: Data = {
+            control: {
+                interval: {
+                    start: new Date('2024-01-01T00:00:05Z'),
+                    duration: 10,
+                },
+            },
+        };
+
+        const control3: Data = {
+            control: {
+                interval: {
+                    start: new Date('2024-01-01T00:00:00Z'),
+                    duration: 10,
+                },
+            },
+        };
+
+        const result = getSortedUniqueDatetimesFromControls([
+            control1,
+            control2,
+            control3,
+        ]);
+
+        expect(result).toStrictEqual([
+            new Date('2024-01-01T00:00:00Z'),
+            new Date('2024-01-01T00:00:05Z'),
+            new Date('2024-01-01T00:00:10Z'),
+            new Date('2024-01-01T00:00:15Z'),
+        ]);
+    });
+
+    it('should handle out of order controls', () => {
+        type Data = Parameters<
+            typeof getSortedUniqueDatetimesFromControls
+        >[0][number];
+
+        const control1: Data = {
+            control: {
+                interval: {
+                    start: new Date('2024-01-01T00:00:10Z'),
+                    duration: 10,
+                },
+            },
+        };
+
+        const control2: Data = {
+            control: {
+                interval: {
+                    start: new Date('2024-01-01T00:00:05Z'),
+                    duration: 10,
+                },
+            },
+        };
+
+        const result = getSortedUniqueDatetimesFromControls([
+            control1,
+            control2,
+        ]);
+
+        expect(result).toStrictEqual([
+            new Date('2024-01-01T00:00:05Z'),
+            new Date('2024-01-01T00:00:10Z'),
+            new Date('2024-01-01T00:00:15Z'),
+            new Date('2024-01-01T00:00:20Z'),
+        ]);
+    });
+});
+
+describe('applyRandomizationToControlSchedule', () => {
+    it('should randomize control schedules', () => {
+        const controlA: ControlSchedule = {
+            data: {
+                fsa: generateMockFunctionSetAssignments({}),
+                program: generateMockDERProgram({}),
+                control: generateMockDERControl({
+                    interval: {
+                        start: new Date('2024-01-01T00:00:00Z'),
+                        duration: 10,
+                    },
+                    randomizeStart: 2,
+                    randomizeDuration: 5,
+                }),
+            },
+            startInclusive: new Date('2024-01-01T00:00:00Z'),
+            endExclusive: new Date('2024-01-01T00:00:10Z'),
+            randomizeStart: 2,
+            randomizeDuration: 5,
+        };
+
+        const controlB: ControlSchedule = {
+            data: {
+                fsa: generateMockFunctionSetAssignments({}),
+                program: generateMockDERProgram({}),
+                control: generateMockDERControl({
+                    interval: {
+                        start: new Date('2024-01-01T00:00:10Z'),
+                        duration: 10,
+                    },
+                    randomizeStart: 2,
+                    randomizeDuration: 5,
+                }),
+            },
+            startInclusive: new Date('2024-01-01T00:00:10Z'),
+            endExclusive: new Date('2024-01-01T00:00:20Z'),
+            randomizeStart: 2,
+            randomizeDuration: 5,
+        };
+
+        const controlC: ControlSchedule = {
+            data: {
+                fsa: generateMockFunctionSetAssignments({}),
+                program: generateMockDERProgram({}),
+                control: generateMockDERControl({
+                    interval: {
+                        start: new Date('2024-01-01T00:00:20Z'),
+                        duration: 10,
+                    },
+                    randomizeStart: 0,
+                    randomizeDuration: 0,
+                }),
+            },
+            startInclusive: new Date('2024-01-01T00:00:20Z'),
+            endExclusive: new Date('2024-01-01T00:00:30Z'),
+            randomizeStart: 0,
+            randomizeDuration: 0,
+        };
+
+        const activeControlSchedule: RandomizedControlSchedule = {
+            ...controlA,
+            effectiveStartInclusive: new Date('2024-01-01T00:00:01Z'),
+            effectiveEndExclusive: new Date('2024-01-01T00:00:13Z'),
+        };
+
+        const result = applyRandomizationToControlSchedule({
+            controlSchedules: [controlA, controlB, controlC],
+            activeControlSchedule,
+        });
+
+        expect(result.length).toStrictEqual(3);
+
+        // leave the active control schedule unchanged
+        expect(result[0]?.effectiveStartInclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:01Z'),
+        );
+        expect(result[0]?.effectiveEndExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:13Z'),
+        );
+
+        expect(result[1]?.effectiveStartInclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:13Z'),
+        );
+        expect(
+            result[1]?.effectiveEndExclusive.getTime(),
+        ).toBeGreaterThanOrEqual(new Date('2024-01-01T00:00:20Z').getTime());
+        expect(result[1]?.effectiveEndExclusive.getTime()).toBeLessThanOrEqual(
+            new Date('2024-01-01T00:00:25Z').getTime(),
+        );
+
+        expect(result[2]?.effectiveStartInclusive).toStrictEqual(
+            result[1]?.effectiveEndExclusive,
+        );
+        expect(result[2]?.effectiveEndExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:30Z'),
+        );
+    });
+
+    it('non-successive events with randomization should not cause conflicts', () => {
+        // override crypto.randomInt implementation to always return the max value
+        vi.mocked(randomInt)
+            .mockImplementationOnce(() => 5)
+            .mockImplementationOnce(() => -5);
+
+        const controlA: ControlSchedule = {
+            data: {
+                fsa: generateMockFunctionSetAssignments({}),
+                program: generateMockDERProgram({}),
+                control: generateMockDERControl({
+                    interval: {
+                        start: new Date('2024-01-01T00:00:00Z'),
+                        duration: 10,
+                    },
+                    randomizeStart: 0,
+                    randomizeDuration: 5,
+                }),
+            },
+            startInclusive: new Date('2024-01-01T00:00:00Z'),
+            endExclusive: new Date('2024-01-01T00:00:10Z'),
+            randomizeStart: 0,
+            randomizeDuration: 5,
+        };
+
+        const controlB: ControlSchedule = {
+            data: {
+                fsa: generateMockFunctionSetAssignments({}),
+                program: generateMockDERProgram({}),
+                control: generateMockDERControl({
+                    interval: {
+                        start: new Date('2024-01-01T00:00:13Z'),
+                        duration: 10,
+                    },
+                    randomizeStart: -5,
+                    randomizeDuration: 0,
+                }),
+            },
+            startInclusive: new Date('2024-01-01T00:00:10Z'),
+            endExclusive: new Date('2024-01-01T00:00:20Z'),
+            randomizeStart: -5,
+            randomizeDuration: 0,
+        };
+
+        const result = applyRandomizationToControlSchedule({
+            controlSchedules: [controlA, controlB],
+            activeControlSchedule: null,
+        });
+
+        expect(result.length).toStrictEqual(2);
+
+        expect(result[0]?.effectiveStartInclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:00Z'),
+        );
+        expect(result[0]?.effectiveEndExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:15Z'),
+        );
+
+        expect(result[1]?.effectiveStartInclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:15Z'),
+        );
+        expect(result[1]?.effectiveEndExclusive).toStrictEqual(
+            new Date('2024-01-01T00:00:20Z'),
+        );
+    });
+});
+
+describe('applyRandomizationToDatetime', () => {
+    it('supports positive randomization', () => {
+        const date = new Date('2024-01-01T00:00:00Z');
+
+        const result = applyRandomizationToDatetime({
+            date,
+            randomizationSeconds: 10,
+        });
+
+        expect(result.getTime()).toBeGreaterThanOrEqual(
+            new Date('2024-01-01T00:00:00Z').getTime(),
+        );
+        expect(result.getTime()).toBeLessThanOrEqual(
+            new Date('2024-01-01T00:00:10Z').getTime(),
+        );
+    });
+
+    it('supports positive 1 randomization', () => {
+        const date = new Date('2024-01-01T00:00:00Z');
+
+        const result = applyRandomizationToDatetime({
+            date,
+            randomizationSeconds: 1,
+        });
+
+        expect(result.getTime()).toBeGreaterThanOrEqual(
+            new Date('2024-01-01T00:00:00Z').getTime(),
+        );
+        expect(result.getTime()).toBeLessThanOrEqual(
+            new Date('2024-01-01T00:00:01Z').getTime(),
+        );
+    });
+
+    it('supports 0 randomization', () => {
+        const date = new Date('2024-01-01T00:00:00Z');
+
+        const result = applyRandomizationToDatetime({
+            date,
+            randomizationSeconds: 0,
+        });
+
+        expect(result).toStrictEqual(new Date('2024-01-01T00:00:00Z'));
+    });
+
+    it('supports negative randomization', () => {
+        const date = new Date('2024-01-01T00:00:30Z');
+
+        const result = applyRandomizationToDatetime({
+            date,
+            randomizationSeconds: -10,
+        });
+
+        expect(result.getTime()).toBeGreaterThanOrEqual(
+            new Date('2024-01-01T00:00:20Z').getTime(),
+        );
+        expect(result.getTime()).toBeLessThanOrEqual(
+            new Date('2024-01-01T00:00:30Z').getTime(),
+        );
     });
 });

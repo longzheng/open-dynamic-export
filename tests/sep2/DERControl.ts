@@ -9,6 +9,8 @@ export function generateMockDERControl({
     derControlBase,
     interval,
     eventStatus,
+    randomizeStart,
+    randomizeDuration,
 }: {
     creationTime?: Date;
     derControlBase?: DERControlBase;
@@ -17,6 +19,8 @@ export function generateMockDERControl({
         duration?: number;
     };
     eventStatus?: { currentStatus?: CurrentStatus };
+    randomizeStart?: number;
+    randomizeDuration?: number;
 }): DERControl {
     const mrid = randomUUID();
 
@@ -34,6 +38,8 @@ export function generateMockDERControl({
             start: interval?.start ?? new Date(),
             duration: interval?.duration ?? 1800,
         },
+        randomizeStart,
+        randomizeDuration,
         eventStatus: {
             currentStatus:
                 eventStatus?.currentStatus ?? CurrentStatus.Scheduled,
