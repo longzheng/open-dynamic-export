@@ -15,23 +15,7 @@ import {
 import { InverterSunSpecConnection } from '../connection/inverter';
 import { SunSpecConnection } from '../connection/base';
 
-vi.mock('modbus-serial', async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        // mocking the ModbusRTU class default export
-        default: vi.fn().mockReturnValue({
-            // not sure if there's another way to implement the actual ModbusRTU class
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            on: (actual as any).prototype.on,
-            // mock functions to allow connection state to be set
-            connectTCP: vi.fn(),
-            setID: vi.fn(),
-            setTimeout: vi.fn(),
-            readHoldingRegisters: vi.fn(),
-            writeRegisters: vi.fn(),
-        }),
-    };
-});
+vi.mock(import('modbus-serial'));
 
 type Model = {
     ID: number;
