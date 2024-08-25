@@ -1,0 +1,7 @@
+services:
+  server:
+    build: .
+    volumes:
+      - ./config/:/app/config/
+      - ./logs/:/app/logs/
+    restart: 'always'

@@ -1,3 +1,6 @@
 import { generateCertRequestAndKey } from '../src/helpers/cert';
 
-generateCertRequestAndKey({ csrPath: 'cert_req.csr', keyPath: 'key.pem' });
+generateCertRequestAndKey({
+    csrPath: './config/cert_req.csr',
+    keyPath: './config/key.pem',
+});

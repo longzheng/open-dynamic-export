@@ -26,11 +26,13 @@ const configSchema = z.object({
 export type Config = z.infer<typeof configSchema>;
 
 export function getConfig() {
-    const configJson = readFileSync('config.json', 'utf8');
-
-    if (!configJson) {
-        throw new Error(`config.json is not found`);
-    }
+    const configJson = (() => {
+        try {
+            return readFileSync('./config/config.json', 'utf8');
+        } catch {
+            throw new Error(`Error reading ./config/config.json`);
+        }
+    })();
 
     const result = configSchema.safeParse(JSON.parse(configJson));
 
@@ -42,13 +44,19 @@ export function getConfig() {
 }
 
 export function getConfigSep2CertKey(config: Config) {
-    const sep2Cert = readFileSync(resolve(config.sep2.certPath), 'utf-8');
+    const sep2Cert = readFileSync(
+        resolve('./config', config.sep2.certPath),
+        'utf-8',
+    );
 
     if (!sep2Cert) {
         throw new Error('Certificate is not found or is empty');
     }
 
-    const sep2Key = readFileSync(resolve(config.sep2.keyPath), 'utf-8');
+    const sep2Key = readFileSync(
+        resolve('./config', config.sep2.keyPath),
+        'utf-8',
+    );
 
     if (!sep2Key) {
         throw new Error('Key is not found or is empty');
