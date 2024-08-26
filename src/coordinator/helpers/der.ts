@@ -15,6 +15,9 @@ import { type NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import { PVConn, type StatusModel } from '../../sunspec/models/status';
 
+const derControlTypeModes: DERControlType =
+    DERControlType.opModConnect | DERControlType.opModEnergize;
+
 export function getDerCapabilityResponseFromSunSpecArray(
     nameplateModels: NameplateModel[],
 ): DERCapability {
@@ -25,8 +28,7 @@ export function getDerCapabilityResponseFromSunSpecArray(
 
     return {
         // hard-coded modes
-        modesSupported:
-            DERControlType.opModConnect | DERControlType.opModEnergize,
+        modesSupported: derControlTypeModes,
         // hard-coded DOE modes
         doeModesSupported:
             DOEModesSupportedType.opModExpLimW |
@@ -67,10 +69,7 @@ export function getDerSettingsResponseFromSunSpecArray(
     return {
         updatedTime: new Date(),
         // hard-coded modes
-        modesEnabled:
-            DERControlType.opModEnergize |
-            DERControlType.opModMaxLimW |
-            DERControlType.opModTargetW,
+        modesEnabled: derControlTypeModes,
         setGradW: metrics.WGra ?? 0,
         setMaxVA: setMaxVA
             ? {
