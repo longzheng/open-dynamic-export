@@ -2,7 +2,7 @@
 
 ## About
 
-This project aims to implement dynamic export control using Node.js/TypeScript implementing SEP2/IEEE 2030.5-2018/AS 5385:2023 (utility connection) and SunSpec Modbus (inverter connection) to satisfy the dynamic connections requirement of various Austrailan energy markets.   
+This project aims to implement dynamic export control using Node.js/TypeScript implementing SEP2/IEEE 2030.5-2018/CSIP-AUS (utility connection) and SunSpec Modbus (inverter connection) to satisfy the dynamic connections requirement of various Austrailan energy markets.   
 
 The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
@@ -25,12 +25,12 @@ sequenceDiagram
     participant D as DER<br>(SunSpec compatible device)
 
     loop
-    SC->>U: Get API responses
+    SC->>U: SEP2 discovery
     U->>SC: Devices, programs, DER controls
     SC->>U: Acknowledge DER controls
     end
 
-    SC->>C: Export limit, ramp rate
+    SC->>C: Control schedules<br> and limits
 
     loop
     MC->>D: Read Modbus registers
@@ -39,9 +39,9 @@ sequenceDiagram
 
     MC->>C: PV power, load power<br>and site power flow
 
-    Note over C: Calculate allowed power level<br>to meet dynamic export requirement
+    Note over C: Get current schedule<br>Calculate target power level<br>to meet limits
 
-    C-->>MC: % WMax
+    C-->>MC: Inverter controls
 
     MC->>D: Write Modbus registers
 
@@ -50,7 +50,7 @@ sequenceDiagram
     SC->>U: Send site and DER telemetry
     end
 
-    box open-dynamic-export
+    box rgb(198,239,210) open-dynamic-export
     participant SC
     participant MC
     participant C
