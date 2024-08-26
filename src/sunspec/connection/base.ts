@@ -4,6 +4,7 @@ import { commonModel } from '../models/common';
 import { logger as pinoLogger } from '../../helpers/logger';
 import { registersToUint32 } from '../helpers/converters';
 import type { Logger } from 'pino';
+import { setTimeout } from 'node:timers/promises';
 
 const connectionTimeoutMs = 5000;
 
@@ -122,27 +123,29 @@ export abstract class SunSpecConnection {
                 return this.modelAddressById.cachePromise;
             case 'notCached': {
                 const cachePromise = (async () => {
-                    try {
-                        const modelAddressById =
-                            await this.scanModelAddresses();
+                    // because the model address cache is critical to most of the operation of the SunSpec client
+                    // if there is an error we want to retry indefinitely
+                    for (;;) {
+                        try {
+                            const modelAddressById =
+                                await this.scanModelAddresses();
 
-                        this.modelAddressById = {
-                            type: 'cached',
-                            cache: modelAddressById,
-                        };
+                            this.modelAddressById = {
+                                type: 'cached',
+                                cache: modelAddressById,
+                            };
 
-                        return modelAddressById;
-                    } catch (error) {
-                        this.logger.error(
-                            {
-                                error,
-                            },
-                            `SunSpec Modbus client error caching model addresses`,
-                        );
+                            return modelAddressById;
+                        } catch (error) {
+                            this.logger.error(
+                                {
+                                    error,
+                                },
+                                `SunSpec Modbus client error caching model addresses, retrying`,
+                            );
 
-                        this.modelAddressById = { type: 'notCached' };
-
-                        throw error;
+                            await setTimeout(1000);
+                        }
                     }
                 })();
 
