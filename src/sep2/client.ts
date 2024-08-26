@@ -8,6 +8,7 @@ import type { RoleFlagsType } from './models/roleFlagsType';
 import { numberToHex } from '../helpers/number';
 import { randomUUID } from 'node:crypto';
 import { DeviceCapabilityHelper } from './helpers/deviceCapability';
+import axiosRetry from 'axios-retry';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -32,7 +33,7 @@ export class SEP2Client {
         this.pen = sep2Config.pen.toString().padStart(8, '0');
         this.lfdi = getCertificateLfdi(cert);
 
-        this.axiosInstance = axios.create({
+        const axiosClient = axios.create({
             baseURL: this.host,
             headers: {
                 'User-Agent': USER_AGENT,
@@ -45,6 +46,14 @@ export class SEP2Client {
                 rejectUnauthorized: false,
             }),
         });
+
+        // exponential backoff retry
+        axiosRetry(axiosClient, {
+            retryDelay: (retryCount, error) =>
+                axiosRetry.exponentialDelay(retryCount, error),
+        });
+
+        this.axiosInstance = axiosClient;
     }
 
     async get(
