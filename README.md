@@ -61,25 +61,26 @@ The initial plan is to implement a SEP2 direct gateway client that interacts dir
 
 The downside of a direct client approach is the registration process is manual and requires generating keys and certificates for each site/NMI. If the project is successful, a future cloud hosted instance will use a cloud proxy gateway architecture to allow self-service registration.
 
-## Implementation plan
+## Features
 
-1.0
-- [x] Project bootstrap
-- [x] SEP2 client
-  - [x] Scheduled polling and pushing
+- [x] SEP2/IEEE 2030.5 client
+  - [x] Discovery and scheduled entity polling
   - [x] DER status/capability/settings reporting
   - [x] DER control scheduling
-  - [x] Site/DER telemetry reporting
+  - [x] Mirror usage point site/DER telemetry reporting
 - [x] SunSpec Modbus client
-  - [x] Inverter data polling
+  - [x] Model scanning
+  - [x] Inverter/meters data polling
   - [X] Inverter control
+- [x] Software-based `setGradW` ramping
 
 Future
+- [ ] Self-service certificate generation
 - [ ] Cloud proxy mode
-- [ ] Web UI
+- [ ] Web UI with real-time metrics and historical metrics
 - [ ] Device package (plug and play solution)
 
-## Running
+## Running server
 
 > [!IMPORTANT]
 > This application cannot run without certified issued by the utility server which must be manually registered and is not provided in this repository. A future version of this application will support a self-service registration process.
