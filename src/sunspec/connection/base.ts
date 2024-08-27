@@ -20,7 +20,7 @@ export abstract class SunSpecConnection {
     public readonly ip: string;
     public readonly port: number;
     public readonly unitId: number;
-    private logger: Logger;
+    public readonly logger: Logger;
 
     private state:
         | { type: 'connected' }

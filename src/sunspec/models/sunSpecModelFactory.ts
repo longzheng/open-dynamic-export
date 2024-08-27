@@ -1,4 +1,3 @@
-import { logger as pinoLogger } from '../../helpers/logger';
 import { objectEntriesWithType } from '../../helpers/object';
 import type { ModelAddress, SunSpecConnection } from '../connection/base';
 
@@ -35,10 +34,12 @@ export function sunSpecModelFactory<
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
 } {
-    const logger = pinoLogger.child({ module: `sunspec-model-${config.name}` });
-
     return {
         read: async ({ modbusConnection, address }) => {
+            const logger = modbusConnection.logger.child({
+                module: `sunspec-model-${config.name}`,
+            });
+
             logger.trace({ address }, 'Reading model');
 
             await modbusConnection.connect();
@@ -57,6 +58,10 @@ export function sunSpecModelFactory<
             });
         },
         write: async ({ modbusConnection, address, values }) => {
+            const logger = modbusConnection.logger.child({
+                module: `sunspec-model-${config.name}`,
+            });
+
             logger.trace({ address, values }, 'Writing model');
 
             await modbusConnection.connect();
