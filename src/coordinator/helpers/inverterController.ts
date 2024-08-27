@@ -330,9 +330,11 @@ export function getWMaxLimPctFromTargetSolarPowerRatio({
     targetSolarPowerRatio: number;
     controlsModel: Pick<ControlsModel, 'WMaxLimPct_SF'>;
 }) {
-    return numberWithPow10(
-        new Decimal(targetSolarPowerRatio).times(100).toNumber(),
-        -controlsModel.WMaxLimPct_SF,
+    return Math.round(
+        numberWithPow10(
+            new Decimal(targetSolarPowerRatio).times(100).toNumber(),
+            -controlsModel.WMaxLimPct_SF,
+        ),
     );
 }
 

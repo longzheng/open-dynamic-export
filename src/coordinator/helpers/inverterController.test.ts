@@ -153,4 +153,15 @@ describe('getWMaxLimPctFromTargetSolarPowerRatio', () => {
 
         expect(WMaxLimPct).toBe(50);
     });
+
+    it('should output whole values', () => {
+        const WMaxLimPct = getWMaxLimPctFromTargetSolarPowerRatio({
+            targetSolarPowerRatio: 0.55821249,
+            controlsModel: {
+                WMaxLimPct_SF: -2,
+            },
+        });
+
+        expect(WMaxLimPct).toBe(5582);
+    });
 });
