@@ -14,20 +14,24 @@ import type { MonitoringSample } from './monitoring';
 import type { DERControlBase } from '../../sep2/models/derControlBase';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import Decimal from 'decimal.js';
-import { numberWithPow10 } from '../../helpers/number';
+import {
+    averageNumbersArray,
+    numberWithPow10,
+    roundToDecimals,
+} from '../../helpers/number';
 import { getTotalFromPerPhaseMeasurement } from '../../helpers/power';
-import { getAveragePowerRatio } from '../../sunspec/helpers/controls';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
 import type { RampRateHelper } from './rampRate';
+import type { NameplateModel } from '../../sunspec/models/nameplate';
 
 type SupportedControlTypes = Extract<
     ControlType,
     'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
 >;
 
-type InvertersData = {
-    inverterControlsData: ControlsModel[];
+type SunSpecData = {
+    inverters: { nameplate: NameplateModel; controls: ControlsModel }[];
     monitoringSample: MonitoringSample;
 };
 
@@ -59,7 +63,7 @@ export class InverterController {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
     };
-    private cachedInvertersData: InvertersData | null = null;
+    private cachedSunSpecData: SunSpecData | null = null;
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
@@ -109,9 +113,9 @@ export class InverterController {
         void this.updateInverterControlValues();
     }
 
-    updateSunSpecInverterData(data: InvertersData) {
+    updateSunSpecInverterData(data: SunSpecData) {
         this.logger.debug('Received inverter data, updating inverter controls');
-        this.cachedInvertersData = data;
+        this.cachedSunSpecData = data;
 
         void this.updateInverterControlValues();
     }
@@ -130,7 +134,7 @@ export class InverterController {
     }
 
     private async updateInverterControlValues() {
-        if (!this.cachedInvertersData) {
+        if (!this.cachedSunSpecData) {
             this.logger.warn(
                 'Inverter data is not cached, cannot update inverter controls yet. Wait for next loop.',
             );
@@ -141,8 +145,7 @@ export class InverterController {
 
         const inverterConfiguration = calculateInverterConfiguration({
             activeDerControlBaseValues,
-            inverterControlsData: this.cachedInvertersData.inverterControlsData,
-            monitoringSample: this.cachedInvertersData.monitoringSample,
+            sunSpecData: this.cachedSunSpecData,
             rampRateHelper: this.rampRateHelper,
         });
 
@@ -157,8 +160,7 @@ export class InverterController {
         await Promise.all(
             this.inverterConnections.map(async (inverter, index) => {
                 // assume the inverter data is in the same order as the connections
-                const inverterData =
-                    this.cachedInvertersData?.inverterControlsData[index];
+                const inverterData = this.cachedSunSpecData?.inverters[index];
 
                 if (!inverterData) {
                     throw new Error('Inverter data not found');
@@ -167,7 +169,7 @@ export class InverterController {
                 const writeControlsModel =
                     generateControlsModelWriteFromInverterConfiguration({
                         inverterConfiguration,
-                        controlsModel: inverterData,
+                        controlsModel: inverterData.controls,
                     });
 
                 if (this.applyControl) {
@@ -187,13 +189,11 @@ export class InverterController {
 
 export function calculateInverterConfiguration({
     activeDerControlBaseValues,
-    inverterControlsData,
-    monitoringSample,
+    sunSpecData,
     rampRateHelper,
 }: {
     activeDerControlBaseValues: ActiveDERControlBaseValues;
-    inverterControlsData: ControlsModel[];
-    monitoringSample: MonitoringSample;
+    sunSpecData: SunSpecData;
     rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
     const logger = pinoLogger.child({ module: 'calculateDynamicExportConfig' });
@@ -215,10 +215,10 @@ export function calculateInverterConfiguration({
     }
 
     const siteWatts = getTotalFromPerPhaseMeasurement(
-        monitoringSample.site.realPower,
+        sunSpecData.monitoringSample.site.realPower,
     );
     const solarWatts = getTotalFromPerPhaseMeasurement(
-        monitoringSample.der.realPower,
+        sunSpecData.monitoringSample.der.realPower,
     );
 
     const exportLimitWatts = activeDerControlBaseValues.opModExpLimW
@@ -248,7 +248,10 @@ export function calculateInverterConfiguration({
         generationLimitWatts,
     );
 
-    const currentPowerRatio = getAveragePowerRatio(inverterControlsData);
+    const currentPowerRatio = getCurrentPowerRatio({
+        inverters: sunSpecData.inverters,
+        currentSolarWatts: solarWatts,
+    });
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         currentPowerRatio,
@@ -257,8 +260,8 @@ export function calculateInverterConfiguration({
     });
 
     const rampedTargetSolarPowerRatio = rampRateHelper.calculateRampValue({
-        current: currentPowerRatio,
-        target: targetSolarPowerRatio,
+        currentPowerRatio,
+        targetPowerRatio: targetSolarPowerRatio,
     });
 
     logger.trace(
@@ -277,9 +280,12 @@ export function calculateInverterConfiguration({
 
     return {
         type: 'limit',
-        currentPowerRatio,
-        targetSolarPowerRatio,
-        rampedTargetSolarPowerRatio,
+        currentPowerRatio: roundToDecimals(currentPowerRatio, 4),
+        targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
+        rampedTargetSolarPowerRatio: roundToDecimals(
+            rampedTargetSolarPowerRatio,
+            4,
+        ),
     };
 }
 
@@ -342,6 +348,52 @@ export function getWMaxLimPctFromTargetSolarPowerRatio({
             new Decimal(targetSolarPowerRatio).times(100).toNumber(),
             -controlsModel.WMaxLimPct_SF,
         ),
+    );
+}
+
+export function getCurrentPowerRatio({
+    inverters,
+    currentSolarWatts,
+}: {
+    inverters: SunSpecData['inverters'];
+    currentSolarWatts: number;
+}) {
+    return averageNumbersArray(
+        inverters.map(({ controls, nameplate }, invertersIndex) => {
+            // if the WMaxLim_Ena is not enabled, we are not yet controlling the inverter
+            // we're not sure if the inverter is under any control that is invisible to SunSpec (e.g. export limit) that might be affecting the output
+            // so we can't know definitely what the "actual" power ratio is
+            // this is a dangerous scenario because if we miscalculate the power ratio at the first instance of control, we might exceed the export limit
+            // the most conservative estimate we can make is the current solar / nameplate ratio which assumes a 100% efficiency
+            // because it will never be 100% efficient, this means that we should always underestimate the power ratio
+            // which is a safe assumption, but we hope future update cycles will find the "correct" power ratio
+            if (controls.WMaxLim_Ena !== WMaxLim_Ena.ENABLED) {
+                const nameplateWatts = numberWithPow10(
+                    nameplate.WRtg,
+                    nameplate.WRtg_SF,
+                );
+
+                const estimatedPowerRatio = currentSolarWatts / nameplateWatts;
+
+                pinoLogger.info(
+                    {
+                        estimatedPowerRatio,
+                        currentSolarWatts,
+                        nameplateWatts,
+                        invertersIndex,
+                    },
+                    'WMaxLim_Ena is not enabled, estimated power ratio',
+                );
+
+                return estimatedPowerRatio;
+            }
+
+            return (
+                // the value is expressed from 0-100, divide to get ratio
+                numberWithPow10(controls.WMaxLimPct, controls.WMaxLimPct_SF) /
+                100
+            );
+        }),
     );
 }
 

@@ -1,14 +1,14 @@
 import Decimal from 'decimal.js';
 
-// The default ramp-rate of 0.27% per second is approximately equal to 16.67% per minute, which is
-// the default value for Wgra in AS/NZS 4777.2
+// The default ramp-rate of 0.27% per second (approximately equal to 16.67% per minute)
+// which is the default value for Wgra in AS/NZS 4777.2
 const defaultRampRatePercentPerSecond = 0.27;
 
-export type RampRate =
+type RampRate =
     | { type: 'limited'; percentPerSecond: number }
     | { type: 'noLimit' };
 
-// many SunSpec inverters (including Fronius and SMA) does not properly support setting WGra
+// many SunSpec inverters (including Fronius and SMA) does not properly support setting WGra using SunSpec
 // the CSIP-AUS ramp rate requirement cannot be met without WGra
 // this is a software based implementation of ramp rates to gradually apply changes to power output
 export class RampRateHelper {
@@ -54,51 +54,70 @@ export class RampRateHelper {
         };
     }
 
+    // calculate the new power ratio when changing from current to target
+    // because the ramp rate and power ratio are both expressed in % of rated power
+    // we can simply use the ramp rate as a cap of the change
+    // our update cycle is variable and does not follow a fixed time interval
+    // so we must dynaically calculate the ramp value based on the time since the last update
     calculateRampValue({
-        current,
-        target,
+        currentPowerRatio,
+        targetPowerRatio,
     }: {
-        current: number;
-        target: number;
+        currentPowerRatio: number;
+        targetPowerRatio: number;
     }): number {
         switch (this.rampRate.type) {
             case 'limited': {
                 // if we've reached the target, reset the ramping time
-                if (current === target) {
+                if (currentPowerRatio === targetPowerRatio) {
                     this.lastRampTime = null;
-                    return target;
-                }
-
-                // start ramping (nothing happens on this cycle, return current value)
-                if (this.lastRampTime === null) {
-                    this.lastRampTime = new Date();
-                    return current;
+                    return targetPowerRatio;
                 }
 
                 const now = new Date();
 
+                // start ramping (nothing happens on this cycle, return current value)
+                if (this.lastRampTime === null) {
+                    this.lastRampTime = now;
+                    return currentPowerRatio;
+                }
+
                 const secondsSinceStartOfRamp =
                     (now.getTime() - this.lastRampTime.getTime()) / 1000;
 
-                const currentRampRatePercent = Math.min(
-                    1,
-                    new Decimal(this.rampRate.percentPerSecond)
-                        .div(100)
-                        .mul(secondsSinceStartOfRamp)
-                        .toNumber(),
-                );
+                // ramping values sub-second does not usually work because the changes are too small for the inverter to apply (usually 2 decimal points)
+                // skip the cycle if it's less than a second
+                if (secondsSinceStartOfRamp < 1) {
+                    return currentPowerRatio;
+                }
 
-                const diff = new Decimal(target).sub(current);
+                const timeFactoredRampRate = new Decimal(
+                    this.rampRate.percentPerSecond,
+                )
+                    .div(100)
+                    .mul(secondsSinceStartOfRamp)
+                    .toNumber();
 
-                const change = diff.mul(currentRampRatePercent);
+                const diff = new Decimal(targetPowerRatio)
+                    .sub(currentPowerRatio)
+                    .toNumber();
+
+                const diffAbs = Math.abs(diff);
+                const diffSign = Math.sign(diff);
+
+                const cappedDiff =
+                    Math.min(diffAbs, timeFactoredRampRate) * diffSign;
 
                 // update the ramp time for the next cycle
                 this.lastRampTime = now;
 
-                return new Decimal(current).plus(change).toNumber();
+                return new Decimal(currentPowerRatio)
+                    .plus(cappedDiff)
+                    .toNumber();
             }
             case 'noLimit': {
-                return target;
+                this.lastRampTime = null;
+                return targetPowerRatio;
             }
         }
     }

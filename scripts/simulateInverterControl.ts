@@ -39,8 +39,10 @@ const rampRateHelper = new RampRateHelper();
 sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
     const inverterConfiguration = calculateInverterConfiguration({
         activeDerControlBaseValues: simulatedActiveDerControlBase,
-        inverterControlsData: invertersData.map(({ controls }) => controls),
-        monitoringSample,
+        sunSpecData: {
+            inverters: invertersData,
+            monitoringSample,
+        },
         rampRateHelper,
     });
 

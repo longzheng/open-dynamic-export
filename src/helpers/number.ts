@@ -93,3 +93,7 @@ export function sumBigIntArray(numbers: bigint[]) {
 export function randomNumber(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
+
+export function roundToDecimals(value: number, decimals: number) {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+}

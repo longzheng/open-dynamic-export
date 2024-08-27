@@ -36,51 +36,103 @@ describe('calculateRampValue', () => {
     it('should return value immediately for no limit', () => {
         helper.setRampRate(0);
 
-        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            100,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(100);
     });
 
     it('should return ramped value after 5 seconds for default limit', () => {
+        // start ramping
         vi.setSystemTime(new Date('2021-01-01T00:00:10Z'));
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50);
 
-        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            50,
-        );
-
+        // after 5 seconds
         vi.setSystemTime(new Date('2021-01-01T00:00:15Z'));
-
-        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            50.675,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50.0135);
     });
 
-    it('should make progress even changing target every 200ms', () => {
+    it('should not return change within the second', () => {
         helper.setRampRate(27);
 
-        vi.setSystemTime(new Date('2021-01-01T00:00:10.000Z'));
-
-        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            50,
-        );
-
-        vi.setSystemTime(new Date('2021-01-01T00:00:10.200Z'));
-
-        expect(helper.calculateRampValue({ current: 50, target: 99 })).toBe(
-            50.02646,
-        );
-
-        vi.setSystemTime(new Date('2021-01-01T00:00:10.400Z'));
+        vi.setSystemTime(new Date('2021-01-01T00:00:10Z'));
 
         expect(
-            helper.calculateRampValue({ current: 50.02646, target: 100 }),
-        ).toBe(50.0534457116);
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50);
 
-        vi.setSystemTime(new Date('2021-01-01T00:00:10.600Z'));
+        vi.setSystemTime(new Date('2021-01-01T00:00:10.500Z'));
 
         expect(
-            helper.calculateRampValue({ current: 50.0534457116, target: 99 }),
-        ).toBe(50.07987685091574);
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:11Z'));
+
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50.0027);
+    });
+
+    it('should make progress even changing target every second', () => {
+        helper.setRampRate(27);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:10Z'));
+
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:11Z'));
+
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 99,
+            }),
+        ).toBe(50.0027);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:12Z'));
+
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50.0027,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50.0054);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:13Z'));
+
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50.0054,
+                targetPowerRatio: 99,
+            }),
+        ).toBe(50.0081);
     });
 
     it('once reach target, reset ramping', () => {
@@ -88,35 +140,50 @@ describe('calculateRampValue', () => {
 
         vi.setSystemTime(new Date('2021-01-01T00:00:10.000Z'));
 
-        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            50,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50);
 
         // start ramp up
         vi.setSystemTime(new Date('2021-01-01T00:02:00.000Z'));
 
-        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            64.85,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 50,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(50.297);
 
         // reached ramp target
         vi.setSystemTime(new Date('2021-01-01T00:05:00.000Z'));
 
-        expect(helper.calculateRampValue({ current: 100, target: 100 })).toBe(
-            100,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 100,
+                targetPowerRatio: 100,
+            }),
+        ).toBe(100);
 
         // start ramp down
         vi.setSystemTime(new Date('2021-01-01T00:05:01.000Z'));
 
-        expect(helper.calculateRampValue({ current: 100, target: 50 })).toBe(
-            100,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 100,
+                targetPowerRatio: 50,
+            }),
+        ).toBe(100);
 
         vi.setSystemTime(new Date('2021-01-01T00:05:02.000Z'));
 
-        expect(helper.calculateRampValue({ current: 100, target: 50 })).toBe(
-            99.865,
-        );
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 100,
+                targetPowerRatio: 50,
+            }),
+        ).toBe(99.9973);
     });
 });

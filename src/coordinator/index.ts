@@ -170,9 +170,7 @@ function main() {
             derHelper.onInverterData(invertersData);
             mirrorUsagePointListHelper.addSample(monitoringSample);
             inverterController.updateSunSpecInverterData({
-                inverterControlsData: invertersData.map(
-                    ({ controls }) => controls,
-                ),
+                inverters: invertersData,
                 monitoringSample,
             });
         },
