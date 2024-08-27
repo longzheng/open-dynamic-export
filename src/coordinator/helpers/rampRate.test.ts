@@ -56,6 +56,8 @@ describe('calculateRampValue', () => {
     });
 
     it('should make progress even changing target every 200ms', () => {
+        helper.setRampRate(27);
+
         vi.setSystemTime(new Date('2021-01-01T00:00:10.000Z'));
 
         expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
@@ -70,8 +72,51 @@ describe('calculateRampValue', () => {
 
         vi.setSystemTime(new Date('2021-01-01T00:00:10.400Z'));
 
+        expect(
+            helper.calculateRampValue({ current: 50.02646, target: 100 }),
+        ).toBe(50.0534457116);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:10.600Z'));
+
+        expect(
+            helper.calculateRampValue({ current: 50.0534457116, target: 99 }),
+        ).toBe(50.07987685091574);
+    });
+
+    it('once reach target, reset ramping', () => {
+        helper.setRampRate(27);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:10.000Z'));
+
         expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
-            50.054,
+            50,
+        );
+
+        // start ramp up
+        vi.setSystemTime(new Date('2021-01-01T00:02:00.000Z'));
+
+        expect(helper.calculateRampValue({ current: 50, target: 100 })).toBe(
+            64.85,
+        );
+
+        // reached ramp target
+        vi.setSystemTime(new Date('2021-01-01T00:05:00.000Z'));
+
+        expect(helper.calculateRampValue({ current: 100, target: 100 })).toBe(
+            100,
+        );
+
+        // start ramp down
+        vi.setSystemTime(new Date('2021-01-01T00:05:01.000Z'));
+
+        expect(helper.calculateRampValue({ current: 100, target: 50 })).toBe(
+            100,
+        );
+
+        vi.setSystemTime(new Date('2021-01-01T00:05:02.000Z'));
+
+        expect(helper.calculateRampValue({ current: 100, target: 50 })).toBe(
+            99.865,
         );
     });
 });

@@ -63,19 +63,22 @@ export class RampRateHelper {
     }): number {
         switch (this.rampRate.type) {
             case 'limited': {
-                // if we've reached the target, reset the last action time
+                // if we've reached the target, reset the ramping time
                 if (current === target) {
                     this.lastRampTime = null;
                     return target;
                 }
 
-                // start ramping
+                // start ramping (nothing happens on this cycle, return current value)
                 if (this.lastRampTime === null) {
                     this.lastRampTime = new Date();
+                    return current;
                 }
 
+                const now = new Date();
+
                 const secondsSinceStartOfRamp =
-                    (new Date().getTime() - this.lastRampTime.getTime()) / 1000;
+                    (now.getTime() - this.lastRampTime.getTime()) / 1000;
 
                 const currentRampRatePercent = Math.min(
                     1,
@@ -88,6 +91,9 @@ export class RampRateHelper {
                 const diff = new Decimal(target).sub(current);
 
                 const change = diff.mul(currentRampRatePercent);
+
+                // update the ramp time for the next cycle
+                this.lastRampTime = now;
 
                 return new Decimal(current).plus(change).toNumber();
             }
