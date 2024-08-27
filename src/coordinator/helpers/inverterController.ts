@@ -226,7 +226,7 @@ export function calculateInverterConfiguration({
 
     // the limits need to be applied together
     // take the lesser of the export limit target solar watts or generation limit
-    const targetSolarWatts = Math.min(generationLimitWatts, exportLimitWatts);
+        generationLimitWatts,
 
     const currentAveragePowerRatio = getAveragePowerRatio(inverterControlsData);
 
