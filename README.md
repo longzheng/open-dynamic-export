@@ -79,6 +79,38 @@ Future
 - [ ] Web UI
 - [ ] Device package (plug and play solution)
 
+## Running
+
+> [!IMPORTANT]
+> This application cannot run without certified issued by the utility server which must be manually registered and is not provided in this repository. A future version of this application will support a self-service registration process.
+
+The Node.js application can be run both directly and via a Docker image.
+
+#### Node.js directly
+
+1. Clone repo
+2. Install dependencies `npm install`
+3. In the `./config` folder make a copy of `config.json.example` and rename it to `config.json`, modify the relevant values
+4. Run `npm run start`
+
+#### Docker
+
+1. Create a Docker Compose file `compose.yaml` with the following content
+
+```yaml
+services:
+  open-dynamic-export:
+    image: longzhengau/open-dynamic-export:latest
+    volumes:
+      - ./config/:/app/config/
+      - ./logs/:/app/logs/
+    restart: 'always'
+```
+
+2. Create a `./config` folder and copy the `config.json.example` file from the repo and rename it to `config.json`
+
+3. Run `docker-compose up -d`
+
 ## Private key and CSR
 
 The SEP2 server uses PKI certificates to authorise and identify clients.

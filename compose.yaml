@@ -1,5 +1,5 @@
 services:
-  server:
+  open-dynamic-export:
     build: .
     volumes:
       - ./config/:/app/config/
