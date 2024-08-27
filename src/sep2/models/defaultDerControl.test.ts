@@ -1,7 +1,6 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks';
-import type { RampRate } from './defaultDerControl';
 import { parseDefaultDERControlXml } from './defaultDerControl';
 
 it('should parse Default DER Control XML', async () => {
@@ -17,8 +16,5 @@ it('should parse Default DER Control XML', async () => {
     expect(defaultDerControl.version).toBe(0);
     expect(defaultDerControl.derControlBase.opModExpLimW?.value).toBe(15);
     expect(defaultDerControl.setGradW).toBe(undefined);
-    expect(defaultDerControl.setSoftGradW).toStrictEqual({
-        type: 'limited',
-        percent: 1,
-    } satisfies RampRate);
+    expect(defaultDerControl.setSoftGradW).toStrictEqual(1);
 });

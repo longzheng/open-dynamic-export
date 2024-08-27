@@ -12,6 +12,7 @@ import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList
 import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAssignmentsList';
 import { DerControlsHelper } from '../sep2/helpers/derControls';
 import { InverterController } from './helpers/inverterController';
+import { RampRateHelper } from './helpers/rampRate';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -32,29 +33,39 @@ const sep2Client = new SEP2Client({
     key: sep2Key,
 });
 
+const rampRateHelper = new RampRateHelper();
+
 const timeHelper: TimeHelper = new TimeHelper({
     client: sep2Client,
 });
+
 const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
     client: sep2Client,
 });
+
 const derListHelper = new DerListHelper({
     client: sep2Client,
 });
+
 const derHelper = new DerHelper({
     client: sep2Client,
     invertersConnections,
+    rampRateHelper,
 });
+
 const functionSetAssignmentsListHelper = new FunctionSetAssignmentsListHelper({
     client: sep2Client,
 });
+
 const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
     client: sep2Client,
 });
+
 const inverterController = new InverterController({
     client: sep2Client,
     invertersConnections,
     applyControl: config.sunSpec.control,
+    rampRateHelper,
 });
 
 const derControlsHelper = new DerControlsHelper({
@@ -63,6 +74,12 @@ const derControlsHelper = new DerControlsHelper({
     logger.debug(data, 'DER controls data changed');
 
     inverterController.updateSep2ControlsData(data);
+
+    rampRateHelper.setRampRate(
+        data.fallbackControl.type === 'default'
+            ? (data.fallbackControl.data.defaultControl.setGradW ?? null)
+            : null,
+    );
 });
 
 function main() {

@@ -8,6 +8,7 @@ import {
     calculateInverterConfiguration,
     generateControlsModelWriteFromInverterConfiguration,
 } from '../src/coordinator/helpers/inverterController';
+import { RampRateHelper } from '../src/coordinator/helpers/rampRate';
 
 // This debugging script simulates dynamic export control (without actually sending commands to inverters)
 // It polls SunSpec data and telemetry
@@ -33,11 +34,14 @@ const sunSpecDataEventEmitter = new SunSpecDataHelper({
     metersConnections,
 });
 
+const rampRateHelper = new RampRateHelper();
+
 sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
     const inverterConfiguration = calculateInverterConfiguration({
         activeDerControlBaseValues: simulatedActiveDerControlBase,
         inverterControlsData: invertersData.map(({ controls }) => controls),
         monitoringSample,
+        rampRateHelper,
     });
 
     const inverterControls = invertersData.map(({ controls }) =>

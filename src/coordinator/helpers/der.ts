@@ -14,6 +14,7 @@ import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics'
 import { type NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import { PVConn, type StatusModel } from '../../sunspec/models/status';
+import type { RampRateHelper } from './rampRate';
 
 const derControlTypeModes: DERControlType =
     DERControlType.opModConnect | DERControlType.opModEnergize;
@@ -54,9 +55,13 @@ export function getDerCapabilityResponseFromSunSpecArray(
     };
 }
 
-export function getDerSettingsResponseFromSunSpecArray(
-    settingsModels: SettingsModel[],
-): DERSettings {
+export function getDerSettingsResponseFromSunSpecArray({
+    settingsModels,
+    rampRateHelper,
+}: {
+    settingsModels: SettingsModel[];
+    rampRateHelper: RampRateHelper;
+}): DERSettings {
     const metrics = getAggregatedSettingsMetrics(settingsModels);
     const setMaxVA = metrics.VAMax
         ? convertNumberToBaseAndPow10Exponent(metrics.VAMax)
@@ -70,7 +75,9 @@ export function getDerSettingsResponseFromSunSpecArray(
         updatedTime: new Date(),
         // hard-coded modes
         modesEnabled: derControlTypeModes,
-        setGradW: metrics.WGra ?? 0,
+        // SunSpec inverters don't properly support WGra
+        // so we use a software based implementation of ramp rates
+        setGradW: rampRateHelper.getDerSettingsSetGradW(),
         setMaxVA: setMaxVA
             ? {
                   value: setMaxVA.base,

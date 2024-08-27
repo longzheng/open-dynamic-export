@@ -19,6 +19,7 @@ import type { StatusModel } from '../../sunspec/models/status';
 import type { PollRate } from '../models/pollRate';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import deepEqual from 'fast-deep-equal';
+import type { RampRateHelper } from '../../coordinator/helpers/rampRate';
 
 type Config = {
     der: DER;
@@ -37,16 +38,20 @@ export class DerHelper {
     private lastSentDerStatus: DERStatus | null = null;
     private invertersConnections: InverterSunSpecConnection[];
     private pollTimer: NodeJS.Timeout | null = null;
+    private rampRateHelper: RampRateHelper;
 
     constructor({
         client,
         invertersConnections,
+        rampRateHelper,
     }: {
         client: SEP2Client;
         invertersConnections: InverterSunSpecConnection[];
+        rampRateHelper: RampRateHelper;
     }) {
         this.client = client;
         this.invertersConnections = invertersConnections;
+        this.rampRateHelper = rampRateHelper;
 
         this.logger = pinoLogger.child({ module: 'DerHelper' });
     }
@@ -85,9 +90,10 @@ export class DerHelper {
             this.lastSentDerCapability = derCapability;
         }
 
-        const derSettings = getDerSettingsResponseFromSunSpecArray(
-            data.map((data) => data.settings),
-        );
+        const derSettings = getDerSettingsResponseFromSunSpecArray({
+            settingsModels: data.map((data) => data.settings),
+            rampRateHelper: this.rampRateHelper,
+        });
 
         this.logger.trace(
             {

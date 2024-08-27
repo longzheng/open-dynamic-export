@@ -19,6 +19,7 @@ import { getTotalFromPerPhaseMeasurement } from '../../helpers/power';
 import { getAveragePowerRatio } from '../../sunspec/helpers/controls';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
+import type { RampRateHelper } from './rampRate';
 
 type SupportedControlTypes = Extract<
     ControlType,
@@ -40,6 +41,7 @@ type InverterConfiguration =
     | {
           type: 'limit';
           targetSolarPowerRatio: number;
+          rampedTargetSolarPowerRatio: number;
       };
 
 const defaultValues = {
@@ -59,20 +61,24 @@ export class InverterController {
     private cachedInvertersData: InvertersData | null = null;
     private applyControl: boolean;
     private logger: Logger;
+    private rampRateHelper: RampRateHelper;
 
     constructor({
         client,
         invertersConnections,
         applyControl,
+        rampRateHelper,
     }: {
         client: SEP2Client;
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
+        rampRateHelper: RampRateHelper;
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
+        this.rampRateHelper = rampRateHelper;
 
         this.schedulerByControlType = {
             opModExpLimW: new ControlSchedulerHelper({
@@ -136,6 +142,7 @@ export class InverterController {
             activeDerControlBaseValues,
             inverterControlsData: this.cachedInvertersData.inverterControlsData,
             monitoringSample: this.cachedInvertersData.monitoringSample,
+            rampRateHelper: this.rampRateHelper,
         });
 
         this.logger.info(
@@ -181,10 +188,12 @@ export function calculateInverterConfiguration({
     activeDerControlBaseValues,
     inverterControlsData,
     monitoringSample,
+    rampRateHelper,
 }: {
     activeDerControlBaseValues: ActiveDERControlBaseValues;
     inverterControlsData: ControlsModel[];
     monitoringSample: MonitoringSample;
+    rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
     const logger = pinoLogger.child({ module: 'calculateDynamicExportConfig' });
 
@@ -233,7 +242,10 @@ export function calculateInverterConfiguration({
 
     // the limits need to be applied together
     // take the lesser of the export limit target solar watts or generation limit
+    const targetSolarWatts = Math.min(
+        exportLimitTargetSolarWatts,
         generationLimitWatts,
+    );
 
     const currentAveragePowerRatio = getAveragePowerRatio(inverterControlsData);
 
@@ -241,6 +253,11 @@ export function calculateInverterConfiguration({
         currentPowerRatio: currentAveragePowerRatio,
         currentSolarWatts: solarWatts,
         targetSolarWatts,
+    });
+
+    const rampedTargetSolarPowerRatio = rampRateHelper.calculateRampValue({
+        current: currentAveragePowerRatio,
+        target: targetSolarPowerRatio,
     });
 
     logger.trace(
@@ -260,6 +277,7 @@ export function calculateInverterConfiguration({
     return {
         type: 'limit',
         targetSolarPowerRatio,
+        rampedTargetSolarPowerRatio,
     };
 }
 
@@ -291,7 +309,7 @@ export function generateControlsModelWriteFromInverterConfiguration({
                 WMaxLim_Ena: WMaxLim_Ena.ENABLED,
                 WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
                     targetSolarPowerRatio:
-                        inverterConfiguration.targetSolarPowerRatio,
+                        inverterConfiguration.rampedTargetSolarPowerRatio,
                     controlsModel,
                 }),
                 // revert WMaxLimtPct in 60 seconds
