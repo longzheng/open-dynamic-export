@@ -32,7 +32,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{} vars.DOCKERHUB_REPO }:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:latest
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
