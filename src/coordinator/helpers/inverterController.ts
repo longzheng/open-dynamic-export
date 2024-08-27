@@ -295,8 +295,13 @@ export function generateControlsModelWriteFromInverterConfiguration({
             return {
                 ...controlsModel,
                 Conn: Conn.DISCONNECT,
-                // some devices may not support setting Conn so we also try setting power to 0
-                WMaxLim_Ena: WMaxLim_Ena.ENABLED,
+                // revert Conn in 60 seconds
+                // this is a safety measure in case the SunSpec connection is lost
+                // we want to revert the inverter to the default which is assumed to be safe
+                // we assume we will write another config witin 60 seconds to reset this timeout
+                Conn_RvrtTms: 60,
+                WMaxLim_Ena: WMaxLim_Ena.DISABLED,
+                // set value to 0 to gracefully handle re-energising and calculating target power ratio
                 WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
                     targetSolarPowerRatio: 0,
                     controlsModel,
@@ -317,7 +322,7 @@ export function generateControlsModelWriteFromInverterConfiguration({
                 // revert WMaxLimtPct in 60 seconds
                 // this is a safety measure in case the SunSpec connection is lost
                 // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another dynamic export config witin 60 seconds to reset this timeout
+                // we assume we will write another config witin 60 seconds to reset this timeout
                 WMaxLimPct_RvrtTms: 60,
                 VArPct_Ena: VArPct_Ena.DISABLED,
                 OutPFSet_Ena: OutPFSet_Ena.DISABLED,
