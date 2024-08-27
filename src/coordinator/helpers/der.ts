@@ -104,7 +104,7 @@ export function getDerStatusResponseFromSunSpecArray(
     const now = new Date();
     const operationalModeStatus: OperationalModeStatus = enumHasValue(
         metrics.PVConn,
-        PVConn.OPERATING,
+        PVConn.CONNECTED,
     )
         ? OperationalModeStatus.OperationalMode
         : OperationalModeStatus.Off;
