@@ -19,7 +19,7 @@ export class RampRateHelper {
     private lastRampTime: Date | null = null;
 
     // returns the setGradW value for DERSettings
-    // value is represented in hundredths of a precent
+    // setGradW is represented in hundredths of a percent
     // e.g. 27 = 0.27% per second
     getDerSettingsSetGradW(): number {
         switch (this.rampRate.type) {
@@ -32,7 +32,7 @@ export class RampRateHelper {
         }
     }
 
-    // value is represented in hundredths of a precent
+    // setGradW is represented in hundredths of a percent
     // e.g. 27 = 0.27% per second
     setRampRate(setGradW: number | null) {
         if (setGradW === null) {
@@ -76,7 +76,8 @@ export class RampRateHelper {
 
                 const now = new Date();
 
-                // start ramping (nothing happens on this cycle, return current value)
+                // start ramping
+                // reeturn the current value and wait until a future cycle
                 if (this.lastRampTime === null) {
                     this.lastRampTime = now;
                     return currentPowerRatio;
@@ -85,16 +86,10 @@ export class RampRateHelper {
                 const secondsSinceStartOfRamp =
                     (now.getTime() - this.lastRampTime.getTime()) / 1000;
 
-                // ramping values sub-second does not usually work because the changes are too small for the inverter to apply (usually 2 decimal points)
-                // skip the cycle if it's less than a second
-                if (secondsSinceStartOfRamp < 1) {
-                    return currentPowerRatio;
-                }
-
-                const timeFactoredRampRate = new Decimal(
+                const timeFactoredRampRatio = new Decimal(
                     this.rampRate.percentPerSecond,
                 )
-                    .div(100)
+                    .div(100) // ramp rate is expressed in %, convert to ratio
                     .mul(secondsSinceStartOfRamp)
                     .toNumber();
 
@@ -103,16 +98,22 @@ export class RampRateHelper {
                     .toNumber();
 
                 const diffAbs = Math.abs(diff);
+
                 const diffSign = Math.sign(diff);
 
-                const cappedDiff =
-                    Math.min(diffAbs, timeFactoredRampRate) * diffSign;
+                const cappedDiff = Math.min(diffAbs, timeFactoredRampRatio);
+
+                // power ratio values are only applicable in SunSpec to 2 decimal points (0.01%)
+                // if the difference is too small, return the current value and wait until a future cycle (with more time)
+                if (cappedDiff < 0.0001) {
+                    return currentPowerRatio;
+                }
 
                 // update the ramp time for the next cycle
                 this.lastRampTime = now;
 
                 return new Decimal(currentPowerRatio)
-                    .plus(cappedDiff)
+                    .plus(cappedDiff * diffSign)
                     .toNumber();
             }
             case 'noLimit': {
