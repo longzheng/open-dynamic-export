@@ -163,7 +163,14 @@ export class InverterController {
                     });
 
                 if (this.applyControl) {
-                    await inverter.writeControlsModel(writeControlsModel);
+                    try {
+                        await inverter.writeControlsModel(writeControlsModel);
+                    } catch (error) {
+                        this.logger.error(
+                            error,
+                            'Error writing inverter controls value',
+                        );
+                    }
                 }
             }),
         );
