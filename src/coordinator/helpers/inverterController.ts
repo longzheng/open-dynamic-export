@@ -40,6 +40,7 @@ type InverterConfiguration =
     | { type: 'deenergize' }
     | {
           type: 'limit';
+          currentPowerRatio: number;
           targetSolarPowerRatio: number;
           rampedTargetSolarPowerRatio: number;
       };
@@ -247,16 +248,16 @@ export function calculateInverterConfiguration({
         generationLimitWatts,
     );
 
-    const currentAveragePowerRatio = getAveragePowerRatio(inverterControlsData);
+    const currentPowerRatio = getAveragePowerRatio(inverterControlsData);
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
-        currentPowerRatio: currentAveragePowerRatio,
+        currentPowerRatio,
         currentSolarWatts: solarWatts,
         targetSolarWatts,
     });
 
     const rampedTargetSolarPowerRatio = rampRateHelper.calculateRampValue({
-        current: currentAveragePowerRatio,
+        current: currentPowerRatio,
         target: targetSolarPowerRatio,
     });
 
@@ -268,7 +269,7 @@ export function calculateInverterConfiguration({
             exportLimitTargetSolarWatts,
             generationLimitWatts,
             targetSolarWatts,
-            currentAveragePowerRatio,
+            currentPowerRatio,
             targetSolarPowerRatio,
         },
         'calculated values',
@@ -276,6 +277,7 @@ export function calculateInverterConfiguration({
 
     return {
         type: 'limit',
+        currentPowerRatio,
         targetSolarPowerRatio,
         rampedTargetSolarPowerRatio,
     };
