@@ -5,9 +5,9 @@ export const logger = pino({
     transport: {
         targets: [
             {
-                target: 'pino/file',
+                target: 'pino-rotating-file-stream',
                 level: 'debug',
-                options: { destination: `./logs/debug.log` },
+                options: { filename: 'debug.log', path: `./logs/` },
             },
             {
                 target: 'pino-pretty',
