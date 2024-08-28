@@ -66,8 +66,8 @@ The downside of a direct client approach is the registration process is manual a
 - [x] SEP2/IEEE 2030.5 client
   - [x] Discovery and scheduled entity polling
   - [x] DER status/capability/settings reporting
-  - [x] DER control scheduling
-  - [x] Mirror usage point site/DER telemetry reporting
+  - [x] DER control scheduling and default DER control fallback
+  - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
 - [x] SunSpec Modbus client
   - [x] Model scanning
   - [x] Inverter/meters data polling
@@ -94,7 +94,7 @@ The Node.js application can be run both directly and via a Docker image.
 3. In the `./config` folder make a copy of `config.json.example` and rename it to `config.json`, modify the relevant values
 4. Run `npm run start`
 
-#### Docker
+#### Docker compose
 
 1. Create a Docker Compose file `compose.yaml` with the following content
 
