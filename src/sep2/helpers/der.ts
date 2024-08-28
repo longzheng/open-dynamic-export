@@ -84,7 +84,12 @@ export class DerHelper {
             'DER capability',
         );
 
-        if (!deepEqual(derCapability, this.lastSentDerCapability)) {
+        if (
+            !this.isDerCapabilityEqual(
+                derCapability,
+                this.lastSentDerCapability,
+            )
+        ) {
             void this.putDerCapability({ derCapability });
 
             this.lastSentDerCapability = derCapability;
@@ -139,21 +144,28 @@ export class DerHelper {
                   defaultPollPushRates.endDeviceListPoll * 1000,
         );
 
-        const inverterData = await Promise.all(
-            this.invertersConnections.map(async (inverter) => {
-                return {
-                    status: await inverter.getStatusModel(),
-                };
-            }),
-        );
+        try {
+            const inverterData = await Promise.all(
+                this.invertersConnections.map(async (inverter) => {
+                    return {
+                        status: await inverter.getStatusModel(),
+                    };
+                }),
+            );
 
-        const derStatus = getDerStatusResponseFromSunSpecArray(
-            inverterData.map((data) => data.status),
-        );
+            const derStatus = getDerStatusResponseFromSunSpecArray(
+                inverterData.map((data) => data.status),
+            );
 
-        void this.putDerStatus({ derStatus });
+            void this.putDerStatus({ derStatus });
 
-        this.lastSentDerStatus = derStatus;
+            this.lastSentDerStatus = derStatus;
+        } catch (error) {
+            this.logger.error(
+                error,
+                'Error updating DER status during scheduled poll',
+            );
+        }
     }
 
     private async putDerCapability({
@@ -172,7 +184,11 @@ export class DerHelper {
         const response = generateDerCapability(derCapability);
         const xml = objectToXml(response);
 
-        await this.client.put(this.config.der.derCapabilityLink.href, xml);
+        try {
+            await this.client.put(this.config.der.derCapabilityLink.href, xml);
+        } catch (error) {
+            this.logger.error(error, 'Error updating DER capability');
+        }
     }
 
     private async putDerSettings({
@@ -191,7 +207,11 @@ export class DerHelper {
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
 
-        await this.client.put(this.config.der.derSettingsLink.href, xml);
+        try {
+            await this.client.put(this.config.der.derSettingsLink.href, xml);
+        } catch (error) {
+            this.logger.error(error, 'Error updating DER settings');
+        }
     }
 
     private async putDerStatus({ derStatus }: { derStatus: DERStatus }) {
@@ -206,7 +226,11 @@ export class DerHelper {
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);
 
-        await this.client.put(this.config.der.derStatusLink.href, xml);
+        try {
+            await this.client.put(this.config.der.derStatusLink.href, xml);
+        } catch (error) {
+            this.logger.error(error, 'Error updating DER capability');
+        }
     }
 
     // check if the DERStatus has changed
@@ -229,5 +253,12 @@ export class DerHelper {
             deepEqual(current.setMaxW, last.setMaxW) &&
             deepEqual(current.setMaxVar, last.setMaxVar)
         );
+    }
+
+    private isDerCapabilityEqual(
+        current: DERCapability,
+        last: DERCapability | null,
+    ) {
+        return deepEqual(current, last);
     }
 }
