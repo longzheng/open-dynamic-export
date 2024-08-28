@@ -1,61 +1,30 @@
-import {
-    safeParseStringToEnumType,
-    stringHexToEnumType,
-} from '../../helpers/enum';
 import { numberToHex } from '../../helpers/number';
 import { assertString } from '../helpers/assert';
 import { xmlns } from '../helpers/namespace';
-import {
-    parseIdentifiedObjectXmlObject,
-    type IdentifiedObject,
-} from './identifiedObject';
 import { parsePostRateXmlObject, type PostRate } from './postRate';
-import { type RoleFlagsType } from './roleFlagsType';
-import { ServiceKind } from './serviceKind';
+import {
+    parseUsagePointBaseXmlObject,
+    type UsagePointBase,
+} from './usagePointBase';
 
-export enum MirrorUsagePointStatus {
-    Off = '0',
-    On = '1',
-}
-
-// A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN.
 export type MirrorUsagePoint = {
     postRate?: PostRate;
-    roleFlags: RoleFlagsType;
-    serviceCategoryKind: ServiceKind;
-    status: MirrorUsagePointStatus;
     deviceLFDI: string;
-} & IdentifiedObject; // TODO this should be UsagePointBase
+} & UsagePointBase;
 
 export function parseMirrorUsagePointXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mirrorUsagePointObject: any,
 ): MirrorUsagePoint {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const identifiedObject = parseIdentifiedObjectXmlObject(
-        mirrorUsagePointObject,
-    );
+    const usagePointBase = parseUsagePointBaseXmlObject(mirrorUsagePointObject);
     const postRate = parsePostRateXmlObject(mirrorUsagePointObject);
-    const roleFlags = stringHexToEnumType<RoleFlagsType>(
-        assertString(mirrorUsagePointObject['roleFlags'][0]),
-    );
-    const serviceCategoryKind = safeParseStringToEnumType(
-        assertString(mirrorUsagePointObject['serviceCategoryKind'][0]),
-        ServiceKind,
-    );
-    const status = safeParseStringToEnumType(
-        assertString(mirrorUsagePointObject['status'][0]),
-        MirrorUsagePointStatus,
-    );
     const deviceLFDI = assertString(mirrorUsagePointObject['deviceLFDI'][0]);
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
-        ...identifiedObject,
+        ...usagePointBase,
         postRate,
-        roleFlags,
-        serviceCategoryKind,
-        status,
         deviceLFDI,
     };
 }

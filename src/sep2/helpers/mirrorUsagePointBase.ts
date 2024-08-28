@@ -6,7 +6,6 @@ import type { MirrorMeterReading } from '../models/mirrorMeterReading';
 import { generateMirrorMeterReadingResponse } from '../models/mirrorMeterReading';
 import type { MirrorUsagePoint } from '../models/mirrorUsagePoint';
 import {
-    MirrorUsagePointStatus,
     generateMirrorUsagePointResponse,
     parseMirrorUsagePointXmlObject,
 } from '../models/mirrorUsagePoint';
@@ -14,6 +13,7 @@ import type { RoleFlagsType } from '../models/roleFlagsType';
 import { ServiceKind } from '../models/serviceKind';
 import { objectToXml } from './xml';
 import type { Logger } from 'pino';
+import { UsagePointBaseStatus } from '../models/usagePointBase';
 
 export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
     protected client: SEP2Client;
@@ -42,7 +42,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         const existingMirrorUsagePoint = mirrorUsagePoints.find(
             (point) =>
                 point.deviceLFDI === this.client.lfdi &&
-                point.status === MirrorUsagePointStatus.On &&
+                point.status === UsagePointBaseStatus.On &&
                 point.roleFlags === this.roleFlags,
         );
 
@@ -59,7 +59,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
                 description: this.description,
                 roleFlags: this.roleFlags,
                 serviceCategoryKind: ServiceKind.Electricity,
-                status: MirrorUsagePointStatus.On,
+                status: UsagePointBaseStatus.On,
                 deviceLFDI: this.client.lfdi,
             },
         });

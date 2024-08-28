@@ -44,8 +44,6 @@ export function generateDerStatusResponse({
             },
             genConnectStatus: {
                 dateTime: dateToStringSeconds(genConnectStatus.dateTime),
-                // TODO: in the handbook documentation this is explained as an explicit
-                // however in the spec this is a bitmap flag
                 value: numberToHex(genConnectStatus.value).padStart(2, '0'),
             },
         },

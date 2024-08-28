@@ -29,7 +29,7 @@ export type MirrorMeterReading = {
         intervalLength: number;
         uom: UomType;
     };
-} & IdentifiedObject; // TODO this should be MeterReadingBase
+} & IdentifiedObject;
 
 export function generateMirrorMeterReadingResponse({
     mRID,

@@ -3,12 +3,12 @@ import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks';
 import {
     parseMirrorUsagePointXmlObject,
-    MirrorUsagePointStatus,
     generateMirrorUsagePointResponse,
 } from './mirrorUsagePoint';
 import { RoleFlagsType } from './roleFlagsType';
 import { ServiceKind } from './serviceKind';
 import { objectToXml } from '../helpers/xml';
+import { UsagePointBaseStatus } from './usagePointBase';
 
 it('should parse end device DER with XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -30,7 +30,7 @@ it('should parse end device DER with XML', async () => {
     expect(mirrorUsagePoint.serviceCategoryKind).toEqual(
         ServiceKind.Electricity,
     );
-    expect(mirrorUsagePoint.status).toEqual(MirrorUsagePointStatus.On);
+    expect(mirrorUsagePoint.status).toEqual(UsagePointBaseStatus.On);
     expect(mirrorUsagePoint.deviceLFDI).toEqual(
         '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
     );
@@ -45,7 +45,7 @@ describe('generateMirrorUsagePointResponse', () => {
                 RoleFlagsType.isPremisesAggregationPoint |
                 RoleFlagsType.isMirror,
             serviceCategoryKind: ServiceKind.Electricity,
-            status: MirrorUsagePointStatus.On,
+            status: UsagePointBaseStatus.On,
             deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
         });
 
@@ -71,7 +71,7 @@ describe('generateMirrorUsagePointResponse', () => {
                 RoleFlagsType.isMirror |
                 RoleFlagsType.isSubmeter,
             serviceCategoryKind: ServiceKind.Electricity,
-            status: MirrorUsagePointStatus.On,
+            status: UsagePointBaseStatus.On,
             deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
         });
 

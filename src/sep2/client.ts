@@ -141,19 +141,14 @@ response data: ${JSON.stringify(error.response?.data, null, 2)}`,
         });
     }
 
-    // async postDerControlResponse(
-    //     replyToHref: string,
-    //     response: DerControlResponse,
-    // ) {
-    //     const data = generateDerControlResponse(response);
-    //     const xml = objectToXml(data);
-    //     return await this.postResponse(replyToHref, xml);
-    // }
-
+    // From the SEP2 Client Handbook
+    // A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN
     generateUsagePointMrid(roleFlags: RoleFlagsType) {
         return `${this.lfdi.substring(0, 22)}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
     }
 
+    // From the SEP2 Client Handbook
+    // The mRID of each MeterReading needs to be unique for that EndDevice
     generateMeterReadingMrid() {
         return `${randomUUID().replace(/-/g, '').substring(0, 24)}${this.pen}`;
     }
