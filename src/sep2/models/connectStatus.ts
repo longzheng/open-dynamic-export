@@ -1,5 +1,3 @@
-import { mapEnumValueToEnumFlagsObject } from '../../helpers/enum';
-
 // DER ConnectStatus value (bitmap):
 // 0 - Connected
 // 1 - Available
@@ -13,12 +11,4 @@ export enum ConnectStatus {
     Operating = 1 << 2,
     Test = 1 << 3,
     Fault = 1 << 4,
-}
-
-export type ConnectStatusObject = Record<keyof typeof ConnectStatus, boolean>;
-
-export function mapEnumNumberToConnectStatusObject(
-    value: number,
-): ConnectStatusObject {
-    return mapEnumValueToEnumFlagsObject(value, ConnectStatus);
 }
