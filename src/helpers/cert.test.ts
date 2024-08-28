@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getCertificateLfdi } from './cert';
+import {
+    formatDateToYYMMDDhhmmssZ,
+    getCertificateLfdi,
+    INDEF_EXPIRY,
+} from './cert';
 
 describe('getCertificateLfdi', () => {
     it('returns valid LFDI', () => {
@@ -74,5 +78,13 @@ EAKsOJor4O3nAiEA49GIjhIUlKVggODrt9nUnhKZcxn0qSmmBAdeN0pd1y8=
         const lfdi = getCertificateLfdi(certString);
 
         expect(lfdi).toBe('0F8872FF54ACDC4A9B789F0872255051D0BDBB64');
+    });
+});
+
+describe('formatDateToYYMMDDhhmmssZ', () => {
+    it('indefinite expiry should return expected value', () => {
+        const formattedDate = formatDateToYYMMDDhhmmssZ(INDEF_EXPIRY);
+
+        expect(formattedDate).toBe('99991231235959Z');
     });
 });

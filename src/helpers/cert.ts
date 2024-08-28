@@ -6,23 +6,36 @@ import rs from 'jsrsasign';
 
 // ported from https://github.com/aguinane/SEP2-Tools/blob/213b19d8c1ebd4144fc8c4a226e7f02f702ff337/sep2tools/cert_create.py
 // SEP2 requires certificates that don't expire
-const INDEF_EXPIRY = new Date('9999-12-31T23:59:59Z');
+export const INDEF_EXPIRY = new Date('9999-12-31T23:59:59Z');
 
 // OID for "X509v3 Any Policy"
 const ANY_POLICY_OID = '2.5.29.32.0';
 
+// { iso(1) identified-organizations(3) dod(6) internet(1) private(4) enterprise(1) 40732 }
+const ieee20305Identifier = '1.3.6.1.4.1.40732';
+
 // IEEE 2030.5 device type assignments (Section 6.11.7.2)
-const SEP2_DEV_GENERIC = '1.3.6.1.4.1.40732.1.1';
-const SEP2_DEV_MOBILE = '1.3.6.1.4.1.40732.1.2';
-const SEP2_DEV_POSTMANUF = '1.3.6.1.4.1.40732.1.3';
+const deviceTypeIdentifier = `${ieee20305Identifier}.1`;
+// used for most devices
+const SEP2_DEV_GENERIC = `${deviceTypeIdentifier}.1`;
+// used in addition to SEP2_DEV_GENERIC to identify "mobile" IEEE 2030.5 entities (may be homed to multiple ESI domains)
+const SEP2_DEV_MOBILE = `${deviceTypeIdentifier}.2`;
+// used in device certs issued post-manufacture
+const SEP2_DEV_POSTMANUF = `${deviceTypeIdentifier}.3`;
 
 // IEEE 2030.5 policy assignments (Section 6.11.7.3)
-const SEP2_TEST_CERT = '1.3.6.1.4.1.40732.2.1';
-const SEP2_SELFSIGNED = '1.3.6.1.4.1.40732.2.2';
-const SEP2_SERVPROV = '1.3.6.1.4.1.40732.2.3';
-const SEP2_BULK_CERT = '1.3.6.1.4.1.40732.2.4';
+const policyIdentifier = `${ieee20305Identifier}.2`;
+// MUST be included in test certificates
+const SEP2_TEST_CERT = `${policyIdentifier}.1`;
+// MUST be included in IEEE 2030.5 self-signed certificates
+const SEP2_SELFSIGNED = `${policyIdentifier}.2`;
+// MUST be included in commercial certificates issued to service providers for IEEE 2030.5 purposes.
+const SEP2_SERVPROV = `${policyIdentifier}.3`;
+// MUST be included in bulk-issued certificates (e.g. where the private key is generated off the device by the issuing CA)
+const SEP2_BULK_CERT = `${policyIdentifier}.4`;
 
 // HardwareModuleName (Section 6.11.7.4)
+// { iso (1) identified-organizations(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) on(8) 4 }
 const SEP2_HARDWARE_MODULE_NAME = '1.3.6.1.5.5.7.8.4';
 
 const DEFAULT_MICA_POLICIES = [SEP2_DEV_GENERIC, SEP2_TEST_CERT];
@@ -206,7 +219,7 @@ export function generateDeviceCertificate({
     console.log(`Device certificate file "${certPath}" created`);
 }
 
-function formatDateToYYMMDDhhmmssZ(date: Date): string {
+export function formatDateToYYMMDDhhmmssZ(date: Date): string {
     const year = date.getUTCFullYear();
     const month = (date.getUTCMonth() + 1).toString().padStart(2, '0'); // Months are zero-based in JS
     const day = date.getUTCDate().toString().padStart(2, '0');
