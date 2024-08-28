@@ -24,6 +24,7 @@ import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
 import type { RampRateHelper } from './rampRate';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
+import type { InverterModel } from '../../sunspec/models/inverter';
 
 type SupportedControlTypes = Extract<
     ControlType,
@@ -31,7 +32,11 @@ type SupportedControlTypes = Extract<
 >;
 
 type SunSpecData = {
-    inverters: { nameplate: NameplateModel; controls: ControlsModel }[];
+    inverters: {
+        inverter: InverterModel;
+        nameplate: NameplateModel;
+        controls: ControlsModel;
+    }[];
     monitoringSample: MonitoringSample;
 };
 
@@ -345,7 +350,12 @@ export function getWMaxLimPctFromTargetSolarPowerRatio({
 }) {
     return Math.round(
         numberWithPow10(
-            new Decimal(targetSolarPowerRatio).times(100).toNumber(),
+            Decimal.min(
+                new Decimal(targetSolarPowerRatio),
+                1, // cap maximum to 1
+            )
+                .times(100)
+                .toNumber(),
             -controlsModel.WMaxLimPct_SF,
         ),
     );
@@ -359,7 +369,7 @@ export function getCurrentPowerRatio({
     currentSolarWatts: number;
 }) {
     return averageNumbersArray(
-        inverters.map(({ controls, nameplate }, invertersIndex) => {
+        inverters.map(({ controls, inverter, nameplate }, invertersIndex) => {
             // if the WMaxLim_Ena is not enabled, we are not yet controlling the inverter
             // we're not sure if the inverter is under any control that is invisible to SunSpec (e.g. export limit) that might be affecting the output
             // so we can't know definitely what the "actual" power ratio is
@@ -368,12 +378,17 @@ export function getCurrentPowerRatio({
             // because it will never be 100% efficient, this means that we should always underestimate the power ratio
             // which is a safe assumption, but we hope future update cycles will find the "correct" power ratio
             if (controls.WMaxLim_Ena !== WMaxLim_Ena.ENABLED) {
+                const solarWatts = numberWithPow10(inverter.W, inverter.W_SF);
+
                 const nameplateWatts = numberWithPow10(
                     nameplate.WRtg,
                     nameplate.WRtg_SF,
                 );
 
-                const estimatedPowerRatio = currentSolarWatts / nameplateWatts;
+                const estimatedPowerRatio = Math.min(
+                    solarWatts / nameplateWatts,
+                    1, // cap maximum to 1 (possible due to inverter overclocking)
+                );
 
                 pinoLogger.info(
                     {
