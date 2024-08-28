@@ -128,19 +128,19 @@ export function getDerStatusResponseFromSunSpecArray(
 export function getConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
     let result: ConnectStatus = 0 as ConnectStatus;
 
-    if (pvConn & PVConn.CONNECTED) {
+    if (enumHasValue(pvConn, PVConn.CONNECTED)) {
         result += ConnectStatus.Connected;
     }
 
-    if (pvConn & PVConn.AVAILABLE) {
+    if (enumHasValue(pvConn, PVConn.AVAILABLE)) {
         result += ConnectStatus.Available;
     }
 
-    if (pvConn & PVConn.OPERATING) {
+    if (enumHasValue(pvConn, PVConn.OPERATING)) {
         result += ConnectStatus.Operating;
     }
 
-    if (pvConn & PVConn.TEST) {
+    if (enumHasValue(pvConn, PVConn.TEST)) {
         result += ConnectStatus.Test;
     }
 
