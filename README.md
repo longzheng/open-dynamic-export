@@ -94,7 +94,7 @@ The Node.js application can be run both directly and via a Docker image.
 3. In the `./config` folder make a copy of `config.json.example` and rename it to `config.json`, modify the relevant values
 4. Run `npm run start`
 
-#### Docker
+#### Docker compose
 
 1. Create a Docker Compose file `compose.yaml` with the following content
 
