@@ -50,7 +50,7 @@ export function sunSpecModelFactory<
                     address.length,
                 );
 
-            logger.trace({ registers }, 'Read registers');
+            logger.trace({ registers: registers.data }, 'Read registers');
 
             return convertReadRegisters({
                 registers: registers.data,
@@ -79,9 +79,7 @@ export function sunSpecModelFactory<
                 registerValues,
             );
 
-            logger.trace('Wrote registers');
-
-            logger.trace({ registerValues }, 'Validating written registers');
+            logger.trace('Wrote registers, validating written registers');
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
