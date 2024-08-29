@@ -2,7 +2,7 @@
 
 ## About
 
-This project aims to implement dynamic export control using Node.js/TypeScript implementing SEP2/IEEE 2030.5-2018/CSIP-AUS (utility connection) and SunSpec Modbus (inverter connection) to satisfy the dynamic connections requirement of various Austrailan energy markets.   
+This project aims to implement dynamic export control using Node.js/TypeScript implementing CSIP-AUS/SEP2/IEEE 2030.5-2018 (utility connection) and SunSpec Modbus (inverter connection) to satisfy the dynamic connections requirement of various Austrailan energy markets.   
 
 The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
@@ -57,9 +57,9 @@ sequenceDiagram
     end
 ```
 
-The initial plan is to implement a SEP2 direct gateway client that interacts directly with the utility server and the DER (solar inverters). This client will be hosted on-site (e.g. home server/Raspberry Pi) using a Docker container and communicate directly with DER in the same local network using Modbus TCP.
+The initial plan is to implement a direct gateway client that interacts directly with the utility server and the DER (solar inverters). This client will be hosted on-site (e.g. home server/Raspberry Pi) using a Docker container and communicate directly with DER in the same local network using Modbus TCP.
 
-The downside of a direct client approach is the registration process is manual and requires generating keys and certificates for each site/NMI. If the project is successful, a future cloud hosted instance will use a cloud proxy gateway architecture to allow self-service registration.
+The downside of a direct client approach is the registration process is manual and requires generating keys and certificates for each site/NMI. If the project is successful, a future version will allow self-service registration or a cloud-hosted aggregator proxy.
 
 ## Features
 
@@ -83,7 +83,7 @@ Future
 ## Running server
 
 > [!IMPORTANT]
-> This application cannot run without certified issued by the utility server which must be manually registered and is not provided in this repository. A future version of this application will support a self-service registration process.
+> This application cannot run without device certificates (and manufacturer certificates issued by the utility server which must be manually registered) and is not provided in this repository. A future version of this application will support a self-service device registration process.
 
 The Node.js application can be run both directly and via a Docker image.
 
@@ -114,7 +114,7 @@ services:
 
 ## Private key and CSR
 
-The SEP2 server uses PKI certificates to authorise and identify clients.
+The CSIP-AUS/SEP2/IEEE 2030.5 server uses PKI certificates to authorise and identify clients.
 
 As a direct client, there needs to be two certificates, one for the "manufacturer" and one for the "device". The "manufacturer" certificate needs to be signed by the utility Smart Energy Root CA (SERCA). Then the "device" certificate is signed with the "manufacturer" certificate & key.
 
