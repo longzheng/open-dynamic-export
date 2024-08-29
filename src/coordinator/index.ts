@@ -13,6 +13,8 @@ import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAss
 import { DerControlsHelper } from '../sep2/helpers/derControls';
 import { InverterController } from './helpers/inverterController';
 import { RampRateHelper } from './helpers/rampRate';
+import { influxDbWriteApi } from '../helpers/influxdb';
+import { Point } from '@influxdata/influxdb-client';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -165,6 +167,58 @@ function main() {
             logger.trace(
                 { invertersData, monitoringSample },
                 'Received SunSpec data',
+            );
+
+            influxDbWriteApi.writePoints(
+                [
+                    new Point('monitoringSample')
+                        .tag('type', 'der')
+                        .floatField(
+                            'reactivePower',
+                            monitoringSample.der.reactivePower,
+                        )
+                        .floatField(
+                            'frequency',
+                            monitoringSample.der.frequency,
+                        ),
+                    new Point('monitoringSample')
+                        .tag('type', 'der')
+                        .tag('phase', 'A')
+                        .floatField(
+                            'realPower',
+                            monitoringSample.der.realPower.phaseA,
+                        )
+                        .floatField(
+                            'voltage',
+                            monitoringSample.der.voltage.phaseA,
+                        ),
+                    monitoringSample.der.realPower.phaseB
+                        ? new Point('monitoringSample')
+                              .tag('type', 'der')
+                              .tag('phase', 'B')
+                              .floatField(
+                                  'realPower',
+                                  monitoringSample.der.realPower.phaseB,
+                              )
+                              .floatField(
+                                  'voltage',
+                                  monitoringSample.der.voltage.phaseB,
+                              )
+                        : null,
+                    monitoringSample.der.realPower.phaseB
+                        ? new Point('monitoringSample')
+                              .tag('type', 'der')
+                              .tag('phase', 'C')
+                              .floatField(
+                                  'realPower',
+                                  monitoringSample.der.realPower.phaseC,
+                              )
+                              .floatField(
+                                  'voltage',
+                                  monitoringSample.der.voltage.phaseC,
+                              )
+                        : null,
+                ].filter((point) => point !== null),
             );
 
             derHelper.onInverterData(invertersData);

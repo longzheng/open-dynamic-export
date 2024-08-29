@@ -16,6 +16,9 @@ import {
 import { CurrentStatus } from '../models/eventStatus';
 import { randomInt } from 'crypto';
 import { addSeconds, isEqual, max } from 'date-fns';
+import { influxDbWriteApi } from '../../helpers/influxdb';
+import { Point } from '@influxdata/influxdb-client';
+import { numberWithPow10 } from '../../helpers/number';
 
 export type ControlType = keyof DERControlBase;
 
@@ -193,6 +196,154 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     private getCurrentControlBaseValue():
         | DERControlBaseValueOfType<ControlKey>
         | undefined {
+        const activeControlPoint = (() => {
+            if (!this.activeControlSchedule) {
+                return null;
+            }
+
+            const point = new Point('controlScheduler')
+                .tag('type', this.controlType)
+                .tag('control', 'active');
+
+            switch (this.controlType) {
+                case 'opModConnect': {
+                    const value =
+                        this.activeControlSchedule.data.control.derControlBase[
+                            'opModConnect'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.booleanField('opModConnect', value);
+                    break;
+                }
+                case 'opModEnergize': {
+                    const value =
+                        this.activeControlSchedule.data.control.derControlBase[
+                            'opModEnergize'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.booleanField('opModEnergize', value);
+                    break;
+                }
+                case 'opModExpLimW': {
+                    const value =
+                        this.activeControlSchedule.data.control.derControlBase[
+                            'opModExpLimW'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.floatField(
+                        'opModExpLimW',
+                        numberWithPow10(value.value, value.multiplier),
+                    );
+                    break;
+                }
+                case 'opModGenLimW': {
+                    const value =
+                        this.activeControlSchedule.data.control.derControlBase[
+                            'opModGenLimW'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.floatField(
+                        'opModGenLimW',
+                        numberWithPow10(value.value, value.multiplier),
+                    );
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            return point;
+        })();
+
+        const fallbackControlPoint = (() => {
+            if (this.fallbackControl.type === 'none') {
+                return null;
+            }
+
+            const point = new Point('controlScheduler')
+                .tag('type', this.controlType)
+                .tag('control', 'default');
+
+            switch (this.controlType) {
+                case 'opModConnect': {
+                    const value =
+                        this.fallbackControl.data.defaultControl.derControlBase[
+                            'opModConnect'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.booleanField('opModConnect', value);
+                    break;
+                }
+                case 'opModEnergize': {
+                    const value =
+                        this.fallbackControl.data.defaultControl.derControlBase[
+                            'opModEnergize'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.booleanField('opModEnergize', value);
+                    break;
+                }
+                case 'opModExpLimW': {
+                    const value =
+                        this.fallbackControl.data.defaultControl.derControlBase[
+                            'opModExpLimW'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.floatField(
+                        'opModExpLimW',
+                        numberWithPow10(value.value, value.multiplier),
+                    );
+                    break;
+                }
+                case 'opModGenLimW': {
+                    const value =
+                        this.fallbackControl.data.defaultControl.derControlBase[
+                            'opModGenLimW'
+                        ];
+
+                    if (value === undefined) {
+                        return null;
+                    }
+                    point.floatField(
+                        'opModGenLimW',
+                        numberWithPow10(value.value, value.multiplier),
+                    );
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            return point;
+        })();
+
+        influxDbWriteApi.writePoints(
+            [activeControlPoint, fallbackControlPoint].filter(
+                (point) => point !== null,
+            ),
+        );
+
         if (this.activeControlSchedule) {
             return this.activeControlSchedule.data.control.derControlBase[
                 this.controlType
