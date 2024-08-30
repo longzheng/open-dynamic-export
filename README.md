@@ -73,6 +73,7 @@ The downside of a direct client approach is the registration process is manual a
   - [x] Inverter/meters data polling
   - [X] Inverter control
 - [x] Software-based `setGradW` ramping
+- [x] Metrics logging in InfluxDB
 
 Future
 - [ ] Self-service certificate generation
@@ -85,32 +86,15 @@ Future
 > [!IMPORTANT]
 > This application cannot run without device certificates (and manufacturer certificates issued by the utility server which must be manually registered) and is not provided in this repository. A future version of this application will support a self-service device registration process.
 
-The Node.js application can be run both directly and via a Docker image.
-
-#### Node.js directly
-
-1. Clone repo
-2. Install dependencies `npm install`
-3. In the `./config` folder make a copy of `config.example.json` and rename it to `config.json`, modify the relevant values
-4. Run `npm run start`
-
 #### Docker compose
 
-1. Create a Docker Compose file `compose.yaml` with the following content
+1. Clone repo
 
-```yaml
-services:
-  open-dynamic-export:
-    image: longzhengau/open-dynamic-export:latest
-    volumes:
-      - ./config/:/app/config/
-      - ./logs/:/app/logs/
-    restart: 'always'
-```
+1. Copy `.env.example` and rename it to `.env` and change the values to suit
 
-2. Create a `./config` folder and copy the [`config.example.json` file from the repo](https://github.com/longzheng/open-dynamic-export/blob/main/config/config.example.json) and rename it to `config.json`
+1. Create a `./config` folder and copy the [`config.example.json` file from the repo](https://github.com/longzheng/open-dynamic-export/blob/main/config/config.example.json) and rename it to `config.json`
 
-3. Run `docker-compose up -d`
+1. Run `docker-compose up -d`
 
 ## Private key and CSR
 
