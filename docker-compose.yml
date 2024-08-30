@@ -10,8 +10,6 @@ services:
     restart: 'always'
     depends_on:
       - influxdb
-    ports:
-      - 9229:9229 # node debug
   influxdb:
     image: influxdb:2
     ports:
@@ -28,12 +26,8 @@ services:
       - influxdb2-admin-password
       - influxdb2-admin-token
     volumes:
-      - type: bind
-        source: influxdb2-data
-        target: /var/lib/influxdb2
-      - type: bind
-        source: influxdb2-config
-        target: /etc/influxdb2
+      - influxdb2-data:/var/lib/influxdb2
+      - influxdb2-config:/etc/influxdb2
 secrets:
   influxdb2-admin-username:
     file: .env.influxdb2-admin-username
@@ -41,3 +35,6 @@ secrets:
     file: .env.influxdb2-admin-password
   influxdb2-admin-token:
     file: .env.influxdb2-admin-token
+volumes:
+  influxdb2-data:
+  influxdb2-config:
