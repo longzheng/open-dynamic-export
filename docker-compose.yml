@@ -1,12 +1,17 @@
 services:
   open-dynamic-export:
-    build: .
+    image: longzhengau/open-dynamic-export:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     volumes:
       - ./config/:/app/config/
       - ./logs/:/app/logs/
     restart: 'always'
     depends_on:
       - influxdb
+    ports:
+      - 9229:9229 # node debug
   influxdb:
     image: influxdb:2
     ports:
