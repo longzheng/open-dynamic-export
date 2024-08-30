@@ -1,7 +1,0 @@
-services:
-  open-dynamic-export:
-    build: .
-    volumes:
-      - ./config/:/app/config/
-      - ./logs/:/app/logs/
-    restart: 'always'

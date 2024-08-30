@@ -1,0 +1,7 @@
+services:
+  open-dynamic-export:
+    environment:
+      NODE_ENV: development
+    ports:
+      - 9229:9229
+    command: ["npx", "tsx", "--inspect-brk=0.0.0.0:9229", "src/coordinator/index.ts"]

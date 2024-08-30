@@ -25,6 +25,8 @@ import { logger as pinoLogger } from '../../helpers/logger';
 import type { RampRateHelper } from './rampRate';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
+import { influxDbWriteApi } from '../../helpers/influxdb';
+import { Point } from '@influxdata/influxdb-client';
 
 type SupportedControlTypes = Extract<
     ControlType,
@@ -214,10 +216,7 @@ export function calculateInverterConfiguration({
         activeDerControlBaseValues.opModEnergize ?? defaultValues.opModEnergize;
     const connect =
         activeDerControlBaseValues.opModConnect ?? defaultValues.opModConnect;
-
-    if (energize === false || connect === false) {
-        return { type: 'deenergize' };
-    }
+    const deenergize = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseMeasurement(
         sunSpecData.monitoringSample.site.realPower,
@@ -269,12 +268,34 @@ export function calculateInverterConfiguration({
         targetPowerRatio: targetSolarPowerRatio,
     });
 
+    influxDbWriteApi.writePoints([
+        new Point('inverterControl')
+            .booleanField('deenergize', deenergize)
+            .floatField('siteWatts', siteWatts)
+            .floatField('solarWatts', solarWatts)
+            .floatField('exportLimitWatts', exportLimitWatts)
+            .floatField(
+                'exportLimitTargetSolarWatts',
+                exportLimitTargetSolarWatts,
+            )
+            .floatField('generationLimitWatts', generationLimitWatts)
+            .floatField('targetSolarWatts', targetSolarWatts)
+            .floatField('currentPowerRatio', currentPowerRatio)
+            .floatField('targetSolarPowerRatio', targetSolarPowerRatio)
+            .floatField(
+                'rampedTargetSolarPowerRatio',
+                rampedTargetSolarPowerRatio,
+            ),
+    ]);
+
     logger.trace(
         {
+            deenergize,
             siteWatts,
             solarWatts,
             exportLimitWatts,
             exportLimitTargetSolarWatts,
+            rampedTargetSolarPowerRatio,
             generationLimitWatts,
             targetSolarWatts,
             currentPowerRatio,
@@ -282,6 +303,10 @@ export function calculateInverterConfiguration({
         },
         'calculated values',
     );
+
+    if (energize === false || connect === false) {
+        return { type: 'deenergize' };
+    }
 
     return {
         type: 'limit',
