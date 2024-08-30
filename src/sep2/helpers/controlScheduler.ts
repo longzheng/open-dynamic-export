@@ -201,9 +201,10 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 return null;
             }
 
-            const point = new Point('controlScheduler')
-                .tag('type', this.controlType)
-                .tag('control', 'active');
+            const point = new Point('controlScheduler').tag(
+                'control',
+                'active',
+            );
 
             switch (this.controlType) {
                 case 'opModConnect': {
@@ -272,9 +273,10 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 return null;
             }
 
-            const point = new Point('controlScheduler')
-                .tag('type', this.controlType)
-                .tag('control', 'default');
+            const point = new Point('controlScheduler').tag(
+                'control',
+                'default',
+            );
 
             switch (this.controlType) {
                 case 'opModConnect': {
