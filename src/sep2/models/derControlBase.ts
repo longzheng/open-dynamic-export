@@ -1,3 +1,4 @@
+import { safeParseIntString } from '../../helpers/number';
 import { assertString } from '../helpers/assert';
 import { stringToBoolean } from '../helpers/boolean';
 import { parseActivePowerXmlObject, type ActivePower } from './activePower';
@@ -15,6 +16,8 @@ export type DERControlBase = {
     opModEnergize?: boolean;
     // connect
     opModConnect?: boolean;
+    // Requested ramp time, in hundredths of a second, for the device to transition from the current DERControl mode setting(s) to the new mode setting(s). If absent, use default ramp rate (setGradW). Resolution is 1/100 sec.
+    rampTms?: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,6 +41,9 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
     const opModConnect = xmlObject['opModConnect']
         ? stringToBoolean(assertString(xmlObject['opModConnect'][0]))
         : undefined;
+    const rampTms = xmlObject['rampTms']
+        ? safeParseIntString(assertString(xmlObject['rampTms'][0]))
+        : undefined;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
     return {
@@ -47,6 +53,7 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
         opModLoadLimW,
         opModEnergize,
         opModConnect,
+        rampTms,
     };
 }
 

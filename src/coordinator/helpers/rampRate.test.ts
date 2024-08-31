@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RampRateHelper } from './rampRate';
 import { afterEach } from 'node:test';
+import { addSeconds } from 'date-fns';
 
 let helper: RampRateHelper;
 
@@ -14,19 +15,19 @@ afterEach(() => {
 
 describe('getSetGradW', () => {
     it('should return default setGradW for null ramp rate', () => {
-        helper.setRampRate(null);
+        helper.setDefaultDERControlRampRate(null);
 
         expect(helper.getDerSettingsSetGradW()).toBe(27);
     });
 
     it('should return 0 setGradW for 0 ramp rate', () => {
-        helper.setRampRate(0);
+        helper.setDefaultDERControlRampRate(0);
 
         expect(helper.getDerSettingsSetGradW()).toBe(0);
     });
 
     it('should return 27 setGradW for 0.27% ramp rate', () => {
-        helper.setRampRate(27);
+        helper.setDefaultDERControlRampRate(27);
 
         expect(helper.getDerSettingsSetGradW()).toBe(27);
     });
@@ -34,7 +35,7 @@ describe('getSetGradW', () => {
 
 describe('calculateRampValue', () => {
     it('should return value immediately for no limit', () => {
-        helper.setRampRate(0);
+        helper.setDefaultDERControlRampRate(0);
 
         expect(
             helper.calculateRampValue({
@@ -65,7 +66,7 @@ describe('calculateRampValue', () => {
     });
 
     it('should not return change if change is less than 0.01%', () => {
-        helper.setRampRate(27);
+        helper.setDefaultDERControlRampRate(27);
 
         vi.setSystemTime(new Date('2021-01-01T00:00:10.000Z'));
 
@@ -96,7 +97,7 @@ describe('calculateRampValue', () => {
     });
 
     it('should make progress even changing target every second', () => {
-        helper.setRampRate(27);
+        helper.setDefaultDERControlRampRate(27);
 
         vi.setSystemTime(new Date('2021-01-01T00:00:10Z'));
 
@@ -136,7 +137,7 @@ describe('calculateRampValue', () => {
     });
 
     it('once reach target, reset ramping', () => {
-        helper.setRampRate(27);
+        helper.setDefaultDERControlRampRate(27);
 
         vi.setSystemTime(new Date('2021-01-01T00:00:10.000Z'));
 
@@ -185,5 +186,81 @@ describe('calculateRampValue', () => {
                 targetPowerRatio: 0.5,
             }),
         ).toBe(0.9973);
+    });
+
+    it('startControlRampTms should still return default setGradW', () => {
+        // rampTms is expressed in hundredths of a second
+        helper.startControlRampTms(5);
+
+        expect(helper.getDerSettingsSetGradW()).toBe(27);
+    });
+
+    it('startControlRampTms should ramp within defined time', () => {
+        vi.setSystemTime('2021-01-01T00:00:10Z');
+
+        const seconds = 30;
+
+        // rampTms is expressed in hundredths of a second
+        helper.startControlRampTms(seconds * 100);
+
+        let currentPowerRatio = 0.5;
+
+        for (let i = 0; i < seconds; i++) {
+            expect(currentPowerRatio).toBeLessThan(1);
+
+            // start ramping
+            vi.setSystemTime(addSeconds('2021-01-01T00:00:10Z', i));
+            currentPowerRatio = helper.calculateRampValue({
+                currentPowerRatio,
+                targetPowerRatio: 1,
+            });
+        }
+
+        expect(currentPowerRatio).toBe(1);
+    });
+
+    it('startControlRampTms should revert to default ramping after defined time', () => {
+        vi.setSystemTime('2021-01-01T00:00:10Z');
+
+        const seconds = 30;
+
+        // rampTms is expressed in hundredths of a second
+        helper.startControlRampTms(seconds * 100);
+
+        // start ramping with rampTms
+        vi.setSystemTime(addSeconds('2021-01-01T00:00:10Z', 0));
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 0.5,
+                targetPowerRatio: 1,
+            }),
+        ).toBe(0.5);
+
+        // end of rampTms
+        vi.setSystemTime(addSeconds('2021-01-01T00:00:10Z', seconds));
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 0.8,
+                targetPowerRatio: 1,
+            }),
+        ).toBe(1);
+
+        // start ramping with default ramping
+        vi.setSystemTime(new Date('2021-01-01T00:01:00Z'));
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 0.5,
+                targetPowerRatio: 1,
+            }),
+        ).toBe(0.5);
+
+        // after 5 seconds with default ramping
+        vi.setSystemTime(new Date('2021-01-01T00:01:05Z'));
+        expect(
+            helper.calculateRampValue({
+                currentPowerRatio: 0.5,
+                targetPowerRatio: 1.0,
+            }),
+        ).toBe(0.5135);
     });
 });

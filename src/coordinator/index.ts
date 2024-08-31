@@ -77,7 +77,7 @@ const derControlsHelper = new DerControlsHelper({
 
     inverterController.updateSep2ControlsData(data);
 
-    rampRateHelper.setRampRate(
+    rampRateHelper.setDefaultDERControlRampRate(
         data.fallbackControl.type === 'default'
             ? (data.fallbackControl.data.defaultControl.setGradW ?? null)
             : null,

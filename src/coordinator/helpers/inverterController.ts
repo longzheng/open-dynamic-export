@@ -96,18 +96,22 @@ export class InverterController {
             opModExpLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModExpLimW',
+                rampRateHelper,
             }),
             opModEnergize: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModEnergize',
+                rampRateHelper,
             }),
             opModConnect: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModConnect',
+                rampRateHelper,
             }),
             opModGenLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModGenLimW',
+                rampRateHelper,
             }),
         };
     }

@@ -1,4 +1,6 @@
 import Decimal from 'decimal.js';
+import { logger as pinoLogger } from '../../helpers/logger';
+import type { Logger } from 'pino';
 
 // The default ramp-rate of 0.27% per second (approximately equal to 16.67% per minute)
 // which is the default value for Wgra in AS/NZS 4777.2
@@ -12,19 +14,30 @@ type RampRate =
 // the CSIP-AUS ramp rate requirement cannot be met without WGra
 // this is a software based implementation of ramp rates to gradually apply changes to power output
 export class RampRateHelper {
-    private rampRate: RampRate = {
+    private defaultDerControlRampRate: RampRate = {
         type: 'limited',
         percentPerSecond: defaultRampRatePercentPerSecond,
     };
+    private rampConfig:
+        | RampRate
+        | { type: 'controlRampTms'; seconds: number; startRampTime: Date } =
+        this.defaultDerControlRampRate;
     private lastRampTime: Date | null = null;
+    private logger: Logger;
+
+    constructor() {
+        this.logger = pinoLogger.child({ module: 'RampRateHelper' });
+    }
 
     // returns the setGradW value for DERSettings
     // setGradW is represented in hundredths of a percent
     // e.g. 27 = 0.27% per second
     getDerSettingsSetGradW(): number {
-        switch (this.rampRate.type) {
+        switch (this.defaultDerControlRampRate.type) {
             case 'limited': {
-                return Math.round(this.rampRate.percentPerSecond * 100);
+                return Math.round(
+                    this.defaultDerControlRampRate.percentPerSecond * 100,
+                );
             }
             case 'noLimit': {
                 return 0;
@@ -34,24 +47,39 @@ export class RampRateHelper {
 
     // setGradW is represented in hundredths of a percent
     // e.g. 27 = 0.27% per second
-    setRampRate(setGradW: number | null) {
+    setDefaultDERControlRampRate(setGradW: number | null) {
+        this.logger.debug({ setGradW }, 'Updated default DERControl Ramp Rate');
+
         if (setGradW === null) {
-            this.rampRate = {
+            this.defaultDerControlRampRate = {
                 type: 'limited',
                 percentPerSecond: defaultRampRatePercentPerSecond,
             };
-            return;
+        } else if (setGradW === 0) {
+            this.defaultDerControlRampRate = { type: 'noLimit' };
+        } else {
+            this.defaultDerControlRampRate = {
+                type: 'limited',
+                percentPerSecond: new Decimal(setGradW).div(100).toNumber(),
+            };
         }
 
-        if (setGradW === 0) {
-            this.rampRate = { type: 'noLimit' };
-            return;
+        if (this.rampConfig.type !== 'controlRampTms') {
+            this.revertToDefaultRampConfig();
         }
+    }
 
-        this.rampRate = {
-            type: 'limited',
-            percentPerSecond: new Decimal(setGradW).div(100).toNumber(),
+    // start ramping using a DERControl RampTms value
+    startControlRampTms(rampTms: number) {
+        this.logger.debug({ rampTms }, 'Setting ramp rate to controlRampTms');
+
+        this.rampConfig = {
+            type: 'controlRampTms',
+            // rampTms is in hundredths of a second
+            seconds: rampTms / 100,
+            startRampTime: new Date(),
         };
+        this.lastRampTime = null;
     }
 
     // calculate the new power ratio when changing from current to target
@@ -66,7 +94,66 @@ export class RampRateHelper {
         currentPowerRatio: number;
         targetPowerRatio: number;
     }): number {
-        switch (this.rampRate.type) {
+        switch (this.rampConfig.type) {
+            case 'controlRampTms': {
+                // if we've reached the target, reset to default ramping
+                if (currentPowerRatio === targetPowerRatio) {
+                    this.revertToDefaultRampConfig();
+                    return targetPowerRatio;
+                }
+
+                const now = new Date();
+
+                // start ramping
+                // reeturn the current value and wait until a future cycle
+                if (this.lastRampTime === null) {
+                    this.lastRampTime = now;
+                    return currentPowerRatio;
+                }
+
+                const secondsSinceLastRamp =
+                    (now.getTime() - this.lastRampTime.getTime()) / 1000;
+
+                const secondsSinceStartOfRamp =
+                    (now.getTime() - this.rampConfig.startRampTime.getTime()) /
+                    1000;
+
+                if (secondsSinceStartOfRamp >= this.rampConfig.seconds) {
+                    this.revertToDefaultRampConfig();
+                    return targetPowerRatio;
+                }
+
+                const delta = new Decimal(targetPowerRatio)
+                    .sub(currentPowerRatio)
+                    .toNumber();
+
+                const deltaAbs = Math.abs(delta);
+
+                const deltaSign = Math.sign(delta);
+
+                const rampRate = new Decimal(deltaAbs)
+                    .div(this.rampConfig.seconds - secondsSinceStartOfRamp)
+                    .toNumber();
+
+                const timeFactoredRampRatio = new Decimal(rampRate)
+                    .mul(secondsSinceLastRamp)
+                    .toNumber();
+
+                const cappedDelta = Math.min(deltaAbs, timeFactoredRampRatio);
+
+                // power ratio values are only applicable in SunSpec to 2 decimal points (0.01%)
+                // if the difference is too small, return the current value and wait until a future cycle (with more time)
+                if (cappedDelta < 0.0001) {
+                    return currentPowerRatio;
+                }
+
+                // update the ramp time for the next cycle
+                this.lastRampTime = now;
+
+                return new Decimal(currentPowerRatio)
+                    .plus(cappedDelta * deltaSign)
+                    .toNumber();
+            }
             case 'limited': {
                 // if we've reached the target, reset the ramping time
                 if (currentPowerRatio === targetPowerRatio) {
@@ -83,29 +170,29 @@ export class RampRateHelper {
                     return currentPowerRatio;
                 }
 
-                const secondsSinceStartOfRamp =
+                const secondsSinceLastRamp =
                     (now.getTime() - this.lastRampTime.getTime()) / 1000;
 
                 const timeFactoredRampRatio = new Decimal(
-                    this.rampRate.percentPerSecond,
+                    this.rampConfig.percentPerSecond,
                 )
                     .div(100) // ramp rate is expressed in %, convert to ratio
-                    .mul(secondsSinceStartOfRamp)
+                    .mul(secondsSinceLastRamp)
                     .toNumber();
 
-                const diff = new Decimal(targetPowerRatio)
+                const delta = new Decimal(targetPowerRatio)
                     .sub(currentPowerRatio)
                     .toNumber();
 
-                const diffAbs = Math.abs(diff);
+                const deltaAbs = Math.abs(delta);
 
-                const diffSign = Math.sign(diff);
+                const deltaSign = Math.sign(delta);
 
-                const cappedDiff = Math.min(diffAbs, timeFactoredRampRatio);
+                const cappedDelta = Math.min(deltaAbs, timeFactoredRampRatio);
 
                 // power ratio values are only applicable in SunSpec to 2 decimal points (0.01%)
-                // if the difference is too small, return the current value and wait until a future cycle (with more time)
-                if (cappedDiff < 0.0001) {
+                // if the delta is too small, return the current value and wait until a future cycle (with more time)
+                if (cappedDelta < 0.0001) {
                     return currentPowerRatio;
                 }
 
@@ -113,13 +200,19 @@ export class RampRateHelper {
                 this.lastRampTime = now;
 
                 return new Decimal(currentPowerRatio)
-                    .plus(cappedDiff * diffSign)
+                    .plus(cappedDelta * deltaSign)
                     .toNumber();
             }
             case 'noLimit': {
                 this.lastRampTime = null;
+
                 return targetPowerRatio;
             }
         }
+    }
+
+    private revertToDefaultRampConfig() {
+        this.rampConfig = this.defaultDerControlRampRate;
+        this.lastRampTime = null;
     }
 }
