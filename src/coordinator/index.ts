@@ -15,6 +15,7 @@ import { InverterController } from './helpers/inverterController';
 import { RampRateHelper } from './helpers/rampRate';
 import { influxDbWriteApi } from '../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
+import { ControlsScheduler } from '../sep2/helpers/controlsScheduler';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -63,11 +64,16 @@ const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
     client: sep2Client,
 });
 
-const inverterController = new InverterController({
+const controlsScheduler = new ControlsScheduler({
     client: sep2Client,
+    rampRateHelper,
+});
+
+const inverterController = new InverterController({
     invertersConnections,
     applyControl: config.sunSpec.control,
     rampRateHelper,
+    controlSystems: [controlsScheduler],
 });
 
 const derControlsHelper = new DerControlsHelper({
@@ -75,7 +81,7 @@ const derControlsHelper = new DerControlsHelper({
 }).on('data', (data) => {
     logger.debug(data, 'DER controls data changed');
 
-    inverterController.updateSep2ControlsData(data);
+    controlsScheduler.updateSep2ControlsData(data);
 
     rampRateHelper.setDefaultDERControlRampRate(
         data.fallbackControl.type === 'default'

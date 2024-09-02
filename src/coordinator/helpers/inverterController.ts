@@ -1,7 +1,4 @@
-import type { SEP2Client } from '../../sep2/client';
 import type { ControlType } from '../../sep2/helpers/controlScheduler';
-import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler';
-import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls';
 import {
     Conn,
     OutPFSet_Ena,
@@ -27,8 +24,9 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { influxDbWriteApi } from '../../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
+import type { ControlSystemBase } from './controlSystemBase';
 
-type SupportedControlTypes = Extract<
+export type SupportedControlTypes = Extract<
     ControlType,
     'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
 >;
@@ -67,61 +65,29 @@ const defaultValues = {
 
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];
-    private schedulerByControlType: {
-        [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
-    };
     private cachedSunSpecData: SunSpecData | null = null;
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
+    private controlSystems: ControlSystemBase[];
 
     constructor({
-        client,
         invertersConnections,
         applyControl,
         rampRateHelper,
+        controlSystems,
     }: {
-        client: SEP2Client;
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
         rampRateHelper: RampRateHelper;
+        controlSystems: ControlSystemBase[];
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
-
-        this.schedulerByControlType = {
-            opModExpLimW: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModExpLimW',
-                rampRateHelper,
-            }),
-            opModEnergize: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModEnergize',
-                rampRateHelper,
-            }),
-            opModConnect: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModConnect',
-                rampRateHelper,
-            }),
-            opModGenLimW: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModGenLimW',
-                rampRateHelper,
-            }),
-        };
-    }
-
-    updateSep2ControlsData(data: DerControlsHelperChangedData) {
-        for (const scheduler of Object.values(this.schedulerByControlType)) {
-            scheduler.updateControlsData(data);
-        }
-
-        void this.updateInverterControlValues();
+        this.controlSystems = controlSystems;
     }
 
     updateSunSpecInverterData(data: SunSpecData) {
@@ -132,16 +98,13 @@ export class InverterController {
     }
 
     private getActiveDerControlBaseValues(): ActiveDERControlBaseValues {
-        return {
-            opModExpLimW:
-                this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue(),
-            opModGenLimW:
-                this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue(),
-            opModEnergize:
-                this.schedulerByControlType.opModEnergize.getActiveScheduleDerControlBaseValue(),
-            opModConnect:
-                this.schedulerByControlType.opModConnect.getActiveScheduleDerControlBaseValue(),
-        };
+        const controlSystemControlBaseValues = this.controlSystems.map(
+            (controlSystem) => controlSystem.getActiveDerControlBaseValues(),
+        );
+
+        // TODO logic to merge the control base values
+        // for now, just return the first one
+        return controlSystemControlBaseValues.at(0)!;
     }
 
     private async updateInverterControlValues() {
