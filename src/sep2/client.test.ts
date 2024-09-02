@@ -13,6 +13,7 @@ beforeAll(() => {
         },
         cert: mockCert,
         key: mockKey,
+        pen: '12345',
     });
 });
 

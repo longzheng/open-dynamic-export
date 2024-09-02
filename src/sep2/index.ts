@@ -1,6 +1,7 @@
 import type { RampRateHelper } from '../coordinator/helpers/rampRate';
 import type { Config } from '../helpers/config';
 import { getSep2Certificate } from '../helpers/config';
+import { env } from '../helpers/env';
 import { logger } from '../helpers/logger';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import { SEP2Client } from './client';
@@ -32,6 +33,7 @@ export function getSep2Instance({
         sep2Config: config.sep2,
         cert: sep2Certificate.cert,
         key: sep2Certificate.key,
+        pen: env.SEP2_PEN,
     });
 
     const timeHelper: TimeHelper = new TimeHelper({

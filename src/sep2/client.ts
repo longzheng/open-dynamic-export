@@ -9,7 +9,6 @@ import { numberToHex } from '../helpers/number';
 import { randomUUID } from 'node:crypto';
 import { DeviceCapabilityHelper } from './helpers/deviceCapability';
 import axiosRetry from 'axios-retry';
-import { env } from '../helpers/env';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -24,6 +23,7 @@ export class SEP2Client {
         sep2Config,
         cert,
         key,
+        pen,
     }: {
         sep2Config: Pick<
             Extract<Config['sep2'], { enabled: true }>,
@@ -31,10 +31,11 @@ export class SEP2Client {
         >;
         cert: string;
         key: string;
+        pen: string;
     }) {
         this.host = sep2Config.host;
         this.dcapUri = sep2Config.dcapUri;
-        this.pen = env.SEP2_PEN.padStart(8, '0');
+        this.pen = pen.padStart(8, '0');
         this.lfdi = getCertificateLfdi(cert);
 
         const axiosClient = axios.create({
