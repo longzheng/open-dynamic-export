@@ -21,8 +21,7 @@ import { logger as pinoLogger } from '../../helpers/logger';
 import type { RampRateHelper } from './rampRate';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
-import { influxDbWriteApi } from '../../helpers/influxdb';
-import { Point } from '@influxdata/influxdb-client';
+import { writeInverterControllerPoints } from '../../helpers/influxdb';
 import type { InverterControlLimitType } from './inverterControlLimitType';
 
 export type SupportedControlTypes = Extract<
@@ -227,25 +226,18 @@ export function calculateInverterConfiguration({
         targetPowerRatio: targetSolarPowerRatio,
     });
 
-    influxDbWriteApi.writePoints([
-        new Point('inverterControl')
-            .booleanField('deenergize', deenergize)
-            .floatField('siteWatts', siteWatts)
-            .floatField('solarWatts', solarWatts)
-            .floatField('exportLimitWatts', exportLimitWatts)
-            .floatField(
-                'exportLimitTargetSolarWatts',
-                exportLimitTargetSolarWatts,
-            )
-            .floatField('generationLimitWatts', generationLimitWatts)
-            .floatField('targetSolarWatts', targetSolarWatts)
-            .floatField('currentPowerRatio', currentPowerRatio)
-            .floatField('targetSolarPowerRatio', targetSolarPowerRatio)
-            .floatField(
-                'rampedTargetSolarPowerRatio',
-                rampedTargetSolarPowerRatio,
-            ),
-    ]);
+    writeInverterControllerPoints({
+        deenergize,
+        siteWatts,
+        solarWatts,
+        exportLimitWatts,
+        exportLimitTargetSolarWatts,
+        rampedTargetSolarPowerRatio,
+        generationLimitWatts,
+        targetSolarWatts,
+        currentPowerRatio,
+        targetSolarPowerRatio,
+    });
 
     logger.trace(
         {
