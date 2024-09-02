@@ -33,7 +33,7 @@ const inverterController = new InverterController({
     invertersConnections,
     applyControl: config.sunSpec.control,
     rampRateHelper,
-    controlLimits: [sep2?.controlsScheduler].filter(
+    controlLimits: [sep2?.scheduledControlLimit].filter(
         (controlLimit) => !!controlLimit,
     ),
 });

@@ -12,7 +12,7 @@ import EventEmitter from 'events';
 import type { InverterControlLimitType } from '../../coordinator/helpers/inverterControlLimitType';
 import { numberWithPow10 } from '../../helpers/number';
 
-export class ControlsScheduler
+export class ScheduledControlLimit
     extends EventEmitter<{
         changed: [];
     }>
