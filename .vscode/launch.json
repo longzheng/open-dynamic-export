@@ -5,11 +5,26 @@
             "request": "attach",
             "name": "Docker: Attach to Node",
             "port": 9229,
+            "continueOnAttach": true,
+            "remoteRoot": "/app",
+            "skipFiles": [
+                // Node.js internal core modules
+                "<node_internals>/**",
+                "${workspaceFolder}/node_modules/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Build and attach to Node",
+            "port": 9229,
+            "continueOnAttach": true,
             "remoteRoot": "/app",
             "preLaunchTask": "docker-compose debug up",
             "skipFiles": [
                 // Node.js internal core modules
                 "<node_internals>/**",
+                 "${workspaceFolder}/node_modules/**"
             ]
         }
     ]
