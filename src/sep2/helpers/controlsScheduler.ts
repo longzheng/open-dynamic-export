@@ -9,14 +9,14 @@ import { ControlSchedulerHelper } from './controlScheduler';
 import { logger as pinoLogger } from '../../helpers/logger';
 import type { DerControlsHelperChangedData } from './derControls';
 import EventEmitter from 'events';
-import type { InverterControlLimitBase } from '../../coordinator/helpers/inverterControlLimitBase';
+import type { InverterControlLimitSystemType } from '../../coordinator/helpers/inverterControlLimitType';
 import { numberWithPow10 } from '../../helpers/number';
 
 export class ControlsScheduler
     extends EventEmitter<{
         changed: [];
     }>
-    implements InverterControlLimitBase
+    implements InverterControlLimitSystemType
 {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;

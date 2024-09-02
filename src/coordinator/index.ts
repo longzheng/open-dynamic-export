@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { SEP2Client } from '../sep2/client';
-import { getConfig, getConfigSep2CertKey } from '../helpers/config';
+import { getConfig, getSep2Certificate } from '../helpers/config';
 import { getSunSpecConnections } from '../sunspec/connections';
 import { SunSpecDataHelper } from './helpers/sunspecData';
 import { logger as pinoLogger } from '../helpers/logger';
@@ -20,7 +20,6 @@ import { ControlsScheduler } from '../sep2/helpers/controlsScheduler';
 const logger = pinoLogger.child({ module: 'coordinator' });
 
 const config = getConfig();
-const { sep2Cert, sep2Key } = getConfigSep2CertKey(config);
 
 const { invertersConnections, metersConnections } =
     getSunSpecConnections(config);
@@ -30,67 +29,67 @@ const sunSpecDataEventEmitter = new SunSpecDataHelper({
     metersConnections,
 });
 
-const sep2Client = new SEP2Client({
-    sep2Config: config.sep2,
-    cert: sep2Cert,
-    key: sep2Key,
-});
-
 const rampRateHelper = new RampRateHelper();
 
-const timeHelper: TimeHelper = new TimeHelper({
-    client: sep2Client,
-});
+const sep2 = (() => {
+    if (!config.sep2.enabled) {
+        return null;
+    }
 
-const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
-    client: sep2Client,
-});
+    const sep2Certificate = getSep2Certificate(config);
 
-const derListHelper = new DerListHelper({
-    client: sep2Client,
-});
+    const sep2Client = new SEP2Client({
+        sep2Config: config.sep2,
+        cert: sep2Certificate.cert,
+        key: sep2Certificate.key,
+    });
 
-const derHelper = new DerHelper({
-    client: sep2Client,
-    invertersConnections,
-    rampRateHelper,
-});
+    const timeHelper: TimeHelper = new TimeHelper({
+        client: sep2Client,
+    });
 
-const functionSetAssignmentsListHelper = new FunctionSetAssignmentsListHelper({
-    client: sep2Client,
-});
+    const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
+        client: sep2Client,
+    });
 
-const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
-    client: sep2Client,
-});
+    const derListHelper = new DerListHelper({
+        client: sep2Client,
+    });
 
-const controlsScheduler = new ControlsScheduler({
-    client: sep2Client,
-    rampRateHelper,
-});
+    const derHelper = new DerHelper({
+        client: sep2Client,
+        invertersConnections,
+        rampRateHelper,
+    });
 
-const inverterController = new InverterController({
-    invertersConnections,
-    applyControl: config.sunSpec.control,
-    rampRateHelper,
-    controlSystems: [controlsScheduler],
-});
+    const functionSetAssignmentsListHelper =
+        new FunctionSetAssignmentsListHelper({
+            client: sep2Client,
+        });
 
-const derControlsHelper = new DerControlsHelper({
-    client: sep2Client,
-}).on('data', (data) => {
-    logger.debug(data, 'DER controls data changed');
+    const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
+        client: sep2Client,
+    });
 
-    controlsScheduler.updateSep2ControlsData(data);
+    const controlsScheduler = new ControlsScheduler({
+        client: sep2Client,
+        rampRateHelper,
+    });
 
-    rampRateHelper.setDefaultDERControlRampRate(
-        data.fallbackControl.type === 'default'
-            ? (data.fallbackControl.data.defaultControl.setGradW ?? null)
-            : null,
-    );
-});
+    const derControlsHelper = new DerControlsHelper({
+        client: sep2Client,
+    }).on('data', (data) => {
+        logger.debug(data, 'DER controls data changed');
 
-function main() {
+        controlsScheduler.updateSep2ControlsData(data);
+
+        rampRateHelper.setDefaultDERControlRampRate(
+            data.fallbackControl.type === 'default'
+                ? (data.fallbackControl.data.defaultControl.setGradW ?? null)
+                : null,
+        );
+    });
+
     endDeviceListHelper.on('data', (endDeviceList) => {
         logger.debug({ endDeviceList }, 'Received SEP2 end device list');
 
@@ -167,74 +166,70 @@ function main() {
         });
     });
 
-    sunSpecDataEventEmitter.on(
-        'data',
-        ({ invertersData, monitoringSample }) => {
-            logger.trace(
-                { invertersData, monitoringSample },
-                'Received SunSpec data',
-            );
+    return {
+        sep2Client,
+        derHelper,
+        mirrorUsagePointListHelper,
+        controlsScheduler,
+    };
+})();
 
-            influxDbWriteApi.writePoints(
-                [
-                    new Point('monitoringSample')
-                        .tag('type', 'der')
-                        .floatField(
-                            'reactivePower',
-                            monitoringSample.der.reactivePower,
-                        )
-                        .floatField(
-                            'frequency',
-                            monitoringSample.der.frequency,
-                        ),
-                    new Point('monitoringSample')
-                        .tag('type', 'der')
-                        .tag('phase', 'A')
-                        .floatField(
-                            'realPower',
-                            monitoringSample.der.realPower.phaseA,
-                        )
-                        .floatField(
-                            'voltage',
-                            monitoringSample.der.voltage.phaseA,
-                        ),
-                    monitoringSample.der.realPower.phaseB
-                        ? new Point('monitoringSample')
-                              .tag('type', 'der')
-                              .tag('phase', 'B')
-                              .floatField(
-                                  'realPower',
-                                  monitoringSample.der.realPower.phaseB,
-                              )
-                              .floatField(
-                                  'voltage',
-                                  monitoringSample.der.voltage.phaseB,
-                              )
-                        : null,
-                    monitoringSample.der.realPower.phaseB
-                        ? new Point('monitoringSample')
-                              .tag('type', 'der')
-                              .tag('phase', 'C')
-                              .floatField(
-                                  'realPower',
-                                  monitoringSample.der.realPower.phaseC,
-                              )
-                              .floatField(
-                                  'voltage',
-                                  monitoringSample.der.voltage.phaseC,
-                              )
-                        : null,
-                ].filter((point) => point !== null),
-            );
+const inverterController = new InverterController({
+    invertersConnections,
+    applyControl: config.sunSpec.control,
+    rampRateHelper,
+    controlLimitSystems: [sep2?.controlsScheduler].filter(
+        (controlLimit) => !!controlLimit,
+    ),
+});
 
-            derHelper.onInverterData(invertersData);
-            mirrorUsagePointListHelper.addSample(monitoringSample);
-            inverterController.updateSunSpecInverterData({
-                inverters: invertersData,
-                monitoringSample,
-            });
-        },
+sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
+    logger.trace({ invertersData, monitoringSample }, 'Received SunSpec data');
+
+    influxDbWriteApi.writePoints(
+        [
+            new Point('monitoringSample')
+                .tag('type', 'der')
+                .floatField('reactivePower', monitoringSample.der.reactivePower)
+                .floatField('frequency', monitoringSample.der.frequency),
+            new Point('monitoringSample')
+                .tag('type', 'der')
+                .tag('phase', 'A')
+                .floatField('realPower', monitoringSample.der.realPower.phaseA)
+                .floatField('voltage', monitoringSample.der.voltage.phaseA),
+            monitoringSample.der.realPower.phaseB
+                ? new Point('monitoringSample')
+                      .tag('type', 'der')
+                      .tag('phase', 'B')
+                      .floatField(
+                          'realPower',
+                          monitoringSample.der.realPower.phaseB,
+                      )
+                      .floatField(
+                          'voltage',
+                          monitoringSample.der.voltage.phaseB,
+                      )
+                : null,
+            monitoringSample.der.realPower.phaseB
+                ? new Point('monitoringSample')
+                      .tag('type', 'der')
+                      .tag('phase', 'C')
+                      .floatField(
+                          'realPower',
+                          monitoringSample.der.realPower.phaseC,
+                      )
+                      .floatField(
+                          'voltage',
+                          monitoringSample.der.voltage.phaseC,
+                      )
+                : null,
+        ].filter((point) => point !== null),
     );
-}
 
-void main();
+    sep2?.derHelper.onInverterData(invertersData);
+    sep2?.mirrorUsagePointListHelper.addSample(monitoringSample);
+    inverterController.updateSunSpecInverterData({
+        inverters: invertersData,
+        monitoringSample,
+    });
+});

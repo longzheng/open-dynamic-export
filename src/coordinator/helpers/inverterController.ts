@@ -23,7 +23,7 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { influxDbWriteApi } from '../../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
-import type { InverterControlLimitBase } from './inverterControlLimitBase';
+import type { InverterControlLimitSystemType } from './inverterControlLimitType';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -70,25 +70,25 @@ export class InverterController {
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
-    private controlSystems: InverterControlLimitBase[];
+    private controlLimitSystems: InverterControlLimitSystemType[];
 
     constructor({
         invertersConnections,
         applyControl,
         rampRateHelper,
-        controlSystems,
+        controlLimitSystems,
     }: {
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
         rampRateHelper: RampRateHelper;
-        controlSystems: InverterControlLimitBase[];
+        controlLimitSystems: InverterControlLimitSystemType[];
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
-        this.controlSystems = controlSystems;
+        this.controlLimitSystems = controlLimitSystems;
     }
 
     updateSunSpecInverterData(data: SunSpecData) {
@@ -98,14 +98,12 @@ export class InverterController {
         void this.updateInverterControlValues();
     }
 
-    private getActiveDerControlBaseValues(): InverterControlLimit {
-        const controlSystemControlBaseValues = this.controlSystems.map(
-            (controlSystem) => controlSystem.getInverterControlLimit(),
+    private getActiveInverterControlLimit(): InverterControlLimit {
+        const controlLimits = this.controlLimitSystems.map((controlSystem) =>
+            controlSystem.getInverterControlLimit(),
         );
 
-        return getAggregatedInverterControlLimit(
-            controlSystemControlBaseValues,
-        );
+        return getAggregatedInverterControlLimit(controlLimits);
     }
 
     private async updateInverterControlValues() {
@@ -116,17 +114,18 @@ export class InverterController {
             return;
         }
 
-        const activeDerControlBaseValues = this.getActiveDerControlBaseValues();
+        const getActiveInverterControlLimit =
+            this.getActiveInverterControlLimit();
 
         const inverterConfiguration = calculateInverterConfiguration({
-            activeControlLimit: activeDerControlBaseValues,
+            activeControlLimit: getActiveInverterControlLimit,
             sunSpecData: this.cachedSunSpecData,
             rampRateHelper: this.rampRateHelper,
         });
 
         this.logger.info(
             {
-                activeDerControlBaseValues,
+                getActiveInverterControlLimit,
                 inverterConfiguration,
             },
             'Updating inverter control values',

@@ -3,6 +3,10 @@ import { getConfig } from '../src/helpers/config';
 
 const config = getConfig();
 
+if (!config.sep2.enabled) {
+    throw new Error('SEP2 is not enabled');
+}
+
 generateDeviceCertificate({
     certPath: './config/cert.pem',
     csrPath: './config/cert_req.csr',
