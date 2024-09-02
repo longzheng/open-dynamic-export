@@ -2,19 +2,102 @@
 
 ## About
 
-This project aims to implement dynamic export control using Node.js/TypeScript implementing CSIP-AUS/SEP2/IEEE 2030.5-2018 (utility connection) and SunSpec Modbus (inverter connection) to satisfy the dynamic connections requirement of various Austrailan energy markets.   
+This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
+- dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy markets
+- fixed/zero export limitations (e.g. 1.5kW export limit)
+- negative feed-in 
 
-The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
+## Supported inverters and meters
 
-## Requirements
+Inverters:
+- One or more SunSpec Modbus TCP compatible solar inverter(s)
+  - Tested with Fronius Primo and Fronius Symo
 
-- One or more SunSpec compatible solar inverter(s) (tested with Fronius Primo and Fronius Symo)
-- One or more SunSpec compatible smart meter(s) (tested with Fronius Smart Meter and Catch Power Relay)
+Meters:
+- One or more SunSpec Modbus TCP compatible smart meter(s) 
+  - Tested with Fronius Smart Meter and Catch Power Relay
 
 > [!IMPORTANT]
 > The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
 
-## Architecture
+## Running
+
+### Configuration
+
+The server uses a configuration JSON to configure how it works.
+
+#### SunSpec
+
+To configure the inverter and meter connections, add the following property to `config.json`
+
+```json
+{
+    "sunSpec": {
+        "control": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
+        "inverters": [ // (array) required: list of inverters
+            {
+                "ip": "192.168.1.6", // (string) required: the IP address of the inverter
+                "port": 502, // (number) required: the Modbus TCP port of the inverter
+                "unitId": 1 // (number) required: the Modbus unit ID of the inverter
+            }
+        ],
+        "meters": [ // (array) optional: list of meters
+            {
+                "ip": "192.168.1.6", // (string) required: the IP address of the meter
+                "port": 502, // (number) required: the Modbus TCP port of the meter
+                "unitId": 240 // (number) required: the Modbus unit ID of the meter
+            }
+        ]
+    }
+    ...
+}
+```
+
+#### Fixed limits
+
+To set fixed limits (such as for fixed export limits), add the following property to `config.json`
+
+```json
+{
+    "limit": {
+        "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
+        "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
+        "generationLimitWatts": 10000 // (number) optional: the maximum generation limit in watts
+    },
+    ...
+}
+```
+
+#### CSIP-AUS
+
+> [!IMPORTANT]
+> This CSIP-AUS client cannot run without device certificates (and manufacturer certificates issued by the utility server which must be manually registered) and is not provided in this repository. A future version of this application will support a self-service device registration process.
+
+To use CSIP-AUS, add following property to `config.json`
+
+```json
+{
+    "sep2": {
+        "host": "https://sep2-test.energyq.com.au", // (string) required: the SEP2 server host
+        "dcapUri": "/api/v2/dcap" // (string) required: the device capability discovery URI
+    },
+    ...
+}
+```
+
+### Docker compose
+
+1. Clone repo
+
+1. Copy `.env.example` and rename it to `.env` and change the values to suit
+
+1. Create a `/config` folder and copy the [`config.example.json` file from the repo](https://github.com/longzheng/open-dynamic-export/blob/main/config/config.example.json) and rename it to `config.json`. Set it with the required values.
+
+1. Run `docker-compose up -d`
+
+## CSIP-AUS client
+
+The project implements a CSIP-AUS compatible client that interacts with the utility server (SEP2 server). The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
 ```mermaid
 sequenceDiagram
@@ -63,42 +146,32 @@ The downside of a direct client approach is the registration process is manual a
 
 ## Features
 
-- [x] SEP2/IEEE 2030.5 client
+- [x] Limits control
+  - [x] Fixed limits
+  - [ ] Dynamic negative feed-in via Amber API
+- [x] Inverter integration
+  - [x] SunSpec Modbus TCP
+- [x] Meter integration
+  - [x] SunSpec Modbus TCP
+  - [ ] Tesla Powerwall
+- [x] CSIP-AUS/SEP2/IEEE 2030.5 client
   - [x] Discovery and scheduled entity polling
   - [x] DER status/capability/settings reporting
   - [x] DER control scheduling and default DER control fallback
   - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
-- [x] SunSpec Modbus client
-  - [x] Model scanning
-  - [x] Inverter/meters data polling
-  - [X] Inverter control
 - [x] Software-based `setGradW` ramping
 - [x] Metrics logging in InfluxDB
 
 Future
-- [ ] Self-service certificate generation
-- [ ] Cloud proxy mode
+- [ ] CSIP-AUS self registration
+- [ ] CSIP-AUS self-service certificate generation
+- [ ] CSIP-AUS cloud aggregator proxy mode
 - [ ] Web UI with real-time metrics and historical metrics
 - [ ] Device package (plug and play solution)
 
-## Running server
+## CSIP-AUS Private key and CSR
 
-> [!IMPORTANT]
-> This application cannot run without device certificates (and manufacturer certificates issued by the utility server which must be manually registered) and is not provided in this repository. A future version of this application will support a self-service device registration process.
-
-#### Docker compose
-
-1. Clone repo
-
-1. Copy `.env.example` and rename it to `.env` and change the values to suit
-
-1. Create a `./config` folder and copy the [`config.example.json` file from the repo](https://github.com/longzheng/open-dynamic-export/blob/main/config/config.example.json) and rename it to `config.json`
-
-1. Run `docker-compose up -d`
-
-## Private key and CSR
-
-The CSIP-AUS/SEP2/IEEE 2030.5 server uses PKI certificates to authorise and identify clients.
+CSIP-AUS uses PKI certificates to authorise and identify clients.
 
 As a direct client, there needs to be two certificates, one for the "manufacturer" and one for the "device". The "manufacturer" certificate needs to be signed by the utility Smart Energy Root CA (SERCA). Then the "device" certificate is signed with the "manufacturer" certificate & key.
 
