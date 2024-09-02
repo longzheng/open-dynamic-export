@@ -8,11 +8,12 @@
         "lint": "tsc --noEmit && npx eslint . && npm run generate:config-json-schema",
         "test": "vitest",
         "start": "tsx src/coordinator/index.ts",
-        "debug-sunspec-data": "tsx scripts/debugSunspecData.ts",
-        "debug-sep2-monitoring": "tsx scripts/debugSep2Monitoring.ts",
-        "device-cert-request": "tsx scripts/deviceCertRequest.ts",
-        "device-cert-generate": "tsx scripts/deviceCertGenerate.ts",
-        "device-cert-lfdi": "tsx scripts/deviceCertLfdi.ts"
+        "debug:sunspec-data": "tsx scripts/debugSunspecData.ts",
+        "debug:sunspec-discovery": "tsx scripts/debugSunspecDiscovery.ts",
+        "debug:monitoring": "tsx scripts/debugMonitoring.ts",
+        "cert:device-request": "tsx scripts/certDeviceRequest.ts",
+        "cert:device-generate": "tsx scripts/certDeviceGenerate.ts",
+        "cert:device-lfdi": "tsx scripts/certDeviceLfdi.ts"
     },
     "keywords": [],
     "author": "Long Zheng",

@@ -36,9 +36,7 @@ async function poll() {
     } catch (error) {
         logger.error({ error }, 'Failed to get monitoring sample');
     } finally {
-        setTimeout(() => {
-            void poll();
-        }, 100);
+        void poll();
     }
 }
 

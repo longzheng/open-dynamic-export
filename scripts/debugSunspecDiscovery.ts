@@ -42,11 +42,11 @@ void (async () => {
             const modelLength = response.data[1]!;
 
             if (modelId === 0xffff && modelLength === 0) {
-                inverterLogger.trace('End of model list');
+                inverterLogger.info('End of model list');
                 break;
             }
 
-            inverterLogger.trace(
+            inverterLogger.info(
                 { modelId, currentAddress, modelLength },
                 `Found inverter model`,
             );
@@ -76,11 +76,11 @@ void (async () => {
             const modelLength = response.data[1]!;
 
             if (modelId === 0xffff && modelLength === 0) {
-                meterLogger.trace('End of model list');
+                meterLogger.info('End of model list');
                 break;
             }
 
-            meterLogger.trace(
+            meterLogger.info(
                 { modelId, currentAddress, modelLength },
                 `Found meter model`,
             );
@@ -89,4 +89,6 @@ void (async () => {
             currentAddress += modelLength + 2; // +2 accounts for model ID and length fields
         }
     }
+
+    process.exit();
 })();
