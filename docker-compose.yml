@@ -9,7 +9,7 @@ services:
     volumes:
       - ./config/:/app/config/
       - ./logs/:/app/logs/
-    restart: 'always'
+    restart: 'unless-stopped'
     depends_on:
       - influxdb
   influxdb:
