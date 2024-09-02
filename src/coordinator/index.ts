@@ -68,7 +68,7 @@ sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
                           monitoringSample.der.voltage.phaseB,
                       )
                 : null,
-            monitoringSample.der.realPower.phaseB
+            monitoringSample.der.realPower.phaseC
                 ? new Point('monitoringSample')
                       .tag('type', 'der')
                       .tag('phase', 'C')
