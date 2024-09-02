@@ -1,21 +1,13 @@
 import 'dotenv/config';
-import { SEP2Client } from '../sep2/client';
-import { getConfig, getSep2Certificate } from '../helpers/config';
+import { getConfig } from '../helpers/config';
 import { getSunSpecConnections } from '../sunspec/connections';
 import { SunSpecDataHelper } from './helpers/sunspecData';
 import { logger as pinoLogger } from '../helpers/logger';
-import { TimeHelper } from '../sep2/helpers/time';
-import { EndDeviceListHelper } from '../sep2/helpers/endDeviceList';
-import { DerListHelper } from '../sep2/helpers/derList';
-import { DerHelper } from '../sep2/helpers/der';
-import { MirrorUsagePointListHelper } from '../sep2/helpers/mirrorUsagePointList';
-import { FunctionSetAssignmentsListHelper } from '../sep2/helpers/functionSetAssignmentsList';
-import { DerControlsHelper } from '../sep2/helpers/derControls';
 import { InverterController } from './helpers/inverterController';
 import { RampRateHelper } from './helpers/rampRate';
 import { influxDbWriteApi } from '../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
-import { ControlsScheduler } from '../sep2/helpers/controlsScheduler';
+import { getSep2Instance } from '../sep2';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -31,148 +23,11 @@ const sunSpecDataEventEmitter = new SunSpecDataHelper({
 
 const rampRateHelper = new RampRateHelper();
 
-const sep2 = (() => {
-    if (!config.sep2.enabled) {
-        return null;
-    }
-
-    const sep2Certificate = getSep2Certificate(config);
-
-    const sep2Client = new SEP2Client({
-        sep2Config: config.sep2,
-        cert: sep2Certificate.cert,
-        key: sep2Certificate.key,
-    });
-
-    const timeHelper: TimeHelper = new TimeHelper({
-        client: sep2Client,
-    });
-
-    const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
-        client: sep2Client,
-    });
-
-    const derListHelper = new DerListHelper({
-        client: sep2Client,
-    });
-
-    const derHelper = new DerHelper({
-        client: sep2Client,
-        invertersConnections,
-        rampRateHelper,
-    });
-
-    const functionSetAssignmentsListHelper =
-        new FunctionSetAssignmentsListHelper({
-            client: sep2Client,
-        });
-
-    const mirrorUsagePointListHelper = new MirrorUsagePointListHelper({
-        client: sep2Client,
-    });
-
-    const controlsScheduler = new ControlsScheduler({
-        client: sep2Client,
-        rampRateHelper,
-    });
-
-    const derControlsHelper = new DerControlsHelper({
-        client: sep2Client,
-    }).on('data', (data) => {
-        logger.debug(data, 'DER controls data changed');
-
-        controlsScheduler.updateSep2ControlsData(data);
-
-        rampRateHelper.setDefaultDERControlRampRate(
-            data.fallbackControl.type === 'default'
-                ? (data.fallbackControl.data.defaultControl.setGradW ?? null)
-                : null,
-        );
-    });
-
-    endDeviceListHelper.on('data', (endDeviceList) => {
-        logger.debug({ endDeviceList }, 'Received SEP2 end device list');
-
-        // as a direct client, we expect only one end device that matches the LFDI of our certificate
-        const endDevice = endDeviceList.endDevices.find(
-            (endDevice) => endDevice.lFDI === sep2Client.lfdi,
-        );
-
-        if (!endDevice) {
-            throw new Error('End device not found');
-        }
-
-        if (endDevice.enabled !== true) {
-            throw new Error('End device is not enabled');
-        }
-
-        if (endDevice.derListLink) {
-            derListHelper.updateHref({
-                href: endDevice.derListLink.href,
-            });
-        }
-
-        if (endDevice.functionSetAssignmentsListLink) {
-            functionSetAssignmentsListHelper.updateHref({
-                href: endDevice.functionSetAssignmentsListLink.href,
-            });
-        }
-    });
-
-    derListHelper.on('data', (derList) => {
-        logger.debug({ derList }, 'Received SEP2 end device DER list');
-
-        if (derList.ders.length !== 1) {
-            throw new Error(
-                `DERS list length is not 1, actual length ${derList.ders.length}`,
-            );
-        }
-
-        const der = derList.ders.at(0)!;
-
-        derHelper.configureDer({
-            der,
-            pollRate: derList.pollRate,
-        });
-    });
-
-    functionSetAssignmentsListHelper.on(
-        'data',
-        (functionSetAssignmentsList) => {
-            logger.debug(
-                { functionSetAssignmentsList },
-                'Received SEP2 function set assignments list',
-            );
-
-            derControlsHelper.updateFsaData(functionSetAssignmentsList);
-        },
-    );
-
-    logger.info('Discovering SEP2');
-
-    sep2Client.discover().on('data', (deviceCapability) => {
-        logger.debug({ deviceCapability }, 'Received SEP2 device capability');
-
-        timeHelper.updateHref({
-            href: deviceCapability.timeLink.href,
-        });
-
-        endDeviceListHelper.updateHref({
-            href: deviceCapability.endDeviceListLink.href,
-        });
-
-        mirrorUsagePointListHelper.updateHref({
-            href: deviceCapability.mirrorUsagePointListLink.href,
-        });
-    });
-
-    return {
-        sep2Client,
-        derHelper,
-        mirrorUsagePointListHelper,
-        controlsScheduler,
-    };
-})();
+const sep2 = getSep2Instance({
+    config,
+    invertersConnections,
+    rampRateHelper,
+});
 
 const inverterController = new InverterController({
     invertersConnections,
@@ -228,6 +83,7 @@ sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
 
     sep2?.derHelper.onInverterData(invertersData);
     sep2?.mirrorUsagePointListHelper.addSample(monitoringSample);
+
     inverterController.updateSunSpecInverterData({
         inverters: invertersData,
         monitoringSample,
