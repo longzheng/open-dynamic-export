@@ -1,4 +1,3 @@
-import { parseStringPromise } from 'xml2js';
 import { getMillisecondsToNextHourMinutesInterval } from '../../helpers/time';
 import type { SEP2Client } from '../client';
 import { defaultPollPushRates } from '../client';
@@ -7,7 +6,7 @@ import { generateMirrorMeterReadingResponse } from '../models/mirrorMeterReading
 import type { MirrorUsagePoint } from '../models/mirrorUsagePoint';
 import {
     generateMirrorUsagePointResponse,
-    parseMirrorUsagePointXmlObject,
+    parseMirrorUsagePointXml,
 } from '../models/mirrorUsagePoint';
 import type { RoleFlagsType } from '../models/roleFlagsType';
 import { ServiceKind } from '../models/serviceKind';
@@ -196,10 +195,15 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
             xml,
         );
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
-        const responseXml = await parseStringPromise(response.data);
+        const locationHeader = response.headers['location'] as
+            | string
+            | undefined;
 
-        return parseMirrorUsagePointXmlObject(responseXml);
+        if (!locationHeader) {
+            throw new Error('Missing location header');
+        }
+
+        return parseMirrorUsagePointXml(await this.client.get(locationHeader));
     }
 
     protected async postMirrorMeterReading({

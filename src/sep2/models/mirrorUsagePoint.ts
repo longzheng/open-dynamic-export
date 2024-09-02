@@ -12,6 +12,19 @@ export type MirrorUsagePoint = {
     deviceLFDI: string;
 } & UsagePointBase;
 
+export function parseMirrorUsagePointXml(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    xml: any,
+): MirrorUsagePoint {
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    const xmlObject = parseMirrorUsagePointXmlObject(xml['MirrorUsagePoint']);
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+
+    return {
+        ...xmlObject,
+    };
+}
+
 export function parseMirrorUsagePointXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mirrorUsagePointObject: any,
