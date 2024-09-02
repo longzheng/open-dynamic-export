@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import type {
-    ActiveDERControlBaseValues,
+    InverterControlLimit,
     SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController';
 import type { RampRateHelper } from '../../coordinator/helpers/rampRate';
@@ -9,13 +9,14 @@ import { ControlSchedulerHelper } from './controlScheduler';
 import { logger as pinoLogger } from '../../helpers/logger';
 import type { DerControlsHelperChangedData } from './derControls';
 import EventEmitter from 'events';
-import type { ControlSystemBase } from '../../coordinator/helpers/controlSystemBase';
+import type { InverterControlLimitBase } from '../../coordinator/helpers/inverterControlLimitBase';
+import { numberWithPow10 } from '../../helpers/number';
 
 export class ControlsScheduler
     extends EventEmitter<{
         changed: [];
     }>
-    implements ControlSystemBase
+    implements InverterControlLimitBase
 {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
@@ -65,12 +66,19 @@ export class ControlsScheduler
         this.emit('changed');
     }
 
-    getActiveDerControlBaseValues(): ActiveDERControlBaseValues {
+    getInverterControlLimit(): InverterControlLimit {
+        const opModExpLimW =
+            this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue();
+        const opModGenLimW =
+            this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue();
+
         return {
-            opModExpLimW:
-                this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue(),
-            opModGenLimW:
-                this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue(),
+            opModExpLimW: opModExpLimW
+                ? numberWithPow10(opModExpLimW.value, opModExpLimW.multiplier)
+                : undefined,
+            opModGenLimW: opModGenLimW
+                ? numberWithPow10(opModGenLimW.value, opModGenLimW.multiplier)
+                : undefined,
             opModEnergize:
                 this.schedulerByControlType.opModEnergize.getActiveScheduleDerControlBaseValue(),
             opModConnect:

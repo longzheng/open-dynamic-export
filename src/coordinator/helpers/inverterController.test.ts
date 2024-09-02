@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import type { InverterControlLimit } from './inverterController';
 import {
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
+    getAggregatedInverterControlLimit,
     getWMaxLimPctFromTargetSolarPowerRatio,
 } from './inverterController';
 
@@ -163,5 +165,61 @@ describe('getWMaxLimPctFromTargetSolarPowerRatio', () => {
         });
 
         expect(WMaxLimPct).toBe(5582);
+    });
+});
+
+describe('getAggregatedInverterControlLimit', () => {
+    it('should return the minimum of all limits', () => {
+        const inverterControlLimit = getAggregatedInverterControlLimit([
+            {
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: 20000,
+            },
+            {
+                opModConnect: false,
+                opModEnergize: true,
+                opModExpLimW: 5000,
+                opModGenLimW: 5000,
+            },
+            {
+                opModConnect: true,
+                opModEnergize: false,
+                opModExpLimW: 2000,
+                opModGenLimW: 10000,
+            },
+        ]);
+
+        expect(inverterControlLimit).toEqual({
+            opModConnect: false,
+            opModEnergize: false,
+            opModExpLimW: 2000,
+            opModGenLimW: 5000,
+        } satisfies InverterControlLimit);
+    });
+
+    it('should return undefined if all limits are undefined', () => {
+        const inverterControlLimit = getAggregatedInverterControlLimit([
+            {
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+            },
+            {
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: 1000,
+                opModGenLimW: undefined,
+            },
+        ]);
+
+        expect(inverterControlLimit).toEqual({
+            opModConnect: undefined,
+            opModEnergize: undefined,
+            opModExpLimW: 1000,
+            opModGenLimW: undefined,
+        } satisfies InverterControlLimit);
     });
 });
