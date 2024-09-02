@@ -25,10 +25,7 @@ export class SEP2Client {
         key,
         pen,
     }: {
-        sep2Config: Pick<
-            Extract<Config['sep2'], { enabled: true }>,
-            'host' | 'dcapUri'
-        >;
+        sep2Config: Pick<NonNullable<Config['sep2']>, 'host' | 'dcapUri'>;
         cert: string;
         key: string;
         pen: string;

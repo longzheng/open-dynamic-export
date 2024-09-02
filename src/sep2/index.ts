@@ -5,7 +5,7 @@ import { env } from '../helpers/env';
 import { logger } from '../helpers/logger';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import { SEP2Client } from './client';
-import { ControlsScheduler } from './helpers/controlsScheduler';
+import { ScheduledControlLimit } from './helpers/scheduledControlLimit';
 import { DerHelper } from './helpers/der';
 import { DerControlsHelper } from './helpers/derControls';
 import { DerListHelper } from './helpers/derList';
@@ -23,7 +23,7 @@ export function getSep2Instance({
     invertersConnections: InverterSunSpecConnection[];
     rampRateHelper: RampRateHelper;
 }) {
-    if (!config.sep2.enabled) {
+    if (!config.sep2) {
         return null;
     }
 
@@ -63,7 +63,7 @@ export function getSep2Instance({
         client: sep2Client,
     });
 
-    const controlsScheduler = new ControlsScheduler({
+    const scheduledControlLimit = new ScheduledControlLimit({
         client: sep2Client,
         rampRateHelper,
     });
@@ -73,7 +73,7 @@ export function getSep2Instance({
     }).on('data', (data) => {
         logger.debug(data, 'DER controls data changed');
 
-        controlsScheduler.updateSep2ControlsData(data);
+        scheduledControlLimit.updateSep2ControlsData(data);
 
         rampRateHelper.setDefaultDERControlRampRate(
             data.fallbackControl.type === 'default'
@@ -162,6 +162,6 @@ export function getSep2Instance({
         sep2Client,
         derHelper,
         mirrorUsagePointListHelper,
-        controlsScheduler,
+        scheduledControlLimit,
     };
 }

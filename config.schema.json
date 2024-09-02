@@ -1,0 +1,108 @@
+{
+  "$ref": "#/definitions/config",
+  "definitions": {
+    "config": {
+      "type": "object",
+      "properties": {
+        "sep2": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string",
+              "format": "uri",
+              "description": "The host of the SEP2 server"
+            },
+            "dcapUri": {
+              "type": "string",
+              "description": "The URI of the DeviceCapability resource"
+            }
+          },
+          "required": [
+            "host",
+            "dcapUri"
+          ],
+          "additionalProperties": false,
+          "description": "If defined, CSIP-AUS/SEP2 server configuration"
+        },
+        "limit": {
+          "type": "object",
+          "properties": {
+            "connect": {
+              "type": "boolean",
+              "description": "Whether the inverter should be connected to the grid"
+            },
+            "exportLimitWatts": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The export limit in watts"
+            },
+            "generationLimitWatts": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The generation limit in watts"
+            }
+          },
+          "additionalProperties": false,
+          "description": "If defined, manual limits for the inverter"
+        },
+        "sunSpec": {
+          "type": "object",
+          "properties": {
+            "inverters": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ip": {
+                    "type": "string",
+                    "pattern": "^(\\d{1,3}\\.){3}\\d{1,3}$",
+                    "description": "The IP address of the SunSpec device"
+                  },
+                  "port": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 65535,
+                    "description": "The port of the SunSpec device"
+                  },
+                  "unitId": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 255,
+                    "default": 1,
+                    "description": "The unit/slave ID of the SunSpec device. Defaults to 1."
+                  }
+                },
+                "required": [
+                  "ip",
+                  "port"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "meters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/config/properties/sunSpec/properties/inverters/items"
+              }
+            },
+            "control": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "inverters",
+            "meters",
+            "control"
+          ],
+          "additionalProperties": false,
+          "description": "SunSpec configuration"
+        }
+      },
+      "required": [
+        "sunSpec"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

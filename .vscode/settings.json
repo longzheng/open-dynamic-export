@@ -2,5 +2,11 @@
     "typescript.tsdk": "./node_modules/typescript/lib",
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit"
-    }
+    },
+    "json.schemas": [
+        {
+            "fileMatch": ["/config/*.json"],
+            "url": "/config.schema.json"
+        }
+    ],
 }
