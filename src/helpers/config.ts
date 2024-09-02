@@ -10,16 +10,12 @@ const sunspecModbusSchema = z.object({
 });
 
 const configSchema = z.object({
-    sep2: z.union([
-        z.object({
-            enabled: z.literal(false),
-        }),
-        z.object({
-            enabled: z.literal(true),
+    sep2: z
+        .object({
             host: z.string().url(),
             dcapUri: z.string(),
-        }),
-    ]),
+        })
+        .optional(),
     sunSpec: z.object({
         inverters: z.array(sunspecModbusSchema),
         meters: z.array(sunspecModbusSchema),
@@ -48,7 +44,7 @@ export function getConfig() {
 }
 
 export function getSep2Certificate(config: Config) {
-    if (!config.sep2.enabled) {
+    if (!config.sep2) {
         throw new Error('SEP2 is not enabled');
     }
 

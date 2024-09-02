@@ -23,7 +23,7 @@ export function getSep2Instance({
     invertersConnections: InverterSunSpecConnection[];
     rampRateHelper: RampRateHelper;
 }) {
-    if (!config.sep2.enabled) {
+    if (!config.sep2) {
         return null;
     }
 
