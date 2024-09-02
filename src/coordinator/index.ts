@@ -8,6 +8,7 @@ import { RampRateHelper } from './helpers/rampRate';
 import { influxDbWriteApi } from '../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
 import { getSep2Instance } from '../sep2';
+import { ConfigControlLimit } from '../configLimit';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -29,11 +30,13 @@ const sep2 = getSep2Instance({
     rampRateHelper,
 });
 
+const configLimit = new ConfigControlLimit({ config });
+
 const inverterController = new InverterController({
     invertersConnections,
     applyControl: config.sunSpec.control,
     rampRateHelper,
-    controlLimits: [sep2?.scheduledControlLimit].filter(
+    controlLimits: [sep2?.scheduledControlLimit, configLimit].filter(
         (controlLimit) => !!controlLimit,
     ),
 });

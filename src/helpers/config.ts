@@ -4,23 +4,61 @@ import { resolve } from 'path';
 import { env } from './env';
 
 const sunspecModbusSchema = z.object({
-    ip: z.string().regex(/^(\d{1,3}\.){3}\d{1,3}$/),
-    port: z.number().min(1).max(65535),
-    unitId: z.number().min(1).max(255),
+    ip: z
+        .string()
+        .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
+        .describe('The IP address of the SunSpec device'),
+    port: z
+        .number()
+        .min(1)
+        .max(65535)
+        .describe('The port of the SunSpec device'),
+    unitId: z
+        .number()
+        .min(1)
+        .max(255)
+        .default(1)
+        .describe('The unit/slave ID of the SunSpec device. Defaults to 1.'),
 });
 
-const configSchema = z.object({
+export const configSchema = z.object({
     sep2: z
         .object({
-            host: z.string().url(),
-            dcapUri: z.string(),
+            host: z.string().url().describe('The host of the SEP2 server'),
+            dcapUri: z
+                .string()
+                .describe('The URI of the DeviceCapability resource'),
         })
-        .optional(),
-    sunSpec: z.object({
-        inverters: z.array(sunspecModbusSchema),
-        meters: z.array(sunspecModbusSchema),
-        control: z.boolean(),
-    }),
+        .optional()
+        .describe('If defined, CSIP-AUS/SEP2 server configuration'),
+    limit: z
+        .object({
+            connect: z
+                .boolean()
+                .optional()
+                .describe(
+                    'Whether the inverter should be connected to the grid',
+                ),
+            exportLimitWatts: z
+                .number()
+                .min(0)
+                .optional()
+                .describe('The export limit in watts'),
+            generationLimitWatts: z
+                .number()
+                .min(0)
+                .optional()
+                .describe('The generation limit in watts'),
+        })
+        .optional()
+        .describe('If defined, manual limits for the inverter'),
+    sunSpec: z
+        .object({
+            inverters: z.array(sunspecModbusSchema),
+            meters: z.array(sunspecModbusSchema),
+            control: z.boolean(),
+        })
+        .describe('SunSpec configuration'),
 });
 
 export type Config = z.infer<typeof configSchema>;
