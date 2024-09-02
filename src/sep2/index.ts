@@ -1,6 +1,5 @@
 import type { RampRateHelper } from '../coordinator/helpers/rampRate';
 import type { Config } from '../helpers/config';
-import { getSep2Certificate } from '../helpers/config';
 import { env } from '../helpers/env';
 import { logger } from '../helpers/logger';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
@@ -13,6 +12,7 @@ import { EndDeviceListHelper } from './helpers/endDeviceList';
 import { FunctionSetAssignmentsListHelper } from './helpers/functionSetAssignmentsList';
 import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList';
 import { TimeHelper } from './helpers/time';
+import { getSep2Certificate } from '../helpers/sep2Cert';
 
 export function getSep2Instance({
     config,
