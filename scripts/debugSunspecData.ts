@@ -2,9 +2,27 @@ import 'dotenv/config';
 import { getConfig } from '../src/helpers/config';
 import { InverterSunSpecConnection } from '../src/sunspec/connection/inverter';
 import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
-import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics';
-import { getInverterMetrics } from '../src/sunspec/helpers/inverterMetrics';
+import {
+    getAggregatedMeterMetrics,
+    getMeterMetrics,
+} from '../src/sunspec/helpers/meterMetrics';
+import {
+    getAggregatedInverterMetrics,
+    getInverterMetrics,
+} from '../src/sunspec/helpers/inverterMetrics';
 import { logger } from '../src/helpers/logger';
+import {
+    getAggregatedNameplateMetrics,
+    getNameplateMetrics,
+} from '../src/sunspec/helpers/nameplateMetrics';
+import {
+    getAggregatedStatusMetrics,
+    getStatusMetrics,
+} from '../src/sunspec/helpers/statusMetrics';
+import {
+    getAggregatedSettingsMetrics,
+    getSettingsMetrics,
+} from '../src/sunspec/helpers/settingsMetrics';
 
 // This debugging script dumps all the SunSpec model data
 // It polls the inverters and smart meters once
@@ -48,12 +66,32 @@ void (async () => {
     logger.info({
         invertersData,
         metersData,
-        inverterMetrics: invertersData.map((inverterData) =>
-            getInverterMetrics(inverterData.inverter),
-        ),
-        meterMetrics: metersData.map((meterData) =>
-            getMeterMetrics(meterData.meter),
-        ),
+        inverterMetrics: invertersData.map((inverterData) => ({
+            inverter: getInverterMetrics(inverterData.inverter),
+            nameplate: getNameplateMetrics(inverterData.nameplate),
+            settings: getSettingsMetrics(inverterData.settings),
+            status: getStatusMetrics(inverterData.status),
+        })),
+        meterMetrics: metersData.map((meterData) => ({
+            meter: getMeterMetrics(meterData.meter),
+        })),
+        aggregatedMetrics: {
+            inveter: getAggregatedInverterMetrics(
+                invertersData.map((inverterData) => inverterData.inverter),
+            ),
+            nameplate: getAggregatedNameplateMetrics(
+                invertersData.map((inverterData) => inverterData.nameplate),
+            ),
+            settings: getAggregatedSettingsMetrics(
+                invertersData.map((inverterData) => inverterData.settings),
+            ),
+            status: getAggregatedStatusMetrics(
+                invertersData.map((inverterData) => inverterData.status),
+            ),
+            meters: getAggregatedMeterMetrics(
+                metersData.map((meterData) => meterData.meter),
+            ),
+        },
     });
 
     process.exit();
