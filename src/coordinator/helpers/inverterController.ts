@@ -23,7 +23,7 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { influxDbWriteApi } from '../../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
-import type { InverterControlLimitSystemType } from './inverterControlLimitType';
+import type { InverterControlLimitType } from './inverterControlLimitType';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -70,25 +70,25 @@ export class InverterController {
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
-    private controlLimitSystems: InverterControlLimitSystemType[];
+    private controlLimits: InverterControlLimitType[];
 
     constructor({
         invertersConnections,
         applyControl,
         rampRateHelper,
-        controlLimitSystems,
+        controlLimits,
     }: {
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
         rampRateHelper: RampRateHelper;
-        controlLimitSystems: InverterControlLimitSystemType[];
+        controlLimits: InverterControlLimitType[];
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
-        this.controlLimitSystems = controlLimitSystems;
+        this.controlLimits = controlLimits;
     }
 
     updateSunSpecInverterData(data: SunSpecData) {
@@ -99,8 +99,8 @@ export class InverterController {
     }
 
     private getActiveInverterControlLimit(): InverterControlLimit {
-        const controlLimits = this.controlLimitSystems.map((controlSystem) =>
-            controlSystem.getInverterControlLimit(),
+        const controlLimits = this.controlLimits.map((controlLimit) =>
+            controlLimit.getInverterControlLimit(),
         );
 
         return getAggregatedInverterControlLimit(controlLimits);
