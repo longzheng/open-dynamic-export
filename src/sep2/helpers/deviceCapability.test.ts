@@ -14,7 +14,6 @@ const sep2Client = new SEP2Client({
     sep2Config: {
         host: 'http://example.com',
         dcapUri: '/dcap',
-        pen: 12345,
     },
     cert: mockCert,
     key: mockKey,

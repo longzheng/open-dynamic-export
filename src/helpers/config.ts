@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { env } from './env';
 
 const sunspecModbusSchema = z.object({
     ip: z.string().regex(/^(\d{1,3}\.){3}\d{1,3}$/),
@@ -17,9 +18,6 @@ const configSchema = z.object({
             enabled: z.literal(true),
             host: z.string().url(),
             dcapUri: z.string(),
-            certPath: z.string(),
-            keyPath: z.string(),
-            pen: z.number(),
         }),
     ]),
     sunSpec: z.object({
@@ -54,16 +52,13 @@ export function getSep2Certificate(config: Config) {
         throw new Error('SEP2 is not enabled');
     }
 
-    const cert = readFileSync(
-        resolve('./config', config.sep2.certPath),
-        'utf-8',
-    );
+    const cert = readFileSync(resolve(env.SEP2_CERT_PATH), 'utf-8');
 
     if (!cert) {
         throw new Error('Certificate is not found or is empty');
     }
 
-    const key = readFileSync(resolve('./config', config.sep2.keyPath), 'utf-8');
+    const key = readFileSync(resolve(env.SEP2_KEY_PATH), 'utf-8');
 
     if (!key) {
         throw new Error('Key is not found or is empty');
