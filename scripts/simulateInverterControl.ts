@@ -3,7 +3,7 @@ import { getConfig } from '../src/helpers/config';
 import { getSunSpecConnections } from '../src/sunspec/connections';
 import { SunSpecDataHelper } from '../src/coordinator/helpers/sunspecData';
 import { logger } from '../src/helpers/logger';
-import type { ActiveDERControlBaseValues } from '../src/coordinator/helpers/inverterController';
+import type { InverterControlLimit } from '../src/coordinator/helpers/inverterController';
 import {
     calculateInverterConfiguration,
     generateControlsModelWriteFromInverterConfiguration,
@@ -14,11 +14,8 @@ import { RampRateHelper } from '../src/coordinator/helpers/rampRate';
 // It polls SunSpec data and telemetry
 // It logs the the calculated target solar watts and power ratio to the console
 
-const simulatedActiveDerControlBase: ActiveDERControlBaseValues = {
-    opModExpLimW: {
-        value: 10000,
-        multiplier: 0,
-    },
+const simulatedActiveDerControlBase: InverterControlLimit = {
+    opModExpLimW: 1000,
     opModGenLimW: undefined,
     opModConnect: true,
     opModEnergize: true,
@@ -38,7 +35,7 @@ const rampRateHelper = new RampRateHelper();
 
 sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
     const inverterConfiguration = calculateInverterConfiguration({
-        activeDerControlBaseValues: simulatedActiveDerControlBase,
+        activeControlLimit: simulatedActiveDerControlBase,
         sunSpecData: {
             inverters: invertersData,
             monitoringSample,

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { env } from './env';
 
 const sunspecModbusSchema = z.object({
     ip: z.string().regex(/^(\d{1,3}\.){3}\d{1,3}$/),
@@ -9,13 +10,16 @@ const sunspecModbusSchema = z.object({
 });
 
 const configSchema = z.object({
-    sep2: z.object({
-        host: z.string().url(),
-        dcapUri: z.string(),
-        certPath: z.string(),
-        keyPath: z.string(),
-        pen: z.number(),
-    }),
+    sep2: z.union([
+        z.object({
+            enabled: z.literal(false),
+        }),
+        z.object({
+            enabled: z.literal(true),
+            host: z.string().url(),
+            dcapUri: z.string(),
+        }),
+    ]),
     sunSpec: z.object({
         inverters: z.array(sunspecModbusSchema),
         meters: z.array(sunspecModbusSchema),
@@ -43,24 +47,22 @@ export function getConfig() {
     return result.data;
 }
 
-export function getConfigSep2CertKey(config: Config) {
-    const sep2Cert = readFileSync(
-        resolve('./config', config.sep2.certPath),
-        'utf-8',
-    );
+export function getSep2Certificate(config: Config) {
+    if (!config.sep2.enabled) {
+        throw new Error('SEP2 is not enabled');
+    }
 
-    if (!sep2Cert) {
+    const cert = readFileSync(resolve(env.SEP2_CERT_PATH), 'utf-8');
+
+    if (!cert) {
         throw new Error('Certificate is not found or is empty');
     }
 
-    const sep2Key = readFileSync(
-        resolve('./config', config.sep2.keyPath),
-        'utf-8',
-    );
+    const key = readFileSync(resolve(env.SEP2_KEY_PATH), 'utf-8');
 
-    if (!sep2Key) {
+    if (!key) {
         throw new Error('Key is not found or is empty');
     }
 
-    return { sep2Cert, sep2Key };
+    return { cert, key };
 }

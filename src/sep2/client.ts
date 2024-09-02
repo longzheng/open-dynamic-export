@@ -23,14 +23,19 @@ export class SEP2Client {
         sep2Config,
         cert,
         key,
+        pen,
     }: {
-        sep2Config: Pick<Config['sep2'], 'host' | 'dcapUri' | 'pen'>;
+        sep2Config: Pick<
+            Extract<Config['sep2'], { enabled: true }>,
+            'host' | 'dcapUri'
+        >;
         cert: string;
         key: string;
+        pen: string;
     }) {
         this.host = sep2Config.host;
         this.dcapUri = sep2Config.dcapUri;
-        this.pen = sep2Config.pen.toString().padStart(8, '0');
+        this.pen = pen.padStart(8, '0');
         this.lfdi = getCertificateLfdi(cert);
 
         const axiosClient = axios.create({

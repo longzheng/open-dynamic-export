@@ -10,10 +10,10 @@ beforeAll(() => {
         sep2Config: {
             host: 'http://example.com',
             dcapUri: '/dcap',
-            pen: 12345,
         },
         cert: mockCert,
         key: mockKey,
+        pen: '12345',
     });
 });
 

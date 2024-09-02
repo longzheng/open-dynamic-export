@@ -1,8 +1,8 @@
 import { getCertificateLfdi } from '../src/helpers/cert';
-import { getConfig, getConfigSep2CertKey } from '../src/helpers/config';
+import { getConfig, getSep2Certificate } from '../src/helpers/config';
 
 const config = getConfig();
-const { sep2Cert } = getConfigSep2CertKey(config);
-const lfdi = getCertificateLfdi(sep2Cert);
+const sep2Certificate = getSep2Certificate(config);
+const lfdi = getCertificateLfdi(sep2Certificate.cert);
 
 console.log(lfdi);

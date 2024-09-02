@@ -1,7 +1,4 @@
-import type { SEP2Client } from '../../sep2/client';
 import type { ControlType } from '../../sep2/helpers/controlScheduler';
-import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler';
-import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls';
 import {
     Conn,
     OutPFSet_Ena,
@@ -11,7 +8,6 @@ import {
     type ControlsModelWrite,
 } from '../../sunspec/models/controls';
 import type { MonitoringSample } from './monitoring';
-import type { DERControlBase } from '../../sep2/models/derControlBase';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import Decimal from 'decimal.js';
 import {
@@ -27,8 +23,9 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { influxDbWriteApi } from '../../helpers/influxdb';
 import { Point } from '@influxdata/influxdb-client';
+import type { InverterControlLimitSystemType } from './inverterControlLimitType';
 
-type SupportedControlTypes = Extract<
+export type SupportedControlTypes = Extract<
     ControlType,
     'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
 >;
@@ -42,10 +39,12 @@ type SunSpecData = {
     monitoringSample: MonitoringSample;
 };
 
-export type ActiveDERControlBaseValues = Pick<
-    DERControlBase,
-    SupportedControlTypes
->;
+export type InverterControlLimit = {
+    opModEnergize: boolean | undefined;
+    opModConnect: boolean | undefined;
+    opModGenLimW: number | undefined;
+    opModExpLimW: number | undefined;
+};
 
 type InverterConfiguration =
     | { type: 'deenergize' }
@@ -67,61 +66,29 @@ const defaultValues = {
 
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];
-    private schedulerByControlType: {
-        [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
-    };
     private cachedSunSpecData: SunSpecData | null = null;
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
+    private controlLimitSystems: InverterControlLimitSystemType[];
 
     constructor({
-        client,
         invertersConnections,
         applyControl,
         rampRateHelper,
+        controlLimitSystems,
     }: {
-        client: SEP2Client;
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
         rampRateHelper: RampRateHelper;
+        controlLimitSystems: InverterControlLimitSystemType[];
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
-
-        this.schedulerByControlType = {
-            opModExpLimW: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModExpLimW',
-                rampRateHelper,
-            }),
-            opModEnergize: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModEnergize',
-                rampRateHelper,
-            }),
-            opModConnect: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModConnect',
-                rampRateHelper,
-            }),
-            opModGenLimW: new ControlSchedulerHelper({
-                client,
-                controlType: 'opModGenLimW',
-                rampRateHelper,
-            }),
-        };
-    }
-
-    updateSep2ControlsData(data: DerControlsHelperChangedData) {
-        for (const scheduler of Object.values(this.schedulerByControlType)) {
-            scheduler.updateControlsData(data);
-        }
-
-        void this.updateInverterControlValues();
+        this.controlLimitSystems = controlLimitSystems;
     }
 
     updateSunSpecInverterData(data: SunSpecData) {
@@ -131,17 +98,12 @@ export class InverterController {
         void this.updateInverterControlValues();
     }
 
-    private getActiveDerControlBaseValues(): ActiveDERControlBaseValues {
-        return {
-            opModExpLimW:
-                this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue(),
-            opModGenLimW:
-                this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue(),
-            opModEnergize:
-                this.schedulerByControlType.opModEnergize.getActiveScheduleDerControlBaseValue(),
-            opModConnect:
-                this.schedulerByControlType.opModConnect.getActiveScheduleDerControlBaseValue(),
-        };
+    private getActiveInverterControlLimit(): InverterControlLimit {
+        const controlLimits = this.controlLimitSystems.map((controlSystem) =>
+            controlSystem.getInverterControlLimit(),
+        );
+
+        return getAggregatedInverterControlLimit(controlLimits);
     }
 
     private async updateInverterControlValues() {
@@ -152,17 +114,18 @@ export class InverterController {
             return;
         }
 
-        const activeDerControlBaseValues = this.getActiveDerControlBaseValues();
+        const getActiveInverterControlLimit =
+            this.getActiveInverterControlLimit();
 
         const inverterConfiguration = calculateInverterConfiguration({
-            activeDerControlBaseValues,
+            activeControlLimit: getActiveInverterControlLimit,
             sunSpecData: this.cachedSunSpecData,
             rampRateHelper: this.rampRateHelper,
         });
 
         this.logger.info(
             {
-                activeDerControlBaseValues,
+                getActiveInverterControlLimit,
                 inverterConfiguration,
             },
             'Updating inverter control values',
@@ -199,11 +162,11 @@ export class InverterController {
 }
 
 export function calculateInverterConfiguration({
-    activeDerControlBaseValues,
+    activeControlLimit,
     sunSpecData,
     rampRateHelper,
 }: {
-    activeDerControlBaseValues: ActiveDERControlBaseValues;
+    activeControlLimit: InverterControlLimit;
     sunSpecData: SunSpecData;
     rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
@@ -211,15 +174,15 @@ export function calculateInverterConfiguration({
 
     logger.trace(
         {
-            activeDerControlBaseValues,
+            activeDerControlBaseValues: activeControlLimit,
         },
         'activeDerControlBaseValue',
     );
 
     const energize =
-        activeDerControlBaseValues.opModEnergize ?? defaultValues.opModEnergize;
+        activeControlLimit.opModEnergize ?? defaultValues.opModEnergize;
     const connect =
-        activeDerControlBaseValues.opModConnect ?? defaultValues.opModConnect;
+        activeControlLimit.opModConnect ?? defaultValues.opModConnect;
     const deenergize = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseMeasurement(
@@ -229,19 +192,11 @@ export function calculateInverterConfiguration({
         sunSpecData.monitoringSample.der.realPower,
     );
 
-    const exportLimitWatts = activeDerControlBaseValues.opModExpLimW
-        ? numberWithPow10(
-              activeDerControlBaseValues.opModExpLimW.value,
-              activeDerControlBaseValues.opModExpLimW.multiplier,
-          )
-        : defaultValues.opModExpLimW;
+    const exportLimitWatts =
+        activeControlLimit.opModExpLimW ?? defaultValues.opModExpLimW;
 
-    const generationLimitWatts = activeDerControlBaseValues.opModGenLimW
-        ? numberWithPow10(
-              activeDerControlBaseValues.opModGenLimW.value,
-              activeDerControlBaseValues.opModGenLimW.multiplier,
-          )
-        : defaultValues.opModGenLimW;
+    const generationLimitWatts =
+        activeControlLimit.opModGenLimW ?? defaultValues.opModGenLimW;
 
     const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
@@ -497,4 +452,56 @@ export function calculateTargetSolarWatts({
     const solarTarget = new Decimal(solarWatts).sub(changeToMeetExportLimit);
 
     return solarTarget.toNumber();
+}
+
+export function getAggregatedInverterControlLimit(
+    controlLimits: InverterControlLimit[],
+) {
+    let opModEnergize: boolean | undefined = undefined;
+    let opModConnect: boolean | undefined = undefined;
+    let opModGenLimW: number | undefined = undefined;
+    let opModExpLimW: number | undefined = undefined;
+
+    for (const controlLimit of controlLimits) {
+        if (controlLimit.opModEnergize !== undefined) {
+            if (opModEnergize === undefined) {
+                opModEnergize = controlLimit.opModEnergize;
+            } else {
+                opModEnergize = opModEnergize && controlLimit.opModEnergize;
+            }
+        }
+
+        if (controlLimit.opModConnect !== undefined) {
+            if (opModConnect === undefined) {
+                opModConnect = controlLimit.opModConnect;
+            } else {
+                opModConnect = opModConnect && controlLimit.opModConnect;
+            }
+        }
+
+        if (controlLimit.opModGenLimW !== undefined) {
+            if (
+                opModGenLimW === undefined ||
+                controlLimit.opModGenLimW < opModGenLimW
+            ) {
+                opModGenLimW = controlLimit.opModGenLimW;
+            }
+        }
+
+        if (controlLimit.opModExpLimW !== undefined) {
+            if (
+                opModExpLimW === undefined ||
+                controlLimit.opModExpLimW < opModExpLimW
+            ) {
+                opModExpLimW = controlLimit.opModExpLimW;
+            }
+        }
+    }
+
+    return {
+        opModEnergize,
+        opModConnect,
+        opModGenLimW,
+        opModExpLimW,
+    };
 }
