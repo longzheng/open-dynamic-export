@@ -30,7 +30,7 @@ The server uses a configuration JSON to configure how it works.
 
 To configure the inverter and meter connections, add the following property to `config.json`
 
-```json
+```js
 {
     "sunSpec": {
         "control": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
@@ -57,7 +57,7 @@ To configure the inverter and meter connections, add the following property to `
 
 To set fixed limits (such as for fixed export limits), add the following property to `config.json`
 
-```json
+```js
 {
     "limit": {
         "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
@@ -75,7 +75,7 @@ To set fixed limits (such as for fixed export limits), add the following propert
 
 To use CSIP-AUS, add following property to `config.json`
 
-```json
+```js
 {
     "sep2": {
         "host": "https://sep2-test.energyq.com.au", // (string) required: the SEP2 server host
