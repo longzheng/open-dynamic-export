@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import { getConfig } from '../src/helpers/config';
-import { getSunSpecConnections } from '../src/sunspec/connections';
+import {
+    getSunSpecInvertersConnections,
+    getSunSpecMetersConnections,
+} from '../src/sunspec/connections';
 import { logger } from '../src/helpers/logger';
 import { generateDerMonitoringSample } from '../src/coordinator/helpers/derMonitoring';
 import { generateSiteMonitoringSample } from '../src/coordinator/helpers/siteMonitoring';
@@ -11,8 +14,9 @@ import { generateSiteMonitoringSample } from '../src/coordinator/helpers/siteMon
 
 const config = getConfig();
 
-const { invertersConnections, metersConnections } =
-    getSunSpecConnections(config);
+const invertersConnections = getSunSpecInvertersConnections(config);
+
+const metersConnections = getSunSpecMetersConnections(config);
 
 async function poll() {
     try {

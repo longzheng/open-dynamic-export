@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import { getConfig } from '../helpers/config';
-import { getSunSpecConnections } from '../sunspec/connections';
-import { SunSpecDataHelper } from './helpers/sunspecData';
+import {
+    getSunSpecInvertersConnections,
+    getSunSpecMetersConnections,
+} from '../sunspec/connections';
+import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller';
 import { logger as pinoLogger } from '../helpers/logger';
 import { InverterController } from './helpers/inverterController';
 import { RampRateHelper } from './helpers/rampRate';
@@ -12,16 +15,21 @@ import {
 import { getSep2Limiter } from '../sep2';
 import { FixedLimiter } from '../limiters/fixed';
 import { AmberLimiter } from '../limiters/amber';
+import { SunSpecMeterPoller } from '../sunspec/sunspecMeterPoller';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
 const config = getConfig();
 
-const { invertersConnections, metersConnections } =
-    getSunSpecConnections(config);
+const invertersConnections = getSunSpecInvertersConnections(config);
 
-const sunSpecDataEventEmitter = new SunSpecDataHelper({
+const metersConnections = getSunSpecMetersConnections(config);
+
+const sunSpecInverterPoller = new SunSpecInverterPoller({
     invertersConnections,
+});
+
+const sunSpecMeterPoller = new SunSpecMeterPoller({
     metersConnections,
 });
 
@@ -53,24 +61,26 @@ const inverterController = new InverterController({
     limiters,
 });
 
-sunSpecDataEventEmitter.on(
-    'data',
-    ({ invertersData, derMonitoringSample, siteMonitoringSample }) => {
-        writeSiteMonitoringSamplePoints(siteMonitoringSample);
-        writeDerMonitoringSamplePoints(derMonitoringSample);
+sunSpecInverterPoller.on('data', ({ invertersData, derMonitoringSample }) => {
+    writeDerMonitoringSamplePoints(derMonitoringSample);
 
-        sep2?.derHelper.onInverterData(invertersData);
-        sep2?.mirrorUsagePointListHelper.addDerMonitoringSample(
-            derMonitoringSample,
-        );
-        sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(
-            siteMonitoringSample,
-        );
+    sep2?.derHelper.onInverterData(invertersData);
+    sep2?.mirrorUsagePointListHelper.addDerMonitoringSample(
+        derMonitoringSample,
+    );
 
-        inverterController.updateSunSpecInverterData({
-            inverters: invertersData,
-            siteMonitoringSample,
-            derMonitoringSample,
-        });
-    },
-);
+    inverterController.updateSunSpecInverterData({
+        inverters: invertersData,
+        derMonitoringSample,
+    });
+});
+
+sunSpecMeterPoller.on('data', ({ siteMonitoringSample }) => {
+    writeSiteMonitoringSamplePoints(siteMonitoringSample);
+
+    sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(
+        siteMonitoringSample,
+    );
+
+    inverterController.updateSiteMonitoringSample(siteMonitoringSample);
+});
