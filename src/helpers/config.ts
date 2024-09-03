@@ -28,7 +28,7 @@ export const configSchema = z.object({
                 .describe('The URI of the DeviceCapability resource'),
         })
         .optional()
-        .describe('If defined, CSIP-AUS/SEP2 server configuration'),
+        .describe('If defined, limit by CSIP-AUS/SEP2 server'),
     limit: z
         .object({
             connect: z
@@ -49,7 +49,18 @@ export const configSchema = z.object({
                 .describe('The generation limit in watts'),
         })
         .optional()
-        .describe('If defined, manual limits for the inverter'),
+        .describe('If defined, limits by manual configuration'),
+    negativeFeedIn: z
+        .union([
+            z.object({
+                type: z.literal('amber'),
+                apiKey: z.string().describe('The API key for the Amber API'),
+                siteId: z.string().describe('The site ID for the Amber API'),
+            }),
+            z.never(), // TODO
+        ])
+        .optional()
+        .describe('If defined, limit by negative feed-in'),
     sunSpec: z
         .object({
             inverters: z.array(sunspecModbusSchema),
