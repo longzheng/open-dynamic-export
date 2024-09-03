@@ -53,7 +53,7 @@ To configure the inverter and meter connections, add the following property to `
 
 ### Limiters
 
-All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive for each control surface (e.g. export = less export, generation = less generation, connection = de-energize) at any one time.
+All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive value of each control type at any one time.
 
 Currently there are four control surfaces, mapped to the CSIP-AUS modes
 
