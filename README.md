@@ -167,9 +167,7 @@ sequenceDiagram
     end
 ```
 
-The initial plan is to implement a direct gateway client that interacts directly with the utility server and the DER (solar inverters). This client will be hosted on-site (e.g. home server/Raspberry Pi) using a Docker container and communicate directly with DER in the same local network using Modbus TCP.
-
-The downside of a direct client approach is the registration process is manual and requires generating keys and certificates for each site/NMI. If the project is successful, a future version will allow self-service registration or a cloud-hosted aggregator proxy.
+The initial plan is to implement a direct gateway client that interacts directly with the utility server and the DER (solar inverters). The downside of a direct client approach is the registration process is manual and requires generating keys and certificates for each site/NMI. If the project is successful, a future version will allow self-service registration or a cloud-hosted aggregator proxy.
 
 ## Features
 
