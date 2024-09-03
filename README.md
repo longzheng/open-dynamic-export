@@ -3,7 +3,7 @@
 ## About
 
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
-- dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy markets
+- dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - negative feed-in (e.g. Amber)
 
@@ -20,13 +20,11 @@ Meters:
 > [!IMPORTANT]
 > The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
 
-## Running
+## Configuration
 
-### Configuration
+The server uses a configuration JSON to configure how it works. 
 
-The server uses a configuration JSON to configure how it works. All "limits" are restrictive, that is a combination of multiple limits will evaluate all limits and enforce the most prohibitive for each control (e.g. export = less export, generation = less generation, connection = de-energize) at any one time.
-
-#### SunSpec
+### SunSpec
 
 To configure the inverter and meter connections, add the following property to `config.json`
 
@@ -53,7 +51,20 @@ To configure the inverter and meter connections, add the following property to `
 }
 ```
 
-#### Fixed limits
+### Limiters
+
+All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive for each control surface (e.g. export = less export, generation = less generation, connection = de-energize) at any one time.
+
+Currently there are four control surfaces, mapped to the CSIP-AUS modes
+
+| Mode            | Description                                                                                  | Overlap resolution     | Default value |
+|-----------------|----------------------------------------------------------------------------------------------|------------------------|---------------|
+| opModConnect    | Connection to the grid                                                                       | Prioritize disconnect  | Connect       |
+| opModEnergize   | Generate or consume energy (in practice for most inverters this is the same as opModConnect) | Prioritize de-energize | Energized     |
+| opModExportLimW | Maximum export limit (in watts)                                                              | Lower limit            | Unlimited     |
+| opModGenLimW    | Maximum inverter generation limit (in watts)                                                 | Lower limit            | Unlimited     |
+
+#### Fixed limit
 
 To set fixed limits (such as for fixed export limits), add the following property to `config.json`
 
