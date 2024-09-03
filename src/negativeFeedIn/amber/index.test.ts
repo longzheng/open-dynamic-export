@@ -81,9 +81,16 @@ describe('AmberControlLimit', () => {
     //  Close server after all tests
     afterAll(() => mockServer.close());
 
+    let amberControlLimit: AmberControlLimit;
+
     beforeEach(() => {
         // tell vitest we use mocked time
         vi.useFakeTimers();
+
+        amberControlLimit = new AmberControlLimit({
+            apiKey: 'abc',
+            siteId: '12345',
+        });
     });
 
     afterEach(() => {
@@ -96,8 +103,6 @@ describe('AmberControlLimit', () => {
 
     it('should return correct control limit when negative price', async () => {
         vi.setSystemTime(new Date('2021-05-05T02:30:01Z'));
-
-        const amberControlLimit = new AmberControlLimit({ siteId: '12345' });
 
         // give the polling a chance to finish
         await vi.advanceTimersToNextTimerAsync();
@@ -114,8 +119,6 @@ describe('AmberControlLimit', () => {
 
     it('should return no control limit when positive price', async () => {
         vi.setSystemTime(new Date('2021-05-05T02:00:01Z'));
-
-        const amberControlLimit = new AmberControlLimit({ siteId: '12345' });
 
         // give the polling a chance to finish
         await vi.advanceTimersToNextTimerAsync();
