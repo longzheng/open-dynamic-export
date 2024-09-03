@@ -51,6 +51,7 @@ export class AmberControlLimit implements InverterControlLimitType {
             },
         );
 
+        // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (error) {
             throw new Error(JSON.stringify(error));
