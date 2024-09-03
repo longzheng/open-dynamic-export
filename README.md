@@ -5,7 +5,7 @@
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy markets
 - fixed/zero export limitations (e.g. 1.5kW export limit)
-- negative feed-in 
+- negative feed-in (e.g. Amber)
 
 ## Supported inverters and meters
 
@@ -24,7 +24,7 @@ Meters:
 
 ### Configuration
 
-The server uses a configuration JSON to configure how it works.
+The server uses a configuration JSON to configure how it works. All "limits" are restrictive, that is a combination of multiple limits will evaluate all limits and enforce the most prohibitive for each control (e.g. export = less export, generation = less generation, connection = de-energize) at any one time.
 
 #### SunSpec
 
@@ -63,6 +63,22 @@ To set fixed limits (such as for fixed export limits), add the following propert
         "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
         "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
         "generationLimitWatts": 10000 // (number) optional: the maximum generation limit in watts
+    },
+    ...
+}
+```
+
+#### Negative feed-in
+
+To set a zero export limit based on negative feed-in, add the following property to `config.json`
+
+For Amber Electric:
+```js
+{
+    "negativeFeedIn": {
+        "type": "amber", // (string) required: the source of the negative feed-in data
+        "apiKey": "asdf", // (string) required: the Amber API key
+        "siteId": "12345" // (string) required: the Amber site ID
     },
     ...
 }
