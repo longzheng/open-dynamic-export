@@ -71,22 +71,7 @@
               "additionalProperties": false
             },
             {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "todo"
-                },
-                "apiKey": {
-                  "type": "string",
-                  "description": "The API key for the TODO API"
-                }
-              },
-              "required": [
-                "type",
-                "apiKey"
-              ],
-              "additionalProperties": false
+              "not": {}
             }
           ],
           "description": "If defined, limit by negative feed-in"
