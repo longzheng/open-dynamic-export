@@ -8,7 +8,8 @@ export const logger = pino({
         targets: [
             {
                 target: 'pino-rotating-file-stream',
-                level: 'debug',
+                // this uses an environment variable because we don't want additional dependencies
+                level: process.env['LOGLEVEL'] ?? 'debug',
                 options: {
                     filename: 'debug.log',
                     path: `./logs/`,

@@ -117,7 +117,7 @@ export class AmberLimiter implements LimiterType {
             (interval) => interval.start <= now && now < interval.end,
         );
 
-        this.logger.trace({ currentInterval }, 'Current interval ');
+        this.logger.trace({ currentInterval }, 'Current interval');
 
         const currentPrice = currentInterval?.price;
 
