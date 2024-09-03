@@ -25,7 +25,7 @@ export function writeMonitoringSamplePoints(
             // site
             new Point('monitoringSample')
                 .tag('type', 'site')
-                .floatField('frequency', monitoringSample.der.frequency),
+                .floatField('frequency', monitoringSample.site.frequency),
             new Point('monitoringSample')
                 .tag('type', 'site')
                 .tag('phase', 'A')
