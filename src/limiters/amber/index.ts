@@ -5,6 +5,7 @@ import type { LimiterType } from '../../coordinator/helpers/limiter';
 import type { InverterControlLimit } from '../../coordinator/helpers/inverterController';
 import type { Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
+import { writeAmberPrice, writeControlLimit } from '../../helpers/influxdb';
 
 type Interval = {
     start: Date;
@@ -32,7 +33,29 @@ export class AmberLimiter implements LimiterType {
     }
 
     getInverterControlLimit(): InverterControlLimit {
-        return getControlLimitFromIntervals(this.feedInIntervals);
+        const price = this.getCurrentPrice();
+
+        const limit =
+            price && price < 0
+                ? {
+                      // if feed in price is negative, limit export to 0
+                      opModConnect: undefined,
+                      opModEnergize: undefined,
+                      opModExpLimW: 0,
+                      opModGenLimW: undefined,
+                  }
+                : {
+                      // can't find current interval, assume export is fine
+                      // if feed in price is positive, export is fine
+                      opModConnect: undefined,
+                      opModEnergize: undefined,
+                      opModExpLimW: undefined,
+                      opModGenLimW: undefined,
+                  };
+
+        writeControlLimit({ limit, name: 'amber' });
+
+        return limit;
     }
 
     private async getSiteFeedInPrices() {
@@ -86,42 +109,20 @@ export class AmberLimiter implements LimiterType {
             );
         }
     }
-}
 
-export function getControlLimitFromIntervals(
-    feedInIntervals: Interval[],
-): InverterControlLimit {
-    // find current feed in price
-    const now = new Date();
-    const currentInterval = feedInIntervals.find(
-        (interval) => interval.start <= now && now < interval.end,
-    );
+    private getCurrentPrice() {
+        // find current feed in price
+        const now = new Date();
+        const currentInterval = this.feedInIntervals.find(
+            (interval) => interval.start <= now && now < interval.end,
+        );
 
-    // can't find current interval, assume export is fine
-    if (!currentInterval) {
-        return {
-            opModConnect: undefined,
-            opModEnergize: undefined,
-            opModExpLimW: undefined,
-            opModGenLimW: undefined,
-        };
+        this.logger.trace({ currentInterval }, 'Current interval ');
+
+        const currentPrice = currentInterval?.price;
+
+        writeAmberPrice(currentPrice);
+
+        return currentPrice;
     }
-
-    // if feed in price is positive, export is fine
-    if (currentInterval.price >= 0) {
-        return {
-            opModConnect: undefined,
-            opModEnergize: undefined,
-            opModExpLimW: undefined,
-            opModGenLimW: undefined,
-        };
-    }
-
-    // if feed in price is negative, limit export to 0
-    return {
-        opModConnect: undefined,
-        opModEnergize: undefined,
-        opModExpLimW: 0,
-        opModGenLimW: undefined,
-    };
 }

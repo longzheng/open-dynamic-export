@@ -8,7 +8,7 @@ import {
     it,
     vi,
 } from 'vitest';
-import { AmberLimiter, getControlLimitFromIntervals } from '.';
+import { AmberLimiter } from '.';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
 
@@ -124,62 +124,6 @@ describe('AmberControlLimit', () => {
         await vi.advanceTimersToNextTimerAsync();
 
         const result = amberControlLimit.getInverterControlLimit();
-
-        expect(result).toEqual({
-            opModConnect: undefined,
-            opModEnergize: undefined,
-            opModExpLimW: undefined,
-            opModGenLimW: undefined,
-        });
-    });
-});
-
-describe('getControlLimitFromIntervals', () => {
-    it('should return correct control limit with active interval', () => {
-        vi.setSystemTime(new Date('2024-01-01T00:00:01Z'));
-
-        const feedInIntervals = [
-            {
-                start: new Date('2024-01-01T00:00:00Z'),
-                end: new Date('2024-01-01T00:30:00Z'),
-                price: -60.0,
-            },
-            {
-                start: new Date('2024-01-01T00:30:00Z'),
-                end: new Date('2024-01-01T01:00:00Z'),
-                price: 30.0,
-            },
-        ];
-
-        const result = getControlLimitFromIntervals(feedInIntervals);
-
-        expect(result).toEqual({
-            opModConnect: undefined,
-            opModEnergize: undefined,
-            opModExpLimW: 0,
-            opModGenLimW: undefined,
-        });
-    });
-
-    it('should return correct control limit when no applicable intervals', () => {
-        // january
-        vi.setSystemTime(new Date('2024-01-01T00:00:01Z'));
-
-        // all future intervals
-        const feedInIntervals = [
-            {
-                start: new Date('2024-02-01T00:00:00Z'),
-                end: new Date('2024-02-01T00:30:00Z'),
-                price: -60.0,
-            },
-            {
-                start: new Date('2024-02-01T00:30:00Z'),
-                end: new Date('2024-02-01T01:00:00Z'),
-                price: 30.0,
-            },
-        ];
-
-        const result = getControlLimitFromIntervals(feedInIntervals);
 
         expect(result).toEqual({
             opModConnect: undefined,

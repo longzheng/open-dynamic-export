@@ -7,6 +7,7 @@ import type { FallbackControl } from '../sep2/helpers/derControls';
 import { numberWithPow10 } from './number';
 import type { SiteMonitoringSample } from '../coordinator/helpers/siteMonitoring';
 import type { DerMonitoringSample } from '../coordinator/helpers/derMonitoring';
+import type { InverterControlLimit } from '../coordinator/helpers/inverterController';
 
 const influxDB = new InfluxDB({
     url: `http://influxdb:${process.env['INFLUXDB_PORT']}`,
@@ -307,4 +308,42 @@ export function writeInverterControllerPoints({
                 rampedTargetSolarPowerRatio,
             ),
     ]);
+}
+
+export function writeAmberPrice(number: number | undefined) {
+    influxDbWriteApi.writePoints(
+        [
+            number !== undefined
+                ? new Point('amber').floatField('price', number)
+                : null,
+        ].filter((point) => point !== null),
+    );
+}
+
+export function writeControlLimit({
+    limit,
+    name,
+}: {
+    limit: InverterControlLimit;
+    name: string;
+}) {
+    const point = new Point('controlLimit').tag('name', name);
+
+    if (limit.opModConnect !== undefined) {
+        point.booleanField('opModConnect', limit.opModConnect);
+    }
+
+    if (limit.opModEnergize !== undefined) {
+        point.booleanField('opModEnergize', limit.opModEnergize);
+    }
+
+    if (limit.opModExpLimW !== undefined) {
+        point.floatField('opModExpLimW', limit.opModExpLimW);
+    }
+
+    if (limit.opModGenLimW !== undefined) {
+        point.floatField('opModGenLimW', limit.opModGenLimW);
+    }
+
+    influxDbWriteApi.writePoint(point);
 }

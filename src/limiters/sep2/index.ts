@@ -11,6 +11,7 @@ import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControl
 import EventEmitter from 'events';
 import type { LimiterType } from '../../coordinator/helpers/limiter';
 import { numberWithPow10 } from '../../helpers/number';
+import { writeControlLimit } from '../../helpers/influxdb';
 
 export class Sep2Limiter
     extends EventEmitter<{
@@ -72,7 +73,7 @@ export class Sep2Limiter
         const opModGenLimW =
             this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue();
 
-        return {
+        const limit = {
             opModExpLimW: opModExpLimW
                 ? numberWithPow10(opModExpLimW.value, opModExpLimW.multiplier)
                 : undefined,
@@ -84,5 +85,9 @@ export class Sep2Limiter
             opModConnect:
                 this.schedulerByControlType.opModConnect.getActiveScheduleDerControlBaseValue(),
         };
+
+        writeControlLimit({ limit, name: 'sep2' });
+
+        return limit;
     }
 }
