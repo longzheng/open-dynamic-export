@@ -7,7 +7,6 @@ import {
     type ControlsModel,
     type ControlsModelWrite,
 } from '../../sunspec/models/controls';
-import type { MonitoringSample } from './monitoring';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import Decimal from 'decimal.js';
 import {
@@ -23,19 +22,21 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { writeInverterControllerPoints } from '../../helpers/influxdb';
 import type { LimiterType } from './limiter';
+import type { SiteMonitoringSample } from './siteMonitoring';
+import type { DerMonitoringSample } from './derMonitoring';
 
 export type SupportedControlTypes = Extract<
     ControlType,
     'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
 >;
 
-type SunSpecData = {
+type SunSpecInverterData = {
     inverters: {
         inverter: InverterModel;
         nameplate: NameplateModel;
         controls: ControlsModel;
     }[];
-    monitoringSample: MonitoringSample;
+    derMonitoringSample: DerMonitoringSample;
 };
 
 export type InverterControlLimit = {
@@ -65,7 +66,8 @@ const defaultValues = {
 
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];
-    private cachedSunSpecData: SunSpecData | null = null;
+    private cachedSunSpecData: SunSpecInverterData | null = null;
+    private cachedSiteMonitoringSample: SiteMonitoringSample | null = null;
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
@@ -90,9 +92,18 @@ export class InverterController {
         this.limiters = limiters;
     }
 
-    updateSunSpecInverterData(data: SunSpecData) {
+    updateSunSpecInverterData(data: SunSpecInverterData) {
         this.logger.debug('Received inverter data, updating inverter controls');
         this.cachedSunSpecData = data;
+
+        void this.updateInverterControlValues();
+    }
+
+    updateSiteMonitoringSample(siteMonitoringSample: SiteMonitoringSample) {
+        this.logger.debug(
+            'Received site monitoring sample, updating inverter controls',
+        );
+        this.cachedSiteMonitoringSample = siteMonitoringSample;
 
         void this.updateInverterControlValues();
     }
@@ -113,12 +124,20 @@ export class InverterController {
             return;
         }
 
+        if (!this.cachedSiteMonitoringSample) {
+            this.logger.warn(
+                'Site monitoring data is not cached, cannot update inverter controls yet. Wait for next loop.',
+            );
+            return;
+        }
+
         const getActiveInverterControlLimit =
             this.getActiveInverterControlLimit();
 
         const inverterConfiguration = calculateInverterConfiguration({
             activeControlLimit: getActiveInverterControlLimit,
             sunSpecData: this.cachedSunSpecData,
+            siteMonitoringSample: this.cachedSiteMonitoringSample,
             rampRateHelper: this.rampRateHelper,
         });
 
@@ -163,10 +182,12 @@ export class InverterController {
 export function calculateInverterConfiguration({
     activeControlLimit,
     sunSpecData,
+    siteMonitoringSample,
     rampRateHelper,
 }: {
     activeControlLimit: InverterControlLimit;
-    sunSpecData: SunSpecData;
+    sunSpecData: SunSpecInverterData;
+    siteMonitoringSample: SiteMonitoringSample;
     rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
     const logger = pinoLogger.child({ module: 'calculateDynamicExportConfig' });
@@ -185,10 +206,10 @@ export function calculateInverterConfiguration({
     const deenergize = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseMeasurement(
-        sunSpecData.monitoringSample.site.realPower,
+        siteMonitoringSample.realPower,
     );
     const solarWatts = getTotalFromPerPhaseMeasurement(
-        sunSpecData.monitoringSample.der.realPower,
+        sunSpecData.derMonitoringSample.realPower,
     );
 
     const exportLimitWatts =
@@ -341,7 +362,7 @@ export function getCurrentPowerRatio({
     inverters,
     currentSolarWatts,
 }: {
-    inverters: SunSpecData['inverters'];
+    inverters: SunSpecInverterData['inverters'];
     currentSolarWatts: number;
 }) {
     return averageNumbersArray(

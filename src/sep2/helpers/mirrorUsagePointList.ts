@@ -4,9 +4,10 @@ import { PollableResource } from './pollableResource';
 import type { MirrorUsagePointList } from '../models/mirrorUsagePointList';
 import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList';
 import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite';
-import type { MonitoringSample } from '../../coordinator/helpers/monitoring';
 import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer';
 import { getListAll } from './pagination';
+import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoring';
+import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoring';
 
 export class MirrorUsagePointListHelper {
     private href: string | null = null;
@@ -60,9 +61,12 @@ export class MirrorUsagePointListHelper {
         this.mirrorUsagePointListPollableResource?.destroy();
     }
 
-    public addSample(sample: MonitoringSample) {
-        this.mirrorUsagePointSite?.addSample(sample);
-        this.mirrorUsagePointDer?.addSample(sample);
+    public addDerMonitoringSample(derMonitoringSample: DerMonitoringSample) {
+        this.mirrorUsagePointDer?.addSample(derMonitoringSample);
+    }
+
+    public addSiteMonitoringSample(siteMonitoringSample: SiteMonitoringSample) {
+        this.mirrorUsagePointSite?.addSample(siteMonitoringSample);
     }
 }
 

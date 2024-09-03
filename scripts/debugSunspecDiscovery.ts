@@ -1,8 +1,10 @@
 import 'dotenv/config';
 import { getConfig } from '../src/helpers/config';
-import { InverterSunSpecConnection } from '../src/sunspec/connection/inverter';
 import { logger } from '../src/helpers/logger';
-import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
+import {
+    getSunSpecInvertersConnections,
+    getSunSpecMetersConnections,
+} from '../src/sunspec/connections';
 
 // This debugging script dumps all the SunSpec models
 // It polls the inverters and smart meters once
@@ -11,15 +13,9 @@ import { MeterSunSpecConnection } from '../src/sunspec/connection/meter';
 const config = getConfig();
 
 void (async () => {
-    const invertersConnections = config.sunSpec.inverters.map(
-        ({ ip, port, unitId }) =>
-            new InverterSunSpecConnection({ ip, port, unitId }),
-    );
+    const invertersConnections = getSunSpecInvertersConnections(config);
 
-    const metersConnections = config.sunSpec.meters.map(
-        ({ ip, port, unitId }) =>
-            new MeterSunSpecConnection({ ip, port, unitId }),
-    );
+    const metersConnections = getSunSpecMetersConnections(config);
 
     for (const inverterConnection of invertersConnections) {
         const inverterLogger = logger.child({
