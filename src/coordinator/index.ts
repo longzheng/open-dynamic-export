@@ -8,6 +8,7 @@ import { RampRateHelper } from './helpers/rampRate';
 import { writeMonitoringSamplePoints } from '../helpers/influxdb';
 import { getSep2Instance } from '../sep2';
 import { ConfigControlLimit } from '../configLimit';
+import { AmberControlLimit } from '../negativeFeedIn/amber';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -29,15 +30,22 @@ const sep2 = getSep2Instance({
     rampRateHelper,
 });
 
-const configLimit = new ConfigControlLimit({ config });
+const controlLimits = [
+    sep2?.scheduledControlLimit,
+    config.limit ? new ConfigControlLimit({ config: config.limit }) : null,
+    config.negativeFeedIn?.type === 'amber'
+        ? new AmberControlLimit({
+              apiKey: config.negativeFeedIn.apiKey,
+              siteId: config.negativeFeedIn.siteId,
+          })
+        : null,
+].filter((controlLimit) => !!controlLimit);
 
 const inverterController = new InverterController({
     invertersConnections,
     applyControl: config.sunSpec.control,
     rampRateHelper,
-    controlLimits: [sep2?.scheduledControlLimit, configLimit].filter(
-        (controlLimit) => !!controlLimit,
-    ),
+    controlLimits,
 });
 
 sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {

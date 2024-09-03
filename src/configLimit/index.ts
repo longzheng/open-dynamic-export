@@ -3,18 +3,18 @@ import type { InverterControlLimitType } from '../coordinator/helpers/inverterCo
 import type { Config } from '../helpers/config';
 
 export class ConfigControlLimit implements InverterControlLimitType {
-    private config: Config;
+    private config: NonNullable<Config['limit']>;
 
-    constructor({ config }: { config: Config }) {
+    constructor({ config }: { config: NonNullable<Config['limit']> }) {
         this.config = config;
     }
 
     getInverterControlLimit(): InverterControlLimit {
         return {
-            opModConnect: this.config.limit?.connect,
-            opModEnergize: this.config.limit?.connect,
-            opModExpLimW: this.config.limit?.exportLimitWatts,
-            opModGenLimW: this.config.limit?.generationLimitWatts,
+            opModConnect: this.config.connect,
+            opModEnergize: this.config.connect,
+            opModExpLimW: this.config.exportLimitWatts,
+            opModGenLimW: this.config.generationLimitWatts,
         };
     }
 }

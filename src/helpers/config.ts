@@ -55,6 +55,7 @@ export const configSchema = z.object({
             z.object({
                 type: z.literal('amber'),
                 apiKey: z.string().describe('The API key for the Amber API'),
+                siteId: z.string().describe('The site ID for the Amber API'),
             }),
             z.object({
                 type: z.literal('todo'),
