@@ -7,7 +7,6 @@ import {
     type ControlsModel,
     type ControlsModelWrite,
 } from '../../sunspec/models/controls';
-import type { MonitoringSample } from './monitoring';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import Decimal from 'decimal.js';
 import {
@@ -23,6 +22,8 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { writeInverterControllerPoints } from '../../helpers/influxdb';
 import type { LimiterType } from './limiter';
+import type { SiteMonitoringSample } from './siteMonitoring';
+import type { DerMonitoringSample } from './derMonitoring';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -35,7 +36,8 @@ type SunSpecData = {
         nameplate: NameplateModel;
         controls: ControlsModel;
     }[];
-    monitoringSample: MonitoringSample;
+    siteMonitoringSample: SiteMonitoringSample;
+    derMonitoringSample: DerMonitoringSample;
 };
 
 export type InverterControlLimit = {
@@ -185,10 +187,10 @@ export function calculateInverterConfiguration({
     const deenergize = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseMeasurement(
-        sunSpecData.monitoringSample.site.realPower,
+        sunSpecData.siteMonitoringSample.realPower,
     );
     const solarWatts = getTotalFromPerPhaseMeasurement(
-        sunSpecData.monitoringSample.der.realPower,
+        sunSpecData.derMonitoringSample.realPower,
     );
 
     const exportLimitWatts =

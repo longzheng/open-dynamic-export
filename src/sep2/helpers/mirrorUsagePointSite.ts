@@ -1,8 +1,5 @@
 import { RoleFlagsType } from '../models/roleFlagsType';
-import {
-    getSamplesIntervalSeconds,
-    type MonitoringSample,
-} from '../../coordinator/helpers/monitoring';
+import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoring';
 import type { PerPhaseMeasurement } from '../../helpers/power';
 import {
     averageNumbersArray,
@@ -18,8 +15,7 @@ import { PhaseCode } from '../models/phaseCode';
 import { UomType } from '../models/uomType';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase';
 import { logger as pinoLogger } from '../../helpers/logger';
-
-type SiteMonitoringSample = Pick<MonitoringSample, 'date' | 'site'>;
+import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoring';
 
 type SiteReading = {
     intervalSeconds: number;
@@ -50,40 +46,40 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
             intervalSeconds: getSamplesIntervalSeconds(samples),
             realPowerAverage: {
                 phaseA: averageNumbersArray(
-                    samples.map((s) => s.site.realPower.phaseA),
+                    samples.map((s) => s.realPower.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.site.realPower.phaseB),
+                    samples.map((s) => s.realPower.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.site.realPower.phaseC),
+                    samples.map((s) => s.realPower.phaseC),
                 ),
             },
             reactivePowerAverage: {
                 phaseA: averageNumbersArray(
-                    samples.map((s) => s.site.reactivePower.phaseA),
+                    samples.map((s) => s.reactivePower.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.site.reactivePower.phaseB),
+                    samples.map((s) => s.reactivePower.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.site.reactivePower.phaseC),
+                    samples.map((s) => s.reactivePower.phaseC),
                 ),
             },
             voltageAverage: {
                 phaseA: averageNumbersArray(
-                    samples.map((s) => s.site.voltage.phaseA),
+                    samples.map((s) => s.voltage.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.site.voltage.phaseB),
+                    samples.map((s) => s.voltage.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.site.voltage.phaseC),
+                    samples.map((s) => s.voltage.phaseC),
                 ),
             },
             frequency: {
-                maximum: Math.max(...samples.map((s) => s.site.frequency)),
-                minimum: Math.min(...samples.map((s) => s.site.frequency)),
+                maximum: Math.max(...samples.map((s) => s.frequency)),
+                minimum: Math.min(...samples.map((s) => s.frequency)),
             },
         };
     }

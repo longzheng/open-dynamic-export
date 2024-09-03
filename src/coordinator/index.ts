@@ -5,7 +5,10 @@ import { SunSpecDataHelper } from './helpers/sunspecData';
 import { logger as pinoLogger } from '../helpers/logger';
 import { InverterController } from './helpers/inverterController';
 import { RampRateHelper } from './helpers/rampRate';
-import { writeMonitoringSamplePoints } from '../helpers/influxdb';
+import {
+    writeDerMonitoringSamplePoints,
+    writeSiteMonitoringSamplePoints,
+} from '../helpers/influxdb';
 import { getSep2Limiter } from '../sep2';
 import { FixedLimiter } from '../limiters/fixed';
 import { AmberLimiter } from '../limiters/amber';
@@ -50,16 +53,24 @@ const inverterController = new InverterController({
     limiters,
 });
 
-sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {
-    logger.trace({ invertersData, monitoringSample }, 'Received SunSpec data');
+sunSpecDataEventEmitter.on(
+    'data',
+    ({ invertersData, derMonitoringSample, siteMonitoringSample }) => {
+        writeSiteMonitoringSamplePoints(siteMonitoringSample);
+        writeDerMonitoringSamplePoints(derMonitoringSample);
 
-    writeMonitoringSamplePoints(monitoringSample);
+        sep2?.derHelper.onInverterData(invertersData);
+        sep2?.mirrorUsagePointListHelper.addDerMonitoringSample(
+            derMonitoringSample,
+        );
+        sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(
+            siteMonitoringSample,
+        );
 
-    sep2?.derHelper.onInverterData(invertersData);
-    sep2?.mirrorUsagePointListHelper.addSample(monitoringSample);
-
-    inverterController.updateSunSpecInverterData({
-        inverters: invertersData,
-        monitoringSample,
-    });
-});
+        inverterController.updateSunSpecInverterData({
+            inverters: invertersData,
+            siteMonitoringSample,
+            derMonitoringSample,
+        });
+    },
+);

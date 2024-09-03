@@ -1,7 +1,6 @@
 import type { ControlsModel } from '../../sunspec/models/controls';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import type { MeterModel } from '../../sunspec/models/meter';
-import { generateMonitoringSample, type MonitoringSample } from './monitoring';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
 import type { MeterSunSpecConnection } from '../../sunspec/connection/meter';
 import EventEmitter from 'events';
@@ -10,6 +9,14 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import type { StatusModel } from '../../sunspec/models/status';
 import { promiseAllObject } from '../../helpers/promise';
+import {
+    generateDerMonitoringSample,
+    type DerMonitoringSample,
+} from './derMonitoring';
+import {
+    generateSiteMonitoringSample,
+    type SiteMonitoringSample,
+} from './siteMonitoring';
 
 const logger = pinoLogger.child({ module: 'SunSpecDataHelper' });
 
@@ -26,7 +33,8 @@ export class SunSpecDataHelper extends EventEmitter<{
             metersData: {
                 meter: MeterModel;
             }[];
-            monitoringSample: MonitoringSample;
+            derMonitoringSample: DerMonitoringSample;
+            siteMonitoringSample: SiteMonitoringSample;
         },
     ];
 }> {
@@ -77,12 +85,23 @@ export class SunSpecDataHelper extends EventEmitter<{
 
             logger.trace({ invertersData, metersData }, 'received data');
 
-            const monitoringSample = generateMonitoringSample({
+            const derMonitoringSample = generateDerMonitoringSample({
                 inverters: invertersData.map(({ inverter }) => inverter),
+            });
+
+            logger.trace(
+                { derMonitoringSample },
+                'generated DER monitoring sample',
+            );
+
+            const siteMonitoringSample = generateSiteMonitoringSample({
                 meters: metersData.map(({ meter }) => meter),
             });
 
-            logger.trace({ monitoringSample }, 'generated monitoring sample');
+            logger.trace(
+                { siteMonitoringSample },
+                'generated site monitoring sample',
+            );
 
             const end = performance.now();
 
@@ -91,7 +110,8 @@ export class SunSpecDataHelper extends EventEmitter<{
             this.emit('data', {
                 invertersData,
                 metersData,
-                monitoringSample,
+                derMonitoringSample,
+                siteMonitoringSample,
             });
         } catch (error) {
             logger.error({ error }, 'Failed to fetch SunSpec data');
