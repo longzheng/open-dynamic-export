@@ -3,7 +3,7 @@ import { InverterSunSpecConnection } from './connection/inverter';
 import { MeterSunSpecConnection } from './connection/meter';
 
 export function getSunSpecInvertersConnections(config: Config) {
-    return config.sunSpec.inverters.map(
+    return config.inverters.map(
         ({ ip, port, unitId }) =>
             new InverterSunSpecConnection({ ip, port, unitId }),
     );

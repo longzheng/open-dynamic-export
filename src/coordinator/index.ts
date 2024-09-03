@@ -56,7 +56,7 @@ const limiters = [
 
 const inverterController = new InverterController({
     invertersConnections,
-    applyControl: config.sunSpec.control,
+    applyControl: config.inverterControl,
     rampRateHelper,
     limiters,
 });

@@ -5,16 +5,15 @@
             "dcapUri": "/api/v2/dcap"
         }
     },
-    "sunSpec": {
-        "control": true,
-        "inverters": [
-            {
-                "ip": "192.168.1.6",
-                "port": 502,
-                "unitId": 1
-            }
-        ]
-    },
+    "inverters": [
+        {
+            "type": "sunspec",
+            "ip": "192.168.1.6",
+            "port": 502,
+            "unitId": 1
+        }
+    ],
+    "inverterControl": true,
     "meters": [
         {
             "type": "sunspec",
