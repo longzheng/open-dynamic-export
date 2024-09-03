@@ -24,29 +24,29 @@ Meters:
 
 The server uses a configuration JSON to configure how it works. 
 
-### SunSpec
+### Inverters and meters
 
 To configure the inverter and meter connections, add the following property to `config.json`
 
 ```js
 {
-    "sunSpec": {
-        "control": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
-        "inverters": [ // (array) required: list of inverters
-            {
-                "ip": "192.168.1.6", // (string) required: the IP address of the inverter
-                "port": 502, // (number) required: the Modbus TCP port of the inverter
-                "unitId": 1 // (number) required: the Modbus unit ID of the inverter
-            }
-        ],
-        "meters": [ // (array) optional: list of meters
-            {
-                "ip": "192.168.1.6", // (string) required: the IP address of the meter
-                "port": 502, // (number) required: the Modbus TCP port of the meter
-                "unitId": 240 // (number) required: the Modbus unit ID of the meter
-            }
-        ]
-    }
+    "inverters": [ // (array) required: list of inverters
+        {
+            "type": "sunspec", // ('sunspec') required: the type of inverter
+            "ip": "192.168.1.6", // (string) required: the IP address of the inverter
+            "port": 502, // (number) required: the Modbus TCP port of the inverter
+            "unitId": 1 // (number) required: the Modbus unit ID of the inverter
+        }
+    ],
+    "inverterControl": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
+    "meters": [ // (array) optional: list of meters
+        {
+            "type": "sunspec", // ('sunspec') required: the type of meter
+            "ip": "192.168.1.6", // (string) required: the IP address of the meter
+            "port": 502, // (number) required: the SunSpec Modbus TCP port of the meter
+            "unitId": 240 // (number) required: the SunSpec unit ID of the meter
+        }
+    ]
     ...
 }
 ```

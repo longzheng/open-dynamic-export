@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { readFileSync } from 'fs';
 
-const sunspecModbusSchema = z.object({
+const sunspecModbusSchema = {
     ip: z
         .string()
         .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
@@ -17,7 +17,7 @@ const sunspecModbusSchema = z.object({
         .max(255)
         .default(1)
         .describe('The unit/slave ID of the SunSpec device. Defaults to 1.'),
-});
+};
 
 export const configSchema = z.object({
     limiters: z
@@ -72,13 +72,30 @@ export const configSchema = z.object({
                 .describe('If defined, limit by negative feed-in'),
         })
         .describe('Limiters configuration'),
-    sunSpec: z
-        .object({
-            inverters: z.array(sunspecModbusSchema),
-            meters: z.array(sunspecModbusSchema),
-            control: z.boolean(),
-        })
-        .describe('SunSpec configuration'),
+    inverters: z
+        .array(
+            z
+                .object({
+                    type: z.literal('sunspec'),
+                    ...sunspecModbusSchema,
+                })
+                .describe('SunSpec inverter configuration'),
+        )
+        .describe('Inverter configuration'),
+    inverterControl: z.boolean().describe('Whether to control the inverters'),
+    meters: z
+        .array(
+            z.union([
+                z
+                    .object({
+                        type: z.literal('sunspec'),
+                        ...sunspecModbusSchema,
+                    })
+                    .describe('SunSpec meter configuration'),
+                z.never(), // TODO
+            ]),
+        )
+        .describe('Meter configuration'),
 });
 
 export type Config = z.infer<typeof configSchema>;

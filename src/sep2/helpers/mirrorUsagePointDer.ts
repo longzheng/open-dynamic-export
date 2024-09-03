@@ -1,8 +1,5 @@
 import { RoleFlagsType } from '../models/roleFlagsType';
-import {
-    getSamplesIntervalSeconds,
-    type MonitoringSample,
-} from '../../coordinator/helpers/monitoring';
+import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoring';
 import type { PerPhaseMeasurement } from '../../helpers/power';
 import {
     averageNumbersArray,
@@ -18,8 +15,7 @@ import { PhaseCode } from '../models/phaseCode';
 import { UomType } from '../models/uomType';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase';
 import { logger as pinoLogger } from '../../helpers/logger';
-
-type DerMonitoringSample = Pick<MonitoringSample, 'date' | 'der'>;
+import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoring';
 
 type DerReading = {
     intervalSeconds: number;
@@ -50,32 +46,32 @@ export class MirrorUsagePointDerHelper extends MirrorUsagePointHelperBase<
             intervalSeconds: getSamplesIntervalSeconds(samples),
             realPowerAverage: {
                 phaseA: averageNumbersArray(
-                    samples.map((s) => s.der.realPower.phaseA),
+                    samples.map((s) => s.realPower.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.der.realPower.phaseB),
+                    samples.map((s) => s.realPower.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.der.realPower.phaseC),
+                    samples.map((s) => s.realPower.phaseC),
                 ),
             },
             reactivePowerAverage: averageNumbersArray(
-                samples.map((s) => s.der.reactivePower),
+                samples.map((s) => s.reactivePower),
             ),
             voltageAverage: {
                 phaseA: averageNumbersArray(
-                    samples.map((s) => s.der.voltage.phaseA),
+                    samples.map((s) => s.voltage.phaseA),
                 ),
                 phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.der.voltage.phaseB),
+                    samples.map((s) => s.voltage.phaseB),
                 ),
                 phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.der.voltage.phaseC),
+                    samples.map((s) => s.voltage.phaseC),
                 ),
             },
             frequency: {
-                maximum: Math.max(...samples.map((s) => s.der.frequency)),
-                minimum: Math.min(...samples.map((s) => s.der.frequency)),
+                maximum: Math.max(...samples.map((s) => s.frequency)),
+                minimum: Math.min(...samples.map((s) => s.frequency)),
             },
         };
     }

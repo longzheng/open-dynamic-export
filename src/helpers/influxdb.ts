@@ -1,11 +1,12 @@
 import { InfluxDB, Point } from '@influxdata/influxdb-client';
-import type { MonitoringSample } from '../coordinator/helpers/monitoring';
 import type {
     ControlType,
     RandomizedControlSchedule,
 } from '../sep2/helpers/controlScheduler';
 import type { FallbackControl } from '../sep2/helpers/derControls';
 import { numberWithPow10 } from './number';
+import type { SiteMonitoringSample } from '../coordinator/helpers/siteMonitoring';
+import type { DerMonitoringSample } from '../coordinator/helpers/derMonitoring';
 
 const influxDB = new InfluxDB({
     url: `http://influxdb:${process.env['INFLUXDB_PORT']}`,
@@ -17,93 +18,94 @@ const influxDbWriteApi = influxDB.getWriteApi(
     process.env['INFLUXDB_BUCKET']!,
 );
 
-export function writeMonitoringSamplePoints(
-    monitoringSample: MonitoringSample,
+export function writeSiteMonitoringSamplePoints(
+    siteMonitoringSample: SiteMonitoringSample,
 ) {
     influxDbWriteApi.writePoints(
         [
-            // site
             new Point('monitoringSample')
                 .tag('type', 'site')
-                .floatField('frequency', monitoringSample.site.frequency),
+                .floatField('frequency', siteMonitoringSample.frequency),
             new Point('monitoringSample')
                 .tag('type', 'site')
                 .tag('phase', 'A')
-                .floatField('realPower', monitoringSample.site.realPower.phaseA)
+                .floatField('realPower', siteMonitoringSample.realPower.phaseA)
                 .floatField(
                     'reactivePower',
-                    monitoringSample.site.reactivePower.phaseA,
+                    siteMonitoringSample.reactivePower.phaseA,
                 )
-                .floatField('voltage', monitoringSample.site.voltage.phaseA),
-            monitoringSample.site.realPower.phaseB
+                .floatField('voltage', siteMonitoringSample.voltage.phaseA),
+            siteMonitoringSample.realPower.phaseB
                 ? new Point('monitoringSample')
                       .tag('type', 'site')
                       .tag('phase', 'B')
                       .floatField(
                           'realPower',
-                          monitoringSample.site.realPower.phaseB,
+                          siteMonitoringSample.realPower.phaseB,
                       )
                       .floatField(
                           'reactivePower',
-                          monitoringSample.site.reactivePower.phaseB,
+                          siteMonitoringSample.reactivePower.phaseB,
                       )
                       .floatField(
                           'voltage',
-                          monitoringSample.site.voltage.phaseB,
+                          siteMonitoringSample.voltage.phaseB,
                       )
                 : null,
-            monitoringSample.site.realPower.phaseC
+            siteMonitoringSample.realPower.phaseC
                 ? new Point('monitoringSample')
                       .tag('type', 'site')
                       .tag('phase', 'C')
                       .floatField(
                           'realPower',
-                          monitoringSample.site.realPower.phaseC,
+                          siteMonitoringSample.realPower.phaseC,
                       )
                       .floatField(
                           'reactivePower',
-                          monitoringSample.site.reactivePower.phaseC,
+                          siteMonitoringSample.reactivePower.phaseC,
                       )
                       .floatField(
                           'voltage',
-                          monitoringSample.site.voltage.phaseC,
+                          siteMonitoringSample.voltage.phaseC,
                       )
                 : null,
-            // der
+        ].filter((point) => point !== null),
+    );
+}
+
+export function writeDerMonitoringSamplePoints(
+    derMonitoringSample: DerMonitoringSample,
+) {
+    influxDbWriteApi.writePoints(
+        [
             new Point('monitoringSample')
                 .tag('type', 'der')
-                .floatField('reactivePower', monitoringSample.der.reactivePower)
-                .floatField('frequency', monitoringSample.der.frequency),
+                .floatField('reactivePower', derMonitoringSample.reactivePower)
+                .floatField('frequency', derMonitoringSample.frequency),
             new Point('monitoringSample')
                 .tag('type', 'der')
                 .tag('phase', 'A')
-                .floatField('realPower', monitoringSample.der.realPower.phaseA)
-                .floatField('voltage', monitoringSample.der.voltage.phaseA),
-            monitoringSample.der.realPower.phaseB
+                .floatField('realPower', derMonitoringSample.realPower.phaseA)
+                .floatField('voltage', derMonitoringSample.voltage.phaseA),
+            derMonitoringSample.realPower.phaseB
                 ? new Point('monitoringSample')
                       .tag('type', 'der')
                       .tag('phase', 'B')
                       .floatField(
                           'realPower',
-                          monitoringSample.der.realPower.phaseB,
+                          derMonitoringSample.realPower.phaseB,
                       )
-                      .floatField(
-                          'voltage',
-                          monitoringSample.der.voltage.phaseB,
-                      )
+                      .floatField('voltage', derMonitoringSample.voltage.phaseB)
                 : null,
-            monitoringSample.der.realPower.phaseC
+            derMonitoringSample.realPower.phaseC
                 ? new Point('monitoringSample')
                       .tag('type', 'der')
                       .tag('phase', 'C')
                       .floatField(
                           'realPower',
-                          monitoringSample.der.realPower.phaseC,
+                          derMonitoringSample.realPower.phaseC,
                       )
-                      .floatField(
-                          'voltage',
-                          monitoringSample.der.voltage.phaseC,
-                      )
+                      .floatField('voltage', derMonitoringSample.voltage.phaseC)
                 : null,
         ].filter((point) => point !== null),
     );
