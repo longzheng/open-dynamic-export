@@ -20,47 +20,58 @@ const sunspecModbusSchema = z.object({
 });
 
 export const configSchema = z.object({
-    sep2: z
+    limiters: z
         .object({
-            host: z.string().url().describe('The host of the SEP2 server'),
-            dcapUri: z
-                .string()
-                .describe('The URI of the DeviceCapability resource'),
+            sep2: z
+                .object({
+                    host: z
+                        .string()
+                        .url()
+                        .describe('The host of the SEP2 server'),
+                    dcapUri: z
+                        .string()
+                        .describe('The URI of the DeviceCapability resource'),
+                })
+                .optional()
+                .describe('If defined, limit by CSIP-AUS/SEP2 server'),
+            fixed: z
+                .object({
+                    connect: z
+                        .boolean()
+                        .optional()
+                        .describe(
+                            'Whether the inverter should be connected to the grid',
+                        ),
+                    exportLimitWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe('The export limit in watts'),
+                    generationLimitWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe('The generation limit in watts'),
+                })
+                .optional()
+                .describe('If defined, limits by manual configuration'),
+            negativeFeedIn: z
+                .union([
+                    z.object({
+                        type: z.literal('amber'),
+                        apiKey: z
+                            .string()
+                            .describe('The API key for the Amber API'),
+                        siteId: z
+                            .string()
+                            .describe('The site ID for the Amber API'),
+                    }),
+                    z.never(), // TODO
+                ])
+                .optional()
+                .describe('If defined, limit by negative feed-in'),
         })
-        .optional()
-        .describe('If defined, limit by CSIP-AUS/SEP2 server'),
-    limit: z
-        .object({
-            connect: z
-                .boolean()
-                .optional()
-                .describe(
-                    'Whether the inverter should be connected to the grid',
-                ),
-            exportLimitWatts: z
-                .number()
-                .min(0)
-                .optional()
-                .describe('The export limit in watts'),
-            generationLimitWatts: z
-                .number()
-                .min(0)
-                .optional()
-                .describe('The generation limit in watts'),
-        })
-        .optional()
-        .describe('If defined, limits by manual configuration'),
-    negativeFeedIn: z
-        .union([
-            z.object({
-                type: z.literal('amber'),
-                apiKey: z.string().describe('The API key for the Amber API'),
-                siteId: z.string().describe('The site ID for the Amber API'),
-            }),
-            z.never(), // TODO
-        ])
-        .optional()
-        .describe('If defined, limit by negative feed-in'),
+        .describe('Limiters configuration'),
     sunSpec: z
         .object({
             inverters: z.array(sunspecModbusSchema),

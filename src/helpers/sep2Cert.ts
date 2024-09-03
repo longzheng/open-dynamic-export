@@ -4,7 +4,7 @@ import { env } from './env';
 import { resolve } from 'path';
 
 export function getSep2Certificate(config: Config) {
-    if (!config.sep2) {
+    if (!config.limiters.sep2) {
         throw new Error('SEP2 is not enabled');
     }
 

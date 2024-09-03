@@ -4,19 +4,19 @@ import type {
     SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController';
 import type { RampRateHelper } from '../../coordinator/helpers/rampRate';
-import type { SEP2Client } from '../client';
-import { ControlSchedulerHelper } from './controlScheduler';
+import type { SEP2Client } from '../../sep2/client';
+import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler';
 import { logger as pinoLogger } from '../../helpers/logger';
-import type { DerControlsHelperChangedData } from './derControls';
+import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls';
 import EventEmitter from 'events';
-import type { InverterControlLimitType } from '../../coordinator/helpers/inverterControlLimitType';
+import type { LimiterType } from '../../coordinator/helpers/limiter';
 import { numberWithPow10 } from '../../helpers/number';
 
-export class ScheduledControlLimit
+export class Sep2Limiter
     extends EventEmitter<{
         changed: [];
     }>
-    implements InverterControlLimitType
+    implements LimiterType
 {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;

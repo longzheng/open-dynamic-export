@@ -22,7 +22,7 @@ import type { RampRateHelper } from './rampRate';
 import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { writeInverterControllerPoints } from '../../helpers/influxdb';
-import type { InverterControlLimitType } from './inverterControlLimitType';
+import type { LimiterType } from './limiter';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -69,25 +69,25 @@ export class InverterController {
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
-    private controlLimits: InverterControlLimitType[];
+    private limiters: LimiterType[];
 
     constructor({
         invertersConnections,
         applyControl,
         rampRateHelper,
-        controlLimits,
+        limiters,
     }: {
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
         rampRateHelper: RampRateHelper;
-        controlLimits: InverterControlLimitType[];
+        limiters: LimiterType[];
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
-        this.controlLimits = controlLimits;
+        this.limiters = limiters;
     }
 
     updateSunSpecInverterData(data: SunSpecData) {
@@ -98,7 +98,7 @@ export class InverterController {
     }
 
     private getActiveInverterControlLimit(): InverterControlLimit {
-        const controlLimits = this.controlLimits.map((controlLimit) =>
+        const controlLimits = this.limiters.map((controlLimit) =>
             controlLimit.getInverterControlLimit(),
         );
 

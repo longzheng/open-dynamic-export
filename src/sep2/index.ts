@@ -4,7 +4,7 @@ import { env } from '../helpers/env';
 import { logger } from '../helpers/logger';
 import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
 import { SEP2Client } from './client';
-import { ScheduledControlLimit } from './helpers/scheduledControlLimit';
+import { Sep2Limiter } from '../limiters/sep2';
 import { DerHelper } from './helpers/der';
 import { DerControlsHelper } from './helpers/derControls';
 import { DerListHelper } from './helpers/derList';
@@ -14,7 +14,7 @@ import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList';
 import { TimeHelper } from './helpers/time';
 import { getSep2Certificate } from '../helpers/sep2Cert';
 
-export function getSep2Instance({
+export function getSep2Limiter({
     config,
     invertersConnections,
     rampRateHelper,
@@ -23,14 +23,14 @@ export function getSep2Instance({
     invertersConnections: InverterSunSpecConnection[];
     rampRateHelper: RampRateHelper;
 }) {
-    if (!config.sep2) {
+    if (!config.limiters.sep2) {
         return null;
     }
 
     const sep2Certificate = getSep2Certificate(config);
 
     const sep2Client = new SEP2Client({
-        sep2Config: config.sep2,
+        sep2Config: config.limiters.sep2,
         cert: sep2Certificate.cert,
         key: sep2Certificate.key,
         pen: env.SEP2_PEN,
@@ -63,7 +63,7 @@ export function getSep2Instance({
         client: sep2Client,
     });
 
-    const scheduledControlLimit = new ScheduledControlLimit({
+    const sep2Limiter = new Sep2Limiter({
         client: sep2Client,
         rampRateHelper,
     });
@@ -73,7 +73,7 @@ export function getSep2Instance({
     }).on('data', (data) => {
         logger.debug(data, 'DER controls data changed');
 
-        scheduledControlLimit.updateSep2ControlsData(data);
+        sep2Limiter.updateSep2ControlsData(data);
 
         rampRateHelper.setDefaultDERControlRampRate(
             data.fallbackControl.type === 'default'
@@ -162,6 +162,6 @@ export function getSep2Instance({
         sep2Client,
         derHelper,
         mirrorUsagePointListHelper,
-        scheduledControlLimit,
+        sep2Limiter,
     };
 }

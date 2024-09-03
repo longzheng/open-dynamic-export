@@ -1,5 +1,5 @@
 import type { InverterControlLimit } from './inverterController';
 
-export type InverterControlLimitType = {
+export type LimiterType = {
     getInverterControlLimit(): InverterControlLimit;
 };

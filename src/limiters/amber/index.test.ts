@@ -8,7 +8,7 @@ import {
     it,
     vi,
 } from 'vitest';
-import { AmberControlLimit, getControlLimitFromIntervals } from '.';
+import { AmberLimiter, getControlLimitFromIntervals } from '.';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
 
@@ -81,13 +81,13 @@ describe('AmberControlLimit', () => {
     //  Close server after all tests
     afterAll(() => mockServer.close());
 
-    let amberControlLimit: AmberControlLimit;
+    let amberControlLimit: AmberLimiter;
 
     beforeEach(() => {
         // tell vitest we use mocked time
         vi.useFakeTimers();
 
-        amberControlLimit = new AmberControlLimit({
+        amberControlLimit = new AmberLimiter({
             apiKey: 'abc',
             siteId: '12345',
         });

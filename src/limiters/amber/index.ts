@@ -1,7 +1,7 @@
 import type { Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
 import type { paths } from './api';
-import type { InverterControlLimitType } from '../../coordinator/helpers/inverterControlLimitType';
+import type { LimiterType } from '../../coordinator/helpers/limiter';
 import type { InverterControlLimit } from '../../coordinator/helpers/inverterController';
 import type { Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
@@ -12,7 +12,7 @@ type Interval = {
     price: number;
 };
 
-export class AmberControlLimit implements InverterControlLimitType {
+export class AmberLimiter implements LimiterType {
     private client: Client<paths>;
     private siteId: string;
     private feedInIntervals: Interval[] = [];

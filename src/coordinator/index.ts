@@ -6,9 +6,9 @@ import { logger as pinoLogger } from '../helpers/logger';
 import { InverterController } from './helpers/inverterController';
 import { RampRateHelper } from './helpers/rampRate';
 import { writeMonitoringSamplePoints } from '../helpers/influxdb';
-import { getSep2Instance } from '../sep2';
-import { ConfigControlLimit } from '../configLimit';
-import { AmberControlLimit } from '../negativeFeedIn/amber';
+import { getSep2Limiter } from '../sep2';
+import { FixedLimiter } from '../limiters/fixed';
+import { AmberLimiter } from '../limiters/amber';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -24,19 +24,21 @@ const sunSpecDataEventEmitter = new SunSpecDataHelper({
 
 const rampRateHelper = new RampRateHelper();
 
-const sep2 = getSep2Instance({
+const sep2 = getSep2Limiter({
     config,
     invertersConnections,
     rampRateHelper,
 });
 
-const controlLimits = [
-    sep2?.scheduledControlLimit,
-    config.limit ? new ConfigControlLimit({ config: config.limit }) : null,
-    config.negativeFeedIn?.type === 'amber'
-        ? new AmberControlLimit({
-              apiKey: config.negativeFeedIn.apiKey,
-              siteId: config.negativeFeedIn.siteId,
+const limiters = [
+    sep2?.sep2Limiter,
+    config.limiters.fixed
+        ? new FixedLimiter({ config: config.limiters.fixed })
+        : null,
+    config.limiters.negativeFeedIn?.type === 'amber'
+        ? new AmberLimiter({
+              apiKey: config.limiters.negativeFeedIn.apiKey,
+              siteId: config.limiters.negativeFeedIn.siteId,
           })
         : null,
 ].filter((controlLimit) => !!controlLimit);
@@ -45,7 +47,7 @@ const inverterController = new InverterController({
     invertersConnections,
     applyControl: config.sunSpec.control,
     rampRateHelper,
-    controlLimits,
+    limiters,
 });
 
 sunSpecDataEventEmitter.on('data', ({ invertersData, monitoringSample }) => {

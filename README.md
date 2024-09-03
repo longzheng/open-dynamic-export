@@ -70,11 +70,13 @@ To set fixed limits (such as for fixed export limits), add the following propert
 
 ```js
 {
-    "limit": {
-        "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
-        "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
-        "generationLimitWatts": 10000 // (number) optional: the maximum generation limit in watts
-    },
+    "limiters": {
+        "fixed": {
+            "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
+            "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
+            "generationLimitWatts": 10000 // (number) optional: the maximum generation limit in watts
+        }
+    }
     ...
 }
 ```
@@ -86,11 +88,13 @@ To set a zero export limit based on negative feed-in, add the following property
 For Amber Electric:
 ```js
 {
-    "negativeFeedIn": {
-        "type": "amber", // (string) required: the source of the negative feed-in data
-        "apiKey": "asdf", // (string) required: the Amber API key
-        "siteId": "12345" // (string) required: the Amber site ID
-    },
+    "limiters": {
+        "negativeFeedIn": {
+            "type": "amber", // (string) required: the source of the negative feed-in data
+            "apiKey": "asdf", // (string) required: the Amber API key
+            "siteId": "12345" // (string) required: the Amber site ID
+        }
+    }
     ...
 }
 ```
@@ -104,10 +108,12 @@ To use CSIP-AUS, add following property to `config.json`
 
 ```js
 {
-    "sep2": {
-        "host": "https://sep2-test.energyq.com.au", // (string) required: the SEP2 server host
-        "dcapUri": "/api/v2/dcap" // (string) required: the device capability discovery URI
-    },
+    "limiters": {
+        "sep2": {
+            "host": "https://sep2-test.energyq.com.au", // (string) required: the SEP2 server host
+            "dcapUri": "/api/v2/dcap" // (string) required: the device capability discovery URI
+        }
+    }
     ...
 }
 ```
