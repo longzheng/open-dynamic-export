@@ -75,10 +75,18 @@ export const configSchema = z.object({
     sunSpec: z
         .object({
             inverters: z.array(sunspecModbusSchema),
-            meters: z.array(sunspecModbusSchema),
             control: z.boolean(),
         })
         .describe('SunSpec configuration'),
+    meters: z.array(
+        z.union([
+            z.object({
+                type: z.literal('sunspec'),
+                ...sunspecModbusSchema.shape,
+            }),
+            z.never(), // TODO
+        ]),
+    ),
 });
 
 export type Config = z.infer<typeof configSchema>;

@@ -10,8 +10,13 @@ export function getSunSpecInvertersConnections(config: Config) {
 }
 
 export function getSunSpecMetersConnections(config: Config) {
-    return config.sunSpec.meters.map(
-        ({ ip, port, unitId }) =>
-            new MeterSunSpecConnection({ ip, port, unitId }),
+    return (
+        config.meters
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            .filter((meter) => meter.type === 'sunspec')
+            .map(
+                ({ ip, port, unitId }) =>
+                    new MeterSunSpecConnection({ ip, port, unitId }),
+            )
     );
 }
