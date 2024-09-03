@@ -12,6 +12,10 @@ export const logger = pino({
                 options: {
                     filename: 'debug.log',
                     path: `./logs/`,
+                    // maximum each log
+                    size: '10MB',
+                    // maximum all logs
+                    maxSize: '1G',
                 },
             },
             {
