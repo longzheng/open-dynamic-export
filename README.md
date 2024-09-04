@@ -184,7 +184,7 @@ To use CSIP-AUS, add following property to `config.json`
 
 1. Create a `/config` folder and copy the [`config.example.json` file from the repo](https://github.com/longzheng/open-dynamic-export/blob/main/config/config.example.json) and rename it to `config.json`. Set it with the required values.
 
-1. Run `docker-compose up -d`
+1. Run `docker compose up -d` (or run `docker compose up -d --build`)
 
 ## CSIP-AUS client
 
