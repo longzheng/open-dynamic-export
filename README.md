@@ -8,6 +8,34 @@ This project aims to implement dynamic export control/solar curtailment of inver
 - two-way tariffs (e.g.time based, caps) export limitation (coming soon)
 - negative feed-in (e.g. Amber)
 
+```mermaid
+flowchart LR
+    ODE(("open-dynamic-export"))
+    I["Inverter(s)"]
+    M["Meter(s)"]
+
+    CSIP-AUS --> DC
+    DC & F & T & NFI --> ODE
+    Configuration --> F
+    A["Amber API"] --> NFI
+    R["Tariff rules"] --> T
+    ODE <--> SunSpec & HTTP & Proprietary
+    Protocols <--> I & M
+
+    subgraph Limiters
+    DC["Dynamic exports"]
+    F["Fixed/zero export"]
+    T["Two-way tariffs"]
+    NFI["Negative feed-in"]
+    end
+
+    subgraph Protocols
+    SunSpec
+    HTTP
+    Proprietary
+    end
+```
+
 ## Supported inverters and meters
 
 Inverters:
@@ -136,14 +164,13 @@ The project implements a CSIP-AUS compatible client that interacts with the util
 
 ```mermaid
 sequenceDiagram
-    participant U as Utility<br>(SEP2 server)
-    participant SC as SEP2 client
+    participant U as Utility<br>(CSIP-AUS server)
+    participant SC as CSIP-AUS client
     participant C as Coordinator
-    participant MC as SunSpec client
-    participant D as DER<br>(SunSpec compatible device)
+    participant D as DER
 
     loop
-    SC->>U: SEP2 discovery
+    SC->>U: Discovery
     U->>SC: Devices, programs, DER controls
     SC->>U: Acknowledge DER controls
     end
@@ -151,17 +178,10 @@ sequenceDiagram
     SC->>C: Control schedules<br> and limits
 
     loop
-    MC->>D: Read Modbus registers
-    D->>MC: Inverter metrics
-    end
-
-    MC->>C: PV power, load power<br>and site power flow
-
+    D->>C: Metrics
     Note over C: Get current schedule<br>Calculate target power level<br>to meet limits
-
-    C-->>MC: Inverter controls
-
-    MC->>D: Write Modbus registers
+    C->>D: Inverter controls
+       end
 
     loop
     SC->>U: Send DER status/capability/settings
@@ -170,7 +190,6 @@ sequenceDiagram
 
     box rgb(198,239,210) open-dynamic-export
     participant SC
-    participant MC
     participant C
     end
 ```
