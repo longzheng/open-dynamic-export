@@ -9,14 +9,13 @@ export function getSunSpecInvertersConnections(config: Config) {
     );
 }
 
-export function getSunSpecMetersConnections(config: Config) {
-    return (
-        config.meters
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            .filter((meter) => meter.type === 'sunspec')
-            .map(
-                ({ ip, port, unitId }) =>
-                    new MeterSunSpecConnection({ ip, port, unitId }),
-            )
-    );
+export function getSunSpecMeterConnection(config: Config) {
+    switch (config.meter.type) {
+        case 'sunspec':
+            return new MeterSunSpecConnection({
+                ip: config.meter.ip,
+                port: config.meter.port,
+                unitId: config.meter.unitId,
+            });
+    }
 }

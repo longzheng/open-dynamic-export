@@ -94,19 +94,15 @@ export const configSchema = z.object({
         )
         .describe('Inverter configuration'),
     inverterControl: z.boolean().describe('Whether to control the inverters'),
-    meters: z
-        .array(
-            z.union([
-                z
-                    .object({
-                        type: z.literal('sunspec'),
-                        ...sunspecModbusSchema,
-                    })
-                    .describe('SunSpec meter configuration'),
-                z.never(), // TODO
-            ]),
-        )
-        .describe('Meter configuration'),
+    meter: z.union([
+        z
+            .object({
+                type: z.literal('sunspec'),
+                ...sunspecModbusSchema,
+            })
+            .describe('SunSpec meter configuration'),
+        z.never(), // TODO
+    ]),
 });
 
 export type Config = z.infer<typeof configSchema>;

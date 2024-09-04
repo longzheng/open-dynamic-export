@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { getConfig } from '../helpers/config';
 import {
     getSunSpecInvertersConnections,
-    getSunSpecMetersConnections,
+    getSunSpecMeterConnection,
 } from '../sunspec/connections';
 import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller';
 import { logger as pinoLogger } from '../helpers/logger';
@@ -25,14 +25,14 @@ const config = getConfig();
 
 const invertersConnections = getSunSpecInvertersConnections(config);
 
-const metersConnections = getSunSpecMetersConnections(config);
+const meterConnection = getSunSpecMeterConnection(config);
 
 const sunSpecInverterPoller = new SunSpecInverterPoller({
     invertersConnections,
 });
 
 const sunSpecMeterPoller = new SunSpecMeterPoller({
-    metersConnections,
+    meterConnection,
 });
 
 const rampRateHelper = new RampRateHelper();

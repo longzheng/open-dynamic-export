@@ -1,9 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../src/helpers/config';
-import {
-    getAggregatedMeterMetrics,
-    getMeterMetrics,
-} from '../src/sunspec/helpers/meterMetrics';
+import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics';
 import {
     getAggregatedInverterMetrics,
     getInverterMetrics,
@@ -23,7 +20,7 @@ import {
 } from '../src/sunspec/helpers/settingsMetrics';
 import {
     getSunSpecInvertersConnections,
-    getSunSpecMetersConnections,
+    getSunSpecMeterConnection,
 } from '../src/sunspec/connections';
 
 // This debugging script dumps all the SunSpec model data
@@ -35,7 +32,7 @@ const config = getConfig();
 void (async () => {
     const invertersConnections = getSunSpecInvertersConnections(config);
 
-    const metersConnections = getSunSpecMetersConnections(config);
+    const meterConnection = getSunSpecMeterConnection(config);
 
     const invertersData = await Promise.all(
         invertersConnections.map(async (inverter) => {
@@ -50,27 +47,23 @@ void (async () => {
         }),
     );
 
-    const metersData = await Promise.all(
-        metersConnections.map(async (meter) => {
-            return {
-                common: await meter.getCommonModel(),
-                meter: await meter.getMeterModel(),
-            };
-        }),
-    );
+    const meterData = {
+        common: await meterConnection.getCommonModel(),
+        meter: await meterConnection.getMeterModel(),
+    };
 
     logger.info({
         invertersData,
-        metersData,
+        metersData: meterData,
         inverterMetrics: invertersData.map((inverterData) => ({
             inverter: getInverterMetrics(inverterData.inverter),
             nameplate: getNameplateMetrics(inverterData.nameplate),
             settings: getSettingsMetrics(inverterData.settings),
             status: getStatusMetrics(inverterData.status),
         })),
-        meterMetrics: metersData.map((meterData) => ({
+        meterMetrics: {
             meter: getMeterMetrics(meterData.meter),
-        })),
+        },
         aggregatedMetrics: {
             inveter: getAggregatedInverterMetrics(
                 invertersData.map((inverterData) => inverterData.inverter),
@@ -83,9 +76,6 @@ void (async () => {
             ),
             status: getAggregatedStatusMetrics(
                 invertersData.map((inverterData) => inverterData.status),
-            ),
-            meters: getAggregatedMeterMetrics(
-                metersData.map((meterData) => meterData.meter),
             ),
         },
     });

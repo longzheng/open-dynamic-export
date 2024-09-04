@@ -3,22 +3,22 @@ import { logger as pinoLogger } from '../helpers/logger';
 import { type SiteMonitoringSample } from '../coordinator/helpers/siteMonitoringSample';
 import { SiteMonitoringPollerBase } from '../coordinator/helpers/siteMonitoringPollerBase';
 import { assertNonNull } from '../helpers/null';
-import { getAggregatedMeterMetrics } from './helpers/meterMetrics';
+import { getMeterMetrics } from './helpers/meterMetrics';
 import type { MeterModel } from './models/meter';
 
 const logger = pinoLogger.child({ module: 'SunSpecMeterPoller' });
 
 export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
-    private metersConnections: MeterSunSpecConnection[];
+    private meterConnection: MeterSunSpecConnection;
 
     constructor({
-        metersConnections,
+        meterConnection,
     }: {
-        metersConnections: MeterSunSpecConnection[];
+        meterConnection: MeterSunSpecConnection;
     }) {
         super({ meterName: 'SunSpecMeterPoller', pollingIntervalMs: 200 });
 
-        this.metersConnections = metersConnections;
+        this.meterConnection = meterConnection;
 
         void this.run();
     }
@@ -26,18 +26,12 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
     override async getSiteMonitoringSample(): Promise<
         Omit<SiteMonitoringSample, 'date'>
     > {
-        const metersData = await Promise.all(
-            this.metersConnections.map(async (meter) => {
-                return {
-                    meter: await meter.getMeterModel(),
-                };
-            }),
-        );
+        const meterModel = await this.meterConnection.getMeterModel();
 
-        logger.trace({ metersData }, 'received data');
+        logger.trace({ meterModel }, 'received data');
 
         const siteMonitoringSample = generateSiteMonitoringSample({
-            meters: metersData.map(({ meter }) => meter),
+            meter: meterModel,
         });
 
         return siteMonitoringSample;
@@ -45,14 +39,13 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
 }
 
 export function generateSiteMonitoringSample({
-    meters,
+    meter,
 }: {
-    meters: MeterModel[];
-}): SiteMonitoringSample {
-    const aggregatedMeterMetrics = getAggregatedMeterMetrics(meters);
+    meter: MeterModel;
+}): Omit<SiteMonitoringSample, 'date'> {
+    const aggregatedMeterMetrics = getMeterMetrics(meter);
 
     return {
-        date: new Date(),
         realPower: {
             phaseA: aggregatedMeterMetrics.WphA ?? aggregatedMeterMetrics.W,
             phaseB: aggregatedMeterMetrics.WphB,
