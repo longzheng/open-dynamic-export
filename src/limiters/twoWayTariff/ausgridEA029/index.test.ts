@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AusgridEA029Limiter } from '.';
-import type { InverterControlLimit } from '../../coordinator/helpers/inverterController';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController';
 
 describe('AusgridEA029Limiter', () => {
     let ausgridEA029Limiter: AusgridEA029Limiter;

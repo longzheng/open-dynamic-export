@@ -14,7 +14,7 @@
         "cert:device-generate": "tsx scripts/certDeviceGenerate.ts",
         "cert:device-lfdi": "tsx scripts/certDeviceLfdi.ts",
         "generate:config-json-schema": "tsx scripts/generateConfigJsonSchema.ts",
-        "generate:amber-api": "openapi-typescript https://raw.githubusercontent.com/amberelectric/public-api/main/swagger.json -o ./src/limiters/amber/api.d.ts"
+        "generate:amber-api": "openapi-typescript https://raw.githubusercontent.com/amberelectric/public-api/main/swagger.json -o ./src/limiters/negativeFeedIn/amber/api.d.ts"
     },
     "keywords": [],
     "author": "Long Zheng",

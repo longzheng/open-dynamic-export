@@ -12,7 +12,7 @@ import { AmberLimiter } from '.';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
 
-describe('AmberControlLimit', () => {
+describe('AmberLimiter', () => {
     // sample data from https://community.openhab.org/t/supporting-spot-energy-pricing/157274
     const sitePricesResponse = [
         {

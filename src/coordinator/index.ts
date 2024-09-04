@@ -14,9 +14,9 @@ import {
 } from '../helpers/influxdb';
 import { getSep2Limiter } from '../sep2';
 import { FixedLimiter } from '../limiters/fixed';
-import { AmberLimiter } from '../limiters/amber';
+import { AmberLimiter } from '../limiters/negativeFeedIn/amber';
 import { SunSpecMeterPoller } from '../sunspec/sunspecMeterPoller';
-import { AusgridEA029Limiter } from '../limiters/ausgridEA029';
+import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
