@@ -1,6 +1,6 @@
 import type { MeterSunSpecConnection } from './connection/meter';
 import { logger as pinoLogger } from '../helpers/logger';
-import { type SiteMonitoringSample } from '../coordinator/helpers/siteMonitoringSample';
+import type { SiteMonitoringSampleData } from '../coordinator/helpers/siteMonitoringSample';
 import { SiteMonitoringPollerBase } from '../coordinator/helpers/siteMonitoringPollerBase';
 import { assertNonNull } from '../helpers/null';
 import { getMeterMetrics } from './helpers/meterMetrics';
@@ -23,9 +23,7 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
         void this.run();
     }
 
-    override async getSiteMonitoringSample(): Promise<
-        Omit<SiteMonitoringSample, 'date'>
-    > {
+    override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData> {
         const meterModel = await this.meterConnection.getMeterModel();
 
         logger.trace({ meterModel }, 'received data');
@@ -42,7 +40,7 @@ export function generateSiteMonitoringSample({
     meter,
 }: {
     meter: MeterModel;
-}): Omit<SiteMonitoringSample, 'date'> {
+}): SiteMonitoringSampleData {
     const aggregatedMeterMetrics = getMeterMetrics(meter);
 
     return {

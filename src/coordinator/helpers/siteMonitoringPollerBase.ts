@@ -1,7 +1,10 @@
 import type { Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
 import EventEmitter from 'node:events';
-import type { SiteMonitoringSample } from './siteMonitoringSample';
+import type {
+    SiteMonitoringSample,
+    SiteMonitoringSampleData,
+} from './siteMonitoringSample';
 
 export abstract class SiteMonitoringPollerBase extends EventEmitter<{
     data: [
@@ -32,9 +35,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         void this.run();
     }
 
-    abstract getSiteMonitoringSample(): Promise<
-        Omit<SiteMonitoringSample, 'date'>
-    >;
+    abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData>;
 
     async run() {
         const start = performance.now();
@@ -45,7 +46,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
 
             const siteMonitoringSample = {
                 date: now,
-                ...(await this.getSiteMonitoringSample()),
+                ...(await this.getSiteMonitoringSampleData()),
             };
 
             this.logger.trace(
