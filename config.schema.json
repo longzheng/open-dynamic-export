@@ -95,7 +95,17 @@
                   "additionalProperties": false
                 },
                 {
-                  "not": {}
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "sapnRELE2W"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
                 }
               ],
               "description": "If defined, limit by two-way tariff"
