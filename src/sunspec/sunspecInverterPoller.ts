@@ -6,10 +6,9 @@ import { logger as pinoLogger } from '../helpers/logger';
 import type { NameplateModel } from './models/nameplate';
 import type { SettingsModel } from './models/settings';
 import type { StatusModel } from './models/status';
-import {
-    generateDerMonitoringSample,
-    type DerMonitoringSample,
-} from '../coordinator/helpers/derMonitoring';
+import { type DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample';
+import { getAggregatedInverterMetrics } from './helpers/inverterMetrics';
+import { assertNonNull } from '../helpers/null';
 
 const logger = pinoLogger.child({ module: 'SunSpecInverterPoller' });
 
@@ -94,4 +93,39 @@ export class SunSpecInverterPoller extends EventEmitter<{
             }, delay);
         }
     }
+}
+
+export function generateDerMonitoringSample({
+    inverters,
+}: {
+    inverters: InverterModel[];
+}): DerMonitoringSample {
+    const aggregatedInverterMetrics = getAggregatedInverterMetrics(inverters);
+
+    return {
+        date: new Date(),
+        realPower: {
+            // inverter W is only single phase
+            // we have to manually calculate per phase power using voltage * current
+            phaseA: aggregatedInverterMetrics.PhVphA
+                ? aggregatedInverterMetrics.AphA *
+                  aggregatedInverterMetrics.PhVphA
+                : aggregatedInverterMetrics.W,
+            phaseB: aggregatedInverterMetrics.PhVphB
+                ? aggregatedInverterMetrics.AphB *
+                  aggregatedInverterMetrics.PhVphB
+                : null,
+            phaseC: aggregatedInverterMetrics.PhVphC
+                ? aggregatedInverterMetrics.AphB *
+                  aggregatedInverterMetrics.PhVphC
+                : null,
+        },
+        reactivePower: aggregatedInverterMetrics.VAr ?? 0,
+        voltage: {
+            phaseA: assertNonNull(aggregatedInverterMetrics.PhVphA),
+            phaseB: aggregatedInverterMetrics.PhVphB,
+            phaseC: aggregatedInverterMetrics.PhVphC,
+        },
+        frequency: aggregatedInverterMetrics.Hz,
+    };
 }

@@ -5,8 +5,8 @@ import {
     getSunSpecMetersConnections,
 } from '../src/sunspec/connections';
 import { logger } from '../src/helpers/logger';
-import { generateDerMonitoringSample } from '../src/coordinator/helpers/derMonitoring';
-import { generateSiteMonitoringSample } from '../src/coordinator/helpers/siteMonitoring';
+import { generateDerMonitoringSample } from '../src/sunspec/sunspecInverterPoller';
+import { generateSiteMonitoringSample } from '../src/sunspec/sunspecMeterPoller';
 
 // This debugging script continously outputs SEP2 monitoring samples
 // It reads SunSpec data, transforms it into monitoring sample, and logs to console

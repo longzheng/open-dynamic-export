@@ -6,8 +6,8 @@ import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList';
 import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite';
 import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer';
 import { getListAll } from './pagination';
-import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoring';
-import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoring';
+import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoringSample';
+import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample';
 
 export class MirrorUsagePointListHelper {
     private href: string | null = null;

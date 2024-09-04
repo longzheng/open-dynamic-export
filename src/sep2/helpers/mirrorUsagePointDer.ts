@@ -1,5 +1,5 @@
 import { RoleFlagsType } from '../models/roleFlagsType';
-import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoring';
+import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase';
 import type { PerPhaseMeasurement } from '../../helpers/power';
 import {
     averageNumbersArray,
@@ -15,7 +15,7 @@ import { PhaseCode } from '../models/phaseCode';
 import { UomType } from '../models/uomType';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase';
 import { logger as pinoLogger } from '../../helpers/logger';
-import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoring';
+import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoringSample';
 
 type DerReading = {
     intervalSeconds: number;

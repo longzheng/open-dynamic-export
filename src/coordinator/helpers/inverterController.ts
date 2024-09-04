@@ -22,8 +22,8 @@ import type { NameplateModel } from '../../sunspec/models/nameplate';
 import type { InverterModel } from '../../sunspec/models/inverter';
 import { writeInverterControllerPoints } from '../../helpers/influxdb';
 import type { LimiterType } from './limiter';
-import type { SiteMonitoringSample } from './siteMonitoring';
-import type { DerMonitoringSample } from './derMonitoring';
+import type { SiteMonitoringSample } from './siteMonitoringSample';
+import type { DerMonitoringSample } from './derMonitoringSample';
 
 export type SupportedControlTypes = Extract<
     ControlType,
