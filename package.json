@@ -38,7 +38,7 @@
     },
     "dependencies": {
         "@influxdata/influxdb-client": "^1.35.0",
-        "axios": "^1.7.2",
+        "axios": "^1.7.7",
         "axios-retry": "^4.5.0",
         "date-fns": "^3.6.0",
         "decimal.js": "^10.4.3",
