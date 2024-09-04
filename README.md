@@ -32,6 +32,7 @@ flowchart LR
     subgraph Protocols
     SunSpec
     HTTP
+    MQTT
     Proprietary
     end
 ```
