@@ -5,8 +5,8 @@
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
-- two-way tariffs (e.g.time based, caps) export limitation (coming soon)
-- negative feed-in (e.g. Amber)
+- two-way tariffs (e.g.time based) export limitation
+- negative feed-in (e.g. Amber) export limitation
 
 ```mermaid
 flowchart LR
@@ -129,6 +129,22 @@ For Amber Electric:
 }
 ```
 
+#### Two-way tariffs
+
+To set a zero export limit based on two-way tariffs, add the following property to `config.json`
+
+For Ausgrid EA029 tariff:
+```js
+{
+    "limiters": {
+        "twoWayTariff": {
+            "type": "ausgridEA029"
+        }
+    }
+    ...
+}
+```
+
 #### CSIP-AUS
 
 > [!IMPORTANT]
@@ -200,8 +216,10 @@ The initial plan is to implement a direct gateway client that interacts directly
 
 - [x] Limits control
   - [x] Fixed limits
-  - [x] Dynamic negative feed-in via Amber API
-  - [ ] Two-way tariffs
+  - [x] Dynamic negative feed-in
+    - [x] Amber
+    - [ ] Localvolts
+  - [x] Two-way tariffs
   - [x] CSIP-AUS
 - [x] Inverter integration
   - [x] SunSpec Modbus TCP
@@ -217,7 +235,7 @@ The initial plan is to implement a direct gateway client that interacts directly
 - [x] Metrics logging in InfluxDB
 
 Future
-- [ ] CSIP-AUS self registration
+- [ ] CSIP-AUS ConnectionPoint registration
 - [ ] CSIP-AUS self-service certificate generation
 - [ ] CSIP-AUS cloud aggregator proxy mode
 - [ ] Web UI with real-time metrics and historical metrics
