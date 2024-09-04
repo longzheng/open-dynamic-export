@@ -5,6 +5,7 @@
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
+- two-way tariffs (e.g.time based, caps) export limitation (coming soon)
 - negative feed-in (e.g. Amber)
 
 ## Supported inverters and meters
@@ -16,6 +17,7 @@ Inverters:
 Meters:
 - One or more SunSpec Modbus TCP compatible smart meter(s) 
   - Tested with Fronius Smart Meter and Catch Power Relay
+- Tesla Powerwall (coming soon)
 
 > [!IMPORTANT]
 > The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
@@ -179,7 +181,9 @@ The initial plan is to implement a direct gateway client that interacts directly
 
 - [x] Limits control
   - [x] Fixed limits
-  - [ ] Dynamic negative feed-in via Amber API
+  - [x] Dynamic negative feed-in via Amber API
+  - [ ] Two-way tariffs
+  - [x] CSIP-AUS
 - [x] Inverter integration
   - [x] SunSpec Modbus TCP
 - [x] Meter integration
