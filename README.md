@@ -262,7 +262,7 @@ As a direct client, there needs to be two certificates, one for the "manufacture
 To generate a device certificate key and certificate signing request.
 
 ```bash
-npm run device-cert-request
+npm run cert:device-request
 ```
 
 For local testing, generate a valid self signed certificate using
@@ -274,13 +274,13 @@ openssl req -x509 -new -key key.pem -out cert.pem -sha256 -days 3650 -nodes -sub
 For live testing, generate a valid device certificate by signing it with the manufacturer certificate.
 
 ```bash
-npm run device-cert-sign
+npm run cert:device-generate
 ```
 
 To view the device certificate LFDI
 
 ```bash
-npm run device-cert-lfdi
+npm run cert:device-lfdi
 ```
 
 The manufacturer certificate is signed manually by the utility. The certificate key and certificate signing request can be generated with
