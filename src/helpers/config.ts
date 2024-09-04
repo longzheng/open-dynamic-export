@@ -70,6 +70,15 @@ export const configSchema = z.object({
                 ])
                 .optional()
                 .describe('If defined, limit by negative feed-in'),
+            twoWayTariff: z
+                .union([
+                    z.object({
+                        type: z.literal('ausgridEA029'),
+                    }),
+                    z.never(), // TODO
+                ])
+                .optional()
+                .describe('If defined, limit by two-way tariff'),
         })
         .describe('Limiters configuration'),
     inverters: z

@@ -78,6 +78,27 @@
                 }
               ],
               "description": "If defined, limit by negative feed-in"
+            },
+            "twoWayTariff": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "ausgridEA029"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "not": {}
+                }
+              ],
+              "description": "If defined, limit by two-way tariff"
             }
           },
           "additionalProperties": false,
