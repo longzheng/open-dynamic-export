@@ -35,23 +35,26 @@ export class AmberLimiter implements LimiterType {
     getInverterControlLimit(): InverterControlLimit {
         const price = this.getCurrentPrice();
 
-        const limit =
-            price && price < 0
-                ? {
-                      // if feed in price is negative, limit export to 0
-                      opModConnect: undefined,
-                      opModEnergize: undefined,
-                      opModExpLimW: 0,
-                      opModGenLimW: undefined,
-                  }
-                : {
-                      // can't find current interval, assume export is fine
-                      // if feed in price is positive, export is fine
-                      opModConnect: undefined,
-                      opModEnergize: undefined,
-                      opModExpLimW: undefined,
-                      opModGenLimW: undefined,
-                  };
+        // negative price means feed-in earns money
+        // positive price means feed-in costs money
+        const feedInCostsMoney = price && price > 0;
+
+        const limit = feedInCostsMoney
+            ? {
+                  // if feed in price is negative, limit export to 0
+                  opModConnect: undefined,
+                  opModEnergize: undefined,
+                  opModExpLimW: 0,
+                  opModGenLimW: undefined,
+              }
+            : {
+                  // can't find current interval, assume export is fine
+                  // if feed in price is positive, export is fine
+                  opModConnect: undefined,
+                  opModEnergize: undefined,
+                  opModExpLimW: undefined,
+                  opModGenLimW: undefined,
+              };
 
         writeControlLimit({ limit, name: 'amber' });
 
@@ -81,7 +84,7 @@ export class AmberLimiter implements LimiterType {
         }
 
         const feedInIntervals = data
-            // .filter((interval) => interval.channelType === 'feedIn')
+            .filter((interval) => interval.channelType === 'feedIn')
             .map(
                 (interval) =>
                     ({

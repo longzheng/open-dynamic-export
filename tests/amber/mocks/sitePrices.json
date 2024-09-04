@@ -1,0 +1,3696 @@
+[
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T14:00:01Z",
+        "endTime": "2024-09-03T14:30:00Z",
+        "nemTime": "2024-09-04T00:30:00+10:00",
+        "perKwh": 15.63436,
+        "renewables": 6.219,
+        "spotPerKwh": 8.06575,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T14:30:01Z",
+        "endTime": "2024-09-03T15:00:00Z",
+        "nemTime": "2024-09-04T01:00:00+10:00",
+        "perKwh": 15.63436,
+        "renewables": 7.39,
+        "spotPerKwh": 8.06575,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T15:00:01Z",
+        "endTime": "2024-09-03T15:30:00Z",
+        "nemTime": "2024-09-04T01:30:00+10:00",
+        "perKwh": 14.48981,
+        "renewables": 7.576,
+        "spotPerKwh": 6.97123,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T15:30:01Z",
+        "endTime": "2024-09-03T16:00:00Z",
+        "nemTime": "2024-09-04T02:00:00+10:00",
+        "perKwh": 13.93134,
+        "renewables": 8.447000000000001,
+        "spotPerKwh": 6.43717,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T16:00:01Z",
+        "endTime": "2024-09-03T16:30:00Z",
+        "nemTime": "2024-09-04T02:30:00+10:00",
+        "perKwh": 14.04736,
+        "renewables": 9.55,
+        "spotPerKwh": 6.54812,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T16:30:01Z",
+        "endTime": "2024-09-03T17:00:00Z",
+        "nemTime": "2024-09-04T03:00:00+10:00",
+        "perKwh": 14.97549,
+        "renewables": 10.045,
+        "spotPerKwh": 7.43568,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T17:00:01Z",
+        "endTime": "2024-09-03T17:30:00Z",
+        "nemTime": "2024-09-04T03:30:00+10:00",
+        "perKwh": 13.75614,
+        "renewables": 11.176,
+        "spotPerKwh": 6.26963,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T17:30:01Z",
+        "endTime": "2024-09-03T18:00:00Z",
+        "nemTime": "2024-09-04T04:00:00+10:00",
+        "perKwh": 13.79966,
+        "renewables": 11.88,
+        "spotPerKwh": 6.31125,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T18:00:01Z",
+        "endTime": "2024-09-03T18:30:00Z",
+        "nemTime": "2024-09-04T04:30:00+10:00",
+        "perKwh": 13.76496,
+        "renewables": 12.309000000000001,
+        "spotPerKwh": 6.27806,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T18:30:01Z",
+        "endTime": "2024-09-03T19:00:00Z",
+        "nemTime": "2024-09-04T05:00:00+10:00",
+        "perKwh": 13.8301,
+        "renewables": 12.463000000000001,
+        "spotPerKwh": 6.34036,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T19:00:01Z",
+        "endTime": "2024-09-03T19:30:00Z",
+        "nemTime": "2024-09-04T05:30:00+10:00",
+        "perKwh": 13.94325,
+        "renewables": 12.110999999999999,
+        "spotPerKwh": 6.44856,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T19:30:01Z",
+        "endTime": "2024-09-03T20:00:00Z",
+        "nemTime": "2024-09-04T06:00:00+10:00",
+        "perKwh": 15.45038,
+        "renewables": 11.376,
+        "spotPerKwh": 7.88981,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T20:00:01Z",
+        "endTime": "2024-09-03T20:30:00Z",
+        "nemTime": "2024-09-04T06:30:00+10:00",
+        "perKwh": 20.44549,
+        "renewables": 9.722999999999999,
+        "spotPerKwh": 12.66659,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T20:30:01Z",
+        "endTime": "2024-09-03T21:00:00Z",
+        "nemTime": "2024-09-04T07:00:00+10:00",
+        "perKwh": 18.48572,
+        "renewables": 13.837,
+        "spotPerKwh": 10.79248,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T21:00:01Z",
+        "endTime": "2024-09-03T21:30:00Z",
+        "nemTime": "2024-09-04T07:30:00+10:00",
+        "perKwh": 14.89593,
+        "renewables": 26.171,
+        "spotPerKwh": 7.3596,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T21:30:01Z",
+        "endTime": "2024-09-03T22:00:00Z",
+        "nemTime": "2024-09-04T08:00:00+10:00",
+        "perKwh": 12.1189,
+        "renewables": 42.272999999999996,
+        "spotPerKwh": 4.70395,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T22:00:01Z",
+        "endTime": "2024-09-03T22:30:00Z",
+        "nemTime": "2024-09-04T08:30:00+10:00",
+        "perKwh": 11.12934,
+        "renewables": 52.233,
+        "spotPerKwh": 3.75765,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T22:30:01Z",
+        "endTime": "2024-09-03T23:00:00Z",
+        "nemTime": "2024-09-04T09:00:00+10:00",
+        "perKwh": 11.85089,
+        "renewables": 57.327,
+        "spotPerKwh": 4.44766,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T23:00:01Z",
+        "endTime": "2024-09-03T23:30:00Z",
+        "nemTime": "2024-09-04T09:30:00+10:00",
+        "perKwh": 14.47578,
+        "renewables": 61.925,
+        "spotPerKwh": 6.95781,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T23:30:01Z",
+        "endTime": "2024-09-04T00:00:00Z",
+        "nemTime": "2024-09-04T10:00:00+10:00",
+        "perKwh": 5.73737,
+        "renewables": 66.277,
+        "spotPerKwh": -1.39864,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T00:00:01Z",
+        "endTime": "2024-09-04T00:30:00Z",
+        "nemTime": "2024-09-04T10:30:00+10:00",
+        "perKwh": 3.48809,
+        "renewables": 72.196,
+        "spotPerKwh": -3.54961,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T00:30:01Z",
+        "endTime": "2024-09-04T01:00:00Z",
+        "nemTime": "2024-09-04T11:00:00+10:00",
+        "perKwh": 2.37418,
+        "renewables": 74.812,
+        "spotPerKwh": -4.61483,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T01:00:01Z",
+        "endTime": "2024-09-04T01:30:00Z",
+        "nemTime": "2024-09-04T11:30:00+10:00",
+        "perKwh": 1.8202,
+        "renewables": 77.325,
+        "spotPerKwh": -5.14459,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T01:30:01Z",
+        "endTime": "2024-09-04T02:00:00Z",
+        "nemTime": "2024-09-04T12:00:00+10:00",
+        "perKwh": 1.702,
+        "renewables": 76.82900000000001,
+        "spotPerKwh": -5.25763,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T02:00:01Z",
+        "endTime": "2024-09-04T02:30:00Z",
+        "nemTime": "2024-09-04T12:30:00+10:00",
+        "perKwh": 1.33592,
+        "renewables": 71.623,
+        "spotPerKwh": -5.6077,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T02:30:01Z",
+        "endTime": "2024-09-04T03:00:00Z",
+        "nemTime": "2024-09-04T13:00:00+10:00",
+        "perKwh": 2.93445,
+        "renewables": 74.292,
+        "spotPerKwh": -4.07905,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T03:00:01Z",
+        "endTime": "2024-09-04T03:30:00Z",
+        "nemTime": "2024-09-04T13:30:00+10:00",
+        "perKwh": 2.14533,
+        "renewables": 75.75,
+        "spotPerKwh": -4.83367,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T03:30:01Z",
+        "endTime": "2024-09-04T04:00:00Z",
+        "nemTime": "2024-09-04T14:00:00+10:00",
+        "perKwh": 3.73638,
+        "renewables": 75.321,
+        "spotPerKwh": -3.31217,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "CurrentInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T04:00:01Z",
+        "endTime": "2024-09-04T04:30:00Z",
+        "nemTime": "2024-09-04T14:30:00+10:00",
+        "perKwh": 6.21768,
+        "renewables": 75.25800000000001,
+        "spotPerKwh": -0.93933,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "estimate": true,
+        "advancedPrice": {
+            "low": 3.86976,
+            "predicted": 4.42212,
+            "high": 4.99495
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T04:30:01Z",
+        "endTime": "2024-09-04T05:00:00Z",
+        "nemTime": "2024-09-04T15:00:00+10:00",
+        "perKwh": 9.17807,
+        "renewables": 69.274,
+        "spotPerKwh": 1.89167,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 4.49288,
+            "predicted": 6.62367,
+            "high": 9.19814
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T05:00:01Z",
+        "endTime": "2024-09-04T05:30:00Z",
+        "nemTime": "2024-09-04T15:30:00+10:00",
+        "perKwh": 2.02254,
+        "renewables": 62.34723283917998,
+        "spotPerKwh": -4.9511,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 3.78202,
+            "predicted": 6.79136,
+            "high": 10.36915
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T05:30:01Z",
+        "endTime": "2024-09-04T06:00:00Z",
+        "nemTime": "2024-09-04T16:00:00+10:00",
+        "perKwh": 1.93742,
+        "renewables": 50.838901268478295,
+        "spotPerKwh": -5.0325,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 4.15643,
+            "predicted": 7.5313,
+            "high": 11.49993
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T06:00:01Z",
+        "endTime": "2024-09-04T06:30:00Z",
+        "nemTime": "2024-09-04T16:30:00+10:00",
+        "perKwh": 1.94662,
+        "renewables": 42.08597957922482,
+        "spotPerKwh": -5.0237,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 5.97468,
+            "predicted": 10.10915,
+            "high": 13.40873
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T06:30:01Z",
+        "endTime": "2024-09-04T07:00:00Z",
+        "nemTime": "2024-09-04T17:00:00+10:00",
+        "perKwh": 4.40231,
+        "renewables": 31.687263924396486,
+        "spotPerKwh": -2.67535,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 8.79542,
+            "predicted": 13.22454,
+            "high": 17.2727
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T07:00:01Z",
+        "endTime": "2024-09-04T07:30:00Z",
+        "nemTime": "2024-09-04T17:30:00+10:00",
+        "perKwh": 15.82588,
+        "renewables": 19.438727387710518,
+        "spotPerKwh": 8.2489,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.03045,
+            "predicted": 16.19363,
+            "high": 22.72137
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T07:30:01Z",
+        "endTime": "2024-09-04T08:00:00Z",
+        "nemTime": "2024-09-04T18:00:00+10:00",
+        "perKwh": 17.63619,
+        "renewables": 10.622030589998639,
+        "spotPerKwh": 9.98008,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 14.55571,
+            "predicted": 18.44984,
+            "high": 27.09961
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T08:00:01Z",
+        "endTime": "2024-09-04T08:30:00Z",
+        "nemTime": "2024-09-04T18:30:00+10:00",
+        "perKwh": 18.56008,
+        "renewables": 10.05011793100871,
+        "spotPerKwh": 10.86359,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 15.56608,
+            "predicted": 19.21904,
+            "high": 29.48583
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T08:30:01Z",
+        "endTime": "2024-09-04T09:00:00Z",
+        "nemTime": "2024-09-04T19:00:00+10:00",
+        "perKwh": 18.13804,
+        "renewables": 10.302062479020401,
+        "spotPerKwh": 10.46,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 15.29653,
+            "predicted": 17.93995,
+            "high": 26.20441
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T09:00:01Z",
+        "endTime": "2024-09-04T09:30:00Z",
+        "nemTime": "2024-09-04T19:30:00+10:00",
+        "perKwh": 17.33545,
+        "renewables": 11.079263202744725,
+        "spotPerKwh": 9.69249,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 14.57725,
+            "predicted": 16.36658,
+            "high": 20.90312
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T09:30:01Z",
+        "endTime": "2024-09-04T10:00:00Z",
+        "nemTime": "2024-09-04T20:00:00+10:00",
+        "perKwh": 15.94206,
+        "renewables": 12.01700146635084,
+        "spotPerKwh": 8.36,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 14.07361,
+            "predicted": 15.65614,
+            "high": 18.02741
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T10:00:01Z",
+        "endTime": "2024-09-04T10:30:00Z",
+        "nemTime": "2024-09-04T20:30:00+10:00",
+        "perKwh": 15.91905,
+        "renewables": 12.77707336752925,
+        "spotPerKwh": 8.338,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 13.52268,
+            "predicted": 15.11173,
+            "high": 17.2004
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T10:30:01Z",
+        "endTime": "2024-09-04T11:00:00Z",
+        "nemTime": "2024-09-04T21:00:00+10:00",
+        "perKwh": 14.27991,
+        "renewables": 13.783792356454438,
+        "spotPerKwh": 6.77051,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 13.23934,
+            "predicted": 14.65147,
+            "high": 16.65631
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T11:00:01Z",
+        "endTime": "2024-09-04T11:30:00Z",
+        "nemTime": "2024-09-04T21:30:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 15.104744945422782,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 13.07062,
+            "predicted": 14.1718,
+            "high": 16.45556
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T11:30:01Z",
+        "endTime": "2024-09-04T12:00:00Z",
+        "nemTime": "2024-09-04T22:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 16.6888479124877,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 13.04515,
+            "predicted": 14.10588,
+            "high": 16.13734
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T12:00:01Z",
+        "endTime": "2024-09-04T12:30:00Z",
+        "nemTime": "2024-09-04T22:30:00+10:00",
+        "perKwh": 14.67675,
+        "renewables": 17.293242166705053,
+        "spotPerKwh": 7.15,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.94381,
+            "predicted": 14.02326,
+            "high": 16.0009
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T12:30:01Z",
+        "endTime": "2024-09-04T13:00:00Z",
+        "nemTime": "2024-09-04T23:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 18.074005633513632,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.883,
+            "predicted": 13.88159,
+            "high": 15.71695
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T13:00:01Z",
+        "endTime": "2024-09-04T13:30:00Z",
+        "nemTime": "2024-09-04T23:30:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 18.866277357356886,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.73083,
+            "predicted": 13.73518,
+            "high": 15.37663
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T13:30:01Z",
+        "endTime": "2024-09-04T14:00:00Z",
+        "nemTime": "2024-09-05T00:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 19.799768677187547,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.56392,
+            "predicted": 13.62348,
+            "high": 15.20172
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T14:00:01Z",
+        "endTime": "2024-09-04T14:30:00Z",
+        "nemTime": "2024-09-05T00:30:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 20.570945085436502,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.48697,
+            "predicted": 13.51952,
+            "high": 15.05875
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T14:30:01Z",
+        "endTime": "2024-09-04T15:00:00Z",
+        "nemTime": "2024-09-05T01:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 21.27145576406764,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.334,
+            "predicted": 13.56074,
+            "high": 15.11398
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T15:00:01Z",
+        "endTime": "2024-09-04T15:30:00Z",
+        "nemTime": "2024-09-05T01:30:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 22.169221015883302,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.14884,
+            "predicted": 13.44133,
+            "high": 14.91886
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T15:30:01Z",
+        "endTime": "2024-09-04T16:00:00Z",
+        "nemTime": "2024-09-05T02:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 22.91634380030673,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.10452,
+            "predicted": 13.52467,
+            "high": 15.27206
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T16:00:01Z",
+        "endTime": "2024-09-04T16:30:00Z",
+        "nemTime": "2024-09-05T02:30:00+10:00",
+        "perKwh": 13.75656,
+        "renewables": 23.471066917301155,
+        "spotPerKwh": 6.27003,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.15046,
+            "predicted": 13.54241,
+            "high": 15.34792
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T16:30:01Z",
+        "endTime": "2024-09-04T17:00:00Z",
+        "nemTime": "2024-09-05T03:00:00+10:00",
+        "perKwh": 13.75423,
+        "renewables": 24.198806616589668,
+        "spotPerKwh": 6.2678,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 12.02828,
+            "predicted": 13.52354,
+            "high": 15.38853
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T17:00:01Z",
+        "endTime": "2024-09-04T17:30:00Z",
+        "nemTime": "2024-09-05T03:30:00+10:00",
+        "perKwh": 13.75423,
+        "renewables": 24.52720042866409,
+        "spotPerKwh": 6.2678,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.76043,
+            "predicted": 13.44935,
+            "high": 15.29517
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T17:30:01Z",
+        "endTime": "2024-09-04T18:00:00Z",
+        "nemTime": "2024-09-05T04:00:00+10:00",
+        "perKwh": 13.75423,
+        "renewables": 24.82431816784555,
+        "spotPerKwh": 6.2678,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.95727,
+            "predicted": 13.42434,
+            "high": 15.06376
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T18:00:01Z",
+        "endTime": "2024-09-04T18:30:00Z",
+        "nemTime": "2024-09-05T04:30:00+10:00",
+        "perKwh": 13.74388,
+        "renewables": 24.68140505248984,
+        "spotPerKwh": 6.25791,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.64865,
+            "predicted": 13.31763,
+            "high": 14.98686
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T18:30:01Z",
+        "endTime": "2024-09-04T19:00:00Z",
+        "nemTime": "2024-09-05T05:00:00+10:00",
+        "perKwh": 13.74388,
+        "renewables": 24.015200711561956,
+        "spotPerKwh": 6.25791,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.62493,
+            "predicted": 13.32249,
+            "high": 15.04324
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T19:00:01Z",
+        "endTime": "2024-09-04T19:30:00Z",
+        "nemTime": "2024-09-05T05:30:00+10:00",
+        "perKwh": 12.43682,
+        "renewables": 23.073352879103837,
+        "spotPerKwh": 5.00798,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.75085,
+            "predicted": 13.45913,
+            "high": 15.16114
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T19:30:01Z",
+        "endTime": "2024-09-04T20:00:00Z",
+        "nemTime": "2024-09-05T06:00:00+10:00",
+        "perKwh": 11.90073,
+        "renewables": 22.192272431094487,
+        "spotPerKwh": 4.49532,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.70746,
+            "predicted": 13.78422,
+            "high": 15.6657
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T20:00:01Z",
+        "endTime": "2024-09-04T20:30:00Z",
+        "nemTime": "2024-09-05T06:30:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 21.24325253520593,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 11.55414,
+            "predicted": 14.01268,
+            "high": 16.94402
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T20:30:01Z",
+        "endTime": "2024-09-04T21:00:00Z",
+        "nemTime": "2024-09-05T07:00:00+10:00",
+        "perKwh": 14.67675,
+        "renewables": 26.722580900650804,
+        "spotPerKwh": 7.15,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 10.27526,
+            "predicted": 13.39634,
+            "high": 16.69299
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T21:00:01Z",
+        "endTime": "2024-09-04T21:30:00Z",
+        "nemTime": "2024-09-05T07:30:00+10:00",
+        "perKwh": 7.16458,
+        "renewables": 37.30547810502514,
+        "spotPerKwh": -0.03381,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 8.63949,
+            "predicted": 11.67135,
+            "high": 14.58035
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T21:30:01Z",
+        "endTime": "2024-09-04T22:00:00Z",
+        "nemTime": "2024-09-05T08:00:00+10:00",
+        "perKwh": 8.35139,
+        "renewables": 48.66944162139281,
+        "spotPerKwh": 1.10112,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 7.23462,
+            "predicted": 10.28493,
+            "high": 13.13886
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T22:00:01Z",
+        "endTime": "2024-09-04T22:30:00Z",
+        "nemTime": "2024-09-05T08:30:00+10:00",
+        "perKwh": 7.44121,
+        "renewables": 58.047820442730156,
+        "spotPerKwh": 0.23072,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "advancedPrice": {
+            "low": 6.55586,
+            "predicted": 9.36015,
+            "high": 12.75141
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T22:30:01Z",
+        "endTime": "2024-09-04T23:00:00Z",
+        "nemTime": "2024-09-05T09:00:00+10:00",
+        "perKwh": 6.33176,
+        "renewables": 65.84136719998229,
+        "spotPerKwh": -0.83023,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 5.70282,
+            "predicted": 8.56443,
+            "high": 12.66812
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T23:00:01Z",
+        "endTime": "2024-09-04T23:30:00Z",
+        "nemTime": "2024-09-05T09:30:00+10:00",
+        "perKwh": 3.20043,
+        "renewables": 69.804106472268,
+        "spotPerKwh": -3.82469,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 4.45724,
+            "predicted": 7.55517,
+            "high": 11.75171
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T23:30:01Z",
+        "endTime": "2024-09-05T00:00:00Z",
+        "nemTime": "2024-09-05T10:00:00+10:00",
+        "perKwh": 2.02255,
+        "renewables": 72.91697478300836,
+        "spotPerKwh": -4.95109,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 3.35048,
+            "predicted": 6.23388,
+            "high": 11.05393
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T00:00:01Z",
+        "endTime": "2024-09-05T00:30:00Z",
+        "nemTime": "2024-09-05T10:30:00+10:00",
+        "perKwh": 1.80513,
+        "renewables": 72.41427400509227,
+        "spotPerKwh": -5.159,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 2.94568,
+            "predicted": 5.21345,
+            "high": 9.48784
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T00:30:01Z",
+        "endTime": "2024-09-05T01:00:00Z",
+        "nemTime": "2024-09-05T11:00:00+10:00",
+        "perKwh": 1.1777,
+        "renewables": 74.77044844074251,
+        "spotPerKwh": -5.75901,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -5.90655,
+            "max": -3.11802
+        },
+        "advancedPrice": {
+            "low": 2.73799,
+            "predicted": 4.61288,
+            "high": 8.41595
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T01:00:01Z",
+        "endTime": "2024-09-05T01:30:00Z",
+        "nemTime": "2024-09-05T11:30:00+10:00",
+        "perKwh": 0.99334,
+        "renewables": 77.17072150898981,
+        "spotPerKwh": -5.93531,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.15066,
+            "max": -4.151
+        },
+        "advancedPrice": {
+            "low": 2.7162,
+            "predicted": 4.31798,
+            "high": 7.37005
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T01:30:01Z",
+        "endTime": "2024-09-05T02:00:00Z",
+        "nemTime": "2024-09-05T12:00:00+10:00",
+        "perKwh": 0.92719,
+        "renewables": 78.24505450951023,
+        "spotPerKwh": -5.99857,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.32475,
+            "max": -4.3321
+        },
+        "advancedPrice": {
+            "low": 2.76426,
+            "predicted": 4.36303,
+            "high": 7.44353
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T02:00:01Z",
+        "endTime": "2024-09-05T02:30:00Z",
+        "nemTime": "2024-09-05T12:30:00+10:00",
+        "perKwh": 0.6376,
+        "renewables": 77.45104297555443,
+        "spotPerKwh": -6.2755,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.5,
+            "max": -4.50099
+        },
+        "advancedPrice": {
+            "low": 2.8553,
+            "predicted": 4.52571,
+            "high": 7.41852
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T02:30:01Z",
+        "endTime": "2024-09-05T03:00:00Z",
+        "nemTime": "2024-09-05T13:00:00+10:00",
+        "perKwh": 0.6376,
+        "renewables": 76.43992661703818,
+        "spotPerKwh": -6.2755,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.5,
+            "max": -4.569
+        },
+        "advancedPrice": {
+            "low": 2.99559,
+            "predicted": 4.69686,
+            "high": 7.85786
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T03:00:01Z",
+        "endTime": "2024-09-05T03:30:00Z",
+        "nemTime": "2024-09-05T13:30:00+10:00",
+        "perKwh": 1.04769,
+        "renewables": 77.2064447193986,
+        "spotPerKwh": -5.88334,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.5,
+            "max": -4.28468
+        },
+        "advancedPrice": {
+            "low": 3.22312,
+            "predicted": 5.25782,
+            "high": 8.92848
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T03:30:01Z",
+        "endTime": "2024-09-05T04:00:00Z",
+        "nemTime": "2024-09-05T14:00:00+10:00",
+        "perKwh": 1.05798,
+        "renewables": 73.83551336387103,
+        "spotPerKwh": -5.8735,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -5.84084,
+            "max": -3.85842
+        },
+        "advancedPrice": {
+            "low": 3.61957,
+            "predicted": 6.14221,
+            "high": 10.20725
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T04:00:01Z",
+        "endTime": "2024-09-05T04:30:00Z",
+        "nemTime": "2024-09-05T14:30:00+10:00",
+        "perKwh": 1.5409,
+        "renewables": 69.24966436186884,
+        "spotPerKwh": -5.41168,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -5.705,
+            "max": -0.95
+        },
+        "advancedPrice": {
+            "low": 4.27497,
+            "predicted": 7.17995,
+            "high": 11.7948
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T04:30:01Z",
+        "endTime": "2024-09-05T05:00:00Z",
+        "nemTime": "2024-09-05T15:00:00+10:00",
+        "perKwh": 2.02255,
+        "renewables": 68.20395239253433,
+        "spotPerKwh": -4.95109,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -4.876,
+            "max": 3.70001
+        },
+        "advancedPrice": {
+            "low": 5.42818,
+            "predicted": 9.22196,
+            "high": 13.72565
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T05:00:01Z",
+        "endTime": "2024-09-05T05:30:00Z",
+        "nemTime": "2024-09-05T15:30:00+10:00",
+        "perKwh": 2.52843,
+        "renewables": 65.70256256558002,
+        "spotPerKwh": -4.46732,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -4.70099,
+            "max": 2.69656
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T05:30:01Z",
+        "endTime": "2024-09-05T06:00:00Z",
+        "nemTime": "2024-09-05T16:00:00+10:00",
+        "perKwh": 4.90211,
+        "renewables": 58.25558813130738,
+        "spotPerKwh": -2.19739,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -4.22446,
+            "max": 3.04126
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T06:00:01Z",
+        "endTime": "2024-09-05T06:30:00Z",
+        "nemTime": "2024-09-05T16:30:00+10:00",
+        "perKwh": 6.34867,
+        "renewables": 50.658627992093216,
+        "spotPerKwh": -0.81406,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -3.84925,
+            "max": 2.34618
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T06:30:01Z",
+        "endTime": "2024-09-05T07:00:00Z",
+        "nemTime": "2024-09-05T17:00:00+10:00",
+        "perKwh": 7.21388,
+        "renewables": 40.54747584736004,
+        "spotPerKwh": 0.01333,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": -3.01074,
+            "max": 5.65056
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T07:00:01Z",
+        "endTime": "2024-09-05T07:30:00Z",
+        "nemTime": "2024-09-05T17:30:00+10:00",
+        "perKwh": 11.99771,
+        "renewables": 26.02235716457779,
+        "spotPerKwh": 4.58806,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 0.98258,
+            "max": 6.999
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T07:30:01Z",
+        "endTime": "2024-09-05T08:00:00Z",
+        "nemTime": "2024-09-05T18:00:00+10:00",
+        "perKwh": 15.25074,
+        "renewables": 16.142695761564216,
+        "spotPerKwh": 7.6989,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 5.689,
+            "max": 10.25
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T08:00:01Z",
+        "endTime": "2024-09-05T08:30:00Z",
+        "nemTime": "2024-09-05T18:30:00+10:00",
+        "perKwh": 16.47006,
+        "renewables": 15.375019522970168,
+        "spotPerKwh": 8.86492,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 6.5,
+            "max": 14.568
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T08:30:01Z",
+        "endTime": "2024-09-05T09:00:00Z",
+        "nemTime": "2024-09-05T19:00:00+10:00",
+        "perKwh": 16.47003,
+        "renewables": 15.671071620905973,
+        "spotPerKwh": 8.8649,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 6.5,
+            "max": 14.568
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T09:00:01Z",
+        "endTime": "2024-09-05T09:30:00Z",
+        "nemTime": "2024-09-05T19:30:00+10:00",
+        "perKwh": 16.01956,
+        "renewables": 16.321808361158364,
+        "spotPerKwh": 8.43412,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 5.7,
+            "max": 11.37046
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T09:30:01Z",
+        "endTime": "2024-09-05T10:00:00Z",
+        "nemTime": "2024-09-05T20:00:00+10:00",
+        "perKwh": 15.94206,
+        "renewables": 17.146884915756317,
+        "spotPerKwh": 8.36,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 5.7,
+            "max": 11.20194
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T10:00:01Z",
+        "endTime": "2024-09-05T10:30:00Z",
+        "nemTime": "2024-09-05T20:30:00+10:00",
+        "perKwh": 15.25074,
+        "renewables": 17.917361987085805,
+        "spotPerKwh": 7.6989,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 4.36998,
+            "max": 8.75
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T10:30:01Z",
+        "endTime": "2024-09-05T11:00:00Z",
+        "nemTime": "2024-09-05T21:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 18.749084682781106,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 4.17889,
+            "max": 7.65214
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T11:00:01Z",
+        "endTime": "2024-09-05T11:30:00Z",
+        "nemTime": "2024-09-05T21:30:00+10:00",
+        "perKwh": 12.14881,
+        "renewables": 19.691278119269928,
+        "spotPerKwh": 4.73256,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 2.29457,
+            "max": 7.60001
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T11:30:01Z",
+        "endTime": "2024-09-05T12:00:00Z",
+        "nemTime": "2024-09-05T22:00:00+10:00",
+        "perKwh": 12.33374,
+        "renewables": 20.584162882626817,
+        "spotPerKwh": 4.9094,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 1.06093,
+            "max": 7.6701
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T12:00:01Z",
+        "endTime": "2024-09-05T12:30:00Z",
+        "nemTime": "2024-09-05T22:30:00+10:00",
+        "perKwh": 14.67675,
+        "renewables": 21.36640805824368,
+        "spotPerKwh": 7.15,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 5.7,
+            "max": 9.35772
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T12:30:01Z",
+        "endTime": "2024-09-05T13:00:00Z",
+        "nemTime": "2024-09-05T23:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 22.17223015044128,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 5.698,
+            "max": 7.672
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T13:00:01Z",
+        "endTime": "2024-09-05T13:30:00Z",
+        "nemTime": "2024-09-05T23:30:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 22.911290344327323,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 4.77325,
+            "max": 7.672
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T13:30:01Z",
+        "endTime": "2024-09-05T14:00:00Z",
+        "nemTime": "2024-09-06T00:00:00+10:00",
+        "perKwh": 13.75653,
+        "renewables": 23.673752127075566,
+        "spotPerKwh": 6.27,
+        "channelType": "general",
+        "spikeStatus": "none",
+        "tariffInformation": {
+            "demandWindow": false
+        },
+        "descriptor": "veryLow",
+        "range": {
+            "min": 4.59729,
+            "max": 7.58
+        }
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T14:00:01Z",
+        "endTime": "2024-09-03T14:30:00Z",
+        "nemTime": "2024-09-04T00:30:00+10:00",
+        "perKwh": -7.66765,
+        "renewables": 6.219,
+        "spotPerKwh": 8.06575,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T14:30:01Z",
+        "endTime": "2024-09-03T15:00:00Z",
+        "nemTime": "2024-09-04T01:00:00+10:00",
+        "perKwh": -7.66765,
+        "renewables": 7.39,
+        "spotPerKwh": 8.06575,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T15:00:01Z",
+        "endTime": "2024-09-03T15:30:00Z",
+        "nemTime": "2024-09-04T01:30:00+10:00",
+        "perKwh": -6.62715,
+        "renewables": 7.576,
+        "spotPerKwh": 6.97123,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T15:30:01Z",
+        "endTime": "2024-09-03T16:00:00Z",
+        "nemTime": "2024-09-04T02:00:00+10:00",
+        "perKwh": -6.11945,
+        "renewables": 8.447000000000001,
+        "spotPerKwh": 6.43717,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T16:00:01Z",
+        "endTime": "2024-09-03T16:30:00Z",
+        "nemTime": "2024-09-04T02:30:00+10:00",
+        "perKwh": -6.22493,
+        "renewables": 9.55,
+        "spotPerKwh": 6.54812,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T16:30:01Z",
+        "endTime": "2024-09-03T17:00:00Z",
+        "nemTime": "2024-09-04T03:00:00+10:00",
+        "perKwh": -7.06868,
+        "renewables": 10.045,
+        "spotPerKwh": 7.43568,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T17:00:01Z",
+        "endTime": "2024-09-03T17:30:00Z",
+        "nemTime": "2024-09-04T03:30:00+10:00",
+        "perKwh": -5.96018,
+        "renewables": 11.176,
+        "spotPerKwh": 6.26963,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T17:30:01Z",
+        "endTime": "2024-09-03T18:00:00Z",
+        "nemTime": "2024-09-04T04:00:00+10:00",
+        "perKwh": -5.99975,
+        "renewables": 11.88,
+        "spotPerKwh": 6.31125,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T18:00:01Z",
+        "endTime": "2024-09-03T18:30:00Z",
+        "nemTime": "2024-09-04T04:30:00+10:00",
+        "perKwh": -5.9682,
+        "renewables": 12.309000000000001,
+        "spotPerKwh": 6.27806,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T18:30:01Z",
+        "endTime": "2024-09-03T19:00:00Z",
+        "nemTime": "2024-09-04T05:00:00+10:00",
+        "perKwh": -6.02742,
+        "renewables": 12.463000000000001,
+        "spotPerKwh": 6.34036,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T19:00:01Z",
+        "endTime": "2024-09-03T19:30:00Z",
+        "nemTime": "2024-09-04T05:30:00+10:00",
+        "perKwh": -6.13028,
+        "renewables": 12.110999999999999,
+        "spotPerKwh": 6.44856,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T19:30:01Z",
+        "endTime": "2024-09-03T20:00:00Z",
+        "nemTime": "2024-09-04T06:00:00+10:00",
+        "perKwh": -7.5004,
+        "renewables": 11.376,
+        "spotPerKwh": 7.88981,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T20:00:01Z",
+        "endTime": "2024-09-03T20:30:00Z",
+        "nemTime": "2024-09-04T06:30:00+10:00",
+        "perKwh": -12.04141,
+        "renewables": 9.722999999999999,
+        "spotPerKwh": 12.66659,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T20:30:01Z",
+        "endTime": "2024-09-03T21:00:00Z",
+        "nemTime": "2024-09-04T07:00:00+10:00",
+        "perKwh": -10.2598,
+        "renewables": 13.837,
+        "spotPerKwh": 10.79248,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T21:00:01Z",
+        "endTime": "2024-09-03T21:30:00Z",
+        "nemTime": "2024-09-04T07:30:00+10:00",
+        "perKwh": -6.99636,
+        "renewables": 26.171,
+        "spotPerKwh": 7.3596,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T21:30:01Z",
+        "endTime": "2024-09-03T22:00:00Z",
+        "nemTime": "2024-09-04T08:00:00+10:00",
+        "perKwh": -4.47178,
+        "renewables": 42.272999999999996,
+        "spotPerKwh": 4.70395,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T22:00:01Z",
+        "endTime": "2024-09-03T22:30:00Z",
+        "nemTime": "2024-09-04T08:30:00+10:00",
+        "perKwh": -3.57219,
+        "renewables": 52.233,
+        "spotPerKwh": 3.75765,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T22:30:01Z",
+        "endTime": "2024-09-03T23:00:00Z",
+        "nemTime": "2024-09-04T09:00:00+10:00",
+        "perKwh": -4.22814,
+        "renewables": 57.327,
+        "spotPerKwh": 4.44766,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T23:00:01Z",
+        "endTime": "2024-09-03T23:30:00Z",
+        "nemTime": "2024-09-04T09:30:00+10:00",
+        "perKwh": -6.6144,
+        "renewables": 61.925,
+        "spotPerKwh": 6.95781,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-03T23:30:01Z",
+        "endTime": "2024-09-04T00:00:00Z",
+        "nemTime": "2024-09-04T10:00:00+10:00",
+        "perKwh": 1.32961,
+        "renewables": 66.277,
+        "spotPerKwh": -1.39864,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T00:00:01Z",
+        "endTime": "2024-09-04T00:30:00Z",
+        "nemTime": "2024-09-04T10:30:00+10:00",
+        "perKwh": 4.57731,
+        "renewables": 72.196,
+        "spotPerKwh": -3.54961,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T00:30:01Z",
+        "endTime": "2024-09-04T01:00:00Z",
+        "nemTime": "2024-09-04T11:00:00+10:00",
+        "perKwh": 5.58996,
+        "renewables": 74.812,
+        "spotPerKwh": -4.61483,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T01:00:01Z",
+        "endTime": "2024-09-04T01:30:00Z",
+        "nemTime": "2024-09-04T11:30:00+10:00",
+        "perKwh": 6.09357,
+        "renewables": 77.325,
+        "spotPerKwh": -5.14459,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T01:30:01Z",
+        "endTime": "2024-09-04T02:00:00Z",
+        "nemTime": "2024-09-04T12:00:00+10:00",
+        "perKwh": 6.20103,
+        "renewables": 76.82900000000001,
+        "spotPerKwh": -5.25763,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T02:00:01Z",
+        "endTime": "2024-09-04T02:30:00Z",
+        "nemTime": "2024-09-04T12:30:00+10:00",
+        "perKwh": 6.53382,
+        "renewables": 71.623,
+        "spotPerKwh": -5.6077,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T02:30:01Z",
+        "endTime": "2024-09-04T03:00:00Z",
+        "nemTime": "2024-09-04T13:00:00+10:00",
+        "perKwh": 5.08062,
+        "renewables": 74.292,
+        "spotPerKwh": -4.07905,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T03:00:01Z",
+        "endTime": "2024-09-04T03:30:00Z",
+        "nemTime": "2024-09-04T13:30:00+10:00",
+        "perKwh": 5.798,
+        "renewables": 75.75,
+        "spotPerKwh": -4.83367,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "ActualInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T03:30:01Z",
+        "endTime": "2024-09-04T04:00:00Z",
+        "nemTime": "2024-09-04T14:00:00+10:00",
+        "perKwh": 4.35159,
+        "renewables": 75.321,
+        "spotPerKwh": -3.31217,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow"
+    },
+    {
+        "type": "CurrentInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T04:00:01Z",
+        "endTime": "2024-09-04T04:30:00Z",
+        "nemTime": "2024-09-04T14:30:00+10:00",
+        "perKwh": 2.09587,
+        "renewables": 75.25800000000001,
+        "spotPerKwh": -0.93933,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "estimate": true,
+        "advancedPrice": {
+            "low": 4.23034,
+            "predicted": 3.72819,
+            "high": 3.20744
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T04:30:01Z",
+        "endTime": "2024-09-04T05:00:00Z",
+        "nemTime": "2024-09-04T15:00:00+10:00",
+        "perKwh": -0.5954,
+        "renewables": 69.274,
+        "spotPerKwh": 1.89167,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "advancedPrice": {
+            "low": 3.66386,
+            "predicted": 1.72678,
+            "high": -0.61365
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T05:00:01Z",
+        "endTime": "2024-09-04T05:30:00Z",
+        "nemTime": "2024-09-04T15:30:00+10:00",
+        "perKwh": 4.70673,
+        "renewables": 62.34723283917998,
+        "spotPerKwh": -4.9511,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 3.1072,
+            "predicted": 0.37144,
+            "high": -2.8811
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T05:30:01Z",
+        "endTime": "2024-09-04T06:00:00Z",
+        "nemTime": "2024-09-04T16:00:00+10:00",
+        "perKwh": 4.78411,
+        "renewables": 50.838901268478295,
+        "spotPerKwh": -5.0325,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 2.76683,
+            "predicted": -0.30124,
+            "high": -3.90908
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T06:00:01Z",
+        "endTime": "2024-09-04T06:30:00Z",
+        "nemTime": "2024-09-04T16:30:00+10:00",
+        "perKwh": 2.38065,
+        "renewables": 42.08597957922482,
+        "spotPerKwh": -5.0237,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": -1.28123,
+            "predicted": -5.03984,
+            "high": -8.03945
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T06:30:01Z",
+        "endTime": "2024-09-04T07:00:00Z",
+        "nemTime": "2024-09-04T17:00:00+10:00",
+        "perKwh": 0.1482,
+        "renewables": 31.687263924396486,
+        "spotPerKwh": -2.67535,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "advancedPrice": {
+            "low": -3.84553,
+            "predicted": -7.87201,
+            "high": -11.55215
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T07:00:01Z",
+        "endTime": "2024-09-04T07:30:00Z",
+        "nemTime": "2024-09-04T17:30:00+10:00",
+        "perKwh": -10.23686,
+        "renewables": 19.438727387710518,
+        "spotPerKwh": 8.2489,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -6.78647,
+            "predicted": -10.57118,
+            "high": -16.50549
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T07:30:01Z",
+        "endTime": "2024-09-04T08:00:00Z",
+        "nemTime": "2024-09-04T18:00:00+10:00",
+        "perKwh": -11.8826,
+        "renewables": 10.622030589998639,
+        "spotPerKwh": 9.98008,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -9.08216,
+            "predicted": -12.62228,
+            "high": -20.48571
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T08:00:01Z",
+        "endTime": "2024-09-04T08:30:00Z",
+        "nemTime": "2024-09-04T18:30:00+10:00",
+        "perKwh": -12.7225,
+        "renewables": 10.05011793100871,
+        "spotPerKwh": 10.86359,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -10.00068,
+            "predicted": -13.32156,
+            "high": -22.655
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T08:30:01Z",
+        "endTime": "2024-09-04T09:00:00Z",
+        "nemTime": "2024-09-04T19:00:00+10:00",
+        "perKwh": -12.33883,
+        "renewables": 10.302062479020401,
+        "spotPerKwh": 10.46,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -9.75564,
+            "predicted": -12.15875,
+            "high": -19.67189
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T09:00:01Z",
+        "endTime": "2024-09-04T09:30:00Z",
+        "nemTime": "2024-09-04T19:30:00+10:00",
+        "perKwh": -11.6092,
+        "renewables": 11.079263202744725,
+        "spotPerKwh": 9.69249,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -9.10175,
+            "predicted": -10.72841,
+            "high": -14.85254
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T09:30:01Z",
+        "endTime": "2024-09-04T10:00:00Z",
+        "nemTime": "2024-09-04T20:00:00+10:00",
+        "perKwh": -10.34248,
+        "renewables": 12.01700146635084,
+        "spotPerKwh": 8.36,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -8.64389,
+            "predicted": -10.08255,
+            "high": -12.23825
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T10:00:01Z",
+        "endTime": "2024-09-04T10:30:00Z",
+        "nemTime": "2024-09-04T20:30:00+10:00",
+        "perKwh": -10.32156,
+        "renewables": 12.77707336752925,
+        "spotPerKwh": 8.338,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -8.14304,
+            "predicted": -9.58764,
+            "high": -11.48643
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T10:30:01Z",
+        "endTime": "2024-09-04T11:00:00Z",
+        "nemTime": "2024-09-04T21:00:00+10:00",
+        "perKwh": -8.83144,
+        "renewables": 13.783792356454438,
+        "spotPerKwh": 6.77051,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -7.88546,
+            "predicted": -9.16921,
+            "high": -10.9918
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T11:00:01Z",
+        "endTime": "2024-09-04T11:30:00Z",
+        "nemTime": "2024-09-04T21:30:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 15.104744945422782,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -5.33698,
+            "predicted": -6.33805,
+            "high": -8.4142
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T11:30:01Z",
+        "endTime": "2024-09-04T12:00:00Z",
+        "nemTime": "2024-09-04T22:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 16.6888479124877,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -5.31383,
+            "predicted": -6.27813,
+            "high": -8.12491
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T12:00:01Z",
+        "endTime": "2024-09-04T12:30:00Z",
+        "nemTime": "2024-09-04T22:30:00+10:00",
+        "perKwh": -6.7971,
+        "renewables": 17.293242166705053,
+        "spotPerKwh": 7.15,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -5.2217,
+            "predicted": -6.20301,
+            "high": -8.00087
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T12:30:01Z",
+        "endTime": "2024-09-04T13:00:00Z",
+        "nemTime": "2024-09-04T23:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 18.074005633513632,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -5.16641,
+            "predicted": -6.07423,
+            "high": -7.74273
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T13:00:01Z",
+        "endTime": "2024-09-04T13:30:00Z",
+        "nemTime": "2024-09-04T23:30:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 18.866277357356886,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -5.02809,
+            "predicted": -5.94113,
+            "high": -7.43336
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-04",
+        "duration": 30,
+        "startTime": "2024-09-04T13:30:01Z",
+        "endTime": "2024-09-04T14:00:00Z",
+        "nemTime": "2024-09-05T00:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 19.799768677187547,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.87634,
+            "predicted": -5.83958,
+            "high": -7.27434
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T14:00:01Z",
+        "endTime": "2024-09-04T14:30:00Z",
+        "nemTime": "2024-09-05T00:30:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 20.570945085436502,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.80639,
+            "predicted": -5.74507,
+            "high": -7.14437
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T14:30:01Z",
+        "endTime": "2024-09-04T15:00:00Z",
+        "nemTime": "2024-09-05T01:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 21.27145576406764,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.66733,
+            "predicted": -5.78255,
+            "high": -7.19458
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T15:00:01Z",
+        "endTime": "2024-09-04T15:30:00Z",
+        "nemTime": "2024-09-05T01:30:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 22.169221015883302,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.499,
+            "predicted": -5.67399,
+            "high": -7.0172
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T15:30:01Z",
+        "endTime": "2024-09-04T16:00:00Z",
+        "nemTime": "2024-09-05T02:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 22.91634380030673,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.45871,
+            "predicted": -5.74976,
+            "high": -7.33829
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T16:00:01Z",
+        "endTime": "2024-09-04T16:30:00Z",
+        "nemTime": "2024-09-05T02:30:00+10:00",
+        "perKwh": -5.96056,
+        "renewables": 23.471066917301155,
+        "spotPerKwh": 6.27003,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.50047,
+            "predicted": -5.76588,
+            "high": -7.40725
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T16:30:01Z",
+        "endTime": "2024-09-04T17:00:00Z",
+        "nemTime": "2024-09-05T03:00:00+10:00",
+        "perKwh": -5.95844,
+        "renewables": 24.198806616589668,
+        "spotPerKwh": 6.2678,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.3894,
+            "predicted": -5.74873,
+            "high": -7.44417
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T17:00:01Z",
+        "endTime": "2024-09-04T17:30:00Z",
+        "nemTime": "2024-09-05T03:30:00+10:00",
+        "perKwh": -5.95844,
+        "renewables": 24.52720042866409,
+        "spotPerKwh": 6.2678,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.1459,
+            "predicted": -5.68128,
+            "high": -7.3593
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T17:30:01Z",
+        "endTime": "2024-09-04T18:00:00Z",
+        "nemTime": "2024-09-05T04:00:00+10:00",
+        "perKwh": -5.95844,
+        "renewables": 24.82431816784555,
+        "spotPerKwh": 6.2678,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.32485,
+            "predicted": -5.65854,
+            "high": -7.14892
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T18:00:01Z",
+        "endTime": "2024-09-04T18:30:00Z",
+        "nemTime": "2024-09-05T04:30:00+10:00",
+        "perKwh": -5.94904,
+        "renewables": 24.68140505248984,
+        "spotPerKwh": 6.25791,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.04428,
+            "predicted": -5.56154,
+            "high": -7.07901
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T18:30:01Z",
+        "endTime": "2024-09-04T19:00:00Z",
+        "nemTime": "2024-09-05T05:00:00+10:00",
+        "perKwh": -5.94904,
+        "renewables": 24.015200711561956,
+        "spotPerKwh": 6.25791,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.02271,
+            "predicted": -5.56595,
+            "high": -7.13027
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T19:00:01Z",
+        "endTime": "2024-09-04T19:30:00Z",
+        "nemTime": "2024-09-05T05:30:00+10:00",
+        "perKwh": -4.7608,
+        "renewables": 23.073352879103837,
+        "spotPerKwh": 5.00798,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -4.13719,
+            "predicted": -5.69017,
+            "high": -7.23746
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T19:30:01Z",
+        "endTime": "2024-09-04T20:00:00Z",
+        "nemTime": "2024-09-05T06:00:00+10:00",
+        "perKwh": -4.27345,
+        "renewables": 22.192272431094487,
+        "spotPerKwh": 4.49532,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "advancedPrice": {
+            "low": -4.09775,
+            "predicted": -5.98571,
+            "high": -7.69614
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T20:00:01Z",
+        "endTime": "2024-09-04T20:30:00Z",
+        "nemTime": "2024-09-05T06:30:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 21.24325253520593,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -3.95837,
+            "predicted": -6.1934,
+            "high": -8.85826
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T20:30:01Z",
+        "endTime": "2024-09-04T21:00:00Z",
+        "nemTime": "2024-09-05T07:00:00+10:00",
+        "perKwh": -6.7971,
+        "renewables": 26.722580900650804,
+        "spotPerKwh": 7.15,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "advancedPrice": {
+            "low": -2.79575,
+            "predicted": -5.63309,
+            "high": -8.63005
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T21:00:01Z",
+        "endTime": "2024-09-04T21:30:00Z",
+        "nemTime": "2024-09-05T07:30:00+10:00",
+        "perKwh": 0.03214,
+        "renewables": 37.30547810502514,
+        "spotPerKwh": -0.03381,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "advancedPrice": {
+            "low": -1.30868,
+            "predicted": -4.06492,
+            "high": -6.70946
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T21:30:01Z",
+        "endTime": "2024-09-04T22:00:00Z",
+        "nemTime": "2024-09-05T08:00:00+10:00",
+        "perKwh": -1.04677,
+        "renewables": 48.66944162139281,
+        "spotPerKwh": 1.10112,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "advancedPrice": {
+            "low": -0.03152,
+            "predicted": -2.80454,
+            "high": -5.39902
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T22:00:01Z",
+        "endTime": "2024-09-04T22:30:00Z",
+        "nemTime": "2024-09-05T08:30:00+10:00",
+        "perKwh": -0.21933,
+        "renewables": 58.047820442730156,
+        "spotPerKwh": 0.23072,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "advancedPrice": {
+            "low": 0.58553,
+            "predicted": -1.96383,
+            "high": -5.04679
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T22:30:01Z",
+        "endTime": "2024-09-04T23:00:00Z",
+        "nemTime": "2024-09-05T09:00:00+10:00",
+        "perKwh": 0.78925,
+        "renewables": 65.84136719998229,
+        "spotPerKwh": -0.83023,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 1.36102,
+            "predicted": -1.24045,
+            "high": -4.97108
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T23:00:01Z",
+        "endTime": "2024-09-04T23:30:00Z",
+        "nemTime": "2024-09-05T09:30:00+10:00",
+        "perKwh": 3.63592,
+        "renewables": 69.804106472268,
+        "spotPerKwh": -3.82469,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 2.49337,
+            "predicted": -0.32293,
+            "high": -4.13797
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-04T23:30:01Z",
+        "endTime": "2024-09-05T00:00:00Z",
+        "nemTime": "2024-09-05T10:00:00+10:00",
+        "perKwh": 4.70672,
+        "renewables": 72.91697478300836,
+        "spotPerKwh": -4.95109,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 3.49951,
+            "predicted": 0.87823,
+            "high": -3.50362
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T00:00:01Z",
+        "endTime": "2024-09-05T00:30:00Z",
+        "nemTime": "2024-09-05T10:30:00+10:00",
+        "perKwh": 6.10727,
+        "renewables": 72.41427400509227,
+        "spotPerKwh": -5.159,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "advancedPrice": {
+            "low": 5.07041,
+            "predicted": 3.0088,
+            "high": -0.87701
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T00:30:01Z",
+        "endTime": "2024-09-05T01:00:00Z",
+        "nemTime": "2024-09-05T11:00:00+10:00",
+        "perKwh": 6.67766,
+        "renewables": 74.77044844074251,
+        "spotPerKwh": -5.75901,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -5.90655,
+            "max": -3.11802
+        },
+        "advancedPrice": {
+            "low": 5.25922,
+            "predicted": 3.55477,
+            "high": 0.09743
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T01:00:01Z",
+        "endTime": "2024-09-05T01:30:00Z",
+        "nemTime": "2024-09-05T11:30:00+10:00",
+        "perKwh": 6.84526,
+        "renewables": 77.17072150898981,
+        "spotPerKwh": -5.93531,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.15066,
+            "max": -4.151
+        },
+        "advancedPrice": {
+            "low": 5.27903,
+            "predicted": 3.82286,
+            "high": 1.04826
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T01:30:01Z",
+        "endTime": "2024-09-05T02:00:00Z",
+        "nemTime": "2024-09-05T12:00:00+10:00",
+        "perKwh": 6.9054,
+        "renewables": 78.24505450951023,
+        "spotPerKwh": -5.99857,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.32475,
+            "max": -4.3321
+        },
+        "advancedPrice": {
+            "low": 5.23534,
+            "predicted": 3.78191,
+            "high": 0.98146
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T02:00:01Z",
+        "endTime": "2024-09-05T02:30:00Z",
+        "nemTime": "2024-09-05T12:30:00+10:00",
+        "perKwh": 7.16866,
+        "renewables": 77.45104297555443,
+        "spotPerKwh": -6.2755,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.5,
+            "max": -4.50099
+        },
+        "advancedPrice": {
+            "low": 5.15258,
+            "predicted": 3.63402,
+            "high": 1.00419
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T02:30:01Z",
+        "endTime": "2024-09-05T03:00:00Z",
+        "nemTime": "2024-09-05T13:00:00+10:00",
+        "perKwh": 7.16866,
+        "renewables": 76.43992661703818,
+        "spotPerKwh": -6.2755,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.5,
+            "max": -4.569
+        },
+        "advancedPrice": {
+            "low": 5.02504,
+            "predicted": 3.47843,
+            "high": 0.60479
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T03:00:01Z",
+        "endTime": "2024-09-05T03:30:00Z",
+        "nemTime": "2024-09-05T13:30:00+10:00",
+        "perKwh": 6.79586,
+        "renewables": 77.2064447193986,
+        "spotPerKwh": -5.88334,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -6.5,
+            "max": -4.28468
+        },
+        "advancedPrice": {
+            "low": 4.81819,
+            "predicted": 2.96846,
+            "high": -0.3685
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T03:30:01Z",
+        "endTime": "2024-09-05T04:00:00Z",
+        "nemTime": "2024-09-05T14:00:00+10:00",
+        "perKwh": 6.7865,
+        "renewables": 73.83551336387103,
+        "spotPerKwh": -5.8735,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -5.84084,
+            "max": -3.85842
+        },
+        "advancedPrice": {
+            "low": 4.45778,
+            "predicted": 2.16448,
+            "high": -1.53102
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T04:00:01Z",
+        "endTime": "2024-09-05T04:30:00Z",
+        "nemTime": "2024-09-05T14:30:00+10:00",
+        "perKwh": 6.34748,
+        "renewables": 69.24966436186884,
+        "spotPerKwh": -5.41168,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -5.705,
+            "max": -0.95
+        },
+        "advancedPrice": {
+            "low": 3.86196,
+            "predicted": 1.22108,
+            "high": -2.97425
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T04:30:01Z",
+        "endTime": "2024-09-05T05:00:00Z",
+        "nemTime": "2024-09-05T15:00:00+10:00",
+        "perKwh": 5.90962,
+        "renewables": 68.20395239253433,
+        "spotPerKwh": -4.95109,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -4.876,
+            "max": 3.70001
+        },
+        "advancedPrice": {
+            "low": 2.81359,
+            "predicted": -0.6353,
+            "high": -4.72956
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T05:00:01Z",
+        "endTime": "2024-09-05T05:30:00Z",
+        "nemTime": "2024-09-05T15:30:00+10:00",
+        "perKwh": 4.24683,
+        "renewables": 65.70256256558002,
+        "spotPerKwh": -4.46732,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -4.70099,
+            "max": 2.69656
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T05:30:01Z",
+        "endTime": "2024-09-05T06:00:00Z",
+        "nemTime": "2024-09-05T16:00:00+10:00",
+        "perKwh": 2.08893,
+        "renewables": 58.25558813130738,
+        "spotPerKwh": -2.19739,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "extremelyLow",
+        "range": {
+            "min": -4.22446,
+            "max": 3.04126
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T06:00:01Z",
+        "endTime": "2024-09-05T06:30:00Z",
+        "nemTime": "2024-09-05T16:30:00+10:00",
+        "perKwh": -1.62122,
+        "renewables": 50.658627992093216,
+        "spotPerKwh": -0.81406,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "range": {
+            "min": -3.84925,
+            "max": 2.34618
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T06:30:01Z",
+        "endTime": "2024-09-05T07:00:00Z",
+        "nemTime": "2024-09-05T17:00:00+10:00",
+        "perKwh": -2.40777,
+        "renewables": 40.54747584736004,
+        "spotPerKwh": 0.01333,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "range": {
+            "min": -3.01074,
+            "max": 5.65056
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T07:00:01Z",
+        "endTime": "2024-09-05T07:30:00Z",
+        "nemTime": "2024-09-05T17:30:00+10:00",
+        "perKwh": -6.75671,
+        "renewables": 26.02235716457779,
+        "spotPerKwh": 4.58806,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 0.98258,
+            "max": 6.999
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T07:30:01Z",
+        "endTime": "2024-09-05T08:00:00Z",
+        "nemTime": "2024-09-05T18:00:00+10:00",
+        "perKwh": -9.71401,
+        "renewables": 16.142695761564216,
+        "spotPerKwh": 7.6989,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 5.689,
+            "max": 10.25
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T08:00:01Z",
+        "endTime": "2024-09-05T08:30:00Z",
+        "nemTime": "2024-09-05T18:30:00+10:00",
+        "perKwh": -10.82248,
+        "renewables": 15.375019522970168,
+        "spotPerKwh": 8.86492,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 6.5,
+            "max": 14.568
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T08:30:01Z",
+        "endTime": "2024-09-05T09:00:00Z",
+        "nemTime": "2024-09-05T19:00:00+10:00",
+        "perKwh": -10.82246,
+        "renewables": 15.671071620905973,
+        "spotPerKwh": 8.8649,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 6.5,
+            "max": 14.568
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T09:00:01Z",
+        "endTime": "2024-09-05T09:30:00Z",
+        "nemTime": "2024-09-05T19:30:00+10:00",
+        "perKwh": -10.41294,
+        "renewables": 16.321808361158364,
+        "spotPerKwh": 8.43412,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 5.7,
+            "max": 11.37046
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T09:30:01Z",
+        "endTime": "2024-09-05T10:00:00Z",
+        "nemTime": "2024-09-05T20:00:00+10:00",
+        "perKwh": -10.34248,
+        "renewables": 17.146884915756317,
+        "spotPerKwh": 8.36,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 5.7,
+            "max": 11.20194
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T10:00:01Z",
+        "endTime": "2024-09-05T10:30:00Z",
+        "nemTime": "2024-09-05T20:30:00+10:00",
+        "perKwh": -9.71401,
+        "renewables": 17.917361987085805,
+        "spotPerKwh": 7.6989,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 4.36998,
+            "max": 8.75
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T10:30:01Z",
+        "endTime": "2024-09-05T11:00:00Z",
+        "nemTime": "2024-09-05T21:00:00+10:00",
+        "perKwh": -8.35563,
+        "renewables": 18.749084682781106,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 4.17889,
+            "max": 7.65214
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T11:00:01Z",
+        "endTime": "2024-09-05T11:30:00Z",
+        "nemTime": "2024-09-05T21:30:00+10:00",
+        "perKwh": -4.49898,
+        "renewables": 19.691278119269928,
+        "spotPerKwh": 4.73256,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "low",
+        "range": {
+            "min": 2.29457,
+            "max": 7.60001
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T11:30:01Z",
+        "endTime": "2024-09-05T12:00:00Z",
+        "nemTime": "2024-09-05T22:00:00+10:00",
+        "perKwh": -4.66709,
+        "renewables": 20.584162882626817,
+        "spotPerKwh": 4.9094,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 1.06093,
+            "max": 7.6701
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T12:00:01Z",
+        "endTime": "2024-09-05T12:30:00Z",
+        "nemTime": "2024-09-05T22:30:00+10:00",
+        "perKwh": -6.7971,
+        "renewables": 21.36640805824368,
+        "spotPerKwh": 7.15,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 5.7,
+            "max": 9.35772
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T12:30:01Z",
+        "endTime": "2024-09-05T13:00:00Z",
+        "nemTime": "2024-09-05T23:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 22.17223015044128,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 5.698,
+            "max": 7.672
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T13:00:01Z",
+        "endTime": "2024-09-05T13:30:00Z",
+        "nemTime": "2024-09-05T23:30:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 22.911290344327323,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 4.77325,
+            "max": 7.672
+        }
+    },
+    {
+        "type": "ForecastInterval",
+        "date": "2024-09-05",
+        "duration": 30,
+        "startTime": "2024-09-05T13:30:01Z",
+        "endTime": "2024-09-05T14:00:00Z",
+        "nemTime": "2024-09-06T00:00:00+10:00",
+        "perKwh": -5.96053,
+        "renewables": 23.673752127075566,
+        "spotPerKwh": 6.27,
+        "channelType": "feedIn",
+        "spikeStatus": "none",
+        "descriptor": "high",
+        "range": {
+            "min": 4.59729,
+            "max": 7.58
+        }
+    }
+]
