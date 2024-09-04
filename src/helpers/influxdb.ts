@@ -5,8 +5,8 @@ import type {
 } from '../sep2/helpers/controlScheduler';
 import type { FallbackControl } from '../sep2/helpers/derControls';
 import { numberWithPow10 } from './number';
-import type { SiteMonitoringSample } from '../coordinator/helpers/siteMonitoring';
-import type { DerMonitoringSample } from '../coordinator/helpers/derMonitoring';
+import type { SiteMonitoringSample } from '../coordinator/helpers/siteMonitoringSample';
+import type { DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample';
 import type { InverterControlLimit } from '../coordinator/helpers/inverterController';
 
 const influxDB = new InfluxDB({

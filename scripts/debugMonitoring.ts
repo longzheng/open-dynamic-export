@@ -2,11 +2,11 @@ import 'dotenv/config';
 import { getConfig } from '../src/helpers/config';
 import {
     getSunSpecInvertersConnections,
-    getSunSpecMetersConnections,
+    getSunSpecMeterConnection,
 } from '../src/sunspec/connections';
 import { logger } from '../src/helpers/logger';
-import { generateDerMonitoringSample } from '../src/coordinator/helpers/derMonitoring';
-import { generateSiteMonitoringSample } from '../src/coordinator/helpers/siteMonitoring';
+import { generateDerMonitoringSample } from '../src/sunspec/sunspecInverterPoller';
+import { generateSiteMonitoringSample } from '../src/sunspec/sunspecMeterPoller';
 
 // This debugging script continously outputs SEP2 monitoring samples
 // It reads SunSpec data, transforms it into monitoring sample, and logs to console
@@ -16,7 +16,7 @@ const config = getConfig();
 
 const invertersConnections = getSunSpecInvertersConnections(config);
 
-const metersConnections = getSunSpecMetersConnections(config);
+const meterConnection = getSunSpecMeterConnection(config);
 
 async function poll() {
     try {
@@ -26,24 +26,19 @@ async function poll() {
             }),
         );
 
-        const metersData = await Promise.all(
-            metersConnections.map(async (meter) => {
-                return await meter.getMeterModel();
-            }),
-        );
-
         const derMonitoringSample = generateDerMonitoringSample({
             inverters: invertersData,
         });
 
+        logger.info({ derMonitoringSample }, 'DER monitoring sample');
+
+        const metersData = await meterConnection.getMeterModel();
+
         const siteMonitoringSample = generateSiteMonitoringSample({
-            meters: metersData,
+            meter: metersData,
         });
 
-        logger.info(
-            { derMonitoringSample, siteMonitoringSample },
-            'calculated monitoring sample',
-        );
+        logger.info({ siteMonitoringSample }, 'site monitoring sample');
     } catch (error) {
         logger.error({ error }, 'Failed to get monitoring sample');
     } finally {

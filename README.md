@@ -12,7 +12,7 @@ This project aims to implement dynamic export control/solar curtailment of inver
 flowchart LR
     ODE(("open-dynamic-export"))
     I["Inverter(s)"]
-    M["Meter(s)"]
+    M["Site meter"]
 
     CSIP-AUS --> DC
     DC & F & T & NFI --> ODE
@@ -32,18 +32,19 @@ flowchart LR
     subgraph Protocols
     SunSpec
     HTTP
+    MQTT
     Proprietary
     end
 ```
 
-## Supported inverters and meters
+## Supported inverters and site meter
 
 Inverters:
 - One or more SunSpec Modbus TCP compatible solar inverter(s)
   - Tested with Fronius Primo and Fronius Symo
 
-Meters:
-- One or more SunSpec Modbus TCP compatible smart meter(s) 
+Site meter:
+- SunSpec Modbus TCP compatible smart meter 
   - Tested with Fronius Smart Meter and Catch Power Relay
 - Tesla Powerwall (coming soon)
 
@@ -69,14 +70,12 @@ To configure the inverter and meter connections, add the following property to `
         }
     ],
     "inverterControl": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
-    "meters": [ // (array) optional: list of meters
-        {
-            "type": "sunspec", // ('sunspec') required: the type of meter
-            "ip": "192.168.1.6", // (string) required: the IP address of the meter
-            "port": 502, // (number) required: the SunSpec Modbus TCP port of the meter
-            "unitId": 240 // (number) required: the SunSpec unit ID of the meter
-        }
-    ]
+    "meter": {
+        "type": "sunspec", // ('sunspec') required: the type of meter
+        "ip": "192.168.1.6", // (string) required: the IP address of the meter
+        "port": 502, // (number) required: the SunSpec Modbus TCP port of the meter
+        "unitId": 240 // (number) required: the SunSpec unit ID of the meter
+    }
     ...
 }
 ```
