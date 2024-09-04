@@ -17,6 +17,7 @@ import { FixedLimiter } from '../limiters/fixed';
 import { AmberLimiter } from '../limiters/negativeFeedIn/amber';
 import { SunSpecMeterPoller } from '../sunspec/sunspecMeterPoller';
 import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029';
+import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -55,6 +56,9 @@ const limiters = [
         : null,
     config.limiters.twoWayTariff?.type === 'ausgridEA029'
         ? new AusgridEA029Limiter()
+        : null,
+    config.limiters.twoWayTariff?.type === 'sapnRELE2W'
+        ? new SapnRELE2WLimiter()
         : null,
 ].filter((controlLimit) => !!controlLimit);
 

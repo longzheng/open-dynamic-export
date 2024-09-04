@@ -75,7 +75,9 @@ export const configSchema = z.object({
                     z.object({
                         type: z.literal('ausgridEA029'),
                     }),
-                    z.never(), // TODO
+                    z.object({
+                        type: z.literal('sapnRELE2W'),
+                    }),
                 ])
                 .optional()
                 .describe('If defined, limit by two-way tariff'),

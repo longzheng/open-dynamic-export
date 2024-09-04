@@ -145,6 +145,18 @@ For Ausgrid EA029 tariff:
 }
 ```
 
+For SAPN RELE2W tariff:
+```js
+{
+    "limiters": {
+        "twoWayTariff": {
+            "type": "sapnRELE2W"
+        }
+    }
+    ...
+}
+```
+
 #### CSIP-AUS
 
 > [!IMPORTANT]
