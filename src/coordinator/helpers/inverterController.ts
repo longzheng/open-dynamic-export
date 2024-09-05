@@ -90,13 +90,13 @@ export class InverterController {
         this.inverterConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
         this.limiters = limiters;
+
+        void this.startLoop();
     }
 
     updateSunSpecInverterData(data: SunSpecInverterData) {
         this.logger.debug('Received inverter data, updating inverter controls');
         this.cachedSunSpecData = data;
-
-        void this.updateInverterControlValues();
     }
 
     updateSiteMonitoringSample(siteMonitoringSample: SiteMonitoringSample) {
@@ -104,8 +104,6 @@ export class InverterController {
             'Received site monitoring sample, updating inverter controls',
         );
         this.cachedSiteMonitoringSample = siteMonitoringSample;
-
-        void this.updateInverterControlValues();
     }
 
     private getActiveInverterControlLimit(): InverterControlLimit {
@@ -114,6 +112,29 @@ export class InverterController {
         );
 
         return getAggregatedInverterControlLimit(controlLimits);
+    }
+
+    private async startLoop() {
+        const start = performance.now();
+
+        try {
+            await this.updateInverterControlValues();
+        } catch (error) {
+            this.logger.error(
+                { error },
+                'Failed to push inverter control values',
+            );
+        } finally {
+            const end = performance.now();
+            const duration = end - start;
+
+            // update the inverter at most every 1 second
+            const delay = Math.max(1000 - duration, 0);
+
+            setTimeout(() => {
+                void this.startLoop();
+            }, delay);
+        }
     }
 
     private async updateInverterControlValues() {
