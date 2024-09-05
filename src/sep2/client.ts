@@ -48,7 +48,11 @@ export class SEP2Client {
             httpsAgent: new https.Agent({
                 cert,
                 key,
-                rejectUnauthorized: false,
+                // the device certificate will have the full chain
+                ca: cert,
+                // the IEEE2023.5 certifiate does not have the host name as the certificate altnames
+                // bypass the server identity check
+                checkServerIdentity: () => undefined,
             }),
         });
 
