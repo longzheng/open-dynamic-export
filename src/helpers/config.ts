@@ -81,6 +81,23 @@ export const configSchema = z.object({
                 ])
                 .optional()
                 .describe('If defined, limit by two-way tariff'),
+            mqtt: z
+                .object({
+                    host: z.string().describe('The host of the MQTT broker'),
+                    username: z
+                        .string()
+                        .optional()
+                        .describe('The username for the MQTT broker'),
+                    password: z
+                        .string()
+                        .optional()
+                        .describe('The password for the MQTT broker'),
+                    topic: z
+                        .string()
+                        .describe('The topic to publish control limits to'),
+                })
+                .optional()
+                .describe('If defined, limit by MQTT'),
         })
         .describe('Limiters configuration'),
     inverters: z
