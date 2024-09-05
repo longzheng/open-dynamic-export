@@ -40,13 +40,17 @@ flowchart LR
 ## Supported inverters and site meter
 
 Inverters:
-- One or more SunSpec Modbus TCP compatible solar inverter(s)
-  - Tested with Fronius Primo and Fronius Symo
+
+| Name    | `config.json` type | Description                                                                                      | Validated models               |
+|---------|--------------------|--------------------------------------------------------------------------------------------------|--------------------------------|
+| SunSpec | `sunspec`          | SunSpec Modbus TCP compatible inverter<br>Must support models 1, 101/102/103, 120, 121, 122, 123 | Fronius Primo<br>Fronius Primo |
 
 Site meter:
-- SunSpec Modbus TCP compatible smart meter 
-  - Tested with Fronius Smart Meter and Catch Power Relay
-- Tesla Powerwall (coming soon)
+
+| Name              | `config.json` type | Description                                                                     | Validated models                                                                |
+|-------------------|--------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| SunSpec           | `sunspec`          | SunSpec Modbus TCP compatible smart meter<br>Must support models 1, 201/202/203 | Fronius Smart Meter 1 phase<br>Fronius Smart Meter 3 phase<br>Catch Power Relay |
+| Tesla Powerwall 2 | `powerwall2`       |                                                                                 | Backup Gateway 2                                                                |
 
 > [!IMPORTANT]
 > The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
@@ -63,7 +67,7 @@ To configure the inverter and meter connections, add the following property to `
 {
     "inverters": [ // (array) required: list of inverters
         {
-            "type": "sunspec", // ('sunspec') required: the type of inverter
+            "type": "sunspec", // (string) required: the type of inverter
             "ip": "192.168.1.6", // (string) required: the IP address of the inverter
             "port": 502, // (number) required: the Modbus TCP port of the inverter
             "unitId": 1 // (number) required: the Modbus unit ID of the inverter
@@ -71,7 +75,7 @@ To configure the inverter and meter connections, add the following property to `
     ],
     "inverterControl": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
     "meter": {
-        "type": "sunspec", // ('sunspec') required: the type of meter
+        "type": "sunspec", // (string) required: the type of meter
         "ip": "192.168.1.6", // (string) required: the IP address of the meter
         "port": 502, // (number) required: the SunSpec Modbus TCP port of the meter
         "unitId": 240 // (number) required: the SunSpec unit ID of the meter
