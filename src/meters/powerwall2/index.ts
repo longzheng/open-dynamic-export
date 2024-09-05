@@ -17,6 +17,8 @@ export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
             ip,
             password,
         });
+
+        void this.startPolling();
     }
 
     override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData> {

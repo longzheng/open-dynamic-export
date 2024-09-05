@@ -17,7 +17,7 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
 
         this.meterConnection = meterConnection;
 
-        void this.run();
+        void this.startPolling();
     }
 
     override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData> {

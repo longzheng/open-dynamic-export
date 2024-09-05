@@ -31,13 +31,11 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
             module: 'SiteMonitoringPollerBase',
             meterName,
         });
-
-        void this.run();
     }
 
     abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData>;
 
-    async run() {
+    protected async startPolling() {
         const start = performance.now();
         const now = new Date();
 
@@ -74,7 +72,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
             const delay = Math.max(this.pollingIntervalMs - duration, 0);
 
             setTimeout(() => {
-                void this.run();
+                void this.startPolling();
             }, delay);
         }
     }
