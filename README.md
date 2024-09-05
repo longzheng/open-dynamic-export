@@ -41,13 +41,13 @@ flowchart LR
 
 Inverters:
 
-| Name    | `config.json` type | Description                                                                                      | Validated models               |
+| Name    | `config.json` inverter type | Description                                                                                      | Tested models               |
 |---------|--------------------|--------------------------------------------------------------------------------------------------|--------------------------------|
-| SunSpec | `sunspec`          | SunSpec Modbus TCP compatible inverter<br>Must support models 1, 101/102/103, 120, 121, 122, 123 | Fronius Primo<br>Fronius Primo |
+| SunSpec | `sunspec`          | SunSpec Modbus TCP compatible inverter<br>Must support models 1, 101/102/103, 120, 121, 122, 123 | Fronius Primo<br>Fronius Symo |
 
 Site meter:
 
-| Name              | `config.json` type | Description                                                                     | Validated models                                                                |
+| Name              | `config.json` meter type | Description                                                                     | Tested models                                                                |
 |-------------------|--------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | SunSpec           | `sunspec`          | SunSpec Modbus TCP compatible smart meter<br>Must support models 1, 201/202/203 | Fronius Smart Meter 1 phase<br>Fronius Smart Meter 3 phase<br>Catch Power Relay |
 | Tesla Powerwall 2 | `powerwall2`       |                                                                                 | Backup Gateway 2                                                                |
