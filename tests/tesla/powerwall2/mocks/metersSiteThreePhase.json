@@ -1,0 +1,56 @@
+[
+    {
+      "id": 0,
+      "location": "test_site",
+      "type": "synchrometerY",
+      "cts": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "inverted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "connection": {
+        "short_id": "1234567-89-A--CN987654G4J01D",
+        "device_serial": "XYZ12345Y4F02BsynchrometerY",
+        "https_conf": {}
+      },
+      "enable_grid_event_logging": true,
+      "Cached_readings": {
+        "last_communication_time": "2023-08-01T10:39:31.525067+10:00",
+        "instant_power": -100,
+        "instant_reactive_power": -1700,
+        "instant_apparent_power": 1701.57,
+        "frequency": 50.0,
+        "energy_exported": 20000000.0,
+        "energy_imported": 14000000.0,
+        "instant_average_voltage": 405.0,
+        "instant_average_current": 9.0,
+        "i_a_current": 4.1,
+        "i_b_current": 2.3,
+        "i_c_current": 2.7,
+        "last_phase_voltage_communication_time": "2023-08-01T10:39:31.545075+10:00",
+        "v_l1n": 235.0,
+        "v_l2n": 233.0,
+        "v_l3n": 234.5,
+        "last_phase_power_communication_time": "2023-08-01T10:39:31.525067+10:00",
+        "real_power_a": 400,
+        "real_power_b": -270,
+        "real_power_c": -230,
+        "reactive_power_a": -770,
+        "reactive_power_b": -440,
+        "reactive_power_c": -570,
+        "last_phase_energy_communication_time": "0001-01-01T00:00:00Z",
+        "serial_number": "XYZ12345Y4F02B",
+        "version": "ab1234567890cd",
+        "timeout": 1500000000,
+        "instant_total_current": 9.0
+      }
+    }
+  ]
+  

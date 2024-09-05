@@ -13,7 +13,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         },
     ];
 }> {
-    private logger: Logger;
+    protected logger: Logger;
     private pollingIntervalMs;
 
     constructor({

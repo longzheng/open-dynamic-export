@@ -14,7 +14,10 @@ export function getSiteMonitoringPollerInstance(
             return new SunSpecMeterPoller({ meterConnection });
         }
         case 'powerwall2': {
-            return new Powerwall2SiteMonitoringPoller();
+            return new Powerwall2SiteMonitoringPoller({
+                ip: config.meter.ip,
+                password: config.meter.password,
+            });
         }
     }
 }
