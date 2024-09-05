@@ -1,12 +1,16 @@
 import type { ControlsModelWrite } from '../models/controls';
 import { controlsModel } from '../models/controls';
 import { inverterModel } from '../models/inverter';
+import type { NameplateModel } from '../models/nameplate';
 import { nameplateModel } from '../models/nameplate';
 import { settingsModel } from '../models/settings';
 import { statusModel } from '../models/status';
 import { SunSpecConnection } from './base';
 
 export class InverterSunSpecConnection extends SunSpecConnection {
+    // the nameplate model should never change so we can cache it
+    private nameplateModelCache: NameplateModel | null = null;
+
     async getInverterModel() {
         const modelAddressById = await this.getModelAddressById();
 
@@ -32,6 +36,10 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async getNameplateModel() {
+        if (this.nameplateModelCache) {
+            return this.nameplateModelCache;
+        }
+
         const modelAddressById = await this.getModelAddressById();
 
         const address = modelAddressById.get(120);
@@ -48,6 +56,8 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         if (data.ID !== 120) {
             throw new Error('Not a SunSpec nameplate model');
         }
+
+        this.nameplateModelCache = data;
 
         return data;
     }
