@@ -205,7 +205,8 @@
                 "ip",
                 "password"
               ],
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "Powerwall 2 meter configuration"
             }
           ]
         }
