@@ -14,12 +14,10 @@
         }
     ],
     "inverterControl": true,
-    "meters": [
-        {
-            "type": "sunspec",
-            "ip": "192.168.1.6",
-            "port": 502,
-            "unitId": 240
-        }
-    ]
+    "meter": {
+        "type": "sunspec",
+        "ip": "192.168.1.6",
+        "port": 502,
+        "unitId": 240
+    }
 }

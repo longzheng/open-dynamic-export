@@ -101,18 +101,20 @@ export const configSchema = z.object({
                 ...sunspecModbusSchema,
             })
             .describe('SunSpec meter configuration'),
-        z.object({
-            type: z.literal('powerwall2'),
-            ip: z
-                .string()
-                .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
-                .describe('The IP address of the Powerwall 2 gateway'),
-            password: z
-                .string()
-                .describe(
-                    'The customer password of the Powerwall 2 gateway. By default, this is the last 5 characters of the password sticker inside the gateway.',
-                ),
-        }),
+        z
+            .object({
+                type: z.literal('powerwall2'),
+                ip: z
+                    .string()
+                    .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
+                    .describe('The IP address of the Powerwall 2 gateway'),
+                password: z
+                    .string()
+                    .describe(
+                        'The customer password of the Powerwall 2 gateway. By default, this is the last 5 characters of the password sticker inside the gateway.',
+                    ),
+            })
+            .describe('Powerwall 2 meter configuration'),
     ]),
 });
 
