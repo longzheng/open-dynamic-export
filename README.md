@@ -240,7 +240,7 @@ The initial plan is to implement a direct gateway client that interacts directly
   - [x] SunSpec Modbus TCP
 - [x] Meter integration
   - [x] SunSpec Modbus TCP
-  - [ ] Tesla Powerwall
+  - [x] Tesla Powerwall
 - [x] CSIP-AUS/SEP2/IEEE 2030.5 client
   - [x] Discovery and scheduled entity polling
   - [x] DER status/capability/settings reporting
