@@ -15,6 +15,7 @@ import { AmberLimiter } from '../limiters/negativeFeedIn/amber';
 import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029';
 import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W';
 import { getSiteMonitoringPollerInstance } from './helpers/siteMonitoring';
+import { MqttLimiter } from '../limiters/mqtt';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -52,6 +53,9 @@ const limiters = [
         : null,
     config.limiters.twoWayTariff?.type === 'sapnRELE2W'
         ? new SapnRELE2WLimiter()
+        : null,
+    config.limiters.mqtt
+        ? new MqttLimiter({ config: config.limiters.mqtt })
         : null,
 ].filter((controlLimit) => !!controlLimit);
 

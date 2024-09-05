@@ -109,6 +109,33 @@
                 }
               ],
               "description": "If defined, limit by two-way tariff"
+            },
+            "mqtt": {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "The host of the MQTT broker"
+                },
+                "username": {
+                  "type": "string",
+                  "description": "The username for the MQTT broker"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password for the MQTT broker"
+                },
+                "topic": {
+                  "type": "string",
+                  "description": "The topic to publish control limits to"
+                }
+              },
+              "required": [
+                "host",
+                "topic"
+              ],
+              "additionalProperties": false,
+              "description": "If defined, limit by MQTT"
             }
           },
           "additionalProperties": false,
