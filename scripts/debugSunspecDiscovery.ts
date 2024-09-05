@@ -15,8 +15,6 @@ const config = getConfig();
 void (async () => {
     const invertersConnections = getSunSpecInvertersConnections(config);
 
-    const meterConnection = getSunSpecMeterConnection(config);
-
     for (const inverterConnection of invertersConnections) {
         const inverterLogger = logger.child({
             ip: inverterConnection.ip,
@@ -52,36 +50,40 @@ void (async () => {
         }
     }
 
-    const meterLogger = logger.child({
-        ip: meterConnection.ip,
-        port: meterConnection.port,
-        unitId: meterConnection.unitId,
-    });
+    if (config.meter.type === 'sunspec') {
+        const meterConnection = getSunSpecMeterConnection(config.meter);
 
-    let currentAddress = 40002;
+        const meterLogger = logger.child({
+            ip: meterConnection.ip,
+            port: meterConnection.port,
+            unitId: meterConnection.unitId,
+        });
 
-    for (;;) {
-        await meterConnection.connect();
+        let currentAddress = 40002;
 
-        const response = await meterConnection.client.readHoldingRegisters(
-            currentAddress,
-            2,
-        );
-        const modelId = response.data[0]!;
-        const modelLength = response.data[1]!;
+        for (;;) {
+            await meterConnection.connect();
 
-        if (modelId === 0xffff && modelLength === 0) {
-            meterLogger.info('End of model list');
-            break;
+            const response = await meterConnection.client.readHoldingRegisters(
+                currentAddress,
+                2,
+            );
+            const modelId = response.data[0]!;
+            const modelLength = response.data[1]!;
+
+            if (modelId === 0xffff && modelLength === 0) {
+                meterLogger.info('End of model list');
+                break;
+            }
+
+            meterLogger.info(
+                { modelId, currentAddress, modelLength },
+                `Found meter model`,
+            );
+
+            // Move to the next model's address
+            currentAddress += modelLength + 2; // +2 accounts for model ID and length fields
         }
-
-        meterLogger.info(
-            { modelId, currentAddress, modelLength },
-            `Found meter model`,
-        );
-
-        // Move to the next model's address
-        currentAddress += modelLength + 2; // +2 accounts for model ID and length fields
     }
 
     process.exit();

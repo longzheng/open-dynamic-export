@@ -1,49 +1,26 @@
 import 'dotenv/config';
 import { getConfig } from '../src/helpers/config';
-import {
-    getSunSpecInvertersConnections,
-    getSunSpecMeterConnection,
-} from '../src/sunspec/connections';
+import { getSunSpecInvertersConnections } from '../src/sunspec/connections';
 import { logger } from '../src/helpers/logger';
-import { generateDerMonitoringSample } from '../src/sunspec/sunspecInverterPoller';
-import { generateSiteMonitoringSample } from '../src/sunspec/sunspecMeterPoller';
+import { SunSpecInverterPoller } from '../src/sunspec/sunspecInverterPoller';
+import { getSiteMonitoringPollerInstance } from '../src/coordinator/helpers/siteMonitoring';
 
-// This debugging script continously outputs SEP2 monitoring samples
-// It reads SunSpec data, transforms it into monitoring sample, and logs to console
-// It polls the inverters and smart meters every 100ms (after the previous poll)
+// This debugging script continously outputs DER and site monitoring samples
 
 const config = getConfig();
 
 const invertersConnections = getSunSpecInvertersConnections(config);
 
-const meterConnection = getSunSpecMeterConnection(config);
+const siteMonitoringPoller = getSiteMonitoringPollerInstance(config);
 
-async function poll() {
-    try {
-        const invertersData = await Promise.all(
-            invertersConnections.map(async (inverter) => {
-                return await inverter.getInverterModel();
-            }),
-        );
+const sunSpecInverterPoller = new SunSpecInverterPoller({
+    invertersConnections,
+});
 
-        const derMonitoringSample = generateDerMonitoringSample({
-            inverters: invertersData,
-        });
+sunSpecInverterPoller.on('data', ({ derMonitoringSample }) => {
+    logger.info({ derMonitoringSample }, 'DER monitoring sample');
+});
 
-        logger.info({ derMonitoringSample }, 'DER monitoring sample');
-
-        const metersData = await meterConnection.getMeterModel();
-
-        const siteMonitoringSample = generateSiteMonitoringSample({
-            meter: metersData,
-        });
-
-        logger.info({ siteMonitoringSample }, 'site monitoring sample');
-    } catch (error) {
-        logger.error({ error }, 'Failed to get monitoring sample');
-    } finally {
-        void poll();
-    }
-}
-
-void poll();
+siteMonitoringPoller.on('data', ({ siteMonitoringSample }) => {
+    logger.info({ siteMonitoringSample }, 'site monitoring sample');
+});

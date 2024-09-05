@@ -1,9 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../helpers/config';
-import {
-    getSunSpecInvertersConnections,
-    getSunSpecMeterConnection,
-} from '../sunspec/connections';
+import { getSunSpecInvertersConnections } from '../sunspec/connections';
 import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller';
 import { logger as pinoLogger } from '../helpers/logger';
 import { InverterController } from './helpers/inverterController';
@@ -15,9 +12,9 @@ import {
 import { getSep2Limiter } from '../sep2';
 import { FixedLimiter } from '../limiters/fixed';
 import { AmberLimiter } from '../limiters/negativeFeedIn/amber';
-import { SunSpecMeterPoller } from '../sunspec/sunspecMeterPoller';
 import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029';
 import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W';
+import { getSiteMonitoringPollerInstance } from './helpers/siteMonitoring';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -25,14 +22,10 @@ const config = getConfig();
 
 const invertersConnections = getSunSpecInvertersConnections(config);
 
-const meterConnection = getSunSpecMeterConnection(config);
+const siteMonitoringPoller = getSiteMonitoringPollerInstance(config);
 
 const sunSpecInverterPoller = new SunSpecInverterPoller({
     invertersConnections,
-});
-
-const sunSpecMeterPoller = new SunSpecMeterPoller({
-    meterConnection,
 });
 
 const rampRateHelper = new RampRateHelper();
@@ -83,7 +76,7 @@ sunSpecInverterPoller.on('data', ({ invertersData, derMonitoringSample }) => {
     });
 });
 
-sunSpecMeterPoller.on('data', ({ siteMonitoringSample }) => {
+siteMonitoringPoller.on('data', ({ siteMonitoringSample }) => {
     writeSiteMonitoringSamplePoints(siteMonitoringSample);
 
     sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(

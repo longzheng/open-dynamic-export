@@ -9,13 +9,12 @@ export function getSunSpecInvertersConnections(config: Config) {
     );
 }
 
-export function getSunSpecMeterConnection(config: Config) {
-    switch (config.meter.type) {
-        case 'sunspec':
-            return new MeterSunSpecConnection({
-                ip: config.meter.ip,
-                port: config.meter.port,
-                unitId: config.meter.unitId,
-            });
-    }
+export function getSunSpecMeterConnection(
+    meterConfig: Extract<Config['meter'], { type: 'sunspec' }>,
+) {
+    return new MeterSunSpecConnection({
+        ip: meterConfig.ip,
+        port: meterConfig.port,
+        unitId: meterConfig.unitId,
+    });
 }

@@ -1,7 +1,10 @@
 import type { Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger';
 import EventEmitter from 'node:events';
-import type { SiteMonitoringSample } from './siteMonitoringSample';
+import type {
+    SiteMonitoringSample,
+    SiteMonitoringSampleData,
+} from './siteMonitoringSample';
 
 export abstract class SiteMonitoringPollerBase extends EventEmitter<{
     data: [
@@ -10,7 +13,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         },
     ];
 }> {
-    private logger: Logger;
+    protected logger: Logger;
     private pollingIntervalMs;
 
     constructor({
@@ -28,15 +31,11 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
             module: 'SiteMonitoringPollerBase',
             meterName,
         });
-
-        void this.run();
     }
 
-    abstract getSiteMonitoringSample(): Promise<
-        Omit<SiteMonitoringSample, 'date'>
-    >;
+    abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData>;
 
-    async run() {
+    protected async startPolling() {
         const start = performance.now();
         const now = new Date();
 
@@ -45,7 +44,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
 
             const siteMonitoringSample = {
                 date: now,
-                ...(await this.getSiteMonitoringSample()),
+                ...(await this.getSiteMonitoringSampleData()),
             };
 
             this.logger.trace(
@@ -73,7 +72,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
             const delay = Math.max(this.pollingIntervalMs - duration, 0);
 
             setTimeout(() => {
-                void this.run();
+                void this.startPolling();
             }, delay);
         }
     }

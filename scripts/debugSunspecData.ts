@@ -31,9 +31,6 @@ const config = getConfig();
 
 void (async () => {
     const invertersConnections = getSunSpecInvertersConnections(config);
-
-    const meterConnection = getSunSpecMeterConnection(config);
-
     const invertersData = await Promise.all(
         invertersConnections.map(async (inverter) => {
             return {
@@ -47,38 +44,50 @@ void (async () => {
         }),
     );
 
-    const meterData = {
-        common: await meterConnection.getCommonModel(),
-        meter: await meterConnection.getMeterModel(),
-    };
+    logger.info(
+        {
+            invertersData,
+            inverterMetrics: invertersData.map((inverterData) => ({
+                inverter: getInverterMetrics(inverterData.inverter),
+                nameplate: getNameplateMetrics(inverterData.nameplate),
+                settings: getSettingsMetrics(inverterData.settings),
+                status: getStatusMetrics(inverterData.status),
+            })),
+            aggregatedMetrics: {
+                inveter: getAggregatedInverterMetrics(
+                    invertersData.map((inverterData) => inverterData.inverter),
+                ),
+                nameplate: getAggregatedNameplateMetrics(
+                    invertersData.map((inverterData) => inverterData.nameplate),
+                ),
+                settings: getAggregatedSettingsMetrics(
+                    invertersData.map((inverterData) => inverterData.settings),
+                ),
+                status: getAggregatedStatusMetrics(
+                    invertersData.map((inverterData) => inverterData.status),
+                ),
+            },
+        },
+        'inverter data',
+    );
 
-    logger.info({
-        invertersData,
-        metersData: meterData,
-        inverterMetrics: invertersData.map((inverterData) => ({
-            inverter: getInverterMetrics(inverterData.inverter),
-            nameplate: getNameplateMetrics(inverterData.nameplate),
-            settings: getSettingsMetrics(inverterData.settings),
-            status: getStatusMetrics(inverterData.status),
-        })),
-        meterMetrics: {
-            meter: getMeterMetrics(meterData.meter),
-        },
-        aggregatedMetrics: {
-            inveter: getAggregatedInverterMetrics(
-                invertersData.map((inverterData) => inverterData.inverter),
-            ),
-            nameplate: getAggregatedNameplateMetrics(
-                invertersData.map((inverterData) => inverterData.nameplate),
-            ),
-            settings: getAggregatedSettingsMetrics(
-                invertersData.map((inverterData) => inverterData.settings),
-            ),
-            status: getAggregatedStatusMetrics(
-                invertersData.map((inverterData) => inverterData.status),
-            ),
-        },
-    });
+    if (config.meter.type === 'sunspec') {
+        const meterConnection = getSunSpecMeterConnection(config.meter);
+        const meterData = {
+            common: await meterConnection.getCommonModel(),
+            meter: await meterConnection.getMeterModel(),
+        };
+
+        logger.info(
+            {
+                metersData: meterData,
+                meterMetrics: {
+                    meter: getMeterMetrics(meterData.meter),
+                },
+            },
+            'meter data',
+        );
+    }
 
     process.exit();
 })();

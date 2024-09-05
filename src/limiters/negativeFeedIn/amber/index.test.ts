@@ -16,7 +16,7 @@ import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json';
 describe('AmberLimiter', () => {
     const mockRestHandlers = [
         http.get('https://api.amber.com.au/v1/sites/*/prices/current', () => {
-            return HttpResponse.json(sitePricesJson as unknown as JSON);
+            return HttpResponse.json(sitePricesJson);
         }),
     ];
 
