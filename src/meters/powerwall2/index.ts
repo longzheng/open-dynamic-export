@@ -20,7 +20,7 @@ export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
     }
 
     override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData> {
-        const metersSiteData = await this.client.getmetersSite();
+        const metersSiteData = await this.client.getMetersSite();
 
         this.logger.trace({ metersSiteData }, 'received data');
 

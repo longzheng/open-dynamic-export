@@ -69,7 +69,7 @@ describe('Powerwall2Client', () => {
     });
 
     it('can get meter site for three phase', async () => {
-        const result = await power2Client.getmetersSite();
+        const result = await power2Client.getMetersSite();
 
         expect(result[0]?.Cached_readings.reactive_power_a).toBe(-770);
         expect(result[0]?.Cached_readings.reactive_power_b).toBe(-440);
@@ -82,7 +82,7 @@ describe('Powerwall2Client', () => {
             }),
         );
 
-        const result = await power2Client.getmetersSite();
+        const result = await power2Client.getMetersSite();
 
         expect(result[0]?.Cached_readings.reactive_power_a).toBe(-600);
         expect(result[0]?.Cached_readings.reactive_power_b).toBe(undefined);

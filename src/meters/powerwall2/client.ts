@@ -51,7 +51,7 @@ export class Powerwall2Client {
         return data;
     }
 
-    public async getmetersSite() {
+    public async getMetersSite() {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const response = await this.get('/api/meters/site');
 
