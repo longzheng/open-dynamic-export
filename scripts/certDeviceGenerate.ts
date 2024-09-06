@@ -1,4 +1,4 @@
-import { generateDeviceCertificate } from '../src/helpers/cert';
+import { generateDeviceCertificate } from '../src/sep2/helpers/cert';
 import { env } from '../src/helpers/env';
 
 generateDeviceCertificate({

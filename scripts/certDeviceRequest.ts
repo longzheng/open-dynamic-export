@@ -1,4 +1,4 @@
-import { generateCertRequestAndKey } from '../src/helpers/cert';
+import { generateCertRequestAndKey } from '../src/sep2/helpers/cert';
 
 generateCertRequestAndKey({
     csrPath: './config/cert_req.csr',

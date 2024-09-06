@@ -2,7 +2,7 @@ import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios, { AxiosError } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
-import { getCertificateLfdi } from '../helpers/cert';
+import { getCertificateLfdi } from './helpers/cert';
 import type { Config } from '../helpers/config';
 import type { RoleFlagsType } from './models/roleFlagsType';
 import { numberToHex } from '../helpers/number';

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { getCertificateLfdi } from '../src/helpers/cert';
+import { getCertificateLfdi } from '../src/sep2/helpers/cert';
 import { getConfig } from '../src/helpers/config';
 import { getSep2Certificate } from '../src/helpers/sep2Cert';
 
