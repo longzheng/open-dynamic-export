@@ -15,11 +15,11 @@ flowchart LR
     M["Site meter"]
 
     CSIP-AUS --> DC
-    DC & F & T & NFI --> ODE
+    DC & F & T & NFI & MQTTL --> ODE
     Configuration --> F
     A["Amber API"] --> NFI
     R["Tariff rules"] --> T
-    ODE <--> SunSpec & HTTP & Proprietary
+    ODE <--> SunSpec & HTTP & Proprietary & MQTT
     Protocols <--> I & M
 
     subgraph Limiters
@@ -27,6 +27,7 @@ flowchart LR
     F["Fixed/zero export"]
     T["Two-way tariffs"]
     NFI["Negative feed-in"]
+    MQTTL["MQTT"]
     end
 
     subgraph Protocols
@@ -41,9 +42,9 @@ flowchart LR
 
 Inverters:
 
-| Name    | `config.json` inverter type | Description                                                                                      | Tested models               |
-|---------|--------------------|--------------------------------------------------------------------------------------------------|--------------------------------|
-| SunSpec | `sunspec`          | SunSpec Modbus TCP compatible inverter<br>Must support models 1, 101/102/103, 120, 121, 122, 123 | Fronius Primo<br>Fronius Symo |
+| Name    | `config.json` inverter type | Description                                                                                      | Tested models                                                                                                                                                                                                                                   |
+| ------- | --------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SunSpec | `sunspec`                   | SunSpec Modbus TCP compatible inverter<br>Must support models 1, 101/102/103, 120, 121, 122, 123 | <a href="https://github.com/longzheng/open-dynamic-export/wiki/Fronius-SunSpec-Modbus-configuration">Fronius Primo</a><br><a href="https://github.com/longzheng/open-dynamic-export/wiki/Fronius-SunSpec-Modbus-configuration">Fronius Symo</a> |
 
 Site meter:
 
