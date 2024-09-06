@@ -12,7 +12,7 @@ import {
 import { objectToXml } from './xml';
 import { logger as pinoLogger } from '../../helpers/logger';
 import type { Logger } from 'pino';
-import { type NameplateModel } from '../../sunspec/models/nameplate';
+import { DERTyp, type NameplateModel } from '../../sunspec/models/nameplate';
 import type { SettingsModel } from '../../sunspec/models/settings';
 import { PVConn, type StatusModel } from '../../sunspec/models/status';
 import type { PollRate } from '../models/pollRate';
@@ -289,8 +289,14 @@ export function getDerCapabilityResponseFromSunSpecArray(
         doeModesSupported:
             DOEModesSupportedType.opModExpLimW |
             DOEModesSupportedType.opModGenLimW,
-        // assume PV for now
-        type: DERType.PhotovoltaicSystem,
+        type: (() => {
+            switch (metrics.DERTyp) {
+                case DERTyp.PV:
+                    return DERType.PhotovoltaicSystem;
+                case DERTyp.PV_STOR:
+                    return DERType.CombinedPVAndStorage;
+            }
+        })(),
         rtgMaxVA: {
             value: rtgMaxVA.base,
             multiplier: rtgMaxVA.pow10,
