@@ -1,4 +1,5 @@
 import type { Config } from '../../helpers/config';
+import { MqttSiteMonitoringPoller } from '../../meters/mqtt';
 import { Powerwall2SiteMonitoringPoller } from '../../meters/powerwall2';
 import { getSunSpecMeterConnection } from '../../sunspec/connections';
 import { SunSpecMeterPoller } from '../../sunspec/sunspecMeterPoller';
@@ -15,8 +16,12 @@ export function getSiteMonitoringPollerInstance(
         }
         case 'powerwall2': {
             return new Powerwall2SiteMonitoringPoller({
-                ip: config.meter.ip,
-                password: config.meter.password,
+                config: config.meter,
+            });
+        }
+        case 'mqtt': {
+            return new MqttSiteMonitoringPoller({
+                config: config.meter,
             });
         }
     }

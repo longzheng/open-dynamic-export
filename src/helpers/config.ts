@@ -94,7 +94,7 @@ export const configSchema = z.object({
                         .describe('The password for the MQTT broker'),
                     topic: z
                         .string()
-                        .describe('The topic to publish control limits to'),
+                        .describe('The topic to pull control limits from'),
                 })
                 .optional()
                 .describe('If defined, limit by MQTT'),
@@ -132,6 +132,23 @@ export const configSchema = z.object({
                     ),
             })
             .describe('Powerwall 2 meter configuration'),
+        z
+            .object({
+                type: z.literal('mqtt'),
+                host: z.string().describe('The host of the MQTT broker'),
+                username: z
+                    .string()
+                    .optional()
+                    .describe('The username for the MQTT broker'),
+                password: z
+                    .string()
+                    .optional()
+                    .describe('The password for the MQTT broker'),
+                topic: z
+                    .string()
+                    .describe('The topic to pull meter readings from'),
+            })
+            .describe('MQTT meter configuration'),
     ]),
 });
 

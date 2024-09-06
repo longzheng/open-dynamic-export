@@ -33,7 +33,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         });
     }
 
-    abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData>;
+    abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null>;
 
     protected async startPolling() {
         const start = performance.now();
@@ -42,9 +42,17 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         try {
             this.logger.trace('generating site monitoring sample');
 
+            const siteMonitoringSampleData =
+                await this.getSiteMonitoringSampleData();
+
+            if (!siteMonitoringSampleData) {
+                this.logger.warn('No site monitoring data available');
+                return;
+            }
+
             const siteMonitoringSample = {
                 date: now,
-                ...(await this.getSiteMonitoringSampleData()),
+                ...siteMonitoringSampleData,
             };
 
             this.logger.trace(

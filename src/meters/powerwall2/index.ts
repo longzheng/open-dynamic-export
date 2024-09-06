@@ -3,25 +3,30 @@ import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMon
 import { Powerwall2Client } from './client';
 import type { z } from 'zod';
 import type { metersSiteSchema } from './api';
+import type { Config } from '../../helpers/config';
 
 export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
     private client: Powerwall2Client;
 
-    constructor({ ip, password }: { ip: string; password: string }) {
+    constructor({
+        config,
+    }: {
+        config: Extract<Config['meter'], { type: 'powerwall2' }>;
+    }) {
         super({
             meterName: 'powerwall2',
             pollingIntervalMs: 200,
         });
 
         this.client = new Powerwall2Client({
-            ip,
-            password,
+            ip: config.ip,
+            password: config.password,
         });
 
         void this.startPolling();
     }
 
-    override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData> {
+    override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null> {
         const metersSiteData = await this.client.getMetersSite();
 
         this.logger.trace({ metersSiteData }, 'received data');
@@ -37,12 +42,12 @@ export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
 export function generateSiteMonitoringSample({
     meter,
 }: {
-    meter: z.TypeOf<typeof metersSiteSchema>;
+    meter: z.infer<typeof metersSiteSchema>;
 }): SiteMonitoringSampleData {
     const firstMeter = meter[0];
 
     if (!firstMeter) {
-        throw new Error('no meters found');
+        throw new Error('no meter found');
     }
 
     return {

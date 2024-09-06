@@ -5,22 +5,32 @@ import {
     mathMaxNullableArray,
     mathMinNullableArray,
 } from './number';
+import { z } from 'zod';
 
-export type PerPhaseMeasurement = {
-    type: 'perPhase';
-    phaseA: number;
-    phaseB: number | null;
-    phaseC: number | null;
-};
+export const perPhaseMeasurementSchema = z.object({
+    type: z.literal('perPhase'),
+    phaseA: z.number(),
+    phaseB: z.number().nullable(),
+    phaseC: z.number().nullable(),
+});
 
-export type NoPhaseMeasurement = {
-    type: 'noPhase';
-    value: number;
-};
+export type PerPhaseMeasurement = z.infer<typeof perPhaseMeasurementSchema>;
 
-export type PerPhaseOrNoPhaseMeasurement =
-    | PerPhaseMeasurement
-    | NoPhaseMeasurement;
+export const noPhaseMeasurementSchema = z.object({
+    type: z.literal('noPhase'),
+    value: z.number(),
+});
+
+export type NoPhaseMeasurement = z.infer<typeof noPhaseMeasurementSchema>;
+
+export const perPhaseOrNoPhaseMeasurementSchema = z.union([
+    perPhaseMeasurementSchema,
+    noPhaseMeasurementSchema,
+]);
+
+export type PerPhaseOrNoPhaseMeasurement = z.infer<
+    typeof perPhaseOrNoPhaseMeasurementSchema
+>;
 
 export type AssertedPerPhaseOrNoPhaseMeasurementArray =
     | {

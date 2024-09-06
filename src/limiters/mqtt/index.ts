@@ -11,7 +11,7 @@ type MqttLimiterConfig = NonNullable<Config['limiters']['mqtt']>;
 
 export class MqttLimiter implements LimiterType {
     private client: mqtt.MqttClient;
-    private cachedMessage: z.TypeOf<typeof mqttSchema> | null = null;
+    private cachedMessage: z.infer<typeof mqttSchema> | null = null;
     private logger: Logger;
 
     constructor({ config }: { config: MqttLimiterConfig }) {
