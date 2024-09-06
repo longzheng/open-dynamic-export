@@ -408,9 +408,12 @@ export function getCurrentPowerRatio({
                     1, // cap maximum to 1 (possible due to inverter overclocking)
                 );
 
-                pinoLogger.info(
+                pinoLogger.debug(
                     {
-                        estimatedPowerRatio,
+                        estimatedPowerRatio: roundToDecimals(
+                            estimatedPowerRatio,
+                            4,
+                        ),
                         currentSolarWatts,
                         nameplateWatts,
                         invertersIndex,
