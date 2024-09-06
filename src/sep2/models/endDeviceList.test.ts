@@ -17,3 +17,15 @@ it('should parse end device list XML', async () => {
         '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
     );
 });
+
+it('should parse end device list XML with csipaus:ConnectionPointLink', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const xml = await parseStringPromise(getMockFile('getEdev_csipaus.xml'));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+
+    const endDeviceList = parseEndDeviceListXml(xml);
+
+    expect(endDeviceList.all).toBe(3);
+    expect(endDeviceList.subscribable).toBe(true);
+    expect(endDeviceList.endDevices.length).toBe(3);
+});

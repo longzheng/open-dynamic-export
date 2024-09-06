@@ -29,6 +29,7 @@ describe('parseEndDeviceXml', () => {
             registrationLink: { href: '/api/v2/edev/_EQLDEV3/rg' },
             derListLink: { href: '/api/v2/edev/_EQLDEV3/der', all: 1 },
             subscriptionListLink: undefined,
+            connectionPointLink: undefined,
         } satisfies EndDevice);
     });
 
@@ -55,7 +56,24 @@ describe('parseEndDeviceXml', () => {
             derListLink: undefined,
             enabled: true,
             functionSetAssignmentsListLink: undefined,
+            connectionPointLink: undefined,
         } satisfies EndDevice);
+    });
+
+    it('should parse end device with csipaus:ConnectionPointLink', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const xml = await parseStringPromise(
+            getMockFile('getEdev_csipaus_edev1.xml'),
+        );
+
+        const endDevice = parseEndDeviceXml(xml);
+
+        expect(endDevice.lFDI).toStrictEqual(
+            '12a4a4b406ad102e7421019135ffa2805235a21c',
+        );
+        expect(endDevice.connectionPointLink).toStrictEqual({
+            href: '/edev/1/cp',
+        });
     });
 });
 

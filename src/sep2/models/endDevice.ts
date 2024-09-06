@@ -19,6 +19,7 @@ export type EndDevice = {
     registrationLink: Link | undefined;
     functionSetAssignmentsListLink: ListLink | undefined;
     subscriptionListLink: ListLink | undefined;
+    connectionPointLink: Link | undefined;
 } & SubscribableResource;
 
 export type EndDeviceResponse = Pick<
@@ -70,6 +71,9 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     const subscriptionListLink = endDeviceObject['SubscriptionListLink']
         ? parseListLinkXmlObject(endDeviceObject['SubscriptionListLink'][0])
         : undefined;
+    const connectionPointLink = endDeviceObject['csipaus:ConnectionPointLink']
+        ? parseLinkXmlObject(endDeviceObject['csipaus:ConnectionPointLink'][0])
+        : undefined;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
@@ -83,6 +87,7 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
         derListLink,
         functionSetAssignmentsListLink,
         subscriptionListLink,
+        connectionPointLink,
     };
 }
 
