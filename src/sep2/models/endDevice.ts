@@ -1,6 +1,7 @@
 import { assertString } from '../helpers/assert';
-import { stringToBoolean } from '../helpers/boolean';
-import { stringIntToDate } from '../helpers/date';
+import { booleanToString, stringToBoolean } from '../helpers/boolean';
+import { dateToStringSeconds, stringIntToDate } from '../helpers/date';
+import { xmlns } from '../helpers/namespace';
 import { parseLinkXmlObject, type Link } from './link';
 import { parseListLinkXmlObject, type ListLink } from './listLink';
 import {
@@ -19,6 +20,11 @@ export type EndDevice = {
     functionSetAssignmentsListLink: ListLink | undefined;
     subscriptionListLink: ListLink | undefined;
 } & SubscribableResource;
+
+export type EndDeviceResponse = Pick<
+    EndDevice,
+    'lFDI' | 'sFDI' | 'changedTime' | 'enabled'
+>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceXml(xml: any): EndDevice {
@@ -77,5 +83,22 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
         derListLink,
         functionSetAssignmentsListLink,
         subscriptionListLink,
+    };
+}
+
+export function generateEndDeviceResponse({
+    lFDI,
+    sFDI,
+    changedTime,
+    enabled,
+}: EndDeviceResponse) {
+    return {
+        EndDevice: {
+            $: { xmlns: xmlns._ },
+            sFDI,
+            lFDI,
+            enabled: booleanToString(enabled),
+            changedTime: dateToStringSeconds(changedTime),
+        },
     };
 }

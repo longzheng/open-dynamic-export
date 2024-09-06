@@ -9,6 +9,15 @@ export function stringIntToBoolean(value: string): boolean {
     }
 }
 
+export function booleanToString(value: boolean): string {
+    switch (value) {
+        case false:
+            return '0';
+        case true:
+            return '1';
+    }
+}
+
 export function stringToBoolean(value: string): boolean {
     switch (value) {
         case 'false':
