@@ -180,6 +180,35 @@ To use CSIP-AUS, add following property to `config.json`
 }
 ```
 
+#### MQTT
+
+To set limits based on a MQTT topic, add the following property to `config.json`
+
+```js
+{
+    "limiters": {
+        "mqtt": {
+            "host": "mqtt://192.168.1.123",
+            "topic": "limits"
+        }
+    }
+    ...
+}
+```
+
+The MQTT topic must contain a JSON message that meets the following schema
+
+```js
+z.object({
+    opModConnect: z.boolean().optional(),
+    opModEnergize: z.boolean().optional(),
+    opModExpLimW: z.number().optional(),
+    opModGenLimW: z.number().optional(),
+});
+```
+
+## Run server
+
 ### Docker compose
 
 1. Clone repo
