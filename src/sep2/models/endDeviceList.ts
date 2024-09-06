@@ -1,5 +1,5 @@
 import { assertArray, assertString } from '../helpers/assert';
-import { stringIntToBoolean } from '../helpers/boolean';
+import { stringToBoolean } from '../helpers/boolean';
 import { parseEndDeviceObject, type EndDevice } from './endDevice';
 import type { PollRate } from './pollRate';
 import { parsePollRateXmlObject } from './pollRate';
@@ -20,7 +20,7 @@ export function parseEndDeviceListXml(xml: any): EndDeviceList {
         xml['EndDeviceList'],
     );
     const pollRate = parsePollRateXmlObject(xml['EndDeviceList']);
-    const subscribable = stringIntToBoolean(
+    const subscribable = stringToBoolean(
         assertString(xml['EndDeviceList']['$']['subscribable']),
     );
     const endDeviceArray = assertArray(xml['EndDeviceList']['EndDevice']);
