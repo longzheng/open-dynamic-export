@@ -17,7 +17,7 @@ export type NameplateModel = {
     // Model length
     L: number;
     // Type of DER device. Default value is 4 to indicate PV device.
-    DERTyp: DERType;
+    DERTyp: DERTyp;
     // Continuous power output capability of the inverter.
     WRtg: number;
     // Scale factor
@@ -209,7 +209,7 @@ export const nameplateModel = sunSpecModelFactory<NameplateModel>({
     },
 });
 
-export enum DERType {
+export enum DERTyp {
     PV = 4,
     PV_STOR = 82,
 }

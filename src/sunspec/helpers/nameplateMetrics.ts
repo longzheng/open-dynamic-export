@@ -53,19 +53,9 @@ export function getAggregatedNameplateMetrics(
 ): ReturnType<typeof getNameplateMetrics> {
     const metrics = nameplates.map(getNameplateMetrics);
 
-    const firstNameplate = metrics.at(0);
-    if (!firstNameplate) {
-        throw new Error('At least one nameplate must be provided');
-    }
-
-    const DERTyp = firstNameplate.DERTyp;
-
-    if (metrics.some((metric) => metric.DERTyp !== DERTyp)) {
-        throw new Error('Different DERTyp detected across nameplates');
-    }
-
     return {
-        DERTyp,
+        // get the highest value
+        DERTyp: Math.max(...metrics.map((metric) => metric.DERTyp)),
         WRtg: sumNumbersArray(metrics.map((metric) => metric.WRtg)),
         VARtg: sumNumbersArray(metrics.map((metric) => metric.VARtg)),
         VArRtgQ1: sumNumbersArray(metrics.map((metric) => metric.VArRtgQ1)),
