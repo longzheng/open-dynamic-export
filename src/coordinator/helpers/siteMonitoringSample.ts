@@ -1,11 +1,15 @@
-import type { PerPhaseMeasurement } from '../../helpers/power';
+import type {
+    PerPhaseMeasurement,
+    PerPhaseOrNoPhaseMeasurement,
+} from '../../helpers/measurement';
 import type { MonitoringSampleBase } from './monitoringSampleBase';
 
+// aligns with the CSIP-AUS requirements for site monitoring
 export type SiteMonitoringSampleData = {
-    realPower: PerPhaseMeasurement;
-    reactivePower: PerPhaseMeasurement;
+    realPower: PerPhaseOrNoPhaseMeasurement;
+    reactivePower: PerPhaseOrNoPhaseMeasurement;
     voltage: PerPhaseMeasurement;
-    frequency: number;
+    frequency: number | null;
 };
 
 export type SiteMonitoringSample = MonitoringSampleBase &

@@ -3,6 +3,8 @@ import {
     averageNumbersArray,
     averageNumbersNullableArray,
     convertNumberToBaseAndPow10Exponent,
+    mathMaxNullableArray,
+    mathMinNullableArray,
     numberWithPow10,
     safeParseIntString,
     sumBigIntArray,
@@ -77,6 +79,30 @@ describe('averageNumbersNullableArray', () => {
     it('should avoid floating point errors', () => {
         const result = averageNumbersNullableArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.2);
+    });
+});
+
+describe('mathMinNullbleArray', () => {
+    it('should return null if any number is null', () => {
+        const result = mathMinNullableArray([1, null, 3]);
+        expect(result).toBe(null);
+    });
+
+    it('should return minimum value if all numbers are not null', () => {
+        const result = mathMinNullableArray([0.1, 0.2, 0.3]);
+        expect(result).toBe(0.1);
+    });
+});
+
+describe('mathMaxNullableArray', () => {
+    it('should return null if any number is null', () => {
+        const result = mathMaxNullableArray([1, null, 3]);
+        expect(result).toBe(null);
+    });
+
+    it('should return maximum value if all numbers are not null', () => {
+        const result = mathMaxNullableArray([0.1, 0.2, 0.3]);
+        expect(result).toBe(0.3);
     });
 });
 
