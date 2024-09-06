@@ -58,6 +58,22 @@ export function averageNumbersNullableArray(numbers: (number | null)[]) {
     return averageNumbersArray(numbers as number[]);
 }
 
+export function mathMinNullableArray(numbers: (number | null)[]) {
+    if (numbers.some((number) => number === null)) {
+        return null;
+    }
+
+    return Math.min(...(numbers as number[]));
+}
+
+export function mathMaxNullableArray(numbers: (number | null)[]) {
+    if (numbers.some((number) => number === null)) {
+        return null;
+    }
+
+    return Math.max(...(numbers as number[]));
+}
+
 export function convertNumberToBaseAndPow10Exponent(number: number): {
     base: number;
     pow10: number;

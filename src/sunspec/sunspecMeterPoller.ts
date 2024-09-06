@@ -38,28 +38,34 @@ export function generateSiteMonitoringSample({
 }: {
     meter: MeterModel;
 }): SiteMonitoringSampleData {
-    const aggregatedMeterMetrics = getMeterMetrics(meter);
+    const meterMetrics = getMeterMetrics(meter);
 
     return {
-        realPower: {
-            phaseA: aggregatedMeterMetrics.WphA ?? aggregatedMeterMetrics.W,
-            phaseB: aggregatedMeterMetrics.WphB,
-            phaseC: aggregatedMeterMetrics.WphC,
-        },
-        reactivePower: {
-            phaseA: assertNonNull(
-                aggregatedMeterMetrics.VARphA ?? aggregatedMeterMetrics.VAR,
-            ),
-            phaseB: aggregatedMeterMetrics.VARphB,
-            phaseC: aggregatedMeterMetrics.VARphC,
-        },
+        realPower: meterMetrics.WphA
+            ? {
+                  type: 'perPhase',
+                  phaseA: meterMetrics.WphA,
+                  phaseB: meterMetrics.WphB,
+                  phaseC: meterMetrics.WphC,
+              }
+            : { type: 'noPhase', value: meterMetrics.W },
+        reactivePower: meterMetrics.VARphA
+            ? {
+                  type: 'perPhase',
+                  phaseA: meterMetrics.VARphA,
+                  phaseB: meterMetrics.VARphB,
+                  phaseC: meterMetrics.VARphC,
+              }
+            : {
+                  type: 'noPhase',
+                  value: assertNonNull(meterMetrics.VAR),
+              },
         voltage: {
-            phaseA: assertNonNull(
-                aggregatedMeterMetrics.PhVphA ?? aggregatedMeterMetrics.PhV,
-            ),
-            phaseB: aggregatedMeterMetrics.PhVphB,
-            phaseC: aggregatedMeterMetrics.PhVphC,
+            type: 'perPhase',
+            phaseA: assertNonNull(meterMetrics.PhVphA ?? meterMetrics.PhV),
+            phaseB: meterMetrics.PhVphB,
+            phaseC: meterMetrics.PhVphC,
         },
-        frequency: aggregatedMeterMetrics.Hz,
+        frequency: meterMetrics.Hz,
     };
 }

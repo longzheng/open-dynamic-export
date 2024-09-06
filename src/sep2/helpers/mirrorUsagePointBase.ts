@@ -13,6 +13,14 @@ import { ServiceKind } from '../models/serviceKind';
 import { objectToXml } from './xml';
 import type { Logger } from 'pino';
 import { UsagePointBaseStatus } from '../models/usagePointBase';
+import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number';
+import { CommodityType } from '../models/commodityType';
+import type { DataQualifierType } from '../models/dataQualifierType';
+import type { FlowDirectionType } from '../models/flowDirectionType';
+import { KindType } from '../models/kindType';
+import type { PhaseCode } from '../models/phaseCode';
+import { QualityFlags } from '../models/qualityFlags';
+import type { UomType } from '../models/uomType';
 
 export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
     protected client: SEP2Client;
@@ -100,19 +108,19 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
             );
 
             try {
-                this.postRealPowerAverage({
+                this.postRealPower({
                     reading,
                     lastUpdateTime,
                     nextUpdateTime,
                 });
 
-                this.postReactivePowerAverage({
+                this.postReactivePower({
                     reading,
                     lastUpdateTime,
                     nextUpdateTime,
                 });
 
-                this.postVoltageAverage({
+                this.postVoltage({
                     reading,
                     lastUpdateTime,
                     nextUpdateTime,
@@ -132,7 +140,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         }
     }
 
-    protected abstract postRealPowerAverage({
+    protected abstract postRealPower({
         reading,
         lastUpdateTime,
         nextUpdateTime,
@@ -142,7 +150,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         nextUpdateTime: Date;
     }): void;
 
-    protected abstract postReactivePowerAverage({
+    protected abstract postReactivePower({
         reading,
         lastUpdateTime,
         nextUpdateTime,
@@ -152,7 +160,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         nextUpdateTime: Date;
     }): void;
 
-    protected abstract postVoltageAverage({
+    protected abstract postVoltage({
         reading,
         lastUpdateTime,
         nextUpdateTime,
@@ -178,7 +186,54 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         return cache;
     }
 
-    protected async postMirrorUsagePoint({
+    protected sendMirrorMeterReading = ({
+        phase,
+        flowDirection,
+        dataQualifier,
+        description,
+        value,
+        uom,
+        lastUpdateTime,
+        nextUpdateTime,
+        intervalLength,
+    }: {
+        phase: PhaseCode;
+        flowDirection: FlowDirectionType;
+        dataQualifier: DataQualifierType;
+        description: string;
+        value: number;
+        uom: UomType;
+        lastUpdateTime: Date;
+        nextUpdateTime: Date;
+        intervalLength: number;
+    }) => {
+        const exponentValue = convertNumberToBaseAndPow10Exponent(value);
+
+        void this.postMirrorMeterReading({
+            mirrorMeterReading: {
+                mRID: this.client.generateMeterReadingMrid(),
+                description,
+                lastUpdateTime,
+                nextUpdateTime,
+                Reading: {
+                    value: exponentValue.base,
+                    qualityFlags: QualityFlags.Valid,
+                },
+                ReadingType: {
+                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
+                    kind: KindType.Power,
+                    dataQualifier,
+                    flowDirection,
+                    intervalLength,
+                    phase,
+                    powerOfTenMultiplier: exponentValue.pow10,
+                    uom,
+                },
+            },
+        });
+    };
+
+    private async postMirrorUsagePoint({
         mirrorUsagePoint,
     }: {
         mirrorUsagePoint: MirrorUsagePoint;
@@ -206,7 +261,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         return parseMirrorUsagePointXml(await this.client.get(locationHeader));
     }
 
-    protected async postMirrorMeterReading({
+    private async postMirrorMeterReading({
         mirrorMeterReading,
     }: {
         mirrorMeterReading: MirrorMeterReading;

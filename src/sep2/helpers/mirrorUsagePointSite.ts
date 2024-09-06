@@ -1,14 +1,16 @@
 import { RoleFlagsType } from '../models/roleFlagsType';
 import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase';
-import type { PerPhaseMeasurement } from '../../helpers/power';
+import type {
+    AvgMaxMin,
+    PerPhaseOrNoPhaseMeasurement,
+} from '../../helpers/measurement';
 import {
-    averageNumbersArray,
-    averageNumbersNullableArray,
-    convertNumberToBaseAndPow10Exponent,
-} from '../../helpers/number';
-import { QualityFlags } from '../models/qualityFlags';
-import { CommodityType } from '../models/commodityType';
-import { KindType } from '../models/kindType';
+    assertPerPhaseOrNoPhaseMeasurementArray,
+    getAvgMaxMinOfNumbersNullable,
+    getAvgMaxMinOfPerPhaseMeasurements,
+    getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements,
+    type PerPhaseMeasurement,
+} from '../../helpers/measurement';
 import { DataQualifierType } from '../models/dataQualifierType';
 import { FlowDirectionType } from '../models/flowDirectionType';
 import { PhaseCode } from '../models/phaseCode';
@@ -19,13 +21,10 @@ import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitor
 
 type SiteReading = {
     intervalSeconds: number;
-    realPowerAverage: PerPhaseMeasurement;
-    reactivePowerAverage: PerPhaseMeasurement;
-    voltageAverage: PerPhaseMeasurement;
-    frequency: {
-        maximum: number;
-        minimum: number;
-    };
+    realPower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
+    reactivePower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
+    voltage: AvgMaxMin<PerPhaseMeasurement>;
+    frequency: AvgMaxMin<number> | null;
 };
 
 export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
@@ -44,47 +43,26 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
     ): SiteReading {
         return {
             intervalSeconds: getSamplesIntervalSeconds(samples),
-            realPowerAverage: {
-                phaseA: averageNumbersArray(
-                    samples.map((s) => s.realPower.phaseA),
+            realPower: getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
+                assertPerPhaseOrNoPhaseMeasurementArray(
+                    samples.map((s) => s.realPower),
                 ),
-                phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.realPower.phaseB),
+            ),
+            reactivePower: getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
+                assertPerPhaseOrNoPhaseMeasurementArray(
+                    samples.map((s) => s.reactivePower),
                 ),
-                phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.realPower.phaseC),
-                ),
-            },
-            reactivePowerAverage: {
-                phaseA: averageNumbersArray(
-                    samples.map((s) => s.reactivePower.phaseA),
-                ),
-                phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.reactivePower.phaseB),
-                ),
-                phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.reactivePower.phaseC),
-                ),
-            },
-            voltageAverage: {
-                phaseA: averageNumbersArray(
-                    samples.map((s) => s.voltage.phaseA),
-                ),
-                phaseB: averageNumbersNullableArray(
-                    samples.map((s) => s.voltage.phaseB),
-                ),
-                phaseC: averageNumbersNullableArray(
-                    samples.map((s) => s.voltage.phaseC),
-                ),
-            },
-            frequency: {
-                maximum: Math.max(...samples.map((s) => s.frequency)),
-                minimum: Math.min(...samples.map((s) => s.frequency)),
-            },
+            ),
+            voltage: getAvgMaxMinOfPerPhaseMeasurements(
+                samples.map((s) => s.voltage),
+            ),
+            frequency: getAvgMaxMinOfNumbersNullable(
+                samples.map((s) => s.frequency),
+            ),
         };
     }
 
-    protected postRealPowerAverage({
+    protected postRealPower({
         reading,
         lastUpdateTime,
         nextUpdateTime,
@@ -93,60 +71,142 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         lastUpdateTime: Date;
         nextUpdateTime: Date;
     }) {
-        const postReading = (
-            phase: PhaseCode,
-            description: string,
-            value: number,
-        ) => {
-            const phaseValue = convertNumberToBaseAndPow10Exponent(value);
-
-            void this.postMirrorMeterReading({
-                mirrorMeterReading: {
-                    mRID: this.client.generateMeterReadingMrid(),
-                    description,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                    Reading: {
-                        value: phaseValue.base,
-                        qualityFlags: QualityFlags.Valid,
-                    },
-                    ReadingType: {
-                        commodity:
-                            CommodityType.ElectricitySecondaryMeteredValue,
-                        kind: KindType.Power,
-                        dataQualifier: DataQualifierType.Average,
-                        flowDirection: FlowDirectionType.Forward,
-                        intervalLength: reading.intervalSeconds,
-                        phase,
-                        powerOfTenMultiplier: phaseValue.pow10,
-                        uom: UomType.W,
-                    },
-                },
+        const postReading = ({
+            phase,
+            dataQualifier,
+            description,
+            value,
+        }: {
+            phase: PhaseCode;
+            dataQualifier: DataQualifierType;
+            description: string;
+            value: number;
+        }) =>
+            this.sendMirrorMeterReading({
+                phase,
+                flowDirection: FlowDirectionType.Forward,
+                dataQualifier,
+                description,
+                value,
+                uom: UomType.W,
+                lastUpdateTime,
+                nextUpdateTime,
+                intervalLength: reading.intervalSeconds,
             });
-        };
 
-        postReading(
-            PhaseCode.PhaseA,
-            'Average Real Power (W) - Phase A',
-            reading.realPowerAverage.phaseA,
-        );
-        if (reading.realPowerAverage.phaseB) {
-            postReading(
-                PhaseCode.PhaseB,
-                'Average Real Power (W) - Phase B',
-                reading.realPowerAverage.phaseB,
-            );
+        switch (reading.realPower.average.type) {
+            case 'noPhase': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Average,
+                    description: 'Average Real Power (W)',
+                    value: reading.realPower.average.value,
+                });
+                break;
+            }
+            case 'perPhase': {
+                postReading({
+                    phase: PhaseCode.PhaseA,
+                    dataQualifier: DataQualifierType.Average,
+                    description: 'Average Real Power (W) - Phase A',
+                    value: reading.realPower.average.phaseA,
+                });
+                if (reading.realPower.average.phaseB) {
+                    postReading({
+                        phase: PhaseCode.PhaseB,
+                        dataQualifier: DataQualifierType.Average,
+                        description: 'Average Real Power (W) - Phase B',
+                        value: reading.realPower.average.phaseB,
+                    });
+                }
+                if (reading.realPower.average.phaseC) {
+                    postReading({
+                        phase: PhaseCode.PhaseC,
+                        dataQualifier: DataQualifierType.Average,
+                        description: 'Average Real Power (W) - Phase C',
+                        value: reading.realPower.average.phaseC,
+                    });
+                }
+                break;
+            }
         }
-        if (reading.realPowerAverage.phaseC) {
-            postReading(
-                PhaseCode.PhaseC,
-                'Average Real Power (W) - Phase C',
-                reading.realPowerAverage.phaseC,
-            );
+
+        switch (reading.realPower.maximum.type) {
+            case 'noPhase': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Maximum,
+                    description: 'Maximum Real Power (W)',
+                    value: reading.realPower.maximum.value,
+                });
+                break;
+            }
+            case 'perPhase': {
+                postReading({
+                    phase: PhaseCode.PhaseA,
+                    dataQualifier: DataQualifierType.Maximum,
+                    description: 'Maximum Real Power (W) - Phase A',
+                    value: reading.realPower.maximum.phaseA,
+                });
+                if (reading.realPower.maximum.phaseB) {
+                    postReading({
+                        phase: PhaseCode.PhaseB,
+                        dataQualifier: DataQualifierType.Maximum,
+                        description: 'Maximum Real Power (W) - Phase B',
+                        value: reading.realPower.maximum.phaseB,
+                    });
+                }
+                if (reading.realPower.maximum.phaseC) {
+                    postReading({
+                        phase: PhaseCode.PhaseC,
+                        dataQualifier: DataQualifierType.Maximum,
+                        description: 'Maximum Real Power (W) - Phase C',
+                        value: reading.realPower.maximum.phaseC,
+                    });
+                }
+                break;
+            }
+        }
+
+        switch (reading.realPower.minimum.type) {
+            case 'noPhase': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Minimum,
+                    description: 'Minimum Real Power (W)',
+                    value: reading.realPower.minimum.value,
+                });
+                break;
+            }
+            case 'perPhase': {
+                postReading({
+                    phase: PhaseCode.PhaseA,
+                    dataQualifier: DataQualifierType.Minimum,
+                    description: 'Minimum Real Power (W) - Phase A',
+                    value: reading.realPower.minimum.phaseA,
+                });
+                if (reading.realPower.minimum.phaseB) {
+                    postReading({
+                        phase: PhaseCode.PhaseB,
+                        dataQualifier: DataQualifierType.Minimum,
+                        description: 'Minimum Real Power (W) - Phase B',
+                        value: reading.realPower.minimum.phaseB,
+                    });
+                }
+                if (reading.realPower.minimum.phaseC) {
+                    postReading({
+                        phase: PhaseCode.PhaseC,
+                        dataQualifier: DataQualifierType.Minimum,
+                        description: 'Minimum Real Power (W) - Phase C',
+                        value: reading.realPower.minimum.phaseC,
+                    });
+                }
+                break;
+            }
         }
     }
 
-    protected postReactivePowerAverage({
+    protected postReactivePower({
         reading,
         lastUpdateTime,
         nextUpdateTime,
@@ -155,60 +215,142 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         lastUpdateTime: Date;
         nextUpdateTime: Date;
     }) {
-        const postReading = (
-            phase: PhaseCode,
-            description: string,
-            value: number,
-        ) => {
-            const phaseValue = convertNumberToBaseAndPow10Exponent(value);
-
-            void this.postMirrorMeterReading({
-                mirrorMeterReading: {
-                    mRID: this.client.generateMeterReadingMrid(),
-                    description,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                    Reading: {
-                        value: phaseValue.base,
-                        qualityFlags: QualityFlags.Valid,
-                    },
-                    ReadingType: {
-                        commodity:
-                            CommodityType.ElectricitySecondaryMeteredValue,
-                        kind: KindType.Power,
-                        dataQualifier: DataQualifierType.Average,
-                        flowDirection: FlowDirectionType.Forward,
-                        intervalLength: reading.intervalSeconds,
-                        phase,
-                        powerOfTenMultiplier: phaseValue.pow10,
-                        uom: UomType.var,
-                    },
-                },
+        const postReading = ({
+            phase,
+            dataQualifier,
+            description,
+            value,
+        }: {
+            phase: PhaseCode;
+            dataQualifier: DataQualifierType;
+            description: string;
+            value: number;
+        }) =>
+            this.sendMirrorMeterReading({
+                phase,
+                flowDirection: FlowDirectionType.Forward,
+                dataQualifier,
+                description,
+                value,
+                uom: UomType.var,
+                lastUpdateTime,
+                nextUpdateTime,
+                intervalLength: reading.intervalSeconds,
             });
-        };
 
-        postReading(
-            PhaseCode.PhaseA,
-            'Average Reactive Power (VAR) - Phase A',
-            reading.reactivePowerAverage.phaseA,
-        );
-        if (reading.reactivePowerAverage.phaseB) {
-            postReading(
-                PhaseCode.PhaseB,
-                'Average Reactive Power (VAR) - Phase B',
-                reading.reactivePowerAverage.phaseB,
-            );
+        switch (reading.reactivePower.average.type) {
+            case 'noPhase': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Average,
+                    description: 'Average Reactive Power (VAR)',
+                    value: reading.reactivePower.average.value,
+                });
+                break;
+            }
+            case 'perPhase': {
+                postReading({
+                    phase: PhaseCode.PhaseA,
+                    dataQualifier: DataQualifierType.Average,
+                    description: 'Average Reactive Power (VAR) - Phase A',
+                    value: reading.reactivePower.average.phaseA,
+                });
+                if (reading.reactivePower.average.phaseB) {
+                    postReading({
+                        phase: PhaseCode.PhaseB,
+                        dataQualifier: DataQualifierType.Average,
+                        description: 'Average Reactive Power (VAR) - Phase B',
+                        value: reading.reactivePower.average.phaseB,
+                    });
+                }
+                if (reading.reactivePower.average.phaseC) {
+                    postReading({
+                        phase: PhaseCode.PhaseC,
+                        dataQualifier: DataQualifierType.Average,
+                        description: 'Average Reactive Power (VAR) - Phase C',
+                        value: reading.reactivePower.average.phaseC,
+                    });
+                }
+                break;
+            }
         }
-        if (reading.reactivePowerAverage.phaseC) {
-            postReading(
-                PhaseCode.PhaseC,
-                'Average Reactive Power (VAR) - Phase C',
-                reading.reactivePowerAverage.phaseC,
-            );
+
+        switch (reading.reactivePower.maximum.type) {
+            case 'noPhase': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Maximum,
+                    description: 'Maximum Reactive Power (VAR)',
+                    value: reading.reactivePower.maximum.value,
+                });
+                break;
+            }
+            case 'perPhase': {
+                postReading({
+                    phase: PhaseCode.PhaseA,
+                    dataQualifier: DataQualifierType.Maximum,
+                    description: 'Maximum Reactive Power (VAR) - Phase A',
+                    value: reading.reactivePower.maximum.phaseA,
+                });
+                if (reading.reactivePower.maximum.phaseB) {
+                    postReading({
+                        phase: PhaseCode.PhaseB,
+                        dataQualifier: DataQualifierType.Maximum,
+                        description: 'Maximum Reactive Power (VAR) - Phase B',
+                        value: reading.reactivePower.maximum.phaseB,
+                    });
+                }
+                if (reading.reactivePower.maximum.phaseC) {
+                    postReading({
+                        phase: PhaseCode.PhaseC,
+                        dataQualifier: DataQualifierType.Maximum,
+                        description: 'Maximum Reactive Power (VAR) - Phase C',
+                        value: reading.reactivePower.maximum.phaseC,
+                    });
+                }
+                break;
+            }
+        }
+
+        switch (reading.reactivePower.minimum.type) {
+            case 'noPhase': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Minimum,
+                    description: 'Minimum Reactive Power (VAR)',
+                    value: reading.reactivePower.minimum.value,
+                });
+                break;
+            }
+            case 'perPhase': {
+                postReading({
+                    phase: PhaseCode.PhaseA,
+                    dataQualifier: DataQualifierType.Minimum,
+                    description: 'Minimum Reactive Power (VAR) - Phase A',
+                    value: reading.reactivePower.minimum.phaseA,
+                });
+                if (reading.reactivePower.minimum.phaseB) {
+                    postReading({
+                        phase: PhaseCode.PhaseB,
+                        dataQualifier: DataQualifierType.Minimum,
+                        description: 'Minimum Reactive Power (VAR) - Phase B',
+                        value: reading.reactivePower.minimum.phaseB,
+                    });
+                }
+                if (reading.reactivePower.minimum.phaseC) {
+                    postReading({
+                        phase: PhaseCode.PhaseC,
+                        dataQualifier: DataQualifierType.Minimum,
+                        description: 'Minimum Reactive Power (VAR) - Phase C',
+                        value: reading.reactivePower.minimum.phaseC,
+                    });
+                }
+                break;
+            }
         }
     }
 
-    protected postVoltageAverage({
+    protected postVoltage({
         reading,
         lastUpdateTime,
         nextUpdateTime,
@@ -217,56 +359,99 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         lastUpdateTime: Date;
         nextUpdateTime: Date;
     }) {
-        const postReading = (
-            phase: PhaseCode,
-            description: string,
-            value: number,
-        ) => {
-            const phaseValue = convertNumberToBaseAndPow10Exponent(value);
-
-            void this.postMirrorMeterReading({
-                mirrorMeterReading: {
-                    mRID: this.client.generateMeterReadingMrid(),
-                    description,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                    Reading: {
-                        value: phaseValue.base,
-                        qualityFlags: QualityFlags.Valid,
-                    },
-                    ReadingType: {
-                        commodity:
-                            CommodityType.ElectricitySecondaryMeteredValue,
-                        kind: KindType.Power,
-                        dataQualifier: DataQualifierType.Average,
-                        flowDirection: FlowDirectionType.Forward,
-                        intervalLength: reading.intervalSeconds,
-                        phase,
-                        powerOfTenMultiplier: phaseValue.pow10,
-                        uom: UomType.Voltage,
-                    },
-                },
+        const postReading = ({
+            phase,
+            dataQualifier,
+            description,
+            value,
+        }: {
+            phase: PhaseCode;
+            dataQualifier: DataQualifierType;
+            description: string;
+            value: number;
+        }) =>
+            this.sendMirrorMeterReading({
+                phase,
+                flowDirection: FlowDirectionType.Forward,
+                dataQualifier,
+                description,
+                value,
+                uom: UomType.Voltage,
+                lastUpdateTime,
+                nextUpdateTime,
+                intervalLength: reading.intervalSeconds,
             });
-        };
 
-        postReading(
-            PhaseCode.PhaseA,
-            'Average Voltage (V) - Phase A',
-            reading.voltageAverage.phaseA,
-        );
-        if (reading.voltageAverage.phaseB) {
-            postReading(
-                PhaseCode.PhaseB,
-                'Average Voltage (V) - Phase B',
-                reading.voltageAverage.phaseB,
-            );
+        // average
+        postReading({
+            phase: PhaseCode.PhaseA,
+            dataQualifier: DataQualifierType.Average,
+            description: 'Average Voltage (V) - Phase A',
+            value: reading.voltage.average.phaseA,
+        });
+        if (reading.voltage.average.phaseB) {
+            postReading({
+                phase: PhaseCode.PhaseB,
+                dataQualifier: DataQualifierType.Average,
+                description: 'Average Voltage (V) - Phase B',
+                value: reading.voltage.average.phaseB,
+            });
         }
-        if (reading.voltageAverage.phaseC) {
-            postReading(
-                PhaseCode.PhaseC,
-                'Average Voltage (V) - Phase C',
-                reading.voltageAverage.phaseC,
-            );
+        if (reading.voltage.average.phaseC) {
+            postReading({
+                phase: PhaseCode.PhaseC,
+                dataQualifier: DataQualifierType.Average,
+                description: 'Average Voltage (V) - Phase C',
+                value: reading.voltage.average.phaseC,
+            });
+        }
+
+        // maximum
+        postReading({
+            phase: PhaseCode.PhaseA,
+            dataQualifier: DataQualifierType.Maximum,
+            description: 'Maximum Voltage (V) - Phase A',
+            value: reading.voltage.maximum.phaseA,
+        });
+        if (reading.voltage.maximum.phaseB) {
+            postReading({
+                phase: PhaseCode.PhaseB,
+                dataQualifier: DataQualifierType.Maximum,
+                description: 'Maximum Voltage (V) - Phase B',
+                value: reading.voltage.maximum.phaseB,
+            });
+        }
+        if (reading.voltage.maximum.phaseC) {
+            postReading({
+                phase: PhaseCode.PhaseC,
+                dataQualifier: DataQualifierType.Maximum,
+                description: 'Maximum Voltage (V) - Phase C',
+                value: reading.voltage.maximum.phaseC,
+            });
+        }
+
+        // minimum
+        postReading({
+            phase: PhaseCode.PhaseA,
+            dataQualifier: DataQualifierType.Minimum,
+            description: 'Minimum Voltage (V) - Phase A',
+            value: reading.voltage.minimum.phaseA,
+        });
+        if (reading.voltage.minimum.phaseB) {
+            postReading({
+                phase: PhaseCode.PhaseB,
+                dataQualifier: DataQualifierType.Minimum,
+                description: 'Minimum Voltage (V) - Phase B',
+                value: reading.voltage.minimum.phaseB,
+            });
+        }
+        if (reading.voltage.minimum.phaseC) {
+            postReading({
+                phase: PhaseCode.PhaseC,
+                dataQualifier: DataQualifierType.Minimum,
+                description: 'Minimum Voltage (V) - Phase C',
+                value: reading.voltage.minimum.phaseC,
+            });
         }
     }
 
@@ -279,57 +464,44 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         lastUpdateTime: Date;
         nextUpdateTime: Date;
     }) {
-        const maximumValue = convertNumberToBaseAndPow10Exponent(
-            reading.frequency.maximum,
-        );
-        const minimumValue = convertNumberToBaseAndPow10Exponent(
-            reading.frequency.minimum,
-        );
+        if (reading.frequency === null) {
+            return;
+        }
 
-        void this.postMirrorMeterReading({
-            mirrorMeterReading: {
-                mRID: this.client.generateMeterReadingMrid(),
-                description: 'Maximum Frequency (Hz)',
-                lastUpdateTime,
-                nextUpdateTime,
-                Reading: {
-                    value: maximumValue.base,
-                    qualityFlags: QualityFlags.Valid,
-                },
-                ReadingType: {
-                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
-                    kind: KindType.Power,
-                    dataQualifier: DataQualifierType.Maximum,
-                    flowDirection: FlowDirectionType.Forward,
-                    intervalLength: reading.intervalSeconds,
-                    phase: PhaseCode.NotApplicable,
-                    powerOfTenMultiplier: maximumValue.pow10,
-                    uom: UomType.Hz,
-                },
-            },
+        void this.sendMirrorMeterReading({
+            phase: PhaseCode.NotApplicable,
+            flowDirection: FlowDirectionType.Forward,
+            dataQualifier: DataQualifierType.Average,
+            description: 'Average Frequency (Hz)',
+            value: reading.frequency.average,
+            uom: UomType.Hz,
+            intervalLength: reading.intervalSeconds,
+            lastUpdateTime,
+            nextUpdateTime,
         });
 
-        void this.postMirrorMeterReading({
-            mirrorMeterReading: {
-                mRID: this.client.generateMeterReadingMrid(),
-                description: 'Minimum Frequency (Hz)',
-                lastUpdateTime,
-                nextUpdateTime,
-                Reading: {
-                    value: minimumValue.base,
-                    qualityFlags: QualityFlags.Valid,
-                },
-                ReadingType: {
-                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
-                    kind: KindType.Power,
-                    dataQualifier: DataQualifierType.Minimum,
-                    flowDirection: FlowDirectionType.Forward,
-                    intervalLength: reading.intervalSeconds,
-                    phase: PhaseCode.NotApplicable,
-                    powerOfTenMultiplier: minimumValue.pow10,
-                    uom: UomType.Hz,
-                },
-            },
+        void this.sendMirrorMeterReading({
+            phase: PhaseCode.NotApplicable,
+            flowDirection: FlowDirectionType.Forward,
+            dataQualifier: DataQualifierType.Maximum,
+            description: 'Maximum Frequency (Hz)',
+            value: reading.frequency.maximum,
+            uom: UomType.Hz,
+            intervalLength: reading.intervalSeconds,
+            lastUpdateTime,
+            nextUpdateTime,
+        });
+
+        void this.sendMirrorMeterReading({
+            phase: PhaseCode.NotApplicable,
+            flowDirection: FlowDirectionType.Forward,
+            dataQualifier: DataQualifierType.Minimum,
+            description: 'Minimum Frequency (Hz)',
+            value: reading.frequency.minimum,
+            uom: UomType.Hz,
+            intervalLength: reading.intervalSeconds,
+            lastUpdateTime,
+            nextUpdateTime,
         });
     }
 }

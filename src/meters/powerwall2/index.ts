@@ -47,21 +47,25 @@ export function generateSiteMonitoringSample({
 
     return {
         realPower: {
+            type: 'perPhase',
             phaseA: firstMeter.Cached_readings.real_power_a,
             phaseB: firstMeter.Cached_readings.real_power_b ?? null,
             phaseC: firstMeter.Cached_readings.real_power_c ?? null,
         },
         reactivePower: {
+            type: 'perPhase',
             phaseA: firstMeter.Cached_readings.reactive_power_a,
             phaseB: firstMeter.Cached_readings.reactive_power_b ?? null,
             phaseC: firstMeter.Cached_readings.reactive_power_c ?? null,
         },
         voltage: {
+            type: 'perPhase',
             phaseA: firstMeter.Cached_readings.v_l1n,
             phaseB: firstMeter.Cached_readings.v_l2n ?? null,
             phaseC: firstMeter.Cached_readings.v_l3n ?? null,
         },
-        // TODO: this seems to be 0
-        frequency: firstMeter.Cached_readings.frequency,
+        // powerwall 2 does not provide site frequency
+        // the value Cached_readings.frequency is always 0
+        frequency: null,
     };
 }

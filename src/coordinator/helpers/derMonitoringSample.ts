@@ -1,9 +1,16 @@
-import type { PerPhaseMeasurement } from '../../helpers/power';
+import type {
+    PerPhaseMeasurement,
+    PerPhaseOrNoPhaseMeasurement,
+} from '../../helpers/measurement';
 import type { MonitoringSampleBase } from './monitoringSampleBase';
 
-export type DerMonitoringSample = MonitoringSampleBase & {
-    realPower: PerPhaseMeasurement;
-    reactivePower: number;
-    voltage: PerPhaseMeasurement;
-    frequency: number;
+// aligns with the CSIP-AUS requirements for DER monitoring
+export type DerMonitoringSampleData = {
+    realPower: PerPhaseOrNoPhaseMeasurement;
+    reactivePower: PerPhaseOrNoPhaseMeasurement;
+    voltage: PerPhaseMeasurement | null;
+    frequency: number | null;
 };
+
+export type DerMonitoringSample = MonitoringSampleBase &
+    DerMonitoringSampleData;

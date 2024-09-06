@@ -107,6 +107,7 @@ export function generateDerMonitoringSample({
         realPower: {
             // inverter W is only single phase
             // we have to manually calculate per phase power using voltage * current
+            type: 'perPhase',
             phaseA: aggregatedInverterMetrics.PhVphA
                 ? aggregatedInverterMetrics.AphA *
                   aggregatedInverterMetrics.PhVphA
@@ -120,8 +121,12 @@ export function generateDerMonitoringSample({
                   aggregatedInverterMetrics.PhVphC
                 : null,
         },
-        reactivePower: aggregatedInverterMetrics.VAr ?? 0,
+        reactivePower: {
+            type: 'noPhase',
+            value: aggregatedInverterMetrics.VAr ?? 0,
+        },
         voltage: {
+            type: 'perPhase',
             phaseA: assertNonNull(aggregatedInverterMetrics.PhVphA),
             phaseB: aggregatedInverterMetrics.PhVphB,
             phaseC: aggregatedInverterMetrics.PhVphC,
