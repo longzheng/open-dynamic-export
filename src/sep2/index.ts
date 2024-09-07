@@ -14,12 +14,12 @@ import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList';
 import { TimeHelper } from './helpers/time';
 import { getSep2Certificate } from '../helpers/sep2Cert';
 import type { EndDeviceList } from './models/endDeviceList';
-import type { EndDeviceResponse } from './models/endDevice';
 import {
     generateEndDeviceResponse,
     parseEndDeviceXml,
 } from './models/endDevice';
 import { objectToXml } from './helpers/xml';
+import { generateConnectionPointResponse } from './models/connectionPoint';
 
 export function getSep2Limiter({
     config,
@@ -109,6 +109,14 @@ export function getSep2Limiter({
                 functionSetAssignmentsListHelper.updateHref({
                     href: endDevice.functionSetAssignmentsListLink.href,
                 });
+            }
+
+            if (endDevice.connectionPointLink?.href) {
+                await putConnectionPointId({
+                    connectionPointHref: endDevice.connectionPointLink.href,
+                });
+
+                await endDeviceListHelper.refresh();
             }
         })();
     });
@@ -210,6 +218,27 @@ export function getSep2Limiter({
         }
 
         return parseEndDeviceXml(await sep2Client.get(locationHeader));
+    }
+
+    async function putConnectionPointId({
+        connectionPointHref,
+    }: {
+        connectionPointHref: string;
+    }) {
+        const nmi = config.limiters.sep2?.nmi;
+
+        if (!nmi) {
+            throw new Error(
+                'Missing NMI for CSIP-AUS ConnectionPoint in-band registration',
+            );
+        }
+
+        const data = generateConnectionPointResponse({
+            connectionPointId: nmi,
+        });
+        const xml = objectToXml(data);
+
+        await sep2Client.put(connectionPointHref, xml);
     }
 
     return {
