@@ -141,3 +141,27 @@ export function registersToAcc64BigInt(registers: number[]): bigint {
         BigInt(registers[3]!)
     );
 }
+
+export function registersToId<ID extends number>(
+    registers: number[],
+    value: ID | ID[],
+): ID {
+    const registerValue = registersToUint16(registers);
+
+    if (typeof value === 'number') {
+        if (registerValue !== value) {
+            throw new Error(
+                `Invalid model ID value, expected ${value}, got ${registerValue}`,
+            );
+        }
+        return value;
+    }
+
+    if (value.some((v) => v === registerValue)) {
+        return registerValue as ID;
+    }
+
+    throw new Error(
+        `Invalid model ID value, expected one of ${value.join('/')}, got ${registerValue}`,
+    );
+}

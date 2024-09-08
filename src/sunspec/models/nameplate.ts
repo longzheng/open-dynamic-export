@@ -5,6 +5,7 @@ import {
     registersToUint16Nullable,
     registersToSunssfNullable,
     registersToInt16Nullable,
+    registersToId,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
@@ -12,8 +13,7 @@ import { sunSpecModelFactory } from './sunSpecModelFactory';
 export type NameplateModel = {
     // Model identifier
     // Well-known value. Uniquely identifies this as a sunspec model nameplate
-    // 120 is nameplate
-    ID: number;
+    ID: 120;
     // Model length
     L: number;
     // Type of DER device. Default value is 4 to indicate PV device.
@@ -74,7 +74,7 @@ export const nameplateModel = sunSpecModelFactory<NameplateModel>({
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, 120),
         },
         L: {
             start: 1,

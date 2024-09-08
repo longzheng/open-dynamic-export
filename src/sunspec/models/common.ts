@@ -1,4 +1,5 @@
 import {
+    registersToId,
     registersToString,
     registersToStringNullable,
     registersToUint16,
@@ -9,7 +10,7 @@ import { sunSpecModelFactory } from './sunSpecModelFactory';
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type CommonModel = {
     // Length of sunspec model common (1)
-    ID: number;
+    ID: 1;
     // Length of sunspec model common (1)
     L: number;
     // Manufacturer
@@ -32,7 +33,7 @@ export const commonModel = sunSpecModelFactory<CommonModel>({
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, 1),
         },
         L: {
             start: 1,

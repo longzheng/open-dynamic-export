@@ -28,10 +28,6 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             address,
         });
 
-        if (data.ID !== 101 && data.ID !== 102 && data.ID !== 103) {
-            throw new Error('Not a SunSpec inverter monitoring model');
-        }
-
         return data;
     }
 
@@ -53,10 +49,6 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             address,
         });
 
-        if (data.ID !== 120) {
-            throw new Error('Not a SunSpec nameplate model');
-        }
-
         this.nameplateModelCache = data;
 
         return data;
@@ -76,10 +68,6 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             address,
         });
 
-        if (data.ID !== 121) {
-            throw new Error('Not a SunSpec settings model');
-        }
-
         return data;
     }
 
@@ -97,10 +85,6 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             address,
         });
 
-        if (data.ID !== 122) {
-            throw new Error('Not a SunSpec status model');
-        }
-
         return data;
     }
 
@@ -117,10 +101,6 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             modbusConnection: this,
             address,
         });
-
-        if (data.ID !== 123) {
-            throw new Error('Not a SunSpec controls model');
-        }
 
         return data;
     }

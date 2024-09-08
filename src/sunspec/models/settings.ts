@@ -1,4 +1,5 @@
 import {
+    registersToId,
     registersToInt16,
     registersToInt16Nullable,
     registersToSunssf,
@@ -10,11 +11,9 @@ import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type SettingsModel = {
-    // Address Offset
     // Model identifier
     // Well-known value. Uniquely identifies this as a sunspec model nameplate
-    // 121 is inverter controls basic settings
-    ID: number;
+    ID: 121;
     // Model length
     L: number;
     // Setting for maximum power output. Default to WRtg.
@@ -85,7 +84,7 @@ export const settingsModel = sunSpecModelFactory<SettingsModel>({
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, 121),
         },
         L: {
             start: 1,
