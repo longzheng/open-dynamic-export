@@ -37,32 +37,41 @@ export function writeSiteMonitoringSamplePoints(
             break;
         }
         case 'perPhase': {
-            new Point('monitoringSample')
-                .timestamp(siteMonitoringSample.date)
-                .tag('type', 'site')
-                .tag('phase', 'A')
-                .floatField('realPower', siteMonitoringSample.realPower.phaseA);
-
-            if (siteMonitoringSample.realPower.phaseB) {
+            influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(siteMonitoringSample.date)
                     .tag('type', 'site')
-                    .tag('phase', 'B')
+                    .tag('phase', 'A')
                     .floatField(
                         'realPower',
-                        siteMonitoringSample.realPower.phaseB,
-                    );
+                        siteMonitoringSample.realPower.phaseA,
+                    ),
+            );
+
+            if (siteMonitoringSample.realPower.phaseB) {
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(siteMonitoringSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'B')
+                        .floatField(
+                            'realPower',
+                            siteMonitoringSample.realPower.phaseB,
+                        ),
+                );
             }
 
             if (siteMonitoringSample.realPower.phaseC) {
-                new Point('monitoringSample')
-                    .timestamp(siteMonitoringSample.date)
-                    .tag('type', 'site')
-                    .tag('phase', 'C')
-                    .floatField(
-                        'realPower',
-                        siteMonitoringSample.realPower.phaseC,
-                    );
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(siteMonitoringSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'C')
+                        .floatField(
+                            'realPower',
+                            siteMonitoringSample.realPower.phaseC,
+                        ),
+                );
             }
         }
     }
@@ -82,61 +91,79 @@ export function writeSiteMonitoringSamplePoints(
             break;
         }
         case 'perPhase': {
-            new Point('monitoringSample')
-                .timestamp(siteMonitoringSample.date)
-                .tag('type', 'site')
-                .tag('phase', 'A')
-                .floatField(
-                    'reactivePower',
-                    siteMonitoringSample.reactivePower.phaseA,
-                );
-
-            if (siteMonitoringSample.reactivePower.phaseB) {
+            influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(siteMonitoringSample.date)
                     .tag('type', 'site')
-                    .tag('phase', 'B')
+                    .tag('phase', 'A')
                     .floatField(
                         'reactivePower',
-                        siteMonitoringSample.reactivePower.phaseB,
-                    );
+                        siteMonitoringSample.reactivePower.phaseA,
+                    ),
+            );
+
+            if (siteMonitoringSample.reactivePower.phaseB) {
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(siteMonitoringSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'B')
+                        .floatField(
+                            'reactivePower',
+                            siteMonitoringSample.reactivePower.phaseB,
+                        ),
+                );
             }
 
             if (siteMonitoringSample.reactivePower.phaseC) {
-                new Point('monitoringSample')
-                    .timestamp(siteMonitoringSample.date)
-                    .tag('type', 'site')
-                    .tag('phase', 'C')
-                    .floatField(
-                        'reactivePower',
-                        siteMonitoringSample.reactivePower.phaseC,
-                    );
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(siteMonitoringSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'C')
+                        .floatField(
+                            'reactivePower',
+                            siteMonitoringSample.reactivePower.phaseC,
+                        ),
+                );
             }
         }
     }
 
     switch (siteMonitoringSample.voltage.type) {
         case 'perPhase': {
-            new Point('monitoringSample')
-                .timestamp(siteMonitoringSample.date)
-                .tag('type', 'site')
-                .tag('phase', 'A')
-                .floatField('voltage', siteMonitoringSample.voltage.phaseA);
-
-            if (siteMonitoringSample.voltage.phaseB) {
+            influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(siteMonitoringSample.date)
                     .tag('type', 'site')
-                    .tag('phase', 'B')
-                    .floatField('voltage', siteMonitoringSample.voltage.phaseB);
+                    .tag('phase', 'A')
+                    .floatField('voltage', siteMonitoringSample.voltage.phaseA),
+            );
+
+            if (siteMonitoringSample.voltage.phaseB) {
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(siteMonitoringSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'B')
+                        .floatField(
+                            'voltage',
+                            siteMonitoringSample.voltage.phaseB,
+                        ),
+                );
             }
 
             if (siteMonitoringSample.voltage.phaseC) {
-                new Point('monitoringSample')
-                    .timestamp(siteMonitoringSample.date)
-                    .tag('type', 'site')
-                    .tag('phase', 'C')
-                    .floatField('voltage', siteMonitoringSample.voltage.phaseC);
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(siteMonitoringSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'C')
+                        .floatField(
+                            'voltage',
+                            siteMonitoringSample.voltage.phaseC,
+                        ),
+                );
             }
         }
     }
@@ -170,32 +197,41 @@ export function writeDerMonitoringSamplePoints(
             break;
         }
         case 'perPhase': {
-            new Point('monitoringSample')
-                .timestamp(derMonitoringSample.date)
-                .tag('type', 'der')
-                .tag('phase', 'A')
-                .floatField('realPower', derMonitoringSample.realPower.phaseA);
-
-            if (derMonitoringSample.realPower.phaseB) {
+            influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(derMonitoringSample.date)
                     .tag('type', 'der')
-                    .tag('phase', 'B')
+                    .tag('phase', 'A')
                     .floatField(
                         'realPower',
-                        derMonitoringSample.realPower.phaseB,
-                    );
+                        derMonitoringSample.realPower.phaseA,
+                    ),
+            );
+
+            if (derMonitoringSample.realPower.phaseB) {
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(derMonitoringSample.date)
+                        .tag('type', 'der')
+                        .tag('phase', 'B')
+                        .floatField(
+                            'realPower',
+                            derMonitoringSample.realPower.phaseB,
+                        ),
+                );
             }
 
             if (derMonitoringSample.realPower.phaseC) {
-                new Point('monitoringSample')
-                    .timestamp(derMonitoringSample.date)
-                    .tag('type', 'der')
-                    .tag('phase', 'C')
-                    .floatField(
-                        'realPower',
-                        derMonitoringSample.realPower.phaseC,
-                    );
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(derMonitoringSample.date)
+                        .tag('type', 'der')
+                        .tag('phase', 'C')
+                        .floatField(
+                            'realPower',
+                            derMonitoringSample.realPower.phaseC,
+                        ),
+                );
             }
         }
     }
@@ -215,60 +251,72 @@ export function writeDerMonitoringSamplePoints(
             break;
         }
         case 'perPhase': {
-            new Point('monitoringSample')
-                .timestamp(derMonitoringSample.date)
-                .tag('type', 'der')
-                .tag('phase', 'A')
-                .floatField(
-                    'reactivePower',
-                    derMonitoringSample.reactivePower.phaseA,
-                );
-
-            if (derMonitoringSample.reactivePower.phaseB) {
+            influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(derMonitoringSample.date)
                     .tag('type', 'der')
-                    .tag('phase', 'B')
+                    .tag('phase', 'A')
                     .floatField(
                         'reactivePower',
-                        derMonitoringSample.reactivePower.phaseB,
-                    );
+                        derMonitoringSample.reactivePower.phaseA,
+                    ),
+            );
+
+            if (derMonitoringSample.reactivePower.phaseB) {
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(derMonitoringSample.date)
+                        .tag('type', 'der')
+                        .tag('phase', 'B')
+                        .floatField(
+                            'reactivePower',
+                            derMonitoringSample.reactivePower.phaseB,
+                        ),
+                );
             }
 
             if (derMonitoringSample.reactivePower.phaseC) {
-                new Point('monitoringSample')
-                    .timestamp(derMonitoringSample.date)
-                    .tag('type', 'der')
-                    .tag('phase', 'C')
-                    .floatField(
-                        'reactivePower',
-                        derMonitoringSample.reactivePower.phaseC,
-                    );
+                influxDbWriteApi.writePoint(
+                    new Point('monitoringSample')
+                        .timestamp(derMonitoringSample.date)
+                        .tag('type', 'der')
+                        .tag('phase', 'C')
+                        .floatField(
+                            'reactivePower',
+                            derMonitoringSample.reactivePower.phaseC,
+                        ),
+                );
             }
         }
     }
 
     if (derMonitoringSample.voltage) {
-        new Point('monitoringSample')
-            .timestamp(derMonitoringSample.date)
-            .tag('type', 'der')
-            .tag('phase', 'A')
-            .floatField('voltage', derMonitoringSample.voltage.phaseA);
-
-        if (derMonitoringSample.voltage.phaseB) {
+        influxDbWriteApi.writePoint(
             new Point('monitoringSample')
                 .timestamp(derMonitoringSample.date)
                 .tag('type', 'der')
-                .tag('phase', 'B')
-                .floatField('voltage', derMonitoringSample.voltage.phaseB);
+                .tag('phase', 'A')
+                .floatField('voltage', derMonitoringSample.voltage.phaseA),
+        );
+
+        if (derMonitoringSample.voltage.phaseB) {
+            influxDbWriteApi.writePoint(
+                new Point('monitoringSample')
+                    .timestamp(derMonitoringSample.date)
+                    .tag('type', 'der')
+                    .tag('phase', 'B')
+                    .floatField('voltage', derMonitoringSample.voltage.phaseB),
+            );
         }
 
         if (derMonitoringSample.voltage.phaseC) {
-            new Point('monitoringSample')
-                .timestamp(derMonitoringSample.date)
-                .tag('type', 'der')
-                .tag('phase', 'C')
-                .floatField('voltage', derMonitoringSample.voltage.phaseC);
+            influxDbWriteApi.writePoint(
+                new Point('monitoringSample')
+                    .timestamp(derMonitoringSample.date)
+                    .tag('type', 'der')
+                    .tag('phase', 'C')
+                    .floatField('voltage', derMonitoringSample.voltage.phaseC),
+            );
         }
     }
 
