@@ -273,6 +273,7 @@ The initial plan is to implement a direct gateway client that interacts directly
   - [x] Tesla Powerwall
 - [x] CSIP-AUS/SEP2/IEEE 2030.5 client
   - [x] Discovery and scheduled entity polling
+  - [x] ConnectionPoint in-band registration
   - [x] DER status/capability/settings reporting
   - [x] DER control scheduling and default DER control fallback
   - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
@@ -280,7 +281,6 @@ The initial plan is to implement a direct gateway client that interacts directly
 - [x] Metrics logging in InfluxDB
 
 Future
-- [ ] CSIP-AUS ConnectionPoint registration
 - [ ] CSIP-AUS self-service certificate generation
 - [ ] CSIP-AUS cloud aggregator proxy mode
 - [ ] Web UI with real-time metrics and historical metrics
