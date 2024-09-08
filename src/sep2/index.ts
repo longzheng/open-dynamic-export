@@ -13,6 +13,14 @@ import { FunctionSetAssignmentsListHelper } from './helpers/functionSetAssignmen
 import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList';
 import { TimeHelper } from './helpers/time';
 import { getSep2Certificate } from '../helpers/sep2Cert';
+import type { EndDeviceList } from './models/endDeviceList';
+import {
+    generateEndDeviceResponse,
+    parseEndDeviceXml,
+} from './models/endDevice';
+import { objectToXml } from './helpers/xml';
+import { generateConnectionPointResponse } from './models/connectionPoint';
+import { RegistrationHelper } from './helpers/registration';
 
 export function getSep2Limiter({
     config,
@@ -41,6 +49,10 @@ export function getSep2Limiter({
     });
 
     const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
+        client: sep2Client,
+    });
+
+    const registrationHelper = new RegistrationHelper({
         client: sep2Client,
     });
 
@@ -83,32 +95,41 @@ export function getSep2Limiter({
     });
 
     endDeviceListHelper.on('data', (endDeviceList) => {
-        logger.debug({ endDeviceList }, 'Received SEP2 end device list');
+        void (async () => {
+            logger.debug({ endDeviceList }, 'Received SEP2 end device list');
 
-        // as a direct client, we expect only one end device that matches the LFDI of our certificate
-        const endDevice = endDeviceList.endDevices.find(
-            (endDevice) => endDevice.lFDI === sep2Client.lfdi,
-        );
+            const endDevice = await getOrCreateEndDevice({ endDeviceList });
 
-        if (!endDevice) {
-            throw new Error('End device not found');
-        }
+            if (endDevice.enabled !== true) {
+                throw new Error('End device is not enabled');
+            }
 
-        if (endDevice.enabled !== true) {
-            throw new Error('End device is not enabled');
-        }
+            if (endDevice.derListLink) {
+                derListHelper.updateHref({
+                    href: endDevice.derListLink.href,
+                });
+            }
 
-        if (endDevice.derListLink) {
-            derListHelper.updateHref({
-                href: endDevice.derListLink.href,
-            });
-        }
+            if (endDevice.functionSetAssignmentsListLink) {
+                functionSetAssignmentsListHelper.updateHref({
+                    href: endDevice.functionSetAssignmentsListLink.href,
+                });
+            }
 
-        if (endDevice.functionSetAssignmentsListLink) {
-            functionSetAssignmentsListHelper.updateHref({
-                href: endDevice.functionSetAssignmentsListLink.href,
-            });
-        }
+            if (endDevice.connectionPointLink?.href) {
+                await putConnectionPointId({
+                    connectionPointHref: endDevice.connectionPointLink.href,
+                });
+
+                await endDeviceListHelper.refresh();
+            }
+
+            if (endDevice.registrationLink) {
+                registrationHelper.updateHref({
+                    href: endDevice.registrationLink.href,
+                });
+            }
+        })();
     });
 
     derListHelper.on('data', (derList) => {
@@ -157,6 +178,79 @@ export function getSep2Limiter({
             href: deviceCapability.mirrorUsagePointListLink.href,
         });
     });
+
+    async function getOrCreateEndDevice({
+        endDeviceList,
+    }: {
+        endDeviceList: EndDeviceList;
+    }) {
+        // as a direct client, we expect only one end device that matches the LFDI of our certificate
+        const endDevice = endDeviceList.endDevices.find(
+            (endDevice) =>
+                endDevice.lFDI === sep2Client.lfdi &&
+                endDevice.enabled === true,
+        );
+
+        if (endDevice) {
+            return endDevice;
+        }
+
+        const endDeviceListHref = endDeviceList.href;
+        if (!endDeviceListHref) {
+            throw new Error('Missing endDeviceList href');
+        }
+
+        return postEndDevice({
+            endDeviceListHref,
+        });
+    }
+
+    async function postEndDevice({
+        endDeviceListHref,
+    }: {
+        endDeviceListHref: string;
+    }) {
+        const data = generateEndDeviceResponse({
+            lFDI: sep2Client.lfdi,
+            sFDI: sep2Client.sfdi,
+            changedTime: new Date(),
+            enabled: true,
+        });
+        const xml = objectToXml(data);
+
+        const response = await sep2Client.post(endDeviceListHref, xml);
+
+        const locationHeader = response.headers['location'] as
+            | string
+            | undefined;
+
+        if (!locationHeader) {
+            throw new Error('Missing location header');
+        }
+
+        return parseEndDeviceXml(await sep2Client.get(locationHeader));
+    }
+
+    async function putConnectionPointId({
+        connectionPointHref,
+    }: {
+        connectionPointHref: string;
+    }) {
+        const nmi = config.limiters.sep2?.nmi;
+
+        if (!nmi) {
+            throw new Error(
+                'Missing NMI for CSIP-AUS ConnectionPoint in-band registration',
+            );
+        }
+
+        const data = generateConnectionPointResponse({
+            connectionPointId: nmi,
+        });
+        const xml = objectToXml(data);
+
+        await sep2Client.put(connectionPointHref, xml);
+    }
 
     return {
         sep2Client,

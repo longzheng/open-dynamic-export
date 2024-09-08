@@ -42,6 +42,10 @@ export class EndDeviceListHelper extends EventEmitter<{
         return this;
     }
 
+    public async refresh() {
+        await this.endDeviceListPollableResource?.poll();
+    }
+
     public destroy() {
         this.endDeviceListPollableResource?.destroy();
     }

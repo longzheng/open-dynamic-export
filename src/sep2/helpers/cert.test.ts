@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
     formatDateToYYMMDDhhmmssZ,
+    getCertificateFingerprint,
     getCertificateLfdi,
+    getCertificateSfdi,
     INDEF_EXPIRY,
 } from './cert';
 
-describe('getCertificateLfdi', () => {
+describe('getCertificateFingerprint', () => {
     it('returns valid LFDI', () => {
         // mock certificate
         const certString = `-----BEGIN CERTIFICATE-----
@@ -24,9 +26,11 @@ HwYDVR0jBBgwFoAUdEYDPJta6xnRJIA4U1e+keJH09swDwYDVR0TAQH/BAUwAwEB
 +ov7KgIhAIb+m/lof7dw7UJzAsQHHdE1r/Ln/p09KFAkymItyygB
 -----END CERTIFICATE-----`;
 
-        const lfdi = getCertificateLfdi(certString);
+        const lfdi = getCertificateFingerprint(certString);
 
-        expect(lfdi).toBe('B9A8A75E324D2312AD09F8DAF9C1295A3CE4142E');
+        expect(lfdi).toBe(
+            'B9A8A75E324D2312AD09F8DAF9C1295A3CE4142EDE6D372A5D033BE6A4294207',
+        );
     });
 
     it('handles certificate chain', () => {
@@ -75,9 +79,31 @@ EAKsOJor4O3nAiEA49GIjhIUlKVggODrt9nUnhKZcxn0qSmmBAdeN0pd1y8=
 -----END CERTIFICATE-----
 `;
 
-        const lfdi = getCertificateLfdi(certString);
+        const lfdi = getCertificateFingerprint(certString);
 
-        expect(lfdi).toBe('0F8872FF54ACDC4A9B789F0872255051D0BDBB64');
+        expect(lfdi).toBe(
+            '0F8872FF54ACDC4A9B789F0872255051D0BDBB64D0E1C7E3FC562F40D852A494',
+        );
+    });
+});
+
+describe('getCertificateLfdi', () => {
+    it('returns valid LFDI', () => {
+        const lfdi = getCertificateLfdi(
+            'B9A8A75E324D2312AD09F8DAF9C1295A3CE4142EDE6D372A5D033BE6A4294207',
+        );
+
+        expect(lfdi).toBe('B9A8A75E324D2312AD09F8DAF9C1295A3CE4142E');
+    });
+});
+
+describe('getCertificateSfdi', () => {
+    it('returns valid SFDI', () => {
+        const lfdi = getCertificateSfdi(
+            '3E4F45AB31EDFE5B67E343E5E4562E31984E23E5349E2AD745672ED145EE213A',
+        );
+
+        expect(lfdi).toBe('167261211391');
     });
 });
 

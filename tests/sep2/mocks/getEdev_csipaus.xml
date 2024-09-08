@@ -1,0 +1,35 @@
+<EndDeviceList href="/sep2/edev" subscribable="1" all="3" results="3"
+    xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:csipaus="https://csipaus.org/ns">
+    <EndDevice href="/sep2/edev/1000">
+        <LFDI>9dfdd56f6128cdc894ale42c698cab197184aBe9</LFDI>
+        <LogEventListLink href="/sep2/edev/1000/log" all="0"/>
+        <sFDI>424105305561</sFDI>
+        <changedTime>1514837000</changedTime>
+        <enabled>1</enabled>
+        <RegistrationLink href="/sep2/edev/1008/rg"/>
+        <SubscriptionListLink href="/sep2/edev/1000/sub" all="0"/>
+    </EndDevice>
+    <EndDevice href="/sep2/edev/1">
+        <csipaus:ConnectionPointLink href="/edev/1/cp"/>
+        <DERListLink href="/sep2/edev/1/der" all="0"/>
+        <LFDI>12a4a4b406ad102e7421019135ffa2805235a21c</LFDI>
+        <LogEventListLink href="/sep2/edev/1/log" all="9"/>
+        <sFDI>050044792964</sFDI>
+        <changedTime>1514836800</changedTime>
+        <enabled>1</enabled>
+        <FunctionSetAssignmentsListLink href="/sep2/edev/1/fsa" all="2"/>
+        <RegistrationLink href="/sep2/edev/1/rg"/>
+    </EndDevice>
+    <EndDevice href="/sep2/edev/2">
+        <csipaus:ConnectionPointLink href="/edev/2/cp"/>
+        <DERListLink href="/sep2/edev/2/der" all="0"/>
+        <LFDI>5509d69f8b353595206ad71b47e27906318ea367</LFDI>
+        <LogEventListLink href="/sep2/edev/2/log" all="0"/>
+        <sFDI>228273300409</sFDI>
+        <changedTime>1514836800</changedTime>
+        <enabled>1</enabled>
+        <FunctionSetAssignmentsListLink href="/sep2/edev/2/fsa" all="2"/>
+        <RegistrationLink href="/sep2/edev/2/rg"/>
+    </EndDevice>
+</EndDeviceList>

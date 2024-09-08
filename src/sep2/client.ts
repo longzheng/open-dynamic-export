@@ -2,7 +2,11 @@ import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios, { AxiosError } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
-import { getCertificateLfdi } from '../helpers/cert';
+import {
+    getCertificateFingerprint,
+    getCertificateLfdi,
+    getCertificateSfdi,
+} from './helpers/cert';
 import type { Config } from '../helpers/config';
 import type { RoleFlagsType } from './models/roleFlagsType';
 import { numberToHex } from '../helpers/number';
@@ -17,6 +21,7 @@ export class SEP2Client {
     private dcapUri: string;
     private pen: string;
     public lfdi: string;
+    public sfdi: string;
     private axiosInstance: AxiosInstance;
 
     constructor({
@@ -36,7 +41,11 @@ export class SEP2Client {
         this.host = sep2Config.host;
         this.dcapUri = sep2Config.dcapUri;
         this.pen = pen.padStart(8, '0');
-        this.lfdi = getCertificateLfdi(cert);
+
+        const certificateFingerprint = getCertificateFingerprint(cert);
+
+        this.lfdi = getCertificateLfdi(certificateFingerprint);
+        this.sfdi = getCertificateSfdi(certificateFingerprint);
 
         const axiosClient = axios.create({
             baseURL: this.host,

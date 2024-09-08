@@ -47,7 +47,7 @@ const DEFAULT_DEV_POLICIES = [
     SEP2_BULK_CERT,
 ];
 
-export function getCertificateLfdi(certPem: string): string {
+export function getCertificateFingerprint(certPem: string): string {
     const cert = new rs.X509();
     cert.readCertPEM(
         certPem
@@ -64,10 +64,33 @@ export function getCertificateLfdi(certPem: string): string {
         .update(Buffer.from(derEncoded, 'hex'))
         .digest('hex');
 
-    // Convert hash to uppercase and take the first 40 characters
-    const result = sha256Hash.toUpperCase().slice(0, 40);
+    return sha256Hash.toUpperCase();
+}
+
+export function getCertificateLfdi(certificateFingerprint: string): string {
+    // Left truncate the hash to (160 bits) 40 hex character
+    const result = certificateFingerprint.slice(0, 40);
 
     return result;
+}
+
+export function getCertificateSfdi(certificateFingerprint: string): string {
+    // Left truncate the hash to 36 bits (9 hex digits)
+    const truncatedHex = certificateFingerprint.slice(0, 9);
+
+    // Convert truncatedHex to decimal (base 10)
+    const sfdiValue = BigInt('0x' + truncatedHex).toString();
+
+    const sum = sfdiValue
+        .split('')
+        .map(Number)
+        .reduce((acc, digit) => acc + digit, 0);
+
+    const checksum = (10 - (sum % 10)) % 10;
+
+    const sfdiWithChecksum = sfdiValue + checksum.toString();
+
+    return sfdiWithChecksum;
 }
 
 export function generateCertRequestAndKey({

@@ -39,6 +39,11 @@ export abstract class PollableResource<
     }): Promise<ResponseType>;
 
     public async poll() {
+        // cancel any existing poll timer
+        if (this.pollTimerId) {
+            clearTimeout(this.pollTimerId);
+        }
+
         const response = await this.get({ client: this.client, url: this.url });
 
         this.emit('data', response);

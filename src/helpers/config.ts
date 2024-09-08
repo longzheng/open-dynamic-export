@@ -31,6 +31,14 @@ export const configSchema = z.object({
                     dcapUri: z
                         .string()
                         .describe('The URI of the DeviceCapability resource'),
+                    nmi: z
+                        .string()
+                        .min(10)
+                        .max(11)
+                        .optional()
+                        .describe(
+                            'For in-band registration, the NMI of the site',
+                        ),
                 })
                 .optional()
                 .describe('If defined, limit by CSIP-AUS/SEP2 server'),

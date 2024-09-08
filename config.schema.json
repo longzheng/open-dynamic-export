@@ -18,6 +18,12 @@
                 "dcapUri": {
                   "type": "string",
                   "description": "The URI of the DeviceCapability resource"
+                },
+                "nmi": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 11,
+                  "description": "For in-band registration, the NMI of the site"
                 }
               },
               "required": [
