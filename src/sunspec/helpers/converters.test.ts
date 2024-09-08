@@ -4,6 +4,7 @@ import {
     int16ToRegisters,
     registersToAcc32,
     registersToAcc64BigInt,
+    registersToId,
     registersToInt16,
     registersToInt16Nullable,
     registersToString,
@@ -121,4 +122,32 @@ it('int16ToRegistersNullable should convert null to registers', () => {
     const value = null;
     const result = int16NullableToRegisters(value);
     expect(result).toEqual([0x8000]);
+});
+
+describe('registersToId', () => {
+    it('registersToId should convert register to a ID number', () => {
+        const registers = [0x0002];
+        const result = registersToId(registers, 2);
+        expect(result).toBe(2);
+    });
+
+    it('registersToId should throw if register does not match ID number', () => {
+        const registers = [0x0004];
+        expect(() => registersToId(registers, 2)).toThrowError(
+            'Invalid model ID value',
+        );
+    });
+
+    it('registersToId should convert register to a ID number array', () => {
+        const registers = [0x0003];
+        const result = registersToId(registers, [2, 3, 4]);
+        expect(result).toBe(3);
+    });
+
+    it('registersToId should throw if register does not match ID number array', () => {
+        const registers = [0x0005];
+        expect(() => registersToId(registers, [2, 3, 4])).toThrowError(
+            'Invalid model ID value',
+        );
+    });
 });

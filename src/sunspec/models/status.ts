@@ -6,14 +6,14 @@ import {
     registersToUint32Nullable,
     registersToStringNullable,
     registersToInt16Nullable,
+    registersToId,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type StatusModel = {
     // Model identifier
-    // 122 is Inverter Controls Extended Measurements and Status
-    ID: number;
+    ID: 122;
     // Model length
     L: number;
     // PV inverter present/available status. Enumerated value.
@@ -64,7 +64,7 @@ export const statusModel = sunSpecModelFactory<StatusModel>({
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, 122),
         },
         L: {
             start: 1,

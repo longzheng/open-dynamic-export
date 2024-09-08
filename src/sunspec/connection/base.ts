@@ -174,10 +174,6 @@ export abstract class SunSpecConnection {
             address,
         });
 
-        if (data.ID !== 1) {
-            throw new Error('Not a SunSpec common model');
-        }
-
         // cache common model
         // this is not expected to ever change so it can be persisted
         this.commonModelCache = data;

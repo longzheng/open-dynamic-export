@@ -9,14 +9,14 @@ import {
     registersToInt16Nullable,
     int16NullableToRegisters,
     registersToSunssfNullable,
+    registersToId,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type ControlsModel = {
     // Model identifier
-    // 123 is Immediate Inverter Controls
-    ID: number;
+    ID: 123;
     // Model length
     L: number;
     // Time window for connect/disconnect
@@ -103,7 +103,7 @@ export const controlsModel = sunSpecModelFactory<
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, 123),
         },
         L: {
             start: 1,

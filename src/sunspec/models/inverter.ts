@@ -8,6 +8,7 @@ import {
     registersToInt16Nullable,
     registersToSunssfNullable,
     registersToUint32Nullable,
+    registersToId,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
@@ -16,7 +17,7 @@ export type InverterModel = {
     // Model identifier
     // Well-known value. Uniquely identifies this as a sunspec model inverter monitoring
     // 101 is single phase, 102 is split phase, 103 is three phase
-    ID: number;
+    ID: 101 | 102 | 103;
     // Model length
     L: number;
     // AC Current
@@ -101,7 +102,7 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, [101, 102, 103]),
         },
         L: {
             start: 1,

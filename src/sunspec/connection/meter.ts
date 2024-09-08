@@ -19,10 +19,6 @@ export class MeterSunSpecConnection extends SunSpecConnection {
             address,
         });
 
-        if (data.ID !== 201 && data.ID !== 202 && data.ID !== 203) {
-            throw new Error('Not a SunSpec meter model');
-        }
-
         return data;
     }
 }

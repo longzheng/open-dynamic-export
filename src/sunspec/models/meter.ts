@@ -5,6 +5,7 @@ import {
     registersToInt16Nullable,
     registersToSunssfNullable,
     registersToAcc32,
+    registersToId,
 } from '../helpers/converters';
 import { sunSpecModelFactory } from './sunSpecModelFactory';
 
@@ -12,7 +13,7 @@ import { sunSpecModelFactory } from './sunSpecModelFactory';
 export type MeterModel = {
     // Model identifier
     // 201: single phase, 202: split phase, 203: three phases
-    ID: number;
+    ID: 201 | 202 | 203;
     // Model length
     L: number;
     // AC Current
@@ -157,7 +158,7 @@ export const meterModel = sunSpecModelFactory<MeterModel>({
         ID: {
             start: 0,
             end: 1,
-            readConverter: registersToUint16,
+            readConverter: (value) => registersToId(value, [201, 202, 203]),
         },
         L: {
             start: 1,
