@@ -42,13 +42,12 @@ describe('getListAll', () => {
         const mockResults: MockStringsList[] = [
             { all: 4, results: 2, strings: ['test1', 'test2'] },
             { all: 4, results: 2, strings: ['test3', 'test4'] },
-            { all: 4, results: 0, strings: [] },
         ];
 
-        vi.spyOn(sep2Client, 'get')
+        const mockGetCalls = vi
+            .spyOn(sep2Client, 'get')
             .mockResolvedValueOnce(mockResults[0])
-            .mockResolvedValueOnce(mockResults[1])
-            .mockResolvedValueOnce(mockResults[2]);
+            .mockResolvedValueOnce(mockResults[1]);
 
         // Act
         const result = await getListAll({
@@ -62,6 +61,7 @@ describe('getListAll', () => {
         // Assert
         expect(result.strings.length).toBe(4);
         expect(result.strings).toEqual(['test1', 'test2', 'test3', 'test4']);
+        expect(mockGetCalls).toBeCalledTimes(2);
     });
 
     it('should throw an error if there are more items than returned', async () => {
@@ -71,7 +71,8 @@ describe('getListAll', () => {
             { all: 4, results: 0, strings: [] },
         ];
 
-        vi.spyOn(sep2Client, 'get')
+        const mockGetCalls = vi
+            .spyOn(sep2Client, 'get')
             .mockResolvedValueOnce(mockResults[0])
             .mockResolvedValueOnce(mockResults[1]);
 
@@ -85,6 +86,7 @@ describe('getListAll', () => {
                 getItems: mockGetItems,
             }),
         ).rejects.toThrow('There are more items (4) than returned (2)');
+        expect(mockGetCalls).toBeCalledTimes(2);
     });
 
     it('should not throw if there are no results', async () => {
@@ -95,7 +97,9 @@ describe('getListAll', () => {
             strings: [],
         };
 
-        vi.spyOn(sep2Client, 'get').mockResolvedValue(mockResult);
+        const mockGetCalls = vi
+            .spyOn(sep2Client, 'get')
+            .mockResolvedValue(mockResult);
 
         // Act
         const result = await getListAll({
@@ -108,5 +112,6 @@ describe('getListAll', () => {
 
         // Assert
         expect(result.strings.length).toBe(0);
+        expect(mockGetCalls).toBeCalledTimes(1);
     });
 });

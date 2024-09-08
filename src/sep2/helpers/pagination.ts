@@ -25,6 +25,14 @@ export async function getListAll<T extends List>({
         url,
         limit,
         parseXml,
+        getItemsLength: () => {
+            // we expect this function to be called after some items are added so this should never be null
+            if (!allResults) {
+                throw new Error('allResults is null');
+            }
+
+            return getItems(allResults).length;
+        },
     })) {
         if (!allResults) {
             allResults = result;
@@ -53,8 +61,10 @@ async function* getListPageGenerator<T extends List>({
     url,
     limit,
     parseXml,
+    getItemsLength,
 }: Omit<PaginationOptions<T>, 'addItems' | 'getItems'> & {
     limit: number;
+    getItemsLength: () => number;
 }): AsyncGenerator<T> {
     let startIndex = 0;
 
@@ -69,7 +79,9 @@ async function* getListPageGenerator<T extends List>({
 
         yield result;
 
-        if (result.results === 0) {
+        // stop the generator if the total number of items matches the results all number
+        // or we didn't receive any more results (to prevent infinite loops if the count is wrong)
+        if (result.all === getItemsLength() || result.results === 0) {
             break;
         }
 
