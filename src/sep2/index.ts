@@ -20,6 +20,7 @@ import {
 } from './models/endDevice';
 import { objectToXml } from './helpers/xml';
 import { generateConnectionPointResponse } from './models/connectionPoint';
+import { RegistrationHelper } from './helpers/registration';
 
 export function getSep2Limiter({
     config,
@@ -48,6 +49,10 @@ export function getSep2Limiter({
     });
 
     const endDeviceListHelper: EndDeviceListHelper = new EndDeviceListHelper({
+        client: sep2Client,
+    });
+
+    const registrationHelper = new RegistrationHelper({
         client: sep2Client,
     });
 
@@ -117,6 +122,12 @@ export function getSep2Limiter({
                 });
 
                 await endDeviceListHelper.refresh();
+            }
+
+            if (endDevice.registrationLink) {
+                registrationHelper.updateHref({
+                    href: endDevice.registrationLink.href,
+                });
             }
         })();
     });
