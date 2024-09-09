@@ -1,19 +1,19 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { stringIntToDate } from '../helpers/date';
-import { parseEventStatusXmlObject, type EventStatus } from './eventStatus';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { stringIntToDate } from '../helpers/date.js';
+import { parseEventStatusXmlObject, type EventStatus } from './eventStatus.js';
 import {
     parseIdentifiedObjectXmlObject,
     type IdentifiedObject,
-} from './identifiedObject';
+} from './identifiedObject.js';
 import {
     parseRespondableResourceXmlObject,
     type RespondableResource,
-} from './respondableResource';
+} from './respondableResource.js';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
-} from './subscribableResource';
+} from './subscribableResource.js';
 
 type Interval = {
     // duration in seconds

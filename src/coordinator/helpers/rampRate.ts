@@ -1,5 +1,5 @@
-import Decimal from 'decimal.js';
-import { logger as pinoLogger } from '../../helpers/logger';
+import { Decimal } from 'decimal.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
 
 // The default ramp-rate of 0.27% per second (approximately equal to 16.67% per minute)

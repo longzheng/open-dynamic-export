@@ -1,7 +1,7 @@
-import { SEP2Client } from './client';
+import { SEP2Client } from './client.js';
 import { beforeAll, it, expect, describe } from 'vitest';
-import { RoleFlagsType } from './models/roleFlagsType';
-import { mockCert, mockKey } from '../../tests/sep2/cert';
+import { RoleFlagsType } from './models/roleFlagsType.js';
+import { mockCert, mockKey } from '../../tests/sep2/cert.js';
 
 let sep2Client: SEP2Client;
 

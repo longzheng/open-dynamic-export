@@ -1,9 +1,11 @@
 {
     "extends": "@tsconfig/strictest/tsconfig.json",
     "compilerOptions": {
-        "target": "ES2023",
-        "module": "ESNext",
-        "moduleResolution": "Node",
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "outDir": "dist",
+        "sourceMap": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
@@ -16,5 +18,5 @@
         // allow unused during dev
         "noUnusedLocals": false,
     },
-    "include": ["src/", "scripts/", "tests/"]
+    "include": ["src/", "scripts/", "tests/", "vitest.config.ts"]
 }

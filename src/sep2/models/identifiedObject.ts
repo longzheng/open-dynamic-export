@@ -1,6 +1,6 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { parseResourceXmlObject, type Resource } from './resource';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { parseResourceXmlObject, type Resource } from './resource.js';
 
 export type IdentifiedObject = {
     description?: string;

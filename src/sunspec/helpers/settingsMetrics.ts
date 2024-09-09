@@ -3,8 +3,8 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../helpers/number';
-import type { SettingsModel } from '../models/settings';
+} from '../../helpers/number.js';
+import type { SettingsModel } from '../models/settings.js';
 
 export function getSettingsMetrics(settings: SettingsModel) {
     return {

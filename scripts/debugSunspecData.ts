@@ -1,27 +1,27 @@
 import 'dotenv/config';
-import { getConfig } from '../src/helpers/config';
-import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics';
+import { getConfig } from '../src/helpers/config.js';
+import { getMeterMetrics } from '../src/sunspec/helpers/meterMetrics.js';
 import {
     getAggregatedInverterMetrics,
     getInverterMetrics,
-} from '../src/sunspec/helpers/inverterMetrics';
-import { logger } from '../src/helpers/logger';
+} from '../src/sunspec/helpers/inverterMetrics.js';
+import { logger } from '../src/helpers/logger.js';
 import {
     getAggregatedNameplateMetrics,
     getNameplateMetrics,
-} from '../src/sunspec/helpers/nameplateMetrics';
+} from '../src/sunspec/helpers/nameplateMetrics.js';
 import {
     getAggregatedStatusMetrics,
     getStatusMetrics,
-} from '../src/sunspec/helpers/statusMetrics';
+} from '../src/sunspec/helpers/statusMetrics.js';
 import {
     getAggregatedSettingsMetrics,
     getSettingsMetrics,
-} from '../src/sunspec/helpers/settingsMetrics';
+} from '../src/sunspec/helpers/settingsMetrics.js';
 import {
     getSunSpecInvertersConnections,
     getSunSpecMeterConnection,
-} from '../src/sunspec/connections';
+} from '../src/sunspec/connections.js';
 
 // This debugging script dumps all the SunSpec model data
 // It polls the inverters and smart meters once

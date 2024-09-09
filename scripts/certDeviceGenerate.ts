@@ -1,5 +1,5 @@
-import { generateDeviceCertificate } from '../src/sep2/helpers/cert';
-import { env } from '../src/helpers/env';
+import { generateDeviceCertificate } from '../src/sep2/helpers/cert.js';
+import { env } from '../src/helpers/env.js';
 
 generateDeviceCertificate({
     certPath: './config/cert.pem',

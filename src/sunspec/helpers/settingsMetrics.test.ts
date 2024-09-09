@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import type { SettingsModel } from '../models/settings';
-import { getSettingsMetrics } from './settingsMetrics';
+import type { SettingsModel } from '../models/settings.js';
+import { getSettingsMetrics } from './settingsMetrics.js';
 
 it('getSettingsMetrics returns data', () => {
     const settings: SettingsModel = {

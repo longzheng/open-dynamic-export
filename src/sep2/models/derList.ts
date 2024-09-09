@@ -1,8 +1,8 @@
-import { assertArray } from '../helpers/assert';
-import type { DER } from './der';
-import { parseDerXmlObject } from './der';
-import { parseListXmlObject, type List } from './list';
-import { parsePollRateXmlObject, type PollRate } from './pollRate';
+import { assertArray } from '../helpers/assert.js';
+import type { DER } from './der.js';
+import { parseDerXmlObject } from './der.js';
+import { parseListXmlObject, type List } from './list.js';
+import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
 
 export type DERList = {
     pollRate: PollRate;

@@ -1,11 +1,11 @@
-import { numberToHex } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { xmlns } from '../helpers/namespace';
-import { parsePostRateXmlObject, type PostRate } from './postRate';
+import { numberToHex } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { xmlns } from '../helpers/namespace.js';
+import { parsePostRateXmlObject, type PostRate } from './postRate.js';
 import {
     parseUsagePointBaseXmlObject,
     type UsagePointBase,
-} from './usagePointBase';
+} from './usagePointBase.js';
 
 export type MirrorUsagePoint = {
     postRate?: PostRate;

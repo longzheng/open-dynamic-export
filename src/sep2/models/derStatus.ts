@@ -1,7 +1,7 @@
-import type { ConnectStatus } from './connectStatus';
-import { dateToStringSeconds } from '../helpers/date';
-import { xmlns } from '../helpers/namespace';
-import { numberToHex } from '../../helpers/number';
+import type { ConnectStatus } from './connectStatus.js';
+import { dateToStringSeconds } from '../helpers/date.js';
+import { xmlns } from '../helpers/namespace.js';
+import { numberToHex } from '../../helpers/number.js';
 
 /// DER OperationalModeStatus value:
 /// 0 - Not applicable / Unknown

@@ -7,7 +7,7 @@ import {
     it,
     vi,
 } from 'vitest';
-import { Powerwall2Client } from './client';
+import { Powerwall2Client } from './client.js';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import loginBasicJson from '../../../tests/tesla/powerwall2/mocks/loginBasic.json';

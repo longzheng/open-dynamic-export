@@ -1,4 +1,4 @@
-import { assertString } from '../helpers/assert';
+import { assertString } from '../helpers/assert.js';
 
 export type Resource = {
     href?: string;

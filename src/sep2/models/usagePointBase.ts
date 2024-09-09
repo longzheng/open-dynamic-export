@@ -1,14 +1,14 @@
 import {
     safeParseStringToEnumType,
     stringHexToEnumType,
-} from '../../helpers/enum';
-import { assertString } from '../helpers/assert';
+} from '../../helpers/enum.js';
+import { assertString } from '../helpers/assert.js';
 import {
     parseIdentifiedObjectXmlObject,
     type IdentifiedObject,
-} from './identifiedObject';
-import type { RoleFlagsType } from './roleFlagsType';
-import { ServiceKind } from './serviceKind';
+} from './identifiedObject.js';
+import type { RoleFlagsType } from './roleFlagsType.js';
+import { ServiceKind } from './serviceKind.js';
 
 export enum UsagePointBaseStatus {
     Off = '0',

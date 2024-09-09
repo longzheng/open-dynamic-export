@@ -3,7 +3,7 @@ import {
     getDerControlEndDate,
     sortByProgramPrimacy,
     sortByProgramPrimacyAndEventCreationTime,
-} from './derControl';
+} from './derControl.js';
 
 describe('sortByProgramPrimacy', () => {
     type Data = Parameters<typeof sortByProgramPrimacy>[0];

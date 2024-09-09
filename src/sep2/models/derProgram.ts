@@ -1,15 +1,15 @@
-import { assertString } from '../helpers/assert';
-import { parseLinkXmlObject, type Link } from './link';
-import { safeParseIntString } from '../../helpers/number';
+import { assertString } from '../helpers/assert.js';
+import { parseLinkXmlObject, type Link } from './link.js';
+import { safeParseIntString } from '../../helpers/number.js';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
-} from './subscribableResource';
+} from './subscribableResource.js';
 import {
     parseIdentifiedObjectXmlObject,
     type IdentifiedObject,
-} from './identifiedObject';
-import { parseListLinkXmlObject, type ListLink } from './listLink';
+} from './identifiedObject.js';
+import { parseListLinkXmlObject, type ListLink } from './listLink.js';
 
 export type DERProgram = {
     defaultDerControlLink: Link | undefined;

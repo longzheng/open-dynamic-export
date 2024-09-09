@@ -1,21 +1,21 @@
 import 'dotenv/config';
-import { getConfig } from '../helpers/config';
-import { getSunSpecInvertersConnections } from '../sunspec/connections';
-import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller';
-import { logger as pinoLogger } from '../helpers/logger';
-import { InverterController } from './helpers/inverterController';
-import { RampRateHelper } from './helpers/rampRate';
+import { getConfig } from '../helpers/config.js';
+import { getSunSpecInvertersConnections } from '../sunspec/connections.js';
+import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller.js';
+import { logger as pinoLogger } from '../helpers/logger.js';
+import { InverterController } from './helpers/inverterController.js';
+import { RampRateHelper } from './helpers/rampRate.js';
 import {
     writeDerMonitoringSamplePoints,
     writeSiteMonitoringSamplePoints,
-} from '../helpers/influxdb';
-import { getSep2Limiter } from '../sep2';
-import { FixedLimiter } from '../limiters/fixed';
-import { AmberLimiter } from '../limiters/negativeFeedIn/amber';
-import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029';
-import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W';
-import { getSiteMonitoringPollerInstance } from './helpers/siteMonitoring';
-import { MqttLimiter } from '../limiters/mqtt';
+} from '../helpers/influxdb.js';
+import { getSep2Limiter } from '../sep2/index.js';
+import { FixedLimiter } from '../limiters/fixed/index.js';
+import { AmberLimiter } from '../limiters/negativeFeedIn/amber/index.js';
+import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029/index.js';
+import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W/index.js';
+import { getSiteMonitoringPollerInstance } from './helpers/siteMonitoring.js';
+import { MqttLimiter } from '../limiters/mqtt/index.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 

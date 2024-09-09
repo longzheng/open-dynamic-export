@@ -1,4 +1,4 @@
-import pino, { stdTimeFunctions } from 'pino';
+import { pino, stdTimeFunctions } from 'pino';
 
 export const logger = pino({
     level: 'trace',

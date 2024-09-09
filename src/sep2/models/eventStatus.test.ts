@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { CurrentStatus, parseEventStatusXmlObject } from './eventStatus';
+import { getMockFile } from '../helpers/mocks.js';
+import { CurrentStatus, parseEventStatusXmlObject } from './eventStatus.js';
 
 it('should parse event status XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

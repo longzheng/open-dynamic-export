@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { type NameplateModel } from '../../sunspec/models/nameplate';
-import type { DERCapability } from '../../sep2/models/derCapability';
-import { DERControlType } from '../../sep2/models/derControlType';
-import { DOEModesSupportedType } from '../../sep2/models/doeModesSupportedType';
+import { type NameplateModel } from '../../sunspec/models/nameplate.js';
+import type { DERCapability } from '../../sep2/models/derCapability.js';
+import { DERControlType } from '../../sep2/models/derControlType.js';
+import { DOEModesSupportedType } from '../../sep2/models/doeModesSupportedType.js';
 import {
     getConnectStatusFromPVConn,
     getDerCapabilityResponseFromSunSpecArray,
-} from './der';
-import { DERType } from '../../sep2/models/derType';
-import { PVConn } from '../../sunspec/models/status';
-import { ConnectStatus } from '../../sep2/models/connectStatus';
+} from './der.js';
+import { DERType } from '../../sep2/models/derType.js';
+import { PVConn } from '../../sunspec/models/status.js';
+import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 
 describe('getDerCapabilityResponseFromSunSpecArray', () => {
     it('should return the correct DERCapabilityResponse for valid nameplateModels', () => {

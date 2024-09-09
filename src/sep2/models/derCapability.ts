@@ -1,12 +1,12 @@
-import { numberToHex } from '../../helpers/number';
-import { type ActivePower } from './activePower';
-import { type ApparentPower } from './apparentPower';
-import type { DERControlType } from './derControlType';
-import type { DERType } from './derType';
-import type { DOEModesSupportedType } from './doeModesSupportedType';
-import { xmlns } from '../helpers/namespace';
-import { type ReactivePower } from './reactivePower';
-import { type VoltageRMS } from './voltageRms';
+import { numberToHex } from '../../helpers/number.js';
+import { type ActivePower } from './activePower.js';
+import { type ApparentPower } from './apparentPower.js';
+import type { DERControlType } from './derControlType.js';
+import type { DERType } from './derType.js';
+import type { DOEModesSupportedType } from './doeModesSupportedType.js';
+import { xmlns } from '../helpers/namespace.js';
+import { type ReactivePower } from './reactivePower.js';
+import { type VoltageRMS } from './voltageRms.js';
 
 export type DERCapability = {
     // Bitmap indicating the DER Controls implemented by the device

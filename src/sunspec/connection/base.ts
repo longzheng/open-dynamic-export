@@ -1,8 +1,8 @@
 import ModbusRTU from 'modbus-serial';
-import type { CommonModel } from '../models/common';
-import { commonModel } from '../models/common';
-import { logger as pinoLogger } from '../../helpers/logger';
-import { registersToUint32 } from '../helpers/converters';
+import type { CommonModel } from '../models/common.js';
+import { commonModel } from '../models/common.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
+import { registersToUint32 } from '../helpers/converters.js';
 import type { Logger } from 'pino';
 import { setTimeout } from 'node:timers/promises';
 
@@ -16,7 +16,7 @@ export type ModelAddress = {
 type ModelAddressById = Map<number, ModelAddress>;
 
 export abstract class SunSpecConnection {
-    public readonly client: ModbusRTU;
+    public readonly client: ModbusRTU.default;
     public readonly ip: string;
     public readonly port: number;
     public readonly unitId: number;
@@ -43,7 +43,7 @@ export abstract class SunSpecConnection {
         port: number;
         unitId: number;
     }) {
-        this.client = new ModbusRTU();
+        this.client = new ModbusRTU.default();
         this.ip = ip;
         this.port = port;
         this.unitId = unitId;

@@ -1,10 +1,10 @@
 import EventEmitter from 'events';
-import { defaultPollPushRates, type SEP2Client } from '../client';
-import { PollableResource } from './pollableResource';
+import { defaultPollPushRates, type SEP2Client } from '../client.js';
+import { PollableResource } from './pollableResource.js';
 import {
     parseRegistrationXml,
     type Registration,
-} from '../models/registration';
+} from '../models/registration.js';
 
 export class RegistrationHelper extends EventEmitter<{
     data: [Registration];

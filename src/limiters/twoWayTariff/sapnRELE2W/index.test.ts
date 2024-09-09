@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController';
-import { SapnRELE2WLimiter } from '.';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
+import { SapnRELE2WLimiter } from './index.js';
 
 describe('AusgridEA029Limiter', () => {
     let sapnRELE2WLimiter: SapnRELE2WLimiter;

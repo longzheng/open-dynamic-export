@@ -1,4 +1,4 @@
-import { safeParseIntString } from '../../helpers/number';
+import { safeParseIntString } from '../../helpers/number.js';
 
 export function stringIntToDate(value: string): Date {
     const valueInt = safeParseIntString(value);

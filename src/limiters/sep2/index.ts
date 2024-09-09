@@ -2,16 +2,16 @@ import type { Logger } from 'pino';
 import type {
     InverterControlLimit,
     SupportedControlTypes,
-} from '../../coordinator/helpers/inverterController';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate';
-import type { SEP2Client } from '../../sep2/client';
-import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler';
-import { logger as pinoLogger } from '../../helpers/logger';
-import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls';
+} from '../../coordinator/helpers/inverterController.js';
+import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
+import type { SEP2Client } from '../../sep2/client.js';
+import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
+import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
 import EventEmitter from 'events';
-import type { LimiterType } from '../../coordinator/helpers/limiter';
-import { numberWithPow10 } from '../../helpers/number';
-import { writeControlLimit } from '../../helpers/influxdb';
+import type { LimiterType } from '../../coordinator/helpers/limiter.js';
+import { numberWithPow10 } from '../../helpers/number.js';
+import { writeControlLimit } from '../../helpers/influxdb.js';
 
 export class Sep2Limiter
     extends EventEmitter<{

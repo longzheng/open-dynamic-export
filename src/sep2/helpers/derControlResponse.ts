@@ -1,11 +1,11 @@
 import type { Logger } from 'pino';
-import type { SEP2Client } from '../client';
-import type { DERControl } from '../models/derControl';
-import { logger as pinoLogger } from '../../helpers/logger';
-import { ResponseStatus } from '../models/derControlResponse';
-import { generateDerControlResponse } from '../models/derControlResponse';
-import { objectToXml } from './xml';
-import { ResponseRequiredType } from '../models/responseRequired';
+import type { SEP2Client } from '../client.js';
+import type { DERControl } from '../models/derControl.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
+import { ResponseStatus } from '../models/derControlResponse.js';
+import { generateDerControlResponse } from '../models/derControlResponse.js';
+import { objectToXml } from './xml.js';
+import { ResponseRequiredType } from '../models/responseRequired.js';
 
 export class DerControlResponseHelper {
     private client: SEP2Client;

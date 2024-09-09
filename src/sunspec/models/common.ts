@@ -4,8 +4,8 @@ import {
     registersToStringNullable,
     registersToUint16,
     registersToUint16Nullable,
-} from '../helpers/converters';
-import { sunSpecModelFactory } from './sunSpecModelFactory';
+} from '../helpers/converters.js';
+import { sunSpecModelFactory } from './sunSpecModelFactory.js';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type CommonModel = {

@@ -1,5 +1,5 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
 
 // in seconds
 export type PostRate = number | null;

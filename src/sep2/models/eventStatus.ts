@@ -1,7 +1,7 @@
-import { safeParseStringToEnumType } from '../../helpers/enum';
-import { assertString } from '../helpers/assert';
-import { stringToBoolean } from '../helpers/boolean';
-import { stringIntToDate } from '../helpers/date';
+import { safeParseStringToEnumType } from '../../helpers/enum.js';
+import { assertString } from '../helpers/assert.js';
+import { stringToBoolean } from '../helpers/boolean.js';
+import { stringIntToDate } from '../helpers/date.js';
 
 // Field representing the current status type.
 // 0 = Scheduled This status indicates that the event has been scheduled and the event has not yet started. The server SHALL set the event to this status when the event is first scheduled and persist until the event has become active or has been cancelled. For events with a start time less than or equal to the current time, this status SHALL never be indicated, the event SHALL start with a status of “Active”.

@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
-import { RoleFlagsType } from './roleFlagsType';
-import { numberToHex } from '../../helpers/number';
+import { RoleFlagsType } from './roleFlagsType.js';
+import { numberToHex } from '../../helpers/number.js';
 
 it('site is 3 hex', () => {
     const value =

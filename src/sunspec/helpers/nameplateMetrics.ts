@@ -3,8 +3,8 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../helpers/number';
-import { type NameplateModel } from '../models/nameplate';
+} from '../../helpers/number.js';
+import { type NameplateModel } from '../models/nameplate.js';
 
 export function getNameplateMetrics(nameplate: NameplateModel) {
     return {

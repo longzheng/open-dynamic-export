@@ -1,26 +1,26 @@
-import type { RampRateHelper } from '../coordinator/helpers/rampRate';
-import type { Config } from '../helpers/config';
-import { env } from '../helpers/env';
-import { logger } from '../helpers/logger';
-import type { InverterSunSpecConnection } from '../sunspec/connection/inverter';
-import { SEP2Client } from './client';
-import { Sep2Limiter } from '../limiters/sep2';
-import { DerHelper } from './helpers/der';
-import { DerControlsHelper } from './helpers/derControls';
-import { DerListHelper } from './helpers/derList';
-import { EndDeviceListHelper } from './helpers/endDeviceList';
-import { FunctionSetAssignmentsListHelper } from './helpers/functionSetAssignmentsList';
-import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList';
-import { TimeHelper } from './helpers/time';
-import { getSep2Certificate } from '../helpers/sep2Cert';
-import type { EndDeviceList } from './models/endDeviceList';
+import type { RampRateHelper } from '../coordinator/helpers/rampRate.js';
+import type { Config } from '../helpers/config.js';
+import { env } from '../helpers/env.js';
+import { logger } from '../helpers/logger.js';
+import type { InverterSunSpecConnection } from '../sunspec/connection/inverter.js';
+import { SEP2Client } from './client.js';
+import { Sep2Limiter } from '../limiters/sep2/index.js';
+import { DerHelper } from './helpers/der.js';
+import { DerControlsHelper } from './helpers/derControls.js';
+import { DerListHelper } from './helpers/derList.js';
+import { EndDeviceListHelper } from './helpers/endDeviceList.js';
+import { FunctionSetAssignmentsListHelper } from './helpers/functionSetAssignmentsList.js';
+import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList.js';
+import { TimeHelper } from './helpers/time.js';
+import { getSep2Certificate } from '../helpers/sep2Cert.js';
+import type { EndDeviceList } from './models/endDeviceList.js';
 import {
     generateEndDeviceResponse,
     parseEndDeviceXml,
-} from './models/endDevice';
-import { objectToXml } from './helpers/xml';
-import { generateConnectionPointResponse } from './models/connectionPoint';
-import { RegistrationHelper } from './helpers/registration';
+} from './models/endDevice.js';
+import { objectToXml } from './helpers/xml.js';
+import { generateConnectionPointResponse } from './models/connectionPoint.js';
+import { RegistrationHelper } from './helpers/registration.js';
 
 export function getSep2Limiter({
     config,

@@ -1,13 +1,13 @@
 import { it, expect } from 'vitest';
-import { objectToXml } from '../helpers/xml';
-import { generateMirrorMeterReadingResponse } from './mirrorMeterReading';
-import { QualityFlags } from './qualityFlags';
-import { CommodityType } from './commodityType';
-import { KindType } from './kindType';
-import { DataQualifierType } from './dataQualifierType';
-import { FlowDirectionType } from './flowDirectionType';
-import { PhaseCode } from './phaseCode';
-import { UomType } from './uomType';
+import { objectToXml } from '../helpers/xml.js';
+import { generateMirrorMeterReadingResponse } from './mirrorMeterReading.js';
+import { QualityFlags } from './qualityFlags.js';
+import { CommodityType } from './commodityType.js';
+import { KindType } from './kindType.js';
+import { DataQualifierType } from './dataQualifierType.js';
+import { FlowDirectionType } from './flowDirectionType.js';
+import { PhaseCode } from './phaseCode.js';
+import { UomType } from './uomType.js';
 
 it('should generate MirrorMeterReading XML', () => {
     const response = generateMirrorMeterReadingResponse({

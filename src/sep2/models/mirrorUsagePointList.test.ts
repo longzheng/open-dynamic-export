@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { parseMirrorUsagePointListXml } from './mirrorUsagePointList';
+import { getMockFile } from '../helpers/mocks.js';
+import { parseMirrorUsagePointListXml } from './mirrorUsagePointList.js';
 
 it('should parse end device list XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

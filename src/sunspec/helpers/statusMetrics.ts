@@ -2,8 +2,8 @@ import {
     numberWithPow10,
     sumBigIntArray,
     sumNumbersNullableArray,
-} from '../../helpers/number';
-import type { StatusModel } from '../models/status';
+} from '../../helpers/number.js';
+import type { StatusModel } from '../models/status.js';
 
 export function getStatusMetrics(status: StatusModel) {
     return {

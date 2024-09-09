@@ -1,10 +1,10 @@
-import { numberToHex } from '../../helpers/number';
-import { type ActivePower } from './activePower';
-import { type ApparentPower } from './apparentPower';
-import { dateToStringSeconds } from '../helpers/date';
-import type { DERControlType } from './derControlType';
-import { xmlns } from '../helpers/namespace';
-import { type ReactivePower } from './reactivePower';
+import { numberToHex } from '../../helpers/number.js';
+import { type ActivePower } from './activePower.js';
+import { type ApparentPower } from './apparentPower.js';
+import { dateToStringSeconds } from '../helpers/date.js';
+import type { DERControlType } from './derControlType.js';
+import { xmlns } from '../helpers/namespace.js';
+import { type ReactivePower } from './reactivePower.js';
 
 export type DERSettings = {
     updatedTime: Date;

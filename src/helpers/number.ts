@@ -1,4 +1,4 @@
-import Decimal from 'decimal.js';
+import { Decimal } from 'decimal.js';
 
 export function safeParseIntString(value: string): number {
     const parsed = parseInt(value, 10);

@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
-import type { Config } from './config';
-import { env } from './env';
+import type { Config } from './config.js';
+import { env } from './env.js';
 import { resolve } from 'path';
 
 export function getSep2Certificate(config: Config) {

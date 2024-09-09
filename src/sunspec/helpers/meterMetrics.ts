@@ -1,4 +1,4 @@
-import { assertNonNull } from '../../helpers/null';
+import { assertNonNull } from '../../helpers/null.js';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
@@ -6,9 +6,9 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../helpers/number';
-import { type MeterModel } from '../models/meter';
-import { getSitePhasesFromMeter } from './sitePhases';
+} from '../../helpers/number.js';
+import { type MeterModel } from '../models/meter.js';
+import { getSitePhasesFromMeter } from './sitePhases.js';
 
 export function getMeterMetrics(meter: MeterModel) {
     const phases = getSitePhasesFromMeter(meter);

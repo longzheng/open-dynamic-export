@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { getConfig } from '../src/helpers/config';
-import { getSunSpecInvertersConnections } from '../src/sunspec/connections';
-import { logger } from '../src/helpers/logger';
-import { SunSpecInverterPoller } from '../src/sunspec/sunspecInverterPoller';
-import { getSiteMonitoringPollerInstance } from '../src/coordinator/helpers/siteMonitoring';
+import { getConfig } from '../src/helpers/config.js';
+import { getSunSpecInvertersConnections } from '../src/sunspec/connections.js';
+import { logger } from '../src/helpers/logger.js';
+import { SunSpecInverterPoller } from '../src/sunspec/sunspecInverterPoller.js';
+import { getSiteMonitoringPollerInstance } from '../src/coordinator/helpers/siteMonitoring.js';
 
 // This debugging script continously outputs DER and site monitoring samples
 

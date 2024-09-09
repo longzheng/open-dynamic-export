@@ -1,5 +1,5 @@
-import { objectEntriesWithType } from '../../helpers/object';
-import type { ModelAddress, SunSpecConnection } from '../connection/base';
+import { objectEntriesWithType } from '../../helpers/object.js';
+import type { ModelAddress, SunSpecConnection } from '../connection/base.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import type { FunctionSetAssignments } from '../../src/sep2/models/functionSetAssignments';
+import type { FunctionSetAssignments } from '../../src/sep2/models/functionSetAssignments.js';
 
 export function generateMockFunctionSetAssignments({
     derProgramsCount,

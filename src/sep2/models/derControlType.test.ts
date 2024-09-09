@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
-import { numberToHex } from '../../helpers/number';
-import { DERControlType } from './derControlType';
+import { numberToHex } from '../../helpers/number.js';
+import { DERControlType } from './derControlType.js';
 
 it('value is expected', () => {
     const value =

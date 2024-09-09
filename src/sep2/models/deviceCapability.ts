@@ -1,8 +1,8 @@
-import type { Link } from './link';
-import { parseLinkXmlObject } from './link';
-import type { ListLink } from './listLink';
-import { parseListLinkXmlObject } from './listLink';
-import { parsePollRateXmlObject, type PollRate } from './pollRate';
+import type { Link } from './link.js';
+import { parseLinkXmlObject } from './link.js';
+import type { ListLink } from './listLink.js';
+import { parseListLinkXmlObject } from './listLink.js';
+import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
 
 export type DeviceCapability = {
     pollRate: PollRate;

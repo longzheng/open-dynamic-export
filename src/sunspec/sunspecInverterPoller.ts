@@ -1,14 +1,14 @@
-import type { ControlsModel } from './models/controls';
-import type { InverterModel } from './models/inverter';
-import type { InverterSunSpecConnection } from './connection/inverter';
+import type { ControlsModel } from './models/controls.js';
+import type { InverterModel } from './models/inverter.js';
+import type { InverterSunSpecConnection } from './connection/inverter.js';
 import EventEmitter from 'events';
-import { logger as pinoLogger } from '../helpers/logger';
-import type { NameplateModel } from './models/nameplate';
-import type { SettingsModel } from './models/settings';
-import type { StatusModel } from './models/status';
-import { type DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample';
-import { getAggregatedInverterMetrics } from './helpers/inverterMetrics';
-import { assertNonNull } from '../helpers/null';
+import { logger as pinoLogger } from '../helpers/logger.js';
+import type { NameplateModel } from './models/nameplate.js';
+import type { SettingsModel } from './models/settings.js';
+import type { StatusModel } from './models/status.js';
+import { type DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample.js';
+import { getAggregatedInverterMetrics } from './helpers/inverterMetrics.js';
+import { assertNonNull } from '../helpers/null.js';
 
 const logger = pinoLogger.child({ module: 'SunSpecInverterPoller' });
 

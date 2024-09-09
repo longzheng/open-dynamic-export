@@ -16,7 +16,7 @@ import {
     registersToUint32Nullable,
     uint16NullableToRegisters,
     uint16ToRegisters,
-} from './converters';
+} from './converters.js';
 
 it('registersToUint32 should convert registers to a 32-bit unsigned integer', () => {
     const registers = [0x1234, 0x5678];

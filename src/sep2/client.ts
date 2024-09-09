@@ -6,12 +6,12 @@ import {
     getCertificateFingerprint,
     getCertificateLfdi,
     getCertificateSfdi,
-} from './helpers/cert';
-import type { Config } from '../helpers/config';
-import type { RoleFlagsType } from './models/roleFlagsType';
-import { numberToHex } from '../helpers/number';
+} from './helpers/cert.js';
+import type { Config } from '../helpers/config.js';
+import type { RoleFlagsType } from './models/roleFlagsType.js';
+import { numberToHex } from '../helpers/number.js';
 import { randomUUID } from 'node:crypto';
-import { DeviceCapabilityHelper } from './helpers/deviceCapability';
+import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
 import axiosRetry from 'axios-retry';
 
 const USER_AGENT = 'open-dynamic-export';

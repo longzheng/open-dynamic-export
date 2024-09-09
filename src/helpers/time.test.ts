@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getMillisecondsToNextHourMinutesInterval } from './time';
+import { getMillisecondsToNextHourMinutesInterval } from './time.js';
 
 describe('getMillisecondsToNextHourInterval', () => {
     beforeEach(() => {

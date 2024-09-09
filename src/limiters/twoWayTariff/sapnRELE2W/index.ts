@@ -1,8 +1,8 @@
 import type { Logger } from 'pino';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController';
-import type { LimiterType } from '../../../coordinator/helpers/limiter';
-import { writeControlLimit } from '../../../helpers/influxdb';
-import { logger as pinoLogger } from '../../../helpers/logger';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
+import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import { writeControlLimit } from '../../../helpers/influxdb.js';
+import { logger as pinoLogger } from '../../../helpers/logger.js';
 
 // https://www.sapowernetworks.com.au/public/download.jsp?id=328119
 export class SapnRELE2WLimiter implements LimiterType {

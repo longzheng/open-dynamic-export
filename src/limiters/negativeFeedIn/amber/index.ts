@@ -1,11 +1,14 @@
 import type { Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
-import type { paths } from './api';
-import type { LimiterType } from '../../../coordinator/helpers/limiter';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController';
+import type { paths } from './api.js';
+import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import type { Logger } from 'pino';
-import { logger as pinoLogger } from '../../../helpers/logger';
-import { writeAmberPrice, writeControlLimit } from '../../../helpers/influxdb';
+import { logger as pinoLogger } from '../../../helpers/logger.js';
+import {
+    writeAmberPrice,
+    writeControlLimit,
+} from '../../../helpers/influxdb.js';
 
 type Interval = {
     start: Date;

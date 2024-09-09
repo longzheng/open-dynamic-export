@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
-import type { InverterEvent1 } from '../models/inverter';
-import { InverterState, type InverterModel } from '../models/inverter';
-import { getInverterMetrics } from './inverterMetrics';
+import type { InverterEvent1 } from '../models/inverter.js';
+import { InverterState, type InverterModel } from '../models/inverter.js';
+import { getInverterMetrics } from './inverterMetrics.js';
 
 it('getInverterMetrics returns data', () => {
     const inverter: InverterModel = {

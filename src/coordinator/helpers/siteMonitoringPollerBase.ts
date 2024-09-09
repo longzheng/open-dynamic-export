@@ -1,10 +1,10 @@
 import type { Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 import EventEmitter from 'node:events';
 import type {
     SiteMonitoringSample,
     SiteMonitoringSampleData,
-} from './siteMonitoringSample';
+} from './siteMonitoringSample.js';
 
 export abstract class SiteMonitoringPollerBase extends EventEmitter<{
     data: [

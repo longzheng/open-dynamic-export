@@ -1,8 +1,8 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { stringIntToDate } from '../helpers/date';
-import { parsePollRateXmlObject, type PollRate } from './pollRate';
-import { parseResourceXmlObject, type Resource } from './resource';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { stringIntToDate } from '../helpers/date.js';
+import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
+import { parseResourceXmlObject, type Resource } from './resource.js';
 
 export type Registration = {
     dateTimeRegistered: Date;

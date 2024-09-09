@@ -1,1 +1,4 @@
+dist/
+
+# generated API docs
 /src/limiters/negativeFeedIn/amber/api.d.ts

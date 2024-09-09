@@ -1,12 +1,12 @@
-import { assertArray, assertString } from '../helpers/assert';
-import { stringToBoolean } from '../helpers/boolean';
-import { parseEndDeviceObject, type EndDevice } from './endDevice';
-import type { PollRate } from './pollRate';
-import { parsePollRateXmlObject } from './pollRate';
+import { assertArray, assertString } from '../helpers/assert.js';
+import { stringToBoolean } from '../helpers/boolean.js';
+import { parseEndDeviceObject, type EndDevice } from './endDevice.js';
+import type { PollRate } from './pollRate.js';
+import { parsePollRateXmlObject } from './pollRate.js';
 import {
     parseSubscribableListXmlObject,
     type SubscribableList,
-} from './subscribableList';
+} from './subscribableList.js';
 
 export type EndDeviceList = {
     pollRate: PollRate;

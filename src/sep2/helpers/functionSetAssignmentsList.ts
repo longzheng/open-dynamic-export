@@ -1,15 +1,15 @@
 import EventEmitter from 'node:events';
-import type { SEP2Client } from '../client';
-import { defaultPollPushRates } from '../client';
-import { PollableResource } from './pollableResource';
+import type { SEP2Client } from '../client.js';
+import { defaultPollPushRates } from '../client.js';
+import { PollableResource } from './pollableResource.js';
 import {
     parseFunctionSetAssignmentsListXml,
     type FunctionSetAssignmentsList,
-} from '../models/functionSetAssignmentsList';
-import { getListAll } from './pagination';
-import type { DerProgramListData } from './derProgramList';
-import { DerProgramListHelper } from './derProgramList';
-import type { FunctionSetAssignments } from '../models/functionSetAssignments';
+} from '../models/functionSetAssignmentsList.js';
+import { getListAll } from './pagination.js';
+import type { DerProgramListData } from './derProgramList.js';
+import { DerProgramListHelper } from './derProgramList.js';
+import type { FunctionSetAssignments } from '../models/functionSetAssignments.js';
 
 export type FunctionSetAssignmentsListData = {
     functionSetAssignments: FunctionSetAssignments;

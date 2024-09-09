@@ -1,5 +1,5 @@
-import { dateToStringSeconds } from '../helpers/date';
-import { xmlns } from '../helpers/namespace';
+import { dateToStringSeconds } from '../helpers/date.js';
+import { xmlns } from '../helpers/namespace.js';
 
 export type DERAvailability = {
     readingTime: Date;

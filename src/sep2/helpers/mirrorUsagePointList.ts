@@ -1,13 +1,13 @@
-import type { SEP2Client } from '../client';
-import { defaultPollPushRates } from '../client';
-import { PollableResource } from './pollableResource';
-import type { MirrorUsagePointList } from '../models/mirrorUsagePointList';
-import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList';
-import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite';
-import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer';
-import { getListAll } from './pagination';
-import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoringSample';
-import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample';
+import type { SEP2Client } from '../client.js';
+import { defaultPollPushRates } from '../client.js';
+import { PollableResource } from './pollableResource.js';
+import type { MirrorUsagePointList } from '../models/mirrorUsagePointList.js';
+import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList.js';
+import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite.js';
+import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer.js';
+import { getListAll } from './pagination.js';
+import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoringSample.js';
+import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample.js';
 
 export class MirrorUsagePointListHelper {
     private href: string | null = null;

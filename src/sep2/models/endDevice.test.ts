@@ -1,9 +1,9 @@
 import { it, expect, describe } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import type { EndDevice } from './endDevice';
-import { generateEndDeviceResponse, parseEndDeviceXml } from './endDevice';
-import { objectToXml } from '../helpers/xml';
+import { getMockFile } from '../helpers/mocks.js';
+import type { EndDevice } from './endDevice.js';
+import { generateEndDeviceResponse, parseEndDeviceXml } from './endDevice.js';
+import { objectToXml } from '../helpers/xml.js';
 
 describe('parseEndDeviceXml', () => {
     it('should parse end device DER with XML', async () => {

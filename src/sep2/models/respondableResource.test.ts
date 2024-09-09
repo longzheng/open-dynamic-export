@@ -1,8 +1,8 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { parseRespondableResourceXmlObject } from './respondableResource';
-import { ResponseRequiredType } from './responseRequired';
+import { getMockFile } from '../helpers/mocks.js';
+import { parseRespondableResourceXmlObject } from './respondableResource.js';
+import { ResponseRequiredType } from './responseRequired.js';
 
 it('should parse respondable resource XML object', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

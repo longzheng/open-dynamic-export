@@ -3,9 +3,9 @@ import {
     getCertificateFingerprint,
     getCertificateLfdi,
     getCertificateSfdi,
-} from '../src/sep2/helpers/cert';
-import { getConfig } from '../src/helpers/config';
-import { getSep2Certificate } from '../src/helpers/sep2Cert';
+} from '../src/sep2/helpers/cert.js';
+import { getConfig } from '../src/helpers/config.js';
+import { getSep2Certificate } from '../src/helpers/sep2Cert.js';
 
 const config = getConfig();
 const sep2Certificate = getSep2Certificate(config);

@@ -1,33 +1,33 @@
-import { defaultPollPushRates, type SEP2Client } from '../client';
-import type { DER } from '../models/der';
-import type { DERCapability } from '../models/derCapability';
-import { generateDerCapability } from '../models/derCapability';
-import type { DERSettings } from '../models/derSettings';
-import { generateDerSettingsResponse } from '../models/derSettings';
+import { defaultPollPushRates, type SEP2Client } from '../client.js';
+import type { DER } from '../models/der.js';
+import type { DERCapability } from '../models/derCapability.js';
+import { generateDerCapability } from '../models/derCapability.js';
+import type { DERSettings } from '../models/derSettings.js';
+import { generateDerSettingsResponse } from '../models/derSettings.js';
 import {
     generateDerStatusResponse,
     OperationalModeStatus,
     type DERStatus,
-} from '../models/derStatus';
-import { objectToXml } from './xml';
-import { logger as pinoLogger } from '../../helpers/logger';
+} from '../models/derStatus.js';
+import { objectToXml } from './xml.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
-import { DERTyp, type NameplateModel } from '../../sunspec/models/nameplate';
-import type { SettingsModel } from '../../sunspec/models/settings';
-import { PVConn, type StatusModel } from '../../sunspec/models/status';
-import type { PollRate } from '../models/pollRate';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
+import { DERTyp, type NameplateModel } from '../../sunspec/models/nameplate.js';
+import type { SettingsModel } from '../../sunspec/models/settings.js';
+import { PVConn, type StatusModel } from '../../sunspec/models/status.js';
+import type { PollRate } from '../models/pollRate.js';
+import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import deepEqual from 'fast-deep-equal';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate';
-import { DERControlType } from '../models/derControlType';
-import { enumHasValue } from '../../helpers/enum';
-import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number';
-import { getAggregatedNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics';
-import { getAggregatedSettingsMetrics } from '../../sunspec/helpers/settingsMetrics';
-import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics';
-import { ConnectStatus } from '../models/connectStatus';
-import { DOEModesSupportedType } from '../models/doeModesSupportedType';
-import { DERType } from '../models/derType';
+import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
+import { DERControlType } from '../models/derControlType.js';
+import { enumHasValue } from '../../helpers/enum.js';
+import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
+import { getAggregatedNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
+import { getAggregatedSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
+import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
+import { ConnectStatus } from '../models/connectStatus.js';
+import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
+import { DERType } from '../models/derType.js';
 
 type Config = {
     der: DER;

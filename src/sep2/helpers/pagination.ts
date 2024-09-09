@@ -1,5 +1,5 @@
-import type { SEP2Client } from '../client';
-import type { List } from '../models/list';
+import type { SEP2Client } from '../client.js';
+import type { List } from '../models/list.js';
 
 export interface PaginationOptions<T extends List> {
     client: SEP2Client;

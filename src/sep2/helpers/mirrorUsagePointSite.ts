@@ -1,23 +1,23 @@
-import { RoleFlagsType } from '../models/roleFlagsType';
-import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase';
+import { RoleFlagsType } from '../models/roleFlagsType.js';
+import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase.js';
 import type {
     AvgMaxMin,
     PerPhaseOrNoPhaseMeasurement,
-} from '../../helpers/measurement';
+} from '../../helpers/measurement.js';
 import {
     assertPerPhaseOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurements,
     getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements,
     type PerPhaseMeasurement,
-} from '../../helpers/measurement';
-import { DataQualifierType } from '../models/dataQualifierType';
-import { FlowDirectionType } from '../models/flowDirectionType';
-import { PhaseCode } from '../models/phaseCode';
-import { UomType } from '../models/uomType';
-import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase';
-import { logger as pinoLogger } from '../../helpers/logger';
-import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample';
+} from '../../helpers/measurement.js';
+import { DataQualifierType } from '../models/dataQualifierType.js';
+import { FlowDirectionType } from '../models/flowDirectionType.js';
+import { PhaseCode } from '../models/phaseCode.js';
+import { UomType } from '../models/uomType.js';
+import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
+import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample.js';
 
 type SiteReading = {
     intervalSeconds: number;

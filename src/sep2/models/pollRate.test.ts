@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { parsePollRateXmlObject } from './pollRate';
+import { getMockFile } from '../helpers/mocks.js';
+import { parsePollRateXmlObject } from './pollRate.js';
 
 it('should parse poll rate with value XML object', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

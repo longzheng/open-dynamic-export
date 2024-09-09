@@ -1,6 +1,6 @@
-import type { Config } from '../helpers/config';
-import { InverterSunSpecConnection } from './connection/inverter';
-import { MeterSunSpecConnection } from './connection/meter';
+import type { Config } from '../helpers/config.js';
+import { InverterSunSpecConnection } from './connection/inverter.js';
+import { MeterSunSpecConnection } from './connection/meter.js';
 
 export function getSunSpecInvertersConnections(config: Config) {
     return config.inverters.map(
