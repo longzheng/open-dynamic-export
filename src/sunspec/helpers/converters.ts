@@ -165,3 +165,18 @@ export function registersToId<ID extends number>(
         `Invalid model ID value, expected one of ${value.join('/')}, got ${registerValue}`,
     );
 }
+
+export function registersToUint64(registers: number[]): bigint {
+    if (registers.length !== 4) {
+        throw new Error(
+            `registersToUint64 invalid register length, should be 4, is ${registers.length}`,
+        );
+    }
+
+    return (
+        (BigInt(registers[0]!) << 48n) |
+        (BigInt(registers[1]!) << 32n) |
+        (BigInt(registers[2]!) << 16n) |
+        BigInt(registers[3]!)
+    );
+}

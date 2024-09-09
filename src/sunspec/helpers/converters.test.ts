@@ -14,6 +14,7 @@ import {
     registersToUint16Nullable,
     registersToUint32,
     registersToUint32Nullable,
+    registersToUint64,
     uint16NullableToRegisters,
     uint16ToRegisters,
 } from './converters';
@@ -150,4 +151,10 @@ describe('registersToId', () => {
             'Invalid model ID value',
         );
     });
+});
+
+it('registersToUint64 should convert registers to a 32-bit unsigned integer', () => {
+    const registers = [0x1234, 0x5678, 0x9abc, 0xdef0];
+    const result = registersToUint64(registers);
+    expect(result).toBe(1311768467463790320n);
 });
