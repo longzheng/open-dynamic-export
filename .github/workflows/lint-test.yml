@@ -13,6 +13,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run lint
+    - run: npm run build
     - name: Check for uncommitted files
       run: git diff --exit-code
     - run: npm test
