@@ -1,5 +1,6 @@
 import type { ControlsModelWrite } from '../models/controls';
 import { controlsModel } from '../models/controls';
+import { derAcMeasurementModel } from '../models/derAcMeasurement';
 import { inverterModel } from '../models/inverter';
 import type { NameplateModel } from '../models/nameplate';
 import { nameplateModel } from '../models/nameplate';
@@ -119,5 +120,22 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             address,
             values,
         });
+    }
+
+    async getDerAcMeasurements() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(701);
+
+        if (!address) {
+            throw new Error('No SunSpec DER AC Measurement model address');
+        }
+
+        const data = await derAcMeasurementModel.read({
+            modbusConnection: this,
+            address,
+        });
+
+        return data;
     }
 }
