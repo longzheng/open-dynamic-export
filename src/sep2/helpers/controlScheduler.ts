@@ -1,23 +1,23 @@
 import type { Logger } from 'pino';
-import type { SEP2Client } from '../client';
-import { logger as pinoLogger } from '../../helpers/logger';
-import { ResponseStatus } from '../models/derControlResponse';
-import type { DERControlBase } from '../models/derControlBase';
+import type { SEP2Client } from '../client.js';
+import { logger as pinoLogger } from '../../helpers/logger.js';
+import { ResponseStatus } from '../models/derControlResponse.js';
+import type { DERControlBase } from '../models/derControlBase.js';
 import type {
     DerControlsHelperChangedData,
     FallbackControl,
     MergedControlsData,
-} from './derControls';
-import { DerControlResponseHelper } from './derControlResponse';
+} from './derControls.js';
+import { DerControlResponseHelper } from './derControlResponse.js';
 import {
     getDerControlEndDate,
     sortByProgramPrimacyAndEventCreationTime,
-} from './derControl';
-import { CurrentStatus } from '../models/eventStatus';
+} from './derControl.js';
+import { CurrentStatus } from '../models/eventStatus.js';
 import { randomInt } from 'crypto';
 import { addSeconds, isEqual, max } from 'date-fns';
-import { writeControlSchedulerPoints } from '../../helpers/influxdb';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate';
+import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
+import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
 
 export type ControlType = keyof DERControlBase;
 

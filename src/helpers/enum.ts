@@ -1,4 +1,4 @@
-import { safeParseHexString } from './number';
+import { safeParseHexString } from './number.js';
 
 type EnumType = { [key: string]: number | string };
 

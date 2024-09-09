@@ -1,5 +1,5 @@
 import { it, expect, describe } from 'vitest';
-import { enumHasValue } from './enum';
+import { enumHasValue } from './enum.js';
 
 enum TestBitwise {
     hello = 1 << 0,

@@ -1,4 +1,4 @@
-import type { ControlType } from '../../sep2/helpers/controlScheduler';
+import type { ControlType } from '../../sep2/helpers/controlScheduler.js';
 import {
     Conn,
     OutPFSet_Ena,
@@ -6,24 +6,24 @@ import {
     WMaxLim_Ena,
     type ControlsModel,
     type ControlsModelWrite,
-} from '../../sunspec/models/controls';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter';
-import Decimal from 'decimal.js';
+} from '../../sunspec/models/controls.js';
+import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
+import { Decimal } from 'decimal.js';
 import {
     averageNumbersArray,
     numberWithPow10,
     roundToDecimals,
-} from '../../helpers/number';
-import { getTotalFromPerPhaseOrNoPhaseMeasurement } from '../../helpers/measurement';
+} from '../../helpers/number.js';
+import { getTotalFromPerPhaseOrNoPhaseMeasurement } from '../../helpers/measurement.js';
 import { type Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger';
-import type { RampRateHelper } from './rampRate';
-import type { NameplateModel } from '../../sunspec/models/nameplate';
-import type { InverterModel } from '../../sunspec/models/inverter';
-import { writeInverterControllerPoints } from '../../helpers/influxdb';
-import type { LimiterType } from './limiter';
-import type { SiteMonitoringSample } from './siteMonitoringSample';
-import type { DerMonitoringSample } from './derMonitoringSample';
+import { logger as pinoLogger } from '../../helpers/logger.js';
+import type { RampRateHelper } from './rampRate.js';
+import type { NameplateModel } from '../../sunspec/models/nameplate.js';
+import type { InverterModel } from '../../sunspec/models/inverter.js';
+import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
+import type { LimiterType } from './limiter.js';
+import type { SiteMonitoringSample } from './siteMonitoringSample.js';
+import type { DerMonitoringSample } from './derMonitoringSample.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,

@@ -5,7 +5,7 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
     INDEF_EXPIRY,
-} from './cert';
+} from './cert.js';
 
 describe('getCertificateFingerprint', () => {
     it('returns valid LFDI', () => {

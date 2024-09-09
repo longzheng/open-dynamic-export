@@ -1,6 +1,6 @@
 import z from 'zod';
-import { safeParseIntString } from './number';
-import { logger } from './logger';
+import { safeParseIntString } from './number.js';
+import { logger } from './logger.js';
 
 const envSchema = z.object({
     SEP2_CERT_PATH: z.string(),

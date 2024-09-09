@@ -1,11 +1,11 @@
 import {
     parseDERControlBaseXmlObject,
     type DERControlBase,
-} from './derControlBase';
+} from './derControlBase.js';
 import {
     parseRandomizableEventXmlObject,
     type RandomizableEvent,
-} from './randomizableEvent';
+} from './randomizableEvent.js';
 
 export type DERControl = {
     derControlBase: DERControlBase;

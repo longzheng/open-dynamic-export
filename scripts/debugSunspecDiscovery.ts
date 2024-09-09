@@ -1,10 +1,10 @@
 import 'dotenv/config';
-import { getConfig } from '../src/helpers/config';
-import { logger } from '../src/helpers/logger';
+import { getConfig } from '../src/helpers/config.js';
+import { logger } from '../src/helpers/logger.js';
 import {
     getSunSpecInvertersConnections,
     getSunSpecMeterConnection,
-} from '../src/sunspec/connections';
+} from '../src/sunspec/connections.js';
 
 // This debugging script dumps all the SunSpec models
 // It polls the inverters and smart meters once

@@ -3,14 +3,14 @@ import type {
     PerPhaseMeasurement,
     NoPhaseMeasurement,
     AssertedPerPhaseOrNoPhaseMeasurementArray,
-} from './measurement';
+} from './measurement.js';
 import {
     assertPerPhaseOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurementsNullable,
     getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements,
     getTotalFromPerPhaseOrNoPhaseMeasurement,
-} from './measurement';
+} from './measurement.js';
 
 describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
     it('should return perPhase when only perPhase measurements are present', () => {

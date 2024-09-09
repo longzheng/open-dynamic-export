@@ -2,12 +2,12 @@ import { InfluxDB, Point } from '@influxdata/influxdb-client';
 import type {
     ControlType,
     RandomizedControlSchedule,
-} from '../sep2/helpers/controlScheduler';
-import type { FallbackControl } from '../sep2/helpers/derControls';
-import { numberWithPow10 } from './number';
-import type { SiteMonitoringSample } from '../coordinator/helpers/siteMonitoringSample';
-import type { DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample';
-import type { InverterControlLimit } from '../coordinator/helpers/inverterController';
+} from '../sep2/helpers/controlScheduler.js';
+import type { FallbackControl } from '../sep2/helpers/derControls.js';
+import { numberWithPow10 } from './number.js';
+import type { SiteMonitoringSample } from '../coordinator/helpers/siteMonitoringSample.js';
+import type { DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample.js';
+import type { InverterControlLimit } from '../coordinator/helpers/inverterController.js';
 
 const influxDB = new InfluxDB({
     url: `http://influxdb:${process.env['INFLUXDB_PORT']}`,

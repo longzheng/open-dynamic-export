@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
-import { numberToHex } from '../../helpers/number';
-import { DOEModesSupportedType } from './doeModesSupportedType';
+import { numberToHex } from '../../helpers/number.js';
+import { DOEModesSupportedType } from './doeModesSupportedType.js';
 
 it('value is expected', () => {
     const value =

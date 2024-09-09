@@ -1,9 +1,9 @@
-import { assertArray } from '../helpers/assert';
-import { parseDERControlXmlObject, type DERControl } from './derControl';
+import { assertArray } from '../helpers/assert.js';
+import { parseDERControlXmlObject, type DERControl } from './derControl.js';
 import {
     parseSubscribableListXmlObject,
     type SubscribableList,
-} from './subscribableList';
+} from './subscribableList.js';
 
 export type DERControlList = {
     derControls: DERControl[];

@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { parseSubscribableListXmlObject } from './subscribableList';
+import { getMockFile } from '../helpers/mocks.js';
+import { parseSubscribableListXmlObject } from './subscribableList.js';
 
 it('should parse subscribable list XML object', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

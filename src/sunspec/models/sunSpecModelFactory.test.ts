@@ -4,16 +4,16 @@ import {
     convertWriteRegisters,
     sunSpecModelFactory,
     type Mapping,
-} from './sunSpecModelFactory';
+} from './sunSpecModelFactory.js';
 import {
     int16ToRegisters,
     registersToInt16,
     registersToString,
     registersToUint16,
     uint16ToRegisters,
-} from '../helpers/converters';
-import { InverterSunSpecConnection } from '../connection/inverter';
-import { SunSpecConnection } from '../connection/base';
+} from '../helpers/converters.js';
+import { InverterSunSpecConnection } from '../connection/inverter.js';
+import { SunSpecConnection } from '../connection/base.js';
 
 vi.mock(import('modbus-serial'));
 

@@ -1,9 +1,9 @@
-import type { MeterSunSpecConnection } from './connection/meter';
-import type { SiteMonitoringSampleData } from '../coordinator/helpers/siteMonitoringSample';
-import { SiteMonitoringPollerBase } from '../coordinator/helpers/siteMonitoringPollerBase';
-import { assertNonNull } from '../helpers/null';
-import { getMeterMetrics } from './helpers/meterMetrics';
-import type { MeterModel } from './models/meter';
+import type { MeterSunSpecConnection } from './connection/meter.js';
+import type { SiteMonitoringSampleData } from '../coordinator/helpers/siteMonitoringSample.js';
+import { SiteMonitoringPollerBase } from '../coordinator/helpers/siteMonitoringPollerBase.js';
+import { assertNonNull } from '../helpers/null.js';
+import { getMeterMetrics } from './helpers/meterMetrics.js';
+import type { MeterModel } from './models/meter.js';
 
 export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
     private meterConnection: MeterSunSpecConnection;

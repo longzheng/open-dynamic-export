@@ -1,9 +1,9 @@
 import { it, expect } from 'vitest';
-import { objectToXml } from '../helpers/xml';
-import { generateDerCapability } from './derCapability';
-import { DERControlType } from './derControlType';
-import { DOEModesSupportedType } from './doeModesSupportedType';
-import { DERType } from './derType';
+import { objectToXml } from '../helpers/xml.js';
+import { generateDerCapability } from './derCapability.js';
+import { DERControlType } from './derControlType.js';
+import { DOEModesSupportedType } from './doeModesSupportedType.js';
+import { DERType } from './derType.js';
 
 it('should generate DERCapability XML', () => {
     const response = generateDerCapability({

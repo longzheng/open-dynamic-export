@@ -1,6 +1,6 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { parseLinkXmlObject, type Link } from './link';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { parseLinkXmlObject, type Link } from './link.js';
 
 export type ListLink = { all?: number } & Link;
 

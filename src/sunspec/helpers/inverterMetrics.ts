@@ -1,4 +1,4 @@
-import { assertNonNull } from '../../helpers/null';
+import { assertNonNull } from '../../helpers/null.js';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
@@ -6,9 +6,9 @@ import {
     numberWithPow10,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from '../../helpers/number';
-import type { InverterModel } from '../models/inverter';
-import { getSitePhasesFromInverter } from './sitePhases';
+} from '../../helpers/number.js';
+import type { InverterModel } from '../models/inverter.js';
+import { getSitePhasesFromInverter } from './sitePhases.js';
 
 export function getInverterMetrics(inverter: InverterModel) {
     const phases = getSitePhasesFromInverter(inverter);

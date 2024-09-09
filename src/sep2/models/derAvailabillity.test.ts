@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
-import { objectToXml } from '../helpers/xml';
-import { generateDerAvailabilityResponse } from './derAvailabillity';
+import { objectToXml } from '../helpers/xml.js';
+import { generateDerAvailabilityResponse } from './derAvailabillity.js';
 
 it('should generate DERAvailability XML', () => {
     const response = generateDerAvailabilityResponse({

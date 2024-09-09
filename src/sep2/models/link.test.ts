@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
-import { parseLinkXmlObject } from './link';
+import { parseLinkXmlObject } from './link.js';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
+import { getMockFile } from '../helpers/mocks.js';
 
 it('should parse link XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

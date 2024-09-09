@@ -8,7 +8,7 @@ import {
     it,
     vi,
 } from 'vitest';
-import { AmberLimiter } from '.';
+import { AmberLimiter } from './index.js';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
 import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json';

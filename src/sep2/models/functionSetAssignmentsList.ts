@@ -1,14 +1,14 @@
-import { assertArray } from '../helpers/assert';
+import { assertArray } from '../helpers/assert.js';
 import {
     parseFunctionSetAssignmentsXmlObject,
     type FunctionSetAssignments,
-} from './functionSetAssignments';
-import type { PollRate } from './pollRate';
-import { parsePollRateXmlObject } from './pollRate';
+} from './functionSetAssignments.js';
+import type { PollRate } from './pollRate.js';
+import { parsePollRateXmlObject } from './pollRate.js';
 import {
     parseSubscribableListXmlObject,
     type SubscribableList,
-} from './subscribableList';
+} from './subscribableList.js';
 
 export type FunctionSetAssignmentsList = {
     pollRate: PollRate;

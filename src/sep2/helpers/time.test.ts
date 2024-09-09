@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { SEP2Client } from '../client';
-import { mockCert, mockKey } from '../../../tests/sep2/cert';
+import { SEP2Client } from '../client.js';
+import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import MockAdapter from 'axios-mock-adapter';
+import type { AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
 import axios from 'axios';
-import { getMockFile } from './mocks';
-import { TimeHelper } from './time';
+import { getMockFile } from './mocks.js';
+import { TimeHelper } from './time.js';
 
-const mockAxios = new MockAdapter(axios)
+const mockAxios = new MockAdapter(axios as AxiosInstance)
     .onGet('http://example.com/api/v2/tm')
     .reply(200, getMockFile('getTm.xml'));
 

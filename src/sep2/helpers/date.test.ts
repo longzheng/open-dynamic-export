@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dateToStringSeconds } from './date';
+import { dateToStringSeconds } from './date.js';
 
 describe('dateToStringSeconds', () => {
     it('should convert a date to a string', () => {

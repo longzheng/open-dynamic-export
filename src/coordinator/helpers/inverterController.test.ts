@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { InverterControlLimit } from './inverterController';
+import type { InverterControlLimit } from './inverterController.js';
 import {
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
     getAggregatedInverterControlLimit,
     getWMaxLimPctFromTargetSolarPowerRatio,
-} from './inverterController';
+} from './inverterController.js';
 
 describe('calculateTargetSolarPowerRatio', () => {
     it('should calculate higher target ratio', () => {

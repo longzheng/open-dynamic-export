@@ -2,18 +2,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
     ControlSchedule,
     RandomizedControlSchedule,
-} from './controlScheduler';
+} from './controlScheduler.js';
 import {
     generateControlsSchedule,
     filterControlsOfType,
     getSortedUniqueDatetimesFromControls,
     applyRandomizationToControlSchedule,
     applyRandomizationToDatetime,
-} from './controlScheduler';
-import type { MergedControlsData } from './derControls';
-import { generateMockDERControl } from '../../../tests/sep2/DERControl';
-import { generateMockDERProgram } from '../../../tests/sep2/DERProgram';
-import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments';
+} from './controlScheduler.js';
+import type { MergedControlsData } from './derControls.js';
+import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
+import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
+import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { randomInt } from 'crypto';
 
 vi.mock(import('crypto'), async (importOriginal) => {

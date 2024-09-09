@@ -1,8 +1,8 @@
 import type {
     PerPhaseMeasurement,
     PerPhaseOrNoPhaseMeasurement,
-} from '../../helpers/measurement';
-import type { MonitoringSampleBase } from './monitoringSampleBase';
+} from '../../helpers/measurement.js';
+import type { MonitoringSampleBase } from './monitoringSampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
 export type DerMonitoringSampleData = {

@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { parseDerListXml } from './derList';
+import { getMockFile } from '../helpers/mocks.js';
+import { parseDerListXml } from './derList.js';
 
 it('should parse DERControlList XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

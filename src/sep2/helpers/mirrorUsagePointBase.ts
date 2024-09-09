@@ -1,26 +1,26 @@
-import { getMillisecondsToNextHourMinutesInterval } from '../../helpers/time';
-import type { SEP2Client } from '../client';
-import { defaultPollPushRates } from '../client';
-import type { MirrorMeterReading } from '../models/mirrorMeterReading';
-import { generateMirrorMeterReadingResponse } from '../models/mirrorMeterReading';
-import type { MirrorUsagePoint } from '../models/mirrorUsagePoint';
+import { getMillisecondsToNextHourMinutesInterval } from '../../helpers/time.js';
+import type { SEP2Client } from '../client.js';
+import { defaultPollPushRates } from '../client.js';
+import type { MirrorMeterReading } from '../models/mirrorMeterReading.js';
+import { generateMirrorMeterReadingResponse } from '../models/mirrorMeterReading.js';
+import type { MirrorUsagePoint } from '../models/mirrorUsagePoint.js';
 import {
     generateMirrorUsagePointResponse,
     parseMirrorUsagePointXml,
-} from '../models/mirrorUsagePoint';
-import type { RoleFlagsType } from '../models/roleFlagsType';
-import { ServiceKind } from '../models/serviceKind';
-import { objectToXml } from './xml';
+} from '../models/mirrorUsagePoint.js';
+import type { RoleFlagsType } from '../models/roleFlagsType.js';
+import { ServiceKind } from '../models/serviceKind.js';
+import { objectToXml } from './xml.js';
 import type { Logger } from 'pino';
-import { UsagePointBaseStatus } from '../models/usagePointBase';
-import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number';
-import { CommodityType } from '../models/commodityType';
-import type { DataQualifierType } from '../models/dataQualifierType';
-import type { FlowDirectionType } from '../models/flowDirectionType';
-import { KindType } from '../models/kindType';
-import type { PhaseCode } from '../models/phaseCode';
-import { QualityFlags } from '../models/qualityFlags';
-import type { UomType } from '../models/uomType';
+import { UsagePointBaseStatus } from '../models/usagePointBase.js';
+import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
+import { CommodityType } from '../models/commodityType.js';
+import type { DataQualifierType } from '../models/dataQualifierType.js';
+import type { FlowDirectionType } from '../models/flowDirectionType.js';
+import { KindType } from '../models/kindType.js';
+import type { PhaseCode } from '../models/phaseCode.js';
+import { QualityFlags } from '../models/qualityFlags.js';
+import type { UomType } from '../models/uomType.js';
 
 export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
     protected client: SEP2Client;

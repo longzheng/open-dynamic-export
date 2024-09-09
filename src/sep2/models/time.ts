@@ -1,9 +1,9 @@
-import { safeParseStringToEnumType } from '../../helpers/enum';
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { stringIntToDate } from '../helpers/date';
-import { parsePollRateXmlObject, type PollRate } from './pollRate';
-import { parseResourceXmlObject, type Resource } from './resource';
+import { safeParseStringToEnumType } from '../../helpers/enum.js';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { stringIntToDate } from '../helpers/date.js';
+import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
+import { parseResourceXmlObject, type Resource } from './resource.js';
 
 // 3 = Time obtained from external authoritative source such as NTP
 // 4 = Time obtained from level 3 source

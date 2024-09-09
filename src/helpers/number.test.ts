@@ -10,7 +10,7 @@ import {
     sumBigIntArray,
     sumNumbersArray,
     sumNumbersNullableArray,
-} from './number';
+} from './number.js';
 
 describe('numberWithPow10', () => {
     it('should calculate positive power of ten', () => {

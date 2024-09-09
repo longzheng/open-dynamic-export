@@ -1,13 +1,13 @@
 import {
     parseIdentifiedObjectXmlObject,
     type IdentifiedObject,
-} from './identifiedObject';
-import { parseLinkXmlObject, type Link } from './link';
-import { parseListLinkXmlObject, type ListLink } from './listLink';
+} from './identifiedObject.js';
+import { parseLinkXmlObject, type Link } from './link.js';
+import { parseListLinkXmlObject, type ListLink } from './listLink.js';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
-} from './subscribableResource';
+} from './subscribableResource.js';
 
 export type FunctionSetAssignments = {
     derProgramListLink: ListLink;

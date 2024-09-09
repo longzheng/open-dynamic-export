@@ -1,13 +1,13 @@
-import { assertString } from '../helpers/assert';
-import { booleanToString, stringToBoolean } from '../helpers/boolean';
-import { dateToStringSeconds, stringIntToDate } from '../helpers/date';
-import { xmlns } from '../helpers/namespace';
-import { parseLinkXmlObject, type Link } from './link';
-import { parseListLinkXmlObject, type ListLink } from './listLink';
+import { assertString } from '../helpers/assert.js';
+import { booleanToString, stringToBoolean } from '../helpers/boolean.js';
+import { dateToStringSeconds, stringIntToDate } from '../helpers/date.js';
+import { xmlns } from '../helpers/namespace.js';
+import { parseLinkXmlObject, type Link } from './link.js';
+import { parseListLinkXmlObject, type ListLink } from './listLink.js';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
-} from './subscribableResource';
+} from './subscribableResource.js';
 
 export type EndDevice = {
     lFDI?: string;

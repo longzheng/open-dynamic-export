@@ -1,5 +1,5 @@
-import { assertString } from '../helpers/assert';
-import { xmlns } from '../helpers/namespace';
+import { assertString } from '../helpers/assert.js';
+import { xmlns } from '../helpers/namespace.js';
 
 export type ConnectionPoint = {
     connectionPointId: string | undefined;

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RampRateHelper } from './rampRate';
+import { RampRateHelper } from './rampRate.js';
 import { afterEach } from 'node:test';
 import { addSeconds } from 'date-fns';
 

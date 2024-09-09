@@ -1,8 +1,8 @@
 import type { Logger } from 'pino';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController';
-import type { LimiterType } from '../../../coordinator/helpers/limiter';
-import { writeControlLimit } from '../../../helpers/influxdb';
-import { logger as pinoLogger } from '../../../helpers/logger';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
+import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import { writeControlLimit } from '../../../helpers/influxdb.js';
+import { logger as pinoLogger } from '../../../helpers/logger.js';
 
 // https://www.ausgrid.com.au/Connections/Solar-and-batteries/Solar-tariffs
 // https://www.ausgrid.com.au/-/media/Documents/Tariff/Solar-Factsheet-two-way-pricing-for-grid-exports.pdf?rev=2cef76fd13444c80b26df4c1a3213833

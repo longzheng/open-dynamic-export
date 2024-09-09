@@ -1,11 +1,11 @@
-import type { ControlsModelWrite } from '../models/controls';
-import { controlsModel } from '../models/controls';
-import { inverterModel } from '../models/inverter';
-import type { NameplateModel } from '../models/nameplate';
-import { nameplateModel } from '../models/nameplate';
-import { settingsModel } from '../models/settings';
-import { statusModel } from '../models/status';
-import { SunSpecConnection } from './base';
+import type { ControlsModelWrite } from '../models/controls.js';
+import { controlsModel } from '../models/controls.js';
+import { inverterModel } from '../models/inverter.js';
+import type { NameplateModel } from '../models/nameplate.js';
+import { nameplateModel } from '../models/nameplate.js';
+import { settingsModel } from '../models/settings.js';
+import { statusModel } from '../models/status.js';
+import { SunSpecConnection } from './base.js';
 
 export class InverterSunSpecConnection extends SunSpecConnection {
     // the nameplate model should never change so we can cache it

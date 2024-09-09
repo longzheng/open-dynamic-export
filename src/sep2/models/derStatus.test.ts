@@ -1,7 +1,10 @@
 import { it, expect } from 'vitest';
-import { objectToXml } from '../helpers/xml';
-import { generateDerStatusResponse, OperationalModeStatus } from './derStatus';
-import { ConnectStatus } from './connectStatus';
+import { objectToXml } from '../helpers/xml.js';
+import {
+    generateDerStatusResponse,
+    OperationalModeStatus,
+} from './derStatus.js';
+import { ConnectStatus } from './connectStatus.js';
 
 it('should generate DERStatus XML', () => {
     const response = generateDerStatusResponse({

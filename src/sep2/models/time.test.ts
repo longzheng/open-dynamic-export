@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { parseStringPromise } from 'xml2js';
-import { getMockFile } from '../helpers/mocks';
-import { parseTimeXml, TimeQuality } from './time';
+import { getMockFile } from '../helpers/mocks.js';
+import { parseTimeXml, TimeQuality } from './time.js';
 
 it('should parse time XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

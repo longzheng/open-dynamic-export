@@ -1,11 +1,11 @@
-import { assertArray } from '../helpers/assert';
-import { parsePollRateXmlObject, type PollRate } from './pollRate';
-import type { DERProgram } from './derProgram';
-import { parseDERProgramXmlObject } from './derProgram';
+import { assertArray } from '../helpers/assert.js';
+import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
+import type { DERProgram } from './derProgram.js';
+import { parseDERProgramXmlObject } from './derProgram.js';
 import {
     parseSubscribableListXmlObject,
     type SubscribableList,
-} from './subscribableList';
+} from './subscribableList.js';
 
 export type DERProgramList = {
     pollRate: PollRate;

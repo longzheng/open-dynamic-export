@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
-import { objectToXml } from '../helpers/xml';
-import { DERControlType } from './derControlType';
-import { generateDerSettingsResponse } from './derSettings';
+import { objectToXml } from '../helpers/xml.js';
+import { DERControlType } from './derControlType.js';
+import { generateDerSettingsResponse } from './derSettings.js';
 
 it('should generate DERSettings XML', () => {
     const response = generateDerSettingsResponse({

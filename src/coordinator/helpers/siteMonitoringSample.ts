@@ -1,8 +1,8 @@
 import {
     perPhaseMeasurementSchema,
     perPhaseOrNoPhaseMeasurementSchema,
-} from '../../helpers/measurement';
-import type { MonitoringSampleBase } from './monitoringSampleBase';
+} from '../../helpers/measurement.js';
+import type { MonitoringSampleBase } from './monitoringSampleBase.js';
 import { z } from 'zod';
 
 // aligns with the CSIP-AUS requirements for site monitoring

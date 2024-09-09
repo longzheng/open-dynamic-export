@@ -1,5 +1,5 @@
-import { meterModel } from '../models/meter';
-import { SunSpecConnection } from './base';
+import { meterModel } from '../models/meter.js';
+import { SunSpecConnection } from './base.js';
 
 export class MeterSunSpecConnection extends SunSpecConnection {
     async getMeterModel() {

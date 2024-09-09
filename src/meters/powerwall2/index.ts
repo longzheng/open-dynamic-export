@@ -1,9 +1,9 @@
-import { SiteMonitoringPollerBase } from '../../coordinator/helpers/siteMonitoringPollerBase';
-import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMonitoringSample';
-import { Powerwall2Client } from './client';
+import { SiteMonitoringPollerBase } from '../../coordinator/helpers/siteMonitoringPollerBase.js';
+import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMonitoringSample.js';
+import { Powerwall2Client } from './client.js';
 import type { z } from 'zod';
-import type { metersSiteSchema } from './api';
-import type { Config } from '../../helpers/config';
+import type { metersSiteSchema } from './api.js';
+import type { Config } from '../../helpers/config.js';
 
 export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
     private client: Powerwall2Client;

@@ -5,8 +5,11 @@ import type {
     StActCtl,
     StatusModel,
     StorConn,
-} from '../models/status';
-import { getAggregatedStatusMetrics, getStatusMetrics } from './statusMetrics';
+} from '../models/status.js';
+import {
+    getAggregatedStatusMetrics,
+    getStatusMetrics,
+} from './statusMetrics.js';
 
 describe('getStatusMetrics', () => {
     it('returns data', () => {

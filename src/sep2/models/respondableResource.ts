@@ -1,7 +1,7 @@
-import { stringHexToEnumType } from '../../helpers/enum';
-import { assertString } from '../helpers/assert';
-import { parseResourceXmlObject, type Resource } from './resource';
-import { type ResponseRequiredType } from './responseRequired';
+import { stringHexToEnumType } from '../../helpers/enum.js';
+import { assertString } from '../helpers/assert.js';
+import { parseResourceXmlObject, type Resource } from './resource.js';
+import { type ResponseRequiredType } from './responseRequired.js';
 
 export type RespondableResource = {
     replyToHref?: string;

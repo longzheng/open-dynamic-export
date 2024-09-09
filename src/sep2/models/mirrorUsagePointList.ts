@@ -1,9 +1,9 @@
-import { assertArray } from '../helpers/assert';
-import { parseListXmlObject, type List } from './list';
-import type { MirrorUsagePoint } from './mirrorUsagePoint';
-import { parseMirrorUsagePointXmlObject } from './mirrorUsagePoint';
-import type { PollRate } from './pollRate';
-import { parsePollRateXmlObject } from './pollRate';
+import { assertArray } from '../helpers/assert.js';
+import { parseListXmlObject, type List } from './list.js';
+import type { MirrorUsagePoint } from './mirrorUsagePoint.js';
+import { parseMirrorUsagePointXmlObject } from './mirrorUsagePoint.js';
+import type { PollRate } from './pollRate.js';
+import { parsePollRateXmlObject } from './pollRate.js';
 
 export type MirrorUsagePointList = {
     pollRate: PollRate;

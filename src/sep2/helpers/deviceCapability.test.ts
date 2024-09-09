@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { defaultPollPushRates, SEP2Client } from '../client';
-import { mockCert, mockKey } from '../../../tests/sep2/cert';
-import { DeviceCapabilityHelper } from './deviceCapability';
+import { defaultPollPushRates, SEP2Client } from '../client.js';
+import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
+import { DeviceCapabilityHelper } from './deviceCapability.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { getMockFile } from './mocks';
+import type { AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
+import { getMockFile } from './mocks.js';
 
-new MockAdapter(axios)
+new MockAdapter(axios as AxiosInstance)
     .onGet('http://example.com/dcap')
     .reply(200, getMockFile('getDcap.xml'));
 

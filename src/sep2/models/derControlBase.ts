@@ -1,7 +1,7 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { stringToBoolean } from '../helpers/boolean';
-import { parseActivePowerXmlObject, type ActivePower } from './activePower';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { stringToBoolean } from '../helpers/boolean.js';
+import { parseActivePowerXmlObject, type ActivePower } from './activePower.js';
 
 export type DERControlBase = {
     // site import limit

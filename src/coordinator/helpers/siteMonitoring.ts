@@ -1,9 +1,9 @@
-import type { Config } from '../../helpers/config';
-import { MqttSiteMonitoringPoller } from '../../meters/mqtt';
-import { Powerwall2SiteMonitoringPoller } from '../../meters/powerwall2';
-import { getSunSpecMeterConnection } from '../../sunspec/connections';
-import { SunSpecMeterPoller } from '../../sunspec/sunspecMeterPoller';
-import type { SiteMonitoringPollerBase } from './siteMonitoringPollerBase';
+import type { Config } from '../../helpers/config.js';
+import { MqttSiteMonitoringPoller } from '../../meters/mqtt/index.js';
+import { Powerwall2SiteMonitoringPoller } from '../../meters/powerwall2/index.js';
+import { getSunSpecMeterConnection } from '../../sunspec/connections.js';
+import { SunSpecMeterPoller } from '../../sunspec/sunspecMeterPoller.js';
+import type { SiteMonitoringPollerBase } from './siteMonitoringPollerBase.js';
 
 export function getSiteMonitoringPollerInstance(
     config: Config,

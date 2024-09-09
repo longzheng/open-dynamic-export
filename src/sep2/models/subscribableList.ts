@@ -1,8 +1,8 @@
-import { parseListXmlObject, type List } from './list';
+import { parseListXmlObject, type List } from './list.js';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
-} from './subscribableResource';
+} from './subscribableResource.js';
 
 export type SubscribableList = List & SubscribableResource;
 

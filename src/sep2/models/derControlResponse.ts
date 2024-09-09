@@ -1,5 +1,5 @@
-import { dateToStringSeconds } from '../helpers/date';
-import { xmlns } from '../helpers/namespace';
+import { dateToStringSeconds } from '../helpers/date.js';
+import { xmlns } from '../helpers/namespace.js';
 
 // The status field contains the acknowledgement or status. Each event type (DRLC, DER, Price, or Text) can return different status information (e.g. an Acknowledge will be returned for a Price event where a DRLC event can return Event Received, Event Started, and Event Completed). The Status field value definitions are defined in Table 27: Response Types by Function Set.
 // EventReceived = 1,

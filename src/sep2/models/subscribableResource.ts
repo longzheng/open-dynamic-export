@@ -1,6 +1,6 @@
-import { assertString } from '../helpers/assert';
-import { stringToBoolean } from '../helpers/boolean';
-import { parseResourceXmlObject, type Resource } from './resource';
+import { assertString } from '../helpers/assert.js';
+import { stringToBoolean } from '../helpers/boolean.js';
+import { parseResourceXmlObject, type Resource } from './resource.js';
 
 export type SubscribableResource = { subscribable: boolean } & Resource;
 

@@ -1,6 +1,6 @@
-import { safeParseIntString } from '../../helpers/number';
-import { assertString } from '../helpers/assert';
-import { parseEventXmlObject, type Event } from './event';
+import { safeParseIntString } from '../../helpers/number.js';
+import { assertString } from '../helpers/assert.js';
+import { parseEventXmlObject, type Event } from './event.js';
 
 export type RandomizableEvent = {
     // Number of seconds boundary inside which a random value must be selected to be applied to the associated interval start time, to avoid sudden synchronized demand changes. If related to price level changes, sign may be ignored. Valid range is -3600 to 3600. If not specified, 0 is the default.

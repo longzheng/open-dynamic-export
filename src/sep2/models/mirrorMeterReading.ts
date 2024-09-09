@@ -1,14 +1,14 @@
-import { numberToHex } from '../../helpers/number';
-import type { CommodityType } from './commodityType';
-import type { DataQualifierType } from './dataQualifierType';
-import { dateToStringSeconds } from '../helpers/date';
-import type { FlowDirectionType } from './flowDirectionType';
-import type { KindType } from './kindType';
-import { xmlns } from '../helpers/namespace';
-import { PhaseCode } from './phaseCode';
-import type { QualityFlags } from './qualityFlags';
-import type { UomType } from './uomType';
-import type { IdentifiedObject } from './identifiedObject';
+import { numberToHex } from '../../helpers/number.js';
+import type { CommodityType } from './commodityType.js';
+import type { DataQualifierType } from './dataQualifierType.js';
+import { dateToStringSeconds } from '../helpers/date.js';
+import type { FlowDirectionType } from './flowDirectionType.js';
+import type { KindType } from './kindType.js';
+import { xmlns } from '../helpers/namespace.js';
+import { PhaseCode } from './phaseCode.js';
+import type { QualityFlags } from './qualityFlags.js';
+import type { UomType } from './uomType.js';
+import type { IdentifiedObject } from './identifiedObject.js';
 
 // reading MRID should be a random UUIDv4 with the PEN
 export type MirrorMeterReading = {

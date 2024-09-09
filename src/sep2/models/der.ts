@@ -1,8 +1,8 @@
-import { parseLinkXmlObject, type Link } from './link';
+import { parseLinkXmlObject, type Link } from './link.js';
 import {
     parseSubscribableResourceXmlObject,
     type SubscribableResource,
-} from './subscribableResource';
+} from './subscribableResource.js';
 
 export type DER = {
     derAvailabilityLink: Link;

@@ -1,5 +1,5 @@
 import type { Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { AxiosInstance } from 'axios';
 import * as https from 'node:https';
 import axios, { AxiosError } from 'axios';
@@ -7,7 +7,7 @@ import {
     meterAggregatesSchema,
     metersSiteSchema,
     systemStatusSoeSchema,
-} from './api';
+} from './api.js';
 
 export class Powerwall2Client {
     private logger: Logger;

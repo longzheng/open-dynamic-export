@@ -1,11 +1,11 @@
 import mqtt from 'mqtt';
-import type { InverterControlLimit } from '../../coordinator/helpers/inverterController';
-import type { LimiterType } from '../../coordinator/helpers/limiter';
-import type { Config } from '../../helpers/config';
-import { writeControlLimit } from '../../helpers/influxdb';
+import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
+import type { LimiterType } from '../../coordinator/helpers/limiter.js';
+import type { Config } from '../../helpers/config.js';
+import { writeControlLimit } from '../../helpers/influxdb.js';
 import { z } from 'zod';
 import type { Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 
 type MqttLimiterConfig = NonNullable<Config['limiters']['mqtt']>;
 

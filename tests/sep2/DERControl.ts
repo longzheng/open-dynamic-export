@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
-import type { DERControl } from '../../src/sep2/models/derControl';
-import { ResponseRequiredType } from '../../src/sep2/models/responseRequired';
-import { CurrentStatus } from '../../src/sep2/models/eventStatus';
-import type { DERControlBase } from '../../src/sep2/models/derControlBase';
+import type { DERControl } from '../../src/sep2/models/derControl.js';
+import { ResponseRequiredType } from '../../src/sep2/models/responseRequired.js';
+import { CurrentStatus } from '../../src/sep2/models/eventStatus.js';
+import type { DERControlBase } from '../../src/sep2/models/derControlBase.js';
 
 export function generateMockDERControl({
     creationTime,

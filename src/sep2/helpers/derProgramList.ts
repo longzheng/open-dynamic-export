@@ -1,19 +1,19 @@
 import EventEmitter from 'node:events';
-import type { SEP2Client } from '../client';
-import { defaultPollPushRates } from '../client';
-import { PollableResource } from './pollableResource';
+import type { SEP2Client } from '../client.js';
+import { defaultPollPushRates } from '../client.js';
+import { PollableResource } from './pollableResource.js';
 import {
     parseDerProgramListXml,
     type DERProgramList,
-} from '../models/derProgramList';
-import { getListAll } from './pagination';
-import type { DERProgram } from '../models/derProgram';
+} from '../models/derProgramList.js';
+import { getListAll } from './pagination.js';
+import type { DERProgram } from '../models/derProgram.js';
 import {
     parseDefaultDERControlXml,
     type DefaultDERControl,
-} from '../models/defaultDerControl';
-import { parseDerControlListXml } from '../models/derControlList';
-import type { DERControl } from '../models/derControl';
+} from '../models/defaultDerControl.js';
+import { parseDerControlListXml } from '../models/derControlList.js';
+import type { DERControl } from '../models/derControl.js';
 
 export type DerProgramListData = {
     program: DERProgram;

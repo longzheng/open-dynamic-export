@@ -1,9 +1,9 @@
 import mqtt from 'mqtt';
-import type { Config } from '../../helpers/config';
+import type { Config } from '../../helpers/config.js';
 import type { z } from 'zod';
-import { SiteMonitoringPollerBase } from '../../coordinator/helpers/siteMonitoringPollerBase';
-import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMonitoringSample';
-import { siteMonitoringSampleDataSchema } from '../../coordinator/helpers/siteMonitoringSample';
+import { SiteMonitoringPollerBase } from '../../coordinator/helpers/siteMonitoringPollerBase.js';
+import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMonitoringSample.js';
+import { siteMonitoringSampleDataSchema } from '../../coordinator/helpers/siteMonitoringSample.js';
 
 export class MqttSiteMonitoringPoller extends SiteMonitoringPollerBase {
     private client: mqtt.MqttClient;

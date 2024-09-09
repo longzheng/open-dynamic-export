@@ -1,10 +1,10 @@
-import Decimal from 'decimal.js';
+import { Decimal } from 'decimal.js';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
     mathMaxNullableArray,
     mathMinNullableArray,
-} from './number';
+} from './number.js';
 import { z } from 'zod';
 
 export const perPhaseMeasurementSchema = z.object({
