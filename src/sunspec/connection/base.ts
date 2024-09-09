@@ -224,6 +224,7 @@ export abstract class SunSpecConnection {
                 throw new Error('Model ID or length not found');
             }
 
+            // end block
             if (modelId === 0xffff && modelLength === 0) {
                 break;
             }
