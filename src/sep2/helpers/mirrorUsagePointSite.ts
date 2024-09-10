@@ -384,14 +384,14 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
 
         // average
         postReading({
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             dataQualifier: DataQualifierType.Average,
             description: 'Average Voltage (V) - Phase A',
             value: reading.voltage.average.phaseA,
         });
         if (reading.voltage.average.phaseB) {
             postReading({
-                phase: PhaseCode.PhaseB,
+                phase: PhaseCode.PhaseBN,
                 dataQualifier: DataQualifierType.Average,
                 description: 'Average Voltage (V) - Phase B',
                 value: reading.voltage.average.phaseB,
@@ -399,7 +399,7 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         }
         if (reading.voltage.average.phaseC) {
             postReading({
-                phase: PhaseCode.PhaseC,
+                phase: PhaseCode.PhaseCN,
                 dataQualifier: DataQualifierType.Average,
                 description: 'Average Voltage (V) - Phase C',
                 value: reading.voltage.average.phaseC,
@@ -408,14 +408,14 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
 
         // maximum
         postReading({
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             dataQualifier: DataQualifierType.Maximum,
             description: 'Maximum Voltage (V) - Phase A',
             value: reading.voltage.maximum.phaseA,
         });
         if (reading.voltage.maximum.phaseB) {
             postReading({
-                phase: PhaseCode.PhaseB,
+                phase: PhaseCode.PhaseBN,
                 dataQualifier: DataQualifierType.Maximum,
                 description: 'Maximum Voltage (V) - Phase B',
                 value: reading.voltage.maximum.phaseB,
@@ -423,7 +423,7 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         }
         if (reading.voltage.maximum.phaseC) {
             postReading({
-                phase: PhaseCode.PhaseC,
+                phase: PhaseCode.PhaseCN,
                 dataQualifier: DataQualifierType.Maximum,
                 description: 'Maximum Voltage (V) - Phase C',
                 value: reading.voltage.maximum.phaseC,
@@ -432,14 +432,14 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
 
         // minimum
         postReading({
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             dataQualifier: DataQualifierType.Minimum,
             description: 'Minimum Voltage (V) - Phase A',
             value: reading.voltage.minimum.phaseA,
         });
         if (reading.voltage.minimum.phaseB) {
             postReading({
-                phase: PhaseCode.PhaseB,
+                phase: PhaseCode.PhaseBN,
                 dataQualifier: DataQualifierType.Minimum,
                 description: 'Minimum Voltage (V) - Phase B',
                 value: reading.voltage.minimum.phaseB,
@@ -447,7 +447,7 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         }
         if (reading.voltage.minimum.phaseC) {
             postReading({
-                phase: PhaseCode.PhaseC,
+                phase: PhaseCode.PhaseCN,
                 dataQualifier: DataQualifierType.Minimum,
                 description: 'Minimum Voltage (V) - Phase C',
                 value: reading.voltage.minimum.phaseC,
