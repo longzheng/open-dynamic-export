@@ -52,4 +52,8 @@ export class MqttSiteMonitoringPoller extends SiteMonitoringPollerBase {
     override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null> {
         return this.cachedMessage;
     }
+
+    override onDestroy() {
+        this.client.end();
+    }
 }

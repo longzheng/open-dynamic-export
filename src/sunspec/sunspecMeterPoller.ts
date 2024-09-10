@@ -31,6 +31,10 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
 
         return siteMonitoringSample;
     }
+
+    override onDestroy() {
+        this.meterConnection.client.destroy(() => {});
+    }
 }
 
 export function generateSiteMonitoringSample({

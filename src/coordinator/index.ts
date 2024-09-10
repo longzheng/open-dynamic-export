@@ -16,76 +16,94 @@ import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029/index
 import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W/index.js';
 import { getSiteMonitoringPollerInstance } from './helpers/siteMonitoring.js';
 import { MqttLimiter } from '../limiters/mqtt/index.js';
+import type { SiteMonitoringPollerBase } from './helpers/siteMonitoringPollerBase.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
-const config = getConfig();
+export type Coordinator = {
+    siteMonitoringPoller: SiteMonitoringPollerBase;
+    destroy: () => void;
+};
 
-const invertersConnections = getSunSpecInvertersConnections(config);
+export function createCoordinator(): Coordinator {
+    const config = getConfig();
 
-const siteMonitoringPoller = getSiteMonitoringPollerInstance(config);
+    const invertersConnections = getSunSpecInvertersConnections(config);
 
-const sunSpecInverterPoller = new SunSpecInverterPoller({
-    invertersConnections,
-});
+    const siteMonitoringPoller = getSiteMonitoringPollerInstance(config);
 
-const rampRateHelper = new RampRateHelper();
-
-const sep2 = getSep2Limiter({
-    config,
-    invertersConnections,
-    rampRateHelper,
-});
-
-const limiters = [
-    sep2?.sep2Limiter,
-    config.limiters.fixed
-        ? new FixedLimiter({ config: config.limiters.fixed })
-        : null,
-    config.limiters.negativeFeedIn?.type === 'amber'
-        ? new AmberLimiter({
-              apiKey: config.limiters.negativeFeedIn.apiKey,
-              siteId: config.limiters.negativeFeedIn.siteId,
-          })
-        : null,
-    config.limiters.twoWayTariff?.type === 'ausgridEA029'
-        ? new AusgridEA029Limiter()
-        : null,
-    config.limiters.twoWayTariff?.type === 'sapnRELE2W'
-        ? new SapnRELE2WLimiter()
-        : null,
-    config.limiters.mqtt
-        ? new MqttLimiter({ config: config.limiters.mqtt })
-        : null,
-].filter((controlLimit) => !!controlLimit);
-
-const inverterController = new InverterController({
-    invertersConnections,
-    applyControl: config.inverterControl,
-    rampRateHelper,
-    limiters,
-});
-
-sunSpecInverterPoller.on('data', ({ invertersData, derMonitoringSample }) => {
-    writeDerMonitoringSamplePoints(derMonitoringSample);
-
-    sep2?.derHelper.onInverterData(invertersData);
-    sep2?.mirrorUsagePointListHelper.addDerMonitoringSample(
-        derMonitoringSample,
-    );
-
-    inverterController.updateSunSpecInverterData({
-        inverters: invertersData,
-        derMonitoringSample,
+    const sunSpecInverterPoller = new SunSpecInverterPoller({
+        invertersConnections,
     });
-});
 
-siteMonitoringPoller.on('data', ({ siteMonitoringSample }) => {
-    writeSiteMonitoringSamplePoints(siteMonitoringSample);
+    const rampRateHelper = new RampRateHelper();
 
-    sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(
-        siteMonitoringSample,
+    const sep2 = getSep2Limiter({
+        config,
+        invertersConnections,
+        rampRateHelper,
+    });
+
+    const limiters = [
+        sep2?.sep2Limiter,
+        config.limiters.fixed
+            ? new FixedLimiter({ config: config.limiters.fixed })
+            : null,
+        config.limiters.negativeFeedIn?.type === 'amber'
+            ? new AmberLimiter({
+                  apiKey: config.limiters.negativeFeedIn.apiKey,
+                  siteId: config.limiters.negativeFeedIn.siteId,
+              })
+            : null,
+        config.limiters.twoWayTariff?.type === 'ausgridEA029'
+            ? new AusgridEA029Limiter()
+            : null,
+        config.limiters.twoWayTariff?.type === 'sapnRELE2W'
+            ? new SapnRELE2WLimiter()
+            : null,
+        config.limiters.mqtt
+            ? new MqttLimiter({ config: config.limiters.mqtt })
+            : null,
+    ].filter((controlLimit) => !!controlLimit);
+
+    const inverterController = new InverterController({
+        invertersConnections,
+        applyControl: config.inverterControl,
+        rampRateHelper,
+        limiters,
+    });
+
+    sunSpecInverterPoller.on(
+        'data',
+        ({ invertersData, derMonitoringSample }) => {
+            writeDerMonitoringSamplePoints(derMonitoringSample);
+
+            sep2?.derHelper.onInverterData(invertersData);
+            sep2?.mirrorUsagePointListHelper.addDerMonitoringSample(
+                derMonitoringSample,
+            );
+
+            inverterController.updateSunSpecInverterData({
+                inverters: invertersData,
+                derMonitoringSample,
+            });
+        },
     );
 
-    inverterController.updateSiteMonitoringSample(siteMonitoringSample);
-});
+    siteMonitoringPoller.on('data', ({ siteMonitoringSample }) => {
+        writeSiteMonitoringSamplePoints(siteMonitoringSample);
+
+        sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(
+            siteMonitoringSample,
+        );
+
+        inverterController.updateSiteMonitoringSample(siteMonitoringSample);
+    });
+
+    return {
+        siteMonitoringPoller,
+        destroy: () => {
+            siteMonitoringPoller.destroy();
+        },
+    };
+}

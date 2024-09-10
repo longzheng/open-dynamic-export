@@ -15,6 +15,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
 }> {
     protected logger: Logger;
     private pollingIntervalMs;
+    private pollingTimer: NodeJS.Timeout | null = null;
 
     constructor({
         meterName,
@@ -33,7 +34,17 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         });
     }
 
+    public destroy() {
+        if (this.pollingTimer) {
+            clearTimeout(this.pollingTimer);
+        }
+
+        this.onDestroy();
+    }
+
     abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null>;
+
+    abstract onDestroy(): void;
 
     protected async startPolling() {
         const start = performance.now();
@@ -79,7 +90,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
             // we don't want to run this loop any more frequently than the polling interval to prevent overloading the connection
             const delay = Math.max(this.pollingIntervalMs - duration, 0);
 
-            setTimeout(() => {
+            this.pollingTimer = setTimeout(() => {
                 void this.startPolling();
             }, delay);
         }
