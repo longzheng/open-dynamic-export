@@ -2,7 +2,7 @@ import express, { json, urlencoded } from 'express';
 import { RegisterRoutes } from '../dist/routes.js';
 import { env } from './helpers/env.js';
 
-const port = env.SERVER_PORT;
+const port = 3000;
 
 export const app = express();
 
