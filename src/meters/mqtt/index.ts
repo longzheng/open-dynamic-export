@@ -1,15 +1,13 @@
 import mqtt from 'mqtt';
 import type { Config } from '../../helpers/config.js';
 import type { z } from 'zod';
-import { SiteMonitoringPollerBase } from '../../coordinator/helpers/siteMonitoringPollerBase.js';
-import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMonitoringSample.js';
-import { siteMonitoringSampleDataSchema } from '../../coordinator/helpers/siteMonitoringSample.js';
+import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
+import type { SiteSampleData } from '../siteSample.js';
+import { siteSampleDataSchema } from '../siteSample.js';
 
-export class MqttSiteMonitoringPoller extends SiteMonitoringPollerBase {
+export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     private client: mqtt.MqttClient;
-    private cachedMessage: z.infer<
-        typeof siteMonitoringSampleDataSchema
-    > | null = null;
+    private cachedMessage: z.infer<typeof siteSampleDataSchema> | null = null;
 
     constructor({
         config,
@@ -33,9 +31,7 @@ export class MqttSiteMonitoringPoller extends SiteMonitoringPollerBase {
         this.client.on('message', (_topic, message) => {
             const data = message.toString();
 
-            const result = siteMonitoringSampleDataSchema.safeParse(
-                JSON.parse(data),
-            );
+            const result = siteSampleDataSchema.safeParse(JSON.parse(data));
 
             if (!result.success) {
                 this.logger.error({ message: 'Invalid MQTT message', data });
@@ -49,7 +45,7 @@ export class MqttSiteMonitoringPoller extends SiteMonitoringPollerBase {
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
-    override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null> {
+    override async getSiteSampleData(): Promise<SiteSampleData | null> {
         return this.cachedMessage;
     }
 }

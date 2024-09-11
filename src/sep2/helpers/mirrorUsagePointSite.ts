@@ -1,5 +1,5 @@
 import { RoleFlagsType } from '../models/roleFlagsType.js';
-import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase.js';
+import { getSamplesIntervalSeconds } from '../../coordinator/helpers/sampleBase.js';
 import type {
     AvgMaxMin,
     NoPhaseMeasurement,
@@ -18,7 +18,7 @@ import { PhaseCode } from '../models/phaseCode.js';
 import { UomType } from '../models/uomType.js';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample.js';
+import type { SiteSample } from '../../meters/siteSample.js';
 
 type SiteReading = {
     intervalSeconds: number;
@@ -29,7 +29,7 @@ type SiteReading = {
 };
 
 export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
-    SiteMonitoringSample,
+    SiteSample,
     SiteReading
 > {
     protected roleFlags =
@@ -39,9 +39,7 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         module: 'MirrorUsagePointSiteHelper',
     });
 
-    protected getReadingFromSamples(
-        samples: SiteMonitoringSample[],
-    ): SiteReading {
+    protected getReadingFromSamples(samples: SiteSample[]): SiteReading {
         return {
             intervalSeconds: getSamplesIntervalSeconds(samples),
             realPower: getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(

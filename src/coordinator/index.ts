@@ -6,15 +6,15 @@ import { logger as pinoLogger } from '../helpers/logger.js';
 import { InverterController } from './helpers/inverterController.js';
 import { RampRateHelper } from './helpers/rampRate.js';
 import {
-    writeDerMonitoringSamplePoints,
-    writeSiteMonitoringSamplePoints,
+    writeDerSamplePoints,
+    writeSiteSamplePoints,
 } from '../helpers/influxdb.js';
 import { getSep2Limiter } from '../sep2/index.js';
 import { FixedLimiter } from '../limiters/fixed/index.js';
 import { AmberLimiter } from '../limiters/negativeFeedIn/amber/index.js';
 import { AusgridEA029Limiter } from '../limiters/twoWayTariff/ausgridEA029/index.js';
 import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W/index.js';
-import { getSiteMonitoringPollerInstance } from './helpers/siteMonitoring.js';
+import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
 import { MqttLimiter } from '../limiters/mqtt/index.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
@@ -23,7 +23,7 @@ const config = getConfig();
 
 const invertersConnections = getSunSpecInvertersConnections(config);
 
-const siteMonitoringPoller = getSiteMonitoringPollerInstance(config);
+const siteSamplePoller = getSiteSamplePollerInstance(config);
 
 const sunSpecInverterPoller = new SunSpecInverterPoller({
     invertersConnections,
@@ -66,26 +66,22 @@ const inverterController = new InverterController({
     limiters,
 });
 
-sunSpecInverterPoller.on('data', ({ invertersData, derMonitoringSample }) => {
-    writeDerMonitoringSamplePoints(derMonitoringSample);
+sunSpecInverterPoller.on('data', ({ invertersData, derSample }) => {
+    writeDerSamplePoints(derSample);
 
     sep2?.derHelper.onInverterData(invertersData);
-    sep2?.mirrorUsagePointListHelper.addDerMonitoringSample(
-        derMonitoringSample,
-    );
+    sep2?.mirrorUsagePointListHelper.addDerSample(derSample);
 
     inverterController.updateSunSpecInverterData({
         inverters: invertersData,
-        derMonitoringSample,
+        derSample,
     });
 });
 
-siteMonitoringPoller.on('data', ({ siteMonitoringSample }) => {
-    writeSiteMonitoringSamplePoints(siteMonitoringSample);
+siteSamplePoller.on('data', ({ siteSample }) => {
+    writeSiteSamplePoints(siteSample);
 
-    sep2?.mirrorUsagePointListHelper.addSiteMonitoringSample(
-        siteMonitoringSample,
-    );
+    sep2?.mirrorUsagePointListHelper.addSiteSample(siteSample);
 
-    inverterController.updateSiteMonitoringSample(siteMonitoringSample);
+    inverterController.updateSiteSample(siteSample);
 });

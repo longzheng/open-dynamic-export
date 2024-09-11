@@ -1,5 +1,5 @@
 import { RoleFlagsType } from '../models/roleFlagsType.js';
-import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase.js';
+import { getSamplesIntervalSeconds } from '../../coordinator/helpers/sampleBase.js';
 import type {
     NoPhaseMeasurement,
     PerPhaseNetMeasurement,
@@ -18,7 +18,7 @@ import { PhaseCode } from '../models/phaseCode.js';
 import { UomType } from '../models/uomType.js';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoringSample.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
 
 type DerReading = {
     intervalSeconds: number;
@@ -29,7 +29,7 @@ type DerReading = {
 };
 
 export class MirrorUsagePointDerHelper extends MirrorUsagePointHelperBase<
-    DerMonitoringSample,
+    DerSample,
     DerReading
 > {
     protected roleFlags =
@@ -39,9 +39,7 @@ export class MirrorUsagePointDerHelper extends MirrorUsagePointHelperBase<
         module: 'MirrorUsagePointDerHelper',
     });
 
-    protected getReadingFromSamples(
-        samples: DerMonitoringSample[],
-    ): DerReading {
+    protected getReadingFromSamples(samples: DerSample[]): DerReading {
         return {
             intervalSeconds: getSamplesIntervalSeconds(samples),
             realPower: getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(

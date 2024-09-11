@@ -22,11 +22,11 @@ import type { PhaseCode } from '../models/phaseCode.js';
 import { QualityFlags } from '../models/qualityFlags.js';
 import type { UomType } from '../models/uomType.js';
 
-export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
+export abstract class MirrorUsagePointHelperBase<Sample, Reading> {
     protected client: SEP2Client;
     protected mirrorUsagePointListHref: string | null = null;
     protected mirrorUsagePoint: MirrorUsagePoint | null = null;
-    protected samples: MonitoringSample[] = [];
+    protected samples: Sample[] = [];
     protected abstract description: string;
     protected abstract roleFlags: RoleFlagsType;
     protected postTimer: NodeJS.Timeout | null = null;
@@ -80,13 +80,11 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         void this.post();
     }
 
-    public addSample(sample: MonitoringSample) {
+    public addSample(sample: Sample) {
         this.samples.push(sample);
     }
 
-    protected abstract getReadingFromSamples(
-        samples: MonitoringSample[],
-    ): Reading;
+    protected abstract getReadingFromSamples(samples: Sample[]): Reading;
 
     public post() {
         const nextUpdateMilliseconds = getMillisecondsToNextHourMinutesInterval(
@@ -180,7 +178,7 @@ export abstract class MirrorUsagePointHelperBase<MonitoringSample, Reading> {
         nextUpdateTime: Date;
     }): void;
 
-    protected getSamplesAndClear(): MonitoringSample[] {
+    protected getSamplesAndClear(): Sample[] {
         const cache = this.samples;
         this.samples = [];
         return cache;

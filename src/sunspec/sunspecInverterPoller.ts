@@ -6,7 +6,7 @@ import { logger as pinoLogger } from '../helpers/logger.js';
 import type { NameplateModel } from './models/nameplate.js';
 import type { SettingsModel } from './models/settings.js';
 import type { StatusModel } from './models/status.js';
-import { type DerMonitoringSample } from '../coordinator/helpers/derMonitoringSample.js';
+import { type DerSample } from '../coordinator/helpers/derSample.js';
 import { getAggregatedInverterMetrics } from './helpers/inverterMetrics.js';
 import { assertNonNull } from '../helpers/null.js';
 
@@ -22,7 +22,7 @@ export class SunSpecInverterPoller extends EventEmitter<{
                 status: StatusModel;
                 controls: ControlsModel;
             }[];
-            derMonitoringSample: DerMonitoringSample;
+            derSample: DerSample;
         },
     ];
 }> {
@@ -60,14 +60,11 @@ export class SunSpecInverterPoller extends EventEmitter<{
 
             logger.trace({ invertersData }, 'received data');
 
-            const derMonitoringSample = generateDerMonitoringSample({
+            const derSample = generateDerSample({
                 inverters: invertersData.map(({ inverter }) => inverter),
             });
 
-            logger.trace(
-                { derMonitoringSample },
-                'generated DER monitoring sample',
-            );
+            logger.trace({ derSample }, 'generated DER sample');
 
             const end = performance.now();
 
@@ -75,7 +72,7 @@ export class SunSpecInverterPoller extends EventEmitter<{
 
             this.emit('data', {
                 invertersData,
-                derMonitoringSample,
+                derSample,
             });
         } catch (error) {
             logger.error({ error }, 'Failed to poll SunSpec inverters');
@@ -95,11 +92,11 @@ export class SunSpecInverterPoller extends EventEmitter<{
     }
 }
 
-export function generateDerMonitoringSample({
+export function generateDerSample({
     inverters,
 }: {
     inverters: InverterModel[];
-}): DerMonitoringSample {
+}): DerSample {
     const aggregatedInverterMetrics = getAggregatedInverterMetrics(inverters);
 
     return {

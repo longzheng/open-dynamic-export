@@ -3,15 +3,14 @@ import type {
     PerPhaseMeasurement,
     PerPhaseNetMeasurement,
 } from '../../helpers/measurement.js';
-import type { MonitoringSampleBase } from './monitoringSampleBase.js';
+import type { SampleBase } from './sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
-export type DerMonitoringSampleData = {
+export type DerSampleData = {
     realPower: PerPhaseNetMeasurement | NoPhaseMeasurement;
     reactivePower: PerPhaseNetMeasurement | NoPhaseMeasurement;
     voltage: PerPhaseMeasurement | null;
     frequency: number | null;
 };
 
-export type DerMonitoringSample = MonitoringSampleBase &
-    DerMonitoringSampleData;
+export type DerSample = SampleBase & DerSampleData;
