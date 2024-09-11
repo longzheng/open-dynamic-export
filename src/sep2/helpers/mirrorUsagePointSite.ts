@@ -2,7 +2,7 @@ import { RoleFlagsType } from '../models/roleFlagsType.js';
 import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase.js';
 import type {
     AvgMaxMin,
-    PerPhaseOrNoPhaseMeasurement,
+    NoPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import {
     assertPerPhaseOrNoPhaseMeasurementArray,
@@ -21,8 +21,8 @@ import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitor
 
 type SiteReading = {
     intervalSeconds: number;
-    realPower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
-    reactivePower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
+    realPower: AvgMaxMin<PerPhaseMeasurement | NoPhaseMeasurement>;
+    reactivePower: AvgMaxMin<PerPhaseMeasurement | NoPhaseMeasurement>;
     voltage: AvgMaxMin<PerPhaseMeasurement>;
     frequency: AvgMaxMin<number> | null;
 };

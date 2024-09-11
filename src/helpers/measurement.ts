@@ -23,15 +23,6 @@ export const noPhaseMeasurementSchema = z.object({
 
 export type NoPhaseMeasurement = z.infer<typeof noPhaseMeasurementSchema>;
 
-export const perPhaseOrNoPhaseMeasurementSchema = z.union([
-    perPhaseMeasurementSchema,
-    noPhaseMeasurementSchema,
-]);
-
-export type PerPhaseOrNoPhaseMeasurement = z.infer<
-    typeof perPhaseOrNoPhaseMeasurementSchema
->;
-
 export type AssertedPerPhaseOrNoPhaseMeasurementArray =
     | {
           type: 'perPhase';
@@ -45,7 +36,7 @@ export type AssertedPerPhaseOrNoPhaseMeasurementArray =
 // an array of PerPhaseOrNoPhaseMeasurement may contain both types mixed together
 // to simplify calculations, we assert that the array contains only one type
 export function assertPerPhaseOrNoPhaseMeasurementArray(
-    measurements: PerPhaseOrNoPhaseMeasurement[],
+    measurements: (PerPhaseMeasurement | NoPhaseMeasurement)[],
 ): AssertedPerPhaseOrNoPhaseMeasurementArray {
     if (measurements.length === 0) {
         return {
@@ -72,7 +63,7 @@ export function assertPerPhaseOrNoPhaseMeasurementArray(
 }
 
 export function getTotalFromPerPhaseOrNoPhaseMeasurement(
-    measurement: PerPhaseOrNoPhaseMeasurement,
+    measurement: PerPhaseMeasurement | NoPhaseMeasurement,
 ) {
     switch (measurement.type) {
         case 'noPhase':
@@ -142,7 +133,7 @@ export type AvgMaxMin<T> = {
 
 export function getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
     array: AssertedPerPhaseOrNoPhaseMeasurementArray,
-): AvgMaxMin<PerPhaseOrNoPhaseMeasurement> {
+): AvgMaxMin<PerPhaseMeasurement | NoPhaseMeasurement> {
     switch (array.type) {
         case 'noPhase': {
             const values = array.measurements.map((m) => m.value);

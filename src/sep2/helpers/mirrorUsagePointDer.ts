@@ -1,5 +1,6 @@
 import { RoleFlagsType } from '../models/roleFlagsType.js';
 import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase.js';
+import type { NoPhaseMeasurement } from '../../helpers/measurement.js';
 import {
     assertPerPhaseOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
@@ -7,7 +8,6 @@ import {
     getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements,
     type AvgMaxMin,
     type PerPhaseMeasurement,
-    type PerPhaseOrNoPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import { DataQualifierType } from '../models/dataQualifierType.js';
 import { FlowDirectionType } from '../models/flowDirectionType.js';
@@ -19,8 +19,8 @@ import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitorin
 
 type DerReading = {
     intervalSeconds: number;
-    realPower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
-    reactivePower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
+    realPower: AvgMaxMin<PerPhaseMeasurement | NoPhaseMeasurement>;
+    reactivePower: AvgMaxMin<PerPhaseMeasurement | NoPhaseMeasurement>;
     voltage: AvgMaxMin<PerPhaseMeasurement> | null;
     frequency: AvgMaxMin<number> | null;
 };
