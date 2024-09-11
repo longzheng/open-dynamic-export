@@ -36,7 +36,18 @@ export function writeSiteMonitoringSamplePoints(
             );
             break;
         }
-        case 'perPhase': {
+        case 'perPhaseNet': {
+            influxDbWriteApi.writePoint(
+                new Point('monitoringSample')
+                    .timestamp(siteMonitoringSample.date)
+                    .tag('type', 'site')
+                    .tag('phase', 'net')
+                    .floatField(
+                        'realPower',
+                        siteMonitoringSample.realPower.net,
+                    ),
+            );
+
             influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(siteMonitoringSample.date)
@@ -90,7 +101,18 @@ export function writeSiteMonitoringSamplePoints(
             );
             break;
         }
-        case 'perPhase': {
+        case 'perPhaseNet': {
+            influxDbWriteApi.writePoint(
+                new Point('monitoringSample')
+                    .timestamp(siteMonitoringSample.date)
+                    .tag('type', 'site')
+                    .tag('phase', 'net')
+                    .floatField(
+                        'reactivePower',
+                        siteMonitoringSample.reactivePower.net,
+                    ),
+            );
+
             influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(siteMonitoringSample.date)
@@ -196,7 +218,15 @@ export function writeDerMonitoringSamplePoints(
             );
             break;
         }
-        case 'perPhase': {
+        case 'perPhaseNet': {
+            influxDbWriteApi.writePoint(
+                new Point('monitoringSample')
+                    .timestamp(derMonitoringSample.date)
+                    .tag('type', 'der')
+                    .tag('phase', 'net')
+                    .floatField('realPower', derMonitoringSample.realPower.net),
+            );
+
             influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(derMonitoringSample.date)
@@ -250,7 +280,18 @@ export function writeDerMonitoringSamplePoints(
             );
             break;
         }
-        case 'perPhase': {
+        case 'perPhaseNet': {
+            influxDbWriteApi.writePoint(
+                new Point('monitoringSample')
+                    .timestamp(derMonitoringSample.date)
+                    .tag('type', 'der')
+                    .tag('phase', 'net')
+                    .floatField(
+                        'reactivePower',
+                        derMonitoringSample.reactivePower.net,
+                    ),
+            );
+
             influxDbWriteApi.writePoint(
                 new Point('monitoringSample')
                     .timestamp(derMonitoringSample.date)

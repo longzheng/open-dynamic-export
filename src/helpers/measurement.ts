@@ -1,4 +1,3 @@
-import { Decimal } from 'decimal.js';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
@@ -7,6 +6,7 @@ import {
 } from './number.js';
 import { z } from 'zod';
 
+// per-phase measurements where the phases cannot be net metered (e.g. voltage)
 export const perPhaseMeasurementSchema = z.object({
     type: z.literal('perPhase'),
     phaseA: z.number(),
@@ -16,6 +16,19 @@ export const perPhaseMeasurementSchema = z.object({
 
 export type PerPhaseMeasurement = z.infer<typeof perPhaseMeasurementSchema>;
 
+// per-phase measurements where the phases can be net metered (e.g. power)
+export const perPhaseNetMeasurementSchema = z.object({
+    type: z.literal('perPhaseNet'),
+    phaseA: z.number(),
+    phaseB: z.number().nullable(),
+    phaseC: z.number().nullable(),
+    net: z.number(),
+});
+
+export type PerPhaseNetMeasurement = z.infer<
+    typeof perPhaseNetMeasurementSchema
+>;
+
 export const noPhaseMeasurementSchema = z.object({
     type: z.literal('noPhase'),
     value: z.number(),
@@ -23,63 +36,55 @@ export const noPhaseMeasurementSchema = z.object({
 
 export type NoPhaseMeasurement = z.infer<typeof noPhaseMeasurementSchema>;
 
-export const perPhaseOrNoPhaseMeasurementSchema = z.union([
-    perPhaseMeasurementSchema,
-    noPhaseMeasurementSchema,
-]);
-
-export type PerPhaseOrNoPhaseMeasurement = z.infer<
-    typeof perPhaseOrNoPhaseMeasurementSchema
->;
-
-export type AssertedPerPhaseOrNoPhaseMeasurementArray =
+export type AssertedPerPhaseNetOrNoPhaseMeasurementArray =
     | {
-          type: 'perPhase';
-          measurements: PerPhaseMeasurement[];
+          type: 'perPhaseNet';
+          measurements: PerPhaseNetMeasurement[];
       }
     | {
           type: 'noPhase';
           measurements: NoPhaseMeasurement[];
       };
 
-// an array of PerPhaseOrNoPhaseMeasurement may contain both types mixed together
+// an array of measurements may contain both types mixed together
 // to simplify calculations, we assert that the array contains only one type
-export function assertPerPhaseOrNoPhaseMeasurementArray(
-    measurements: PerPhaseOrNoPhaseMeasurement[],
-): AssertedPerPhaseOrNoPhaseMeasurementArray {
-    // prefer per phase measurements
-    const perPhaseMeasurements = measurements.filter(
-        (measurement) => measurement.type === 'perPhase',
-    );
-
-    if (perPhaseMeasurements.length > 0) {
+export function assertPerPhaseNetOrNoPhaseMeasurementArray(
+    measurements: (PerPhaseNetMeasurement | NoPhaseMeasurement)[],
+): AssertedPerPhaseNetOrNoPhaseMeasurementArray {
+    if (measurements.length === 0) {
         return {
-            type: 'perPhase',
-            measurements: perPhaseMeasurements,
+            type: 'noPhase',
+            measurements: [],
         };
     }
 
-    const noPhaseMeasurements = measurements.filter(
-        (measurement) => measurement.type === 'noPhase',
-    );
-
-    return {
-        type: 'noPhase',
-        measurements: noPhaseMeasurements,
-    };
+    // use the first measurement type to filter the rest of the array
+    switch (measurements.at(0)!.type) {
+        case 'perPhaseNet': {
+            return {
+                type: 'perPhaseNet',
+                measurements: measurements.filter(
+                    (m) => m.type === 'perPhaseNet',
+                ),
+            };
+        }
+        case 'noPhase': {
+            return {
+                type: 'noPhase',
+                measurements: measurements.filter((m) => m.type === 'noPhase'),
+            };
+        }
+    }
 }
 
-export function getTotalFromPerPhaseOrNoPhaseMeasurement(
-    measurement: PerPhaseOrNoPhaseMeasurement,
+export function getTotalFromPerPhaseNetOrNoPhaseMeasurement(
+    measurement: PerPhaseNetMeasurement | NoPhaseMeasurement,
 ) {
     switch (measurement.type) {
         case 'noPhase':
             return measurement.value;
-        case 'perPhase':
-            return new Decimal(measurement.phaseA)
-                .plus(measurement.phaseB ?? 0)
-                .plus(measurement.phaseC ?? 0)
-                .toNumber();
+        case 'perPhaseNet':
+            return measurement.net;
     }
 }
 
@@ -99,6 +104,24 @@ function getPhaseValuesFromPerPhaseMeasurements(
     };
 }
 
+type PhaseNetValues = {
+    phaseA: number[];
+    phaseB: (number | null)[];
+    phaseC: (number | null)[];
+    net: number[];
+};
+
+function getPhaseValuesFromPerPhaseNetMeasurements(
+    measurements: PerPhaseNetMeasurement[],
+): PhaseNetValues {
+    return {
+        phaseA: measurements.map((m) => m.phaseA),
+        phaseB: measurements.map((m) => m.phaseB),
+        phaseC: measurements.map((m) => m.phaseC),
+        net: measurements.map((m) => m.net),
+    };
+}
+
 function getAverageFromPerPhaseMeasurements(
     phaseValues: PhaseValues,
 ): PerPhaseMeasurement {
@@ -107,6 +130,18 @@ function getAverageFromPerPhaseMeasurements(
         phaseA: averageNumbersArray(phaseValues.phaseA),
         phaseB: averageNumbersNullableArray(phaseValues.phaseB),
         phaseC: averageNumbersNullableArray(phaseValues.phaseC),
+    };
+}
+
+function getAverageFromPerPhaseNetMeasurements(
+    phaseValues: PhaseNetValues,
+): PerPhaseNetMeasurement {
+    return {
+        type: 'perPhaseNet',
+        phaseA: averageNumbersArray(phaseValues.phaseA),
+        phaseB: averageNumbersNullableArray(phaseValues.phaseB),
+        phaseC: averageNumbersNullableArray(phaseValues.phaseC),
+        net: averageNumbersArray(phaseValues.net),
     };
 }
 
@@ -121,6 +156,18 @@ function getMinimumFromPerPhaseMeasurements(
     };
 }
 
+function getMinimumFromPerPhaseNetMeasurements(
+    phaseValues: PhaseNetValues,
+): PerPhaseNetMeasurement {
+    return {
+        type: 'perPhaseNet',
+        phaseA: Math.min(...phaseValues.phaseA),
+        phaseB: mathMinNullableArray(phaseValues.phaseB),
+        phaseC: mathMinNullableArray(phaseValues.phaseC),
+        net: Math.min(...phaseValues.net),
+    };
+}
+
 function getMaximumFromPerPhaseMeasurements(
     phaseValues: PhaseValues,
 ): PerPhaseMeasurement {
@@ -132,15 +179,27 @@ function getMaximumFromPerPhaseMeasurements(
     };
 }
 
+function getMaximumFromPerPhaseNetMeasurements(
+    phaseValues: PhaseNetValues,
+): PerPhaseNetMeasurement {
+    return {
+        type: 'perPhaseNet',
+        phaseA: Math.max(...phaseValues.phaseA),
+        phaseB: mathMaxNullableArray(phaseValues.phaseB),
+        phaseC: mathMaxNullableArray(phaseValues.phaseC),
+        net: Math.max(...phaseValues.net),
+    };
+}
+
 export type AvgMaxMin<T> = {
     average: T;
     maximum: T;
     minimum: T;
 };
 
-export function getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
-    array: AssertedPerPhaseOrNoPhaseMeasurementArray,
-): AvgMaxMin<PerPhaseOrNoPhaseMeasurement> {
+export function getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(
+    array: AssertedPerPhaseNetOrNoPhaseMeasurementArray,
+): AvgMaxMin<PerPhaseNetMeasurement | NoPhaseMeasurement> {
     switch (array.type) {
         case 'noPhase': {
             const values = array.measurements.map((m) => m.value);
@@ -160,15 +219,15 @@ export function getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
                 },
             };
         }
-        case 'perPhase': {
-            const phaseValues = getPhaseValuesFromPerPhaseMeasurements(
+        case 'perPhaseNet': {
+            const phaseValues = getPhaseValuesFromPerPhaseNetMeasurements(
                 array.measurements,
             );
 
             return {
-                average: getAverageFromPerPhaseMeasurements(phaseValues),
-                maximum: getMaximumFromPerPhaseMeasurements(phaseValues),
-                minimum: getMinimumFromPerPhaseMeasurements(phaseValues),
+                average: getAverageFromPerPhaseNetMeasurements(phaseValues),
+                maximum: getMaximumFromPerPhaseNetMeasurements(phaseValues),
+                minimum: getMinimumFromPerPhaseNetMeasurements(phaseValues),
             };
         }
     }

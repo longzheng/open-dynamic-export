@@ -105,21 +105,8 @@ export function generateDerMonitoringSample({
     return {
         date: new Date(),
         realPower: {
-            // inverter W is only single phase
-            // we have to manually calculate per phase power using voltage * current
-            type: 'perPhase',
-            phaseA: aggregatedInverterMetrics.PhVphA
-                ? aggregatedInverterMetrics.AphA *
-                  aggregatedInverterMetrics.PhVphA
-                : aggregatedInverterMetrics.W,
-            phaseB: aggregatedInverterMetrics.PhVphB
-                ? aggregatedInverterMetrics.AphB *
-                  aggregatedInverterMetrics.PhVphB
-                : null,
-            phaseC: aggregatedInverterMetrics.PhVphC
-                ? aggregatedInverterMetrics.AphB *
-                  aggregatedInverterMetrics.PhVphC
-                : null,
+            type: 'noPhase',
+            value: aggregatedInverterMetrics.W,
         },
         reactivePower: {
             type: 'noPhase',

@@ -1,14 +1,21 @@
 import {
+    noPhaseMeasurementSchema,
     perPhaseMeasurementSchema,
-    perPhaseOrNoPhaseMeasurementSchema,
+    perPhaseNetMeasurementSchema,
 } from '../../helpers/measurement.js';
 import type { MonitoringSampleBase } from './monitoringSampleBase.js';
 import { z } from 'zod';
 
 // aligns with the CSIP-AUS requirements for site monitoring
 export const siteMonitoringSampleDataSchema = z.object({
-    realPower: perPhaseOrNoPhaseMeasurementSchema,
-    reactivePower: perPhaseOrNoPhaseMeasurementSchema,
+    realPower: z.union([
+        perPhaseNetMeasurementSchema,
+        noPhaseMeasurementSchema,
+    ]),
+    reactivePower: z.union([
+        perPhaseNetMeasurementSchema,
+        noPhaseMeasurementSchema,
+    ]),
     voltage: perPhaseMeasurementSchema,
     frequency: z.number().nullable(),
 });

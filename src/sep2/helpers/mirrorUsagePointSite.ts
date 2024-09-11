@@ -2,13 +2,14 @@ import { RoleFlagsType } from '../models/roleFlagsType.js';
 import { getSamplesIntervalSeconds } from '../../coordinator/helpers/monitoringSampleBase.js';
 import type {
     AvgMaxMin,
-    PerPhaseOrNoPhaseMeasurement,
+    NoPhaseMeasurement,
+    PerPhaseNetMeasurement,
 } from '../../helpers/measurement.js';
 import {
-    assertPerPhaseOrNoPhaseMeasurementArray,
+    assertPerPhaseNetOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurements,
-    getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements,
+    getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements,
     type PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import { DataQualifierType } from '../models/dataQualifierType.js';
@@ -21,8 +22,8 @@ import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitor
 
 type SiteReading = {
     intervalSeconds: number;
-    realPower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
-    reactivePower: AvgMaxMin<PerPhaseOrNoPhaseMeasurement>;
+    realPower: AvgMaxMin<PerPhaseNetMeasurement | NoPhaseMeasurement>;
+    reactivePower: AvgMaxMin<PerPhaseNetMeasurement | NoPhaseMeasurement>;
     voltage: AvgMaxMin<PerPhaseMeasurement>;
     frequency: AvgMaxMin<number> | null;
 };
@@ -43,13 +44,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
     ): SiteReading {
         return {
             intervalSeconds: getSamplesIntervalSeconds(samples),
-            realPower: getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
-                assertPerPhaseOrNoPhaseMeasurementArray(
+            realPower: getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(
+                assertPerPhaseNetOrNoPhaseMeasurementArray(
                     samples.map((s) => s.realPower),
                 ),
             ),
-            reactivePower: getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements(
-                assertPerPhaseOrNoPhaseMeasurementArray(
+            reactivePower: getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(
+                assertPerPhaseNetOrNoPhaseMeasurementArray(
                     samples.map((s) => s.reactivePower),
                 ),
             ),
@@ -104,7 +105,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
                 });
                 break;
             }
-            case 'perPhase': {
+            case 'perPhaseNet': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Average,
+                    description: 'Average Real Power (W) - Net',
+                    value: reading.realPower.average.net,
+                });
                 postReading({
                     phase: PhaseCode.PhaseA,
                     dataQualifier: DataQualifierType.Average,
@@ -141,7 +148,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
                 });
                 break;
             }
-            case 'perPhase': {
+            case 'perPhaseNet': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Maximum,
+                    description: 'Maximum Real Power (W) - Net',
+                    value: reading.realPower.maximum.net,
+                });
                 postReading({
                     phase: PhaseCode.PhaseA,
                     dataQualifier: DataQualifierType.Maximum,
@@ -178,7 +191,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
                 });
                 break;
             }
-            case 'perPhase': {
+            case 'perPhaseNet': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Minimum,
+                    description: 'Minimum Real Power (W) - Net',
+                    value: reading.realPower.minimum.net,
+                });
                 postReading({
                     phase: PhaseCode.PhaseA,
                     dataQualifier: DataQualifierType.Minimum,
@@ -248,7 +267,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
                 });
                 break;
             }
-            case 'perPhase': {
+            case 'perPhaseNet': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Average,
+                    description: 'Average Reactive Power (VAR) - Net',
+                    value: reading.reactivePower.average.net,
+                });
                 postReading({
                     phase: PhaseCode.PhaseA,
                     dataQualifier: DataQualifierType.Average,
@@ -285,7 +310,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
                 });
                 break;
             }
-            case 'perPhase': {
+            case 'perPhaseNet': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Maximum,
+                    description: 'Maximum Reactive Power (VAR) - Net',
+                    value: reading.reactivePower.maximum.net,
+                });
                 postReading({
                     phase: PhaseCode.PhaseA,
                     dataQualifier: DataQualifierType.Maximum,
@@ -322,7 +353,13 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
                 });
                 break;
             }
-            case 'perPhase': {
+            case 'perPhaseNet': {
+                postReading({
+                    phase: PhaseCode.NotApplicable,
+                    dataQualifier: DataQualifierType.Minimum,
+                    description: 'Minimum Reactive Power (VAR) - Net',
+                    value: reading.reactivePower.minimum.net,
+                });
                 postReading({
                     phase: PhaseCode.PhaseA,
                     dataQualifier: DataQualifierType.Minimum,
@@ -384,72 +421,72 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
 
         // average
         postReading({
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             dataQualifier: DataQualifierType.Average,
-            description: 'Average Voltage (V) - Phase A',
+            description: 'Average Voltage (V) - Phase AN',
             value: reading.voltage.average.phaseA,
         });
         if (reading.voltage.average.phaseB) {
             postReading({
-                phase: PhaseCode.PhaseB,
+                phase: PhaseCode.PhaseBN,
                 dataQualifier: DataQualifierType.Average,
-                description: 'Average Voltage (V) - Phase B',
+                description: 'Average Voltage (V) - Phase BN',
                 value: reading.voltage.average.phaseB,
             });
         }
         if (reading.voltage.average.phaseC) {
             postReading({
-                phase: PhaseCode.PhaseC,
+                phase: PhaseCode.PhaseCN,
                 dataQualifier: DataQualifierType.Average,
-                description: 'Average Voltage (V) - Phase C',
+                description: 'Average Voltage (V) - Phase CN',
                 value: reading.voltage.average.phaseC,
             });
         }
 
         // maximum
         postReading({
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             dataQualifier: DataQualifierType.Maximum,
-            description: 'Maximum Voltage (V) - Phase A',
+            description: 'Maximum Voltage (V) - Phase AN',
             value: reading.voltage.maximum.phaseA,
         });
         if (reading.voltage.maximum.phaseB) {
             postReading({
-                phase: PhaseCode.PhaseB,
+                phase: PhaseCode.PhaseBN,
                 dataQualifier: DataQualifierType.Maximum,
-                description: 'Maximum Voltage (V) - Phase B',
+                description: 'Maximum Voltage (V) - Phase BN',
                 value: reading.voltage.maximum.phaseB,
             });
         }
         if (reading.voltage.maximum.phaseC) {
             postReading({
-                phase: PhaseCode.PhaseC,
+                phase: PhaseCode.PhaseCN,
                 dataQualifier: DataQualifierType.Maximum,
-                description: 'Maximum Voltage (V) - Phase C',
+                description: 'Maximum Voltage (V) - Phase CN',
                 value: reading.voltage.maximum.phaseC,
             });
         }
 
         // minimum
         postReading({
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             dataQualifier: DataQualifierType.Minimum,
-            description: 'Minimum Voltage (V) - Phase A',
+            description: 'Minimum Voltage (V) - Phase AN',
             value: reading.voltage.minimum.phaseA,
         });
         if (reading.voltage.minimum.phaseB) {
             postReading({
-                phase: PhaseCode.PhaseB,
+                phase: PhaseCode.PhaseBN,
                 dataQualifier: DataQualifierType.Minimum,
-                description: 'Minimum Voltage (V) - Phase B',
+                description: 'Minimum Voltage (V) - Phase BN',
                 value: reading.voltage.minimum.phaseB,
             });
         }
         if (reading.voltage.minimum.phaseC) {
             postReading({
-                phase: PhaseCode.PhaseC,
+                phase: PhaseCode.PhaseCN,
                 dataQualifier: DataQualifierType.Minimum,
-                description: 'Minimum Voltage (V) - Phase C',
+                description: 'Minimum Voltage (V) - Phase CN',
                 value: reading.voltage.minimum.phaseC,
             });
         }
