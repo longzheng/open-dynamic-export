@@ -7,7 +7,7 @@ import {
     registersToUint16,
     registersToUint16Nullable,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type SettingsModel = {
@@ -78,7 +78,7 @@ export type SettingsModel = {
     ECPNomHz_SF: number | null;
 };
 
-export const settingsModel = sunSpecModelFactory<SettingsModel>({
+export const settingsModel = modbusModelFactory<SettingsModel>({
     name: 'settings',
     mapping: {
         ID: {

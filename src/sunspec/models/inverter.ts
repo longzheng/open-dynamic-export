@@ -10,7 +10,7 @@ import {
     registersToUint32Nullable,
     registersToId,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type InverterModel = {
@@ -96,7 +96,7 @@ export type InverterModel = {
     EvtVnd4: number | null;
 };
 
-export const inverterModel = sunSpecModelFactory<InverterModel>({
+export const inverterModel = modbusModelFactory<InverterModel>({
     name: 'inverter',
     mapping: {
         ID: {

@@ -11,7 +11,7 @@ import {
     registersToSunssfNullable,
     registersToId,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type ControlsModel = {
@@ -94,7 +94,7 @@ export type ControlsModelWrite = Pick<
     | 'VArPct_Ena'
 >;
 
-export const controlsModel = sunSpecModelFactory<
+export const controlsModel = modbusModelFactory<
     ControlsModel,
     keyof ControlsModelWrite
 >({

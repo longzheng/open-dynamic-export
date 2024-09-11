@@ -8,7 +8,7 @@ import {
     registersToInt16Nullable,
     registersToId,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
 export type StatusModel = {
@@ -58,7 +58,7 @@ export type StatusModel = {
     Ris_SF: number | null;
 };
 
-export const statusModel = sunSpecModelFactory<StatusModel>({
+export const statusModel = modbusModelFactory<StatusModel>({
     name: 'status',
     mapping: {
         ID: {
