@@ -47,26 +47,28 @@ export type AssertedPerPhaseOrNoPhaseMeasurementArray =
 export function assertPerPhaseOrNoPhaseMeasurementArray(
     measurements: PerPhaseOrNoPhaseMeasurement[],
 ): AssertedPerPhaseOrNoPhaseMeasurementArray {
-    // prefer per phase measurements
-    const perPhaseMeasurements = measurements.filter(
-        (measurement) => measurement.type === 'perPhase',
-    );
-
-    if (perPhaseMeasurements.length > 0) {
+    if (measurements.length === 0) {
         return {
-            type: 'perPhase',
-            measurements: perPhaseMeasurements,
+            type: 'noPhase',
+            measurements: [],
         };
     }
 
-    const noPhaseMeasurements = measurements.filter(
-        (measurement) => measurement.type === 'noPhase',
-    );
-
-    return {
-        type: 'noPhase',
-        measurements: noPhaseMeasurements,
-    };
+    // use the first measurement type to filter the rest of the array
+    switch (measurements.at(0)!.type) {
+        case 'perPhase': {
+            return {
+                type: 'perPhase',
+                measurements: measurements.filter((m) => m.type === 'perPhase'),
+            };
+        }
+        case 'noPhase': {
+            return {
+                type: 'noPhase',
+                measurements: measurements.filter((m) => m.type === 'noPhase'),
+            };
+        }
+    }
 }
 
 export function getTotalFromPerPhaseOrNoPhaseMeasurement(
