@@ -43,18 +43,20 @@ export function generateSiteMonitoringSample({
     return {
         realPower: meterMetrics.WphA
             ? {
-                  type: 'perPhase',
+                  type: 'perPhaseNet',
                   phaseA: meterMetrics.WphA,
                   phaseB: meterMetrics.WphB,
                   phaseC: meterMetrics.WphC,
+                  net: meterMetrics.W,
               }
             : { type: 'noPhase', value: meterMetrics.W },
         reactivePower: meterMetrics.VARphA
             ? {
-                  type: 'perPhase',
+                  type: 'perPhaseNet',
                   phaseA: meterMetrics.VARphA,
                   phaseB: meterMetrics.VARphB,
                   phaseC: meterMetrics.VARphC,
+                  net: assertNonNull(meterMetrics.VAR),
               }
             : {
                   type: 'noPhase',

@@ -52,16 +52,18 @@ export function generateSiteMonitoringSample({
 
     return {
         realPower: {
-            type: 'perPhase',
+            type: 'perPhaseNet',
             phaseA: firstMeter.Cached_readings.real_power_a,
             phaseB: firstMeter.Cached_readings.real_power_b ?? null,
             phaseC: firstMeter.Cached_readings.real_power_c ?? null,
+            net: firstMeter.Cached_readings.instant_power,
         },
         reactivePower: {
-            type: 'perPhase',
+            type: 'perPhaseNet',
             phaseA: firstMeter.Cached_readings.reactive_power_a,
             phaseB: firstMeter.Cached_readings.reactive_power_b ?? null,
             phaseC: firstMeter.Cached_readings.reactive_power_c ?? null,
+            net: firstMeter.Cached_readings.instant_reactive_power,
         },
         voltage: {
             type: 'perPhase',

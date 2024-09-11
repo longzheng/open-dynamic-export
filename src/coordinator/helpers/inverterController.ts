@@ -14,7 +14,7 @@ import {
     numberWithPow10,
     roundToDecimals,
 } from '../../helpers/number.js';
-import { getTotalFromPerPhaseOrNoPhaseMeasurement } from '../../helpers/measurement.js';
+import { getTotalFromPerPhaseNetOrNoPhaseMeasurement } from '../../helpers/measurement.js';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { RampRateHelper } from './rampRate.js';
@@ -226,10 +226,10 @@ export function calculateInverterConfiguration({
         activeControlLimit.opModConnect ?? defaultValues.opModConnect;
     const deenergize = energize === false || connect === false;
 
-    const siteWatts = getTotalFromPerPhaseOrNoPhaseMeasurement(
+    const siteWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
         siteMonitoringSample.realPower,
     );
-    const solarWatts = getTotalFromPerPhaseOrNoPhaseMeasurement(
+    const solarWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
         sunSpecData.derMonitoringSample.realPower,
     );
 
