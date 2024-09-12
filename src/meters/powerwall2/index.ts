@@ -1,11 +1,11 @@
-import { SiteMonitoringPollerBase } from '../../coordinator/helpers/siteMonitoringPollerBase.js';
-import type { SiteMonitoringSampleData } from '../../coordinator/helpers/siteMonitoringSample.js';
+import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
+import type { SiteSampleData } from '../siteSample.js';
 import { Powerwall2Client } from './client.js';
 import type { z } from 'zod';
 import type { metersSiteSchema } from './api.js';
 import type { Config } from '../../helpers/config.js';
 
-export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
+export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;
 
     constructor({
@@ -26,26 +26,26 @@ export class Powerwall2SiteMonitoringPoller extends SiteMonitoringPollerBase {
         void this.startPolling();
     }
 
-    override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null> {
+    override async getSiteSampleData(): Promise<SiteSampleData | null> {
         const metersSiteData = await this.client.getMetersSite();
 
         this.logger.trace({ metersSiteData }, 'received data');
 
-        const siteMonitoringSample = generateSiteMonitoringSample({
+        const siteSample = generateSiteSample({
             meter: metersSiteData,
         });
 
-        return siteMonitoringSample;
+        return siteSample;
     }
 
     override onDestroy() {}
 }
 
-export function generateSiteMonitoringSample({
+export function generateSiteSample({
     meter,
 }: {
     meter: z.infer<typeof metersSiteSchema>;
-}): SiteMonitoringSampleData {
+}): SiteSampleData {
     const firstMeter = meter[0];
 
     if (!firstMeter) {

@@ -1,15 +1,12 @@
 import type { Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { logger as pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
-import type {
-    SiteMonitoringSample,
-    SiteMonitoringSampleData,
-} from './siteMonitoringSample.js';
+import type { SiteSample, SiteSampleData } from './siteSample.js';
 
-export abstract class SiteMonitoringPollerBase extends EventEmitter<{
+export abstract class SiteSamplePollerBase extends EventEmitter<{
     data: [
         {
-            siteMonitoringSample: SiteMonitoringSample;
+            siteSample: SiteSample;
         },
     ];
 }> {
@@ -22,14 +19,14 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         pollingIntervalMs,
     }: {
         meterName: string;
-        // how frequently at most to poll the site monitoring data
+        // how frequently at most to poll the site sample data
         pollingIntervalMs: number;
     }) {
         super();
 
         this.pollingIntervalMs = pollingIntervalMs;
         this.logger = pinoLogger.child({
-            module: 'SiteMonitoringPollerBase',
+            module: 'SiteSamplePollerBase',
             meterName,
         });
     }
@@ -42,7 +39,7 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         this.onDestroy();
     }
 
-    abstract getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData | null>;
+    abstract getSiteSampleData(): Promise<SiteSampleData | null>;
 
     abstract onDestroy(): void;
 
@@ -51,35 +48,31 @@ export abstract class SiteMonitoringPollerBase extends EventEmitter<{
         const now = new Date();
 
         try {
-            this.logger.trace('generating site monitoring sample');
+            this.logger.trace('generating site sample data');
 
-            const siteMonitoringSampleData =
-                await this.getSiteMonitoringSampleData();
+            const siteSampleData = await this.getSiteSampleData();
 
-            if (!siteMonitoringSampleData) {
-                this.logger.warn('No site monitoring data available');
+            if (!siteSampleData) {
+                this.logger.warn('No site sample data available');
                 return;
             }
 
-            const siteMonitoringSample = {
+            const siteSample = {
                 date: now,
-                ...siteMonitoringSampleData,
+                ...siteSampleData,
             };
 
-            this.logger.trace(
-                { siteMonitoringSample },
-                'generated site monitoring sample',
-            );
+            this.logger.trace({ siteSample }, 'generated site sample data');
 
             const end = performance.now();
 
             this.logger.trace({ duration: end - start }, 'run time');
 
             this.emit('data', {
-                siteMonitoringSample,
+                siteSample,
             });
         } catch (error) {
-            this.logger.error({ error }, 'Failed to poll site monitoring data');
+            this.logger.error({ error }, 'Failed to poll site sample data');
         } finally {
             // this loop must meet sampling requirements and dynamic export requirements
             // Energex SEP2 Client Handbook specifies "As per the standard, samples should be taken every 200ms (10 cycles). If not capable of sampling this frequently, 1 second samples may be sufficient."

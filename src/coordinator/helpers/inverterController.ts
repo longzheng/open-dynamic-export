@@ -22,8 +22,8 @@ import type { NameplateModel } from '../../sunspec/models/nameplate.js';
 import type { InverterModel } from '../../sunspec/models/inverter.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { LimiterType } from './limiter.js';
-import type { SiteMonitoringSample } from './siteMonitoringSample.js';
-import type { DerMonitoringSample } from './derMonitoringSample.js';
+import type { SiteSample } from '../../meters/siteSample.js';
+import type { DerSample } from './derSample.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -36,7 +36,7 @@ type SunSpecInverterData = {
         nameplate: NameplateModel;
         controls: ControlsModel;
     }[];
-    derMonitoringSample: DerMonitoringSample;
+    derSample: DerSample;
 };
 
 export type InverterControlLimit = {
@@ -67,7 +67,7 @@ const defaultValues = {
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];
     private cachedSunSpecData: SunSpecInverterData | null = null;
-    private cachedSiteMonitoringSample: SiteMonitoringSample | null = null;
+    private cachedSiteSample: SiteSample | null = null;
     private applyControl: boolean;
     private logger: Logger;
     private rampRateHelper: RampRateHelper;
@@ -99,11 +99,9 @@ export class InverterController {
         this.cachedSunSpecData = data;
     }
 
-    updateSiteMonitoringSample(siteMonitoringSample: SiteMonitoringSample) {
-        this.logger.debug(
-            'Received site monitoring sample, updating inverter controls',
-        );
-        this.cachedSiteMonitoringSample = siteMonitoringSample;
+    updateSiteSample(siteSample: SiteSample) {
+        this.logger.debug('Received site sample, updating inverter controls');
+        this.cachedSiteSample = siteSample;
     }
 
     private getActiveInverterControlLimit(): InverterControlLimit {
@@ -145,7 +143,7 @@ export class InverterController {
             return;
         }
 
-        if (!this.cachedSiteMonitoringSample) {
+        if (!this.cachedSiteSample) {
             this.logger.warn(
                 'Site monitoring data is not cached, cannot update inverter controls yet. Wait for next loop.',
             );
@@ -158,7 +156,7 @@ export class InverterController {
         const inverterConfiguration = calculateInverterConfiguration({
             activeControlLimit: getActiveInverterControlLimit,
             sunSpecData: this.cachedSunSpecData,
-            siteMonitoringSample: this.cachedSiteMonitoringSample,
+            siteSample: this.cachedSiteSample,
             rampRateHelper: this.rampRateHelper,
         });
 
@@ -203,12 +201,12 @@ export class InverterController {
 export function calculateInverterConfiguration({
     activeControlLimit,
     sunSpecData,
-    siteMonitoringSample,
+    siteSample,
     rampRateHelper,
 }: {
     activeControlLimit: InverterControlLimit;
     sunSpecData: SunSpecInverterData;
-    siteMonitoringSample: SiteMonitoringSample;
+    siteSample: SiteSample;
     rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
     const logger = pinoLogger.child({ module: 'calculateDynamicExportConfig' });
@@ -227,10 +225,10 @@ export function calculateInverterConfiguration({
     const deenergize = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-        siteMonitoringSample.realPower,
+        siteSample.realPower,
     );
     const solarWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-        sunSpecData.derMonitoringSample.realPower,
+        sunSpecData.derSample.realPower,
     );
 
     const exportLimitWatts =

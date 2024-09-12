@@ -2,12 +2,12 @@ import {
     noPhaseMeasurementSchema,
     perPhaseMeasurementSchema,
     perPhaseNetMeasurementSchema,
-} from '../../helpers/measurement.js';
-import type { MonitoringSampleBase } from './monitoringSampleBase.js';
+} from '../helpers/measurement.js';
+import type { SampleBase } from '../coordinator/helpers/sampleBase.js';
 import { z } from 'zod';
 
-// aligns with the CSIP-AUS requirements for site monitoring
-export const siteMonitoringSampleDataSchema = z.object({
+// aligns with the CSIP-AUS requirements for site sample
+export const siteSampleDataSchema = z.object({
     realPower: z.union([
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
@@ -20,9 +20,6 @@ export const siteMonitoringSampleDataSchema = z.object({
     frequency: z.number().nullable(),
 });
 
-export type SiteMonitoringSampleData = z.infer<
-    typeof siteMonitoringSampleDataSchema
->;
+export type SiteSampleData = z.infer<typeof siteSampleDataSchema>;
 
-export type SiteMonitoringSample = MonitoringSampleBase &
-    SiteMonitoringSampleData;
+export type SiteSample = SampleBase & SiteSampleData;

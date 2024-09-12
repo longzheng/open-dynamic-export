@@ -6,8 +6,8 @@ import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList.js'
 import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite.js';
 import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer.js';
 import { getListAll } from './pagination.js';
-import type { DerMonitoringSample } from '../../coordinator/helpers/derMonitoringSample.js';
-import type { SiteMonitoringSample } from '../../coordinator/helpers/siteMonitoringSample.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import type { SiteSample } from '../../meters/siteSample.js';
 
 export class MirrorUsagePointListHelper {
     private href: string | null = null;
@@ -61,12 +61,12 @@ export class MirrorUsagePointListHelper {
         this.mirrorUsagePointListPollableResource?.destroy();
     }
 
-    public addDerMonitoringSample(derMonitoringSample: DerMonitoringSample) {
-        this.mirrorUsagePointDer?.addSample(derMonitoringSample);
+    public addDerSample(derSample: DerSample) {
+        this.mirrorUsagePointDer?.addSample(derSample);
     }
 
-    public addSiteMonitoringSample(siteMonitoringSample: SiteMonitoringSample) {
-        this.mirrorUsagePointSite?.addSample(siteMonitoringSample);
+    public addSiteSample(siteSample: SiteSample) {
+        this.mirrorUsagePointSite?.addSample(siteSample);
     }
 }
 

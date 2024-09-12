@@ -1,11 +1,11 @@
-import type { MeterSunSpecConnection } from './connection/meter.js';
-import type { SiteMonitoringSampleData } from '../coordinator/helpers/siteMonitoringSample.js';
-import { SiteMonitoringPollerBase } from '../coordinator/helpers/siteMonitoringPollerBase.js';
-import { assertNonNull } from '../helpers/null.js';
-import { getMeterMetrics } from './helpers/meterMetrics.js';
-import type { MeterModel } from './models/meter.js';
+import type { MeterSunSpecConnection } from '../../sunspec/connection/meter.js';
+import type { SiteSampleData } from '../siteSample.js';
+import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
+import { assertNonNull } from '../../helpers/null.js';
+import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
+import type { MeterModel } from '../../sunspec/models/meter.js';
 
-export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
+export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     private meterConnection: MeterSunSpecConnection;
 
     constructor({
@@ -20,16 +20,16 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
         void this.startPolling();
     }
 
-    override async getSiteMonitoringSampleData(): Promise<SiteMonitoringSampleData> {
+    override async getSiteSampleData(): Promise<SiteSampleData> {
         const meterModel = await this.meterConnection.getMeterModel();
 
         this.logger.trace({ meterModel }, 'received data');
 
-        const siteMonitoringSample = generateSiteMonitoringSample({
+        const siteSample = generateSiteSample({
             meter: meterModel,
         });
 
-        return siteMonitoringSample;
+        return siteSample;
     }
 
     override onDestroy() {
@@ -37,11 +37,11 @@ export class SunSpecMeterPoller extends SiteMonitoringPollerBase {
     }
 }
 
-export function generateSiteMonitoringSample({
+export function generateSiteSample({
     meter,
 }: {
     meter: MeterModel;
-}): SiteMonitoringSampleData {
+}): SiteSampleData {
     const meterMetrics = getMeterMetrics(meter);
 
     return {
