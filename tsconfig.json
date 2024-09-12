@@ -19,5 +19,5 @@
         "noUnusedLocals": false,
         "experimentalDecorators": true,
     },
-    "include": ["src/", "scripts/", "tests/", "vitest.config.ts"]
+    "include": ["src/", "scripts/", "tests/", "vitest.config.ts", "eslint.config.mjs"]
 }
