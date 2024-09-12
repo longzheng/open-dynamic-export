@@ -21,7 +21,7 @@ app.get('/', (_req, res) => {
 });
 
 app.use('/docs', swaggerUi.serve, (_req: ExRequest, res: ExResponse) => {
-    return res.send(swaggerUi.generateHTML(swaggerJson));
+    return res.send(swaggerUi.generateHTML(swaggerJson, {}));
 });
 
 RegisterRoutes(app);
