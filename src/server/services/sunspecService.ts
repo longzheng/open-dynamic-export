@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { getConfig } from '../../helpers/config.js';
-import { logger } from '../../helpers/logger.js';
 import {
     getSunSpecInvertersConnections,
     getSunSpecMeterConnection,
@@ -22,8 +21,6 @@ import {
     getStatusMetrics,
     getAggregatedStatusMetrics,
 } from '../../sunspec/helpers/statusMetrics.js';
-import type { StatusModel } from '../../sunspec/models/status.js';
-import { a } from 'vitest/dist/suite-BWgaIsVn.js';
 
 export async function getSunSpecData() {
     const config = getConfig();
@@ -71,6 +68,7 @@ export async function getSunSpecData() {
             settings: inverterData.settings,
             status: {
                 ...inverterData.status,
+                // remap bigint to string to avoid tsoa type error
                 ActWh: inverterData.status.ActWh.toString(),
                 ActVAh: inverterData.status.ActVAh.toString(),
                 ActVArhQ1: inverterData.status.ActVArhQ1.toString(),
@@ -88,6 +86,7 @@ export async function getSunSpecData() {
 
                 return {
                     ...statusMetrics,
+                    // remap bigint to string to avoid tsoa type error
                     ActWh: statusMetrics.ActWh.toString(),
                     ActVAh: statusMetrics.ActVAh.toString(),
                     ActVArhQ1: statusMetrics.ActVArhQ1.toString(),
@@ -114,6 +113,7 @@ export async function getSunSpecData() {
 
                 return {
                     ...aggregatedStatusMetrics,
+                    // remap bigint to string to avoid tsoa type error
                     ActWh: aggregatedStatusMetrics.ActWh.toString(),
                     ActVAh: aggregatedStatusMetrics.ActVAh.toString(),
                     ActVArhQ1: aggregatedStatusMetrics.ActVArhQ1.toString(),
