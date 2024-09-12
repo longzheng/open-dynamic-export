@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { getConfig } from '../../helpers/config.js';
 import { getSep2Certificate } from '../../helpers/sep2Cert.js';
 import {
     getCertificateFingerprint,
@@ -13,8 +12,7 @@ type CertificateIds = {
 };
 
 export function getCertificateIds(): CertificateIds {
-    const config = getConfig();
-    const sep2Certificate = getSep2Certificate(config);
+    const sep2Certificate = getSep2Certificate();
     const fingerprint = getCertificateFingerprint(sep2Certificate.cert);
     const lfdi = getCertificateLfdi(fingerprint);
     const sfdi = getCertificateSfdi(fingerprint);
