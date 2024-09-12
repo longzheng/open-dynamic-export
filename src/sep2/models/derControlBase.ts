@@ -22,7 +22,7 @@ export type DERControlBase = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const opModImpLimW = parseLimitWattsXmlObjectOptional(
         xmlObject['ns2:opModImpLimW'],
     );
@@ -44,7 +44,7 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
     const rampTms = xmlObject['rampTms']
         ? safeParseIntString(assertString(xmlObject['rampTms'][0]))
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         opModImpLimW,

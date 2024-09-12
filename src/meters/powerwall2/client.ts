@@ -34,7 +34,6 @@ export class Powerwall2Client {
     }
 
     public async getMeterAggregates() {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const response = await this.get('/api/meters/aggregates');
 
         const data = meterAggregatesSchema.parse(response);
@@ -43,7 +42,6 @@ export class Powerwall2Client {
     }
 
     public async getSoe() {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const response = await this.get('/api/system_status/soe');
 
         const data = systemStatusSoeSchema.parse(response);
@@ -52,7 +50,6 @@ export class Powerwall2Client {
     }
 
     public async getMetersSite() {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const response = await this.get('/api/meters/site');
 
         const data = metersSiteSchema.parse(response);
@@ -79,7 +76,7 @@ export class Powerwall2Client {
                             },
                         );
 
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         const token = response.data.token as string;
 
                         this.token = { type: 'cached', token };
@@ -110,8 +107,7 @@ export class Powerwall2Client {
     private async get(
         url: string,
         params?: Record<string, string>,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): Promise<any> {
+    ): Promise<unknown> {
         try {
             const response = await this.axiosInstance.get<string>(url, {
                 params,
@@ -119,7 +115,7 @@ export class Powerwall2Client {
                     Cookie: `AuthCookie=${await this.getToken()}`,
                 },
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
             return response.data;
         } catch (error) {
             if (error instanceof AxiosError) {

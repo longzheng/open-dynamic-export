@@ -26,7 +26,7 @@ export function parseDefaultDERControlXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xml: any,
 ): DefaultDERControl {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(
         xml['DefaultDERControl'],
     );
@@ -46,7 +46,7 @@ export function parseDefaultDERControlXml(
               assertString(xml['DefaultDERControl']['setSoftGradW'][0]),
           )
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

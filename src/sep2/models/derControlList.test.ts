@@ -8,7 +8,6 @@ it('should parse DERControlList XML', async () => {
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const endDeviceList = parseDerControlListXml(xml);
 
@@ -22,7 +21,6 @@ it('should parse DERControlList XML empty', async () => {
     const xml = await parseStringPromise(
         getMockFile('getDerp_P-EQLDEV3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const endDeviceList = parseDerControlListXml(xml);
 

@@ -20,7 +20,7 @@ export function parseFunctionSetAssignmentsXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): FunctionSetAssignments {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
     const derProgramListLink = parseListLinkXmlObject(
@@ -30,7 +30,7 @@ export function parseFunctionSetAssignmentsXmlObject(
         xmlObject['ResponseSetListLink'][0],
     );
     const timeLink = parseLinkXmlObject(xmlObject['TimeLink'][0]);
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

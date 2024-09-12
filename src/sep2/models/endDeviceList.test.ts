@@ -6,7 +6,6 @@ import { parseEndDeviceListXml } from './endDeviceList.js';
 it('should parse end device list XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getEdev.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const endDeviceList = parseEndDeviceListXml(xml);
 
@@ -21,7 +20,6 @@ it('should parse end device list XML', async () => {
 it('should parse end device list XML with csipaus:ConnectionPointLink', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getEdev_csipaus.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const endDeviceList = parseEndDeviceListXml(xml);
 

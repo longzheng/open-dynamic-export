@@ -8,7 +8,6 @@ it('should parse identified object XML', async () => {
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xmlObject =
@@ -30,7 +29,6 @@ it('should parse identified object XML with optional description', async () => {
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xmlObject =

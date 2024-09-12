@@ -19,7 +19,7 @@ export function parseFunctionSetAssignmentsListXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xml: any,
 ): FunctionSetAssignmentsList {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableList = parseSubscribableListXmlObject(
         xml['FunctionSetAssignmentsList'],
     );
@@ -27,7 +27,7 @@ export function parseFunctionSetAssignmentsListXml(
     const functionSetAssignmentsArray = assertArray(
         xml['FunctionSetAssignmentsList']['FunctionSetAssignments'],
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     const functionSetAssignments = functionSetAssignmentsArray.map(
         (assignmentXmlObject) =>

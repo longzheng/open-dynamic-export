@@ -34,7 +34,7 @@ export function parseUsagePointBaseXmlObject(
         assertString(xmlObject['serviceCategoryKind'][0]),
         ServiceKind,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const status = safeParseStringToEnumType(
         assertString(xmlObject['status'][0]),
         UsagePointBaseStatus,

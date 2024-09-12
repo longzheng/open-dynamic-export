@@ -33,7 +33,7 @@ export function parseEventXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): Event {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const respondableResource = parseRespondableResourceXmlObject(xmlObject);
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
@@ -42,7 +42,7 @@ export function parseEventXmlObject(
     );
     const interval = parseIntervalXmlObject(xmlObject['interval'][0]);
     const eventStatus = parseEventStatusXmlObject(xmlObject['EventStatus'][0]);
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...respondableResource,

@@ -8,7 +8,6 @@ it('should parse DERProgram XML object with DefaultDERControlLink', async () => 
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_fsa_2_derp.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derProgramXmlObject =
@@ -32,7 +31,6 @@ it('should parse DERProgram XML object without DefaultDERControlLink', async () 
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_fsa_1_derp.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derProgramXmlObject =

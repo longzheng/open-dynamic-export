@@ -69,7 +69,6 @@ async function* getListPageGenerator<T extends List>({
     let startIndex = 0;
 
     for (;;) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await client.get(url, {
             s: startIndex.toString(),
             l: limit.toString(),

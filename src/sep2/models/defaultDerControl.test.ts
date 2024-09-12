@@ -8,7 +8,6 @@ it('should parse Default DER Control XML', async () => {
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_dderc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const defaultDerControl = parseDefaultDERControlXml(xml);
 

@@ -11,11 +11,11 @@ export function parseListXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): List {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const resource = parseResourceXmlObject(xmlObject);
     const all = safeParseIntString(assertString(xmlObject['$']['all']));
     const results = safeParseIntString(assertString(xmlObject['$']['results']));
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...resource,

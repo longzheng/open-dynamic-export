@@ -8,7 +8,6 @@ it('should parse DERControlList XML', async () => {
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_der.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const derList = parseDerListXml(xml);
 

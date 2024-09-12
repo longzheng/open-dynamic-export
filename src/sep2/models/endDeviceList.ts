@@ -15,7 +15,7 @@ export type EndDeviceList = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceListXml(xml: any): EndDeviceList {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableList = parseSubscribableListXmlObject(
         xml['EndDeviceList'],
     );
@@ -24,7 +24,7 @@ export function parseEndDeviceListXml(xml: any): EndDeviceList {
         assertString(xml['EndDeviceList']['$']['subscribable']),
     );
     const endDeviceArray = assertArray(xml['EndDeviceList']['EndDevice']);
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     const endDevices = endDeviceArray.map((endDeviceXml) =>
         parseEndDeviceObject(endDeviceXml),

@@ -26,7 +26,6 @@ export class DeviceCapabilityHelper extends EventEmitter<{
 
 class DeviceCapabilityPollableResource extends PollableResource<DeviceCapability> {
     async get({ client, url }: { client: SEP2Client; url: string }) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await client.get(url);
 
         return parseDeviceCapabilityXml(xml);
