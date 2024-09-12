@@ -12,6 +12,7 @@ jobs:
         node-version: 20
         cache: 'npm'
     - run: npm ci
+    - run: npm run prebuild
     - run: npm run lint
     - run: npm run build
     - name: Check for uncommitted files

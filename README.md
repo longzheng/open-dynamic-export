@@ -312,8 +312,8 @@ npm run cert:device-generate
 
 To view the device certificate LFDI
 
-```bash
-npm run cert:device-lfdi
+```
+http://localhost:3000/csipAus/id
 ```
 
 The manufacturer certificate is signed manually by the utility. The certificate key and certificate signing request can be generated with

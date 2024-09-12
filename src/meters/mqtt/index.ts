@@ -48,4 +48,8 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     override async getSiteSampleData(): Promise<SiteSampleData | null> {
         return this.cachedMessage;
     }
+
+    override onDestroy() {
+        this.client.end();
+    }
 }

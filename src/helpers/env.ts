@@ -3,6 +3,7 @@ import { safeParseIntString } from './number.js';
 import { logger } from './logger.js';
 
 const envSchema = z.object({
+    SERVER_PORT: z.string().transform(safeParseIntString),
     SEP2_CERT_PATH: z.string(),
     SEP2_KEY_PATH: z.string(),
     SEP2_PEN: z.string(),

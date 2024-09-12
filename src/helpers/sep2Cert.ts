@@ -1,13 +1,8 @@
 import { readFileSync } from 'fs';
-import type { Config } from './config.js';
 import { env } from './env.js';
 import { resolve } from 'path';
 
-export function getSep2Certificate(config: Config) {
-    if (!config.limiters.sep2) {
-        throw new Error('SEP2 is not enabled');
-    }
-
+export function getSep2Certificate() {
     const cert = readFileSync(resolve(env.SEP2_CERT_PATH), 'utf-8');
 
     if (!cert) {

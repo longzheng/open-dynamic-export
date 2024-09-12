@@ -37,6 +37,8 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
 
         return siteSample;
     }
+
+    override onDestroy() {}
 }
 
 export function generateSiteSample({

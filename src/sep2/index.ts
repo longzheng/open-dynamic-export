@@ -35,7 +35,7 @@ export function getSep2Limiter({
         return null;
     }
 
-    const sep2Certificate = getSep2Certificate(config);
+    const sep2Certificate = getSep2Certificate();
 
     const sep2Client = new SEP2Client({
         sep2Config: config.limiters.sep2,

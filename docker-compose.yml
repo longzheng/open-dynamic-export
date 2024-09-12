@@ -6,6 +6,8 @@ services:
       dockerfile: ./Dockerfile
     env_file:
       - .env
+    ports:
+      - ${SERVER_PORT}:3000
     volumes:
       - ./config/:/app/config/
       - ./logs/:/app/logs/
