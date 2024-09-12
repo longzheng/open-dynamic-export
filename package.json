@@ -11,7 +11,6 @@
         "start": "node dist/src/app.js",
         "start:debug": "node --inspect-brk=0.0.0.0:9229 dist/src/app.js",
         "dev": "npm run prebuild && tsx src/app.ts",
-        "debug:sunspec-data": "tsx scripts/debugSunspecData.ts",
         "debug:sunspec-discovery": "tsx scripts/debugSunspecDiscovery.ts",
         "debug:monitoring": "tsx scripts/debugMonitoring.ts",
         "cert:device-request": "tsx scripts/certDeviceRequest.ts",
