@@ -33,7 +33,7 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     }
 
     override onDestroy() {
-        this.meterConnection.client.destroy(() => {});
+        this.meterConnection.client.close(() => {});
     }
 }
 

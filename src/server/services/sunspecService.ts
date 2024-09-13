@@ -49,8 +49,6 @@ export async function getSunSpecData() {
             meter: await meterConnection.getMeterModel(),
         };
 
-        meterConnection.client.destroy(() => {});
-
         return {
             metersData: meterData,
             meterMetrics: {
@@ -58,8 +56,6 @@ export async function getSunSpecData() {
             },
         };
     })();
-
-    invertersConnections.map((inverter) => inverter.client.destroy(() => {}));
 
     return {
         invertersData: invertersData.map((inverterData) => ({
