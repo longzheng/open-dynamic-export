@@ -550,21 +550,21 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
  */
 export enum InverterState {
     // Off
-    I_STATUS_OFF = 1,
+    OFF = 1,
     // Sleeping (auto-shutdown)
-    I_STATUS_SLEEPING = 2,
+    SLEEPING = 2,
     // Starting up
-    I_STATUS_STARTING = 3,
+    STARTING = 3,
     // Tracking power point
-    I_STATUS_MPPT = 4,
+    MPPT = 4,
     // Forced power reduction
-    I_STATUS_THROTTLED = 5,
+    THROTTLED = 5,
     // Shutting down
-    I_STATUS_SHUTTING_DOWN = 6,
+    SHUTTING_DOWN = 6,
     // One or more faults exist
-    I_STATUS_FAULT = 7,
+    FAULT = 7,
     // Standby (service on unit)* might be in Events
-    I_STATUS_STANDBY = 8,
+    STANDBY = 8,
 }
 
 /**

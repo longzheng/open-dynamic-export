@@ -42,7 +42,7 @@ it('getInverterMetrics returns data', () => {
         TmpTrns: null,
         TmpOt: null,
         Tmp_SF: null,
-        St: InverterState.I_STATUS_MPPT,
+        St: InverterState.MPPT,
         StVnd: 4,
         Evt1: 0 as InverterEvent1,
         Evt2: 0,
