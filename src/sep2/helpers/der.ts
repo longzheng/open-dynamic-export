@@ -6,7 +6,6 @@ import type { DERSettings } from '../models/derSettings.js';
 import { generateDerSettingsResponse } from '../models/derSettings.js';
 import {
     generateDerStatusResponse,
-    OperationalModeStatus,
     type DERStatus,
 } from '../models/derStatus.js';
 import { objectToXml } from './xml.js';
@@ -28,6 +27,7 @@ import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics.
 import { ConnectStatus } from '../models/connectStatus.js';
 import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
 import { DERType } from '../models/derType.js';
+import { OperationalModeStatus } from '../models/operationModeStatus.js';
 
 type Config = {
     der: DER;
