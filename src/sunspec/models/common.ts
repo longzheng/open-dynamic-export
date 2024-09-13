@@ -7,23 +7,70 @@ import {
 } from '../helpers/converters.js';
 import { sunSpecModelFactory } from './sunSpecModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Common
+ *
+ * All SunSpec compliant devices must include this as the first model
+ */
 export type CommonModel = {
-    // Length of sunspec model common (1)
+    /**
+     * Model ID
+     *
+     * Model identifier
+     */
     ID: 1;
-    // Length of sunspec model common (1)
+
+    /**
+     * Model Length
+     *
+     * Model length
+     */
     L: number;
-    // Manufacturer
+
+    /**
+     * Manufacturer
+     *
+     * Well known value registered with SunSpec for compliance
+     */
     Mn: string;
-    // Device model
+
+    /**
+     * Model
+     *
+     * Manufacturer specific value (32 chars)
+     */
     Md: string;
-    // Options
+
+    /**
+     * Options
+     *
+     * Manufacturer specific value (16 chars)
+     */
     Opt: string | null;
-    // SW version of inverter
+
+    /**
+     * Version
+     *
+     * Manufacturer specific value (16 chars)
+     */
     Vr: string | null;
-    // Serialnumber of the inverter
+
+    /**
+     * Serial Number
+     *
+     * Manufacturer specific value (32 chars)
+     */
     SN: string;
-    // Modbus Device Address
+
+    /**
+     * Device Address
+     *
+     * Modbus device address
+     *
+     * This point is mandatory for all SunSpec RTU devices and, for those devices, they must support values from 1-247.
+     */
     DA: number | null;
 };
 

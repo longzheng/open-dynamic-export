@@ -12,87 +12,303 @@ import {
 } from '../helpers/converters.js';
 import { sunSpecModelFactory } from './sunSpecModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Inverter (Single Phase, Split-Phase, Three Phase)
+ *
+ * A combination of the three models for single phase, split-phase, and three phase inverters
+ */
 export type InverterModel = {
-    // Model identifier
-    // Well-known value. Uniquely identifies this as a sunspec model inverter monitoring
-    // 101 is single phase, 102 is split phase, 103 is three phase
+    /**
+     * Model ID
+     *
+     * Model identifier
+     */
     ID: 101 | 102 | 103;
-    // Model length
+
+    /**
+     * Model Length
+     *
+     * Model length
+     */
     L: number;
-    // AC Current
+
+    /**
+     * AC Current
+     *
+     * AC Current
+     */
     A: number;
-    // Phase A Current
+
+    /**
+     * Phase A Current
+     *
+     * Phase A Current
+     */
     AphA: number;
-    // Phase B Current
+
+    /**
+     * Phase B Current
+     *
+     * Phase B Current
+     */
     AphB: number | null;
-    // Phase C Current
+
+    /**
+     * Phase C Current
+     *
+     * Phase C Current
+     */
     AphC: number | null;
+
+    /**
+     * Scale Factor for Current
+     */
     A_SF: number;
-    // Phase Voltage AB
+
+    /**
+     * Phase Voltage AB
+     *
+     * Phase Voltage AB
+     */
     PPVphAB: number | null;
-    // Phase Voltage BC
+
+    /**
+     * Phase Voltage BC
+     *
+     * Phase Voltage BC
+     */
     PPVphBC: number | null;
-    // Phase Voltage CA
+
+    /**
+     * Phase Voltage CA
+     *
+     * Phase Voltage CA
+     */
     PPVphCA: number | null;
-    // Phase Voltage AN
+
+    /**
+     * Phase Voltage AN
+     *
+     * Phase Voltage AN
+     */
     PhVphA: number;
-    // Phase Voltage BN
+
+    /**
+     * Phase Voltage BN
+     *
+     * Phase Voltage BN
+     */
     PhVphB: number | null;
-    // Phase Voltage CN
+
+    /**
+     * Phase Voltage CN
+     *
+     * Phase Voltage CN
+     */
     PhVphC: number | null;
+
+    /**
+     * Scale Factor for Voltage
+     */
     V_SF: number;
-    // AC Power
+
+    /**
+     * AC Power
+     *
+     * AC Power
+     */
     W: number;
+
+    /**
+     * Scale Factor for Power
+     */
     W_SF: number;
-    // Line Frequency
+
+    /**
+     * Line Frequency
+     *
+     * Line Frequency
+     */
     Hz: number;
+
+    /**
+     * Scale Factor for Frequency
+     */
     Hz_SF: number;
-    // AC Apparent Power
+
+    /**
+     * AC Apparent Power
+     *
+     * AC Apparent Power
+     */
     VA: number | null;
+
+    /**
+     * Scale Factor for Apparent Power
+     */
     VA_SF: number | null;
-    // AC Reactive Power
+
+    /**
+     * AC Reactive Power
+     *
+     * AC Reactive Power
+     */
     VAr: number | null;
+
+    /**
+     * Scale Factor for Reactive Power
+     */
     VAr_SF: number | null;
-    // AC Power Factor
+
+    /**
+     * AC Power Factor
+     *
+     * AC Power Factor
+     */
     PF: number | null;
+
+    /**
+     * Scale Factor for Power Factor
+     */
     PF_SF: number | null;
-    // AC Energy
+
+    /**
+     * AC Energy
+     *
+     * AC Energy
+     */
     WH: number;
+
+    /**
+     * Scale Factor for Energy
+     */
     WH_SF: number;
-    // DC Amps
+
+    /**
+     * DC Amps
+     *
+     * DC Current
+     */
     DCA: number | null;
+
+    /**
+     * Scale Factor for DC Current
+     */
     DCA_SF: number | null;
-    // DC Voltage
+
+    /**
+     * DC Voltage
+     *
+     * DC Voltage
+     */
     DCV: number | null;
+
+    /**
+     * Scale Factor for DC Voltage
+     */
     DCV_SF: number | null;
-    // DC Power
+
+    /**
+     * DC Watts
+     *
+     * DC Power
+     */
     DCW: number | null;
+
+    /**
+     * Scale Factor for DC Power
+     */
     DCW_SF: number | null;
-    // Cabinet Temperature
+
+    /**
+     * Cabinet Temperature
+     *
+     * Cabinet Temperature
+     */
     TmpCab: number | null;
-    // Heat Sink Temperature
+
+    /**
+     * Heat Sink Temperature
+     *
+     * Heat Sink Temperature
+     */
     TmpSnk: number | null;
-    // Transformer Temperature
+
+    /**
+     * Transformer Temperature
+     *
+     * Transformer Temperature
+     */
     TmpTrns: number | null;
-    // Other Temperature
+
+    /**
+     * Other Temperature
+     *
+     * Other Temperature
+     */
     TmpOt: number | null;
+
+    /**
+     * Scale Factor for Temperature
+     */
     Tmp_SF: number | null;
-    // Operating State
+
+    /**
+     * Operating State
+     *
+     * Enumerated value. Operating state
+     */
     St: InverterState;
-    // Vendor Operating State
+
+    /**
+     * Vendor Operating State
+     *
+     * Vendor specific operating state code
+     */
     StVnd: number | null;
-    // Event1
+
+    /**
+     * Event1
+     *
+     * Bitmask value. Event fields
+     */
     Evt1: InverterEvent1;
-    // Event Bitfield 2
+
+    /**
+     * Event Bitfield 2
+     *
+     * Reserved for future use
+     */
     Evt2: number;
-    // Vendor Event Bitfield 1
+
+    /**
+     * Vendor Event Bitfield 1
+     *
+     * Vendor defined events
+     */
     EvtVnd1: number | null;
-    // Vendor Event Bitfield 2
+
+    /**
+     * Vendor Event Bitfield 2
+     *
+     * Vendor defined events
+     */
     EvtVnd2: number | null;
-    // Vendor Event Bitfield 3
+
+    /**
+     * Vendor Event Bitfield 3
+     *
+     * Vendor defined events
+     */
     EvtVnd3: number | null;
-    // Vendor Event Bitfield 4
+
+    /**
+     * Vendor Event Bitfield 4
+     *
+     * Vendor defined events
+     */
     EvtVnd4: number | null;
 };
 
@@ -327,6 +543,11 @@ export const inverterModel = sunSpecModelFactory<InverterModel>({
     },
 });
 
+/**
+ * InverterState Enumeration
+ *
+ * Enumerated values representing the operating state of the inverter
+ */
 export enum InverterState {
     // Off
     I_STATUS_OFF = 1,
@@ -346,7 +567,11 @@ export enum InverterState {
     I_STATUS_STANDBY = 8,
 }
 
-// SunSpec_Information_Model_Reference_20210302.xlsx
+/**
+ * InverterEvent1 Bitfield Enumeration
+ *
+ * Bitmask values representing various event fields
+ */
 export enum InverterEvent1 {
     GROUND_FAULT = 1 << 0,
     DC_OVER_VOLT = 1 << 1,

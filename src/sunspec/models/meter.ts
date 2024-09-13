@@ -9,146 +9,530 @@ import {
 } from '../helpers/converters.js';
 import { sunSpecModelFactory } from './sunSpecModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Meter (Single Phase, Split-Phase, Three Phase)
+ *
+ * A combination of the three models for single phase, split-phase, and three phase meters
+ */
 export type MeterModel = {
-    // Model identifier
-    // 201: single phase, 202: split phase, 203: three phases
+    /**
+     * Model ID
+     *
+     * Model identifier.
+     */
     ID: 201 | 202 | 203;
-    // Model length
+
+    /**
+     * Model Length
+     *
+     * Model length.
+     */
     L: number;
-    // AC Current
+
+    /**
+     * A
+     *
+     * Total AC Current.
+     */
     A: number;
-    // Phase A Current
+
+    /**
+     * AphA
+     *
+     * Phase A Current.
+     */
     AphA: number;
-    // Phase B Current
+
+    /**
+     * AphB
+     *
+     * Phase B Current.
+     */
     AphB: number | null;
-    // Phase C Current
+
+    /**
+     * AphC
+     *
+     * Phase C Current.
+     */
     AphC: number | null;
+
+    /**
+     * A_SF
+     *
+     * Current scale factor.
+     */
     A_SF: number;
-    // Line to Neutral AC Voltage (average of active phases)
+
+    /**
+     * PhV
+     *
+     * Line to Neutral AC Voltage (average of active phases).
+     */
     PhV: number | null;
-    // Phase Voltage AN
+
+    /**
+     * PhVphA
+     *
+     * Phase Voltage AN.
+     */
     PhVphA: number | null;
-    // Phase Voltage BN
+
+    /**
+     * PhVphB
+     *
+     * Phase Voltage BN.
+     */
     PhVphB: number | null;
-    // Phase Voltage CN
+
+    /**
+     * PhVphC
+     *
+     * Phase Voltage CN.
+     */
     PhVphC: number | null;
-    // Line to Line AC Voltage (average of active phases)
+
+    /**
+     * PPV
+     *
+     * Line to Line AC Voltage (average of active phases).
+     */
     PPV: number | null;
-    // Phase Voltage AB
+
+    /**
+     * PPVphAB
+     *
+     * Phase Voltage AB.
+     */
     PPVphAB: number | null;
-    // Phase Voltage BC
+
+    /**
+     * PPVphBC
+     *
+     * Phase Voltage BC.
+     */
     PPVphBC: number | null;
-    // Phase Voltage CA
+
+    /**
+     * PPVphCA
+     *
+     * Phase Voltage CA.
+     */
     PPVphCA: number | null;
+
+    /**
+     * V_SF
+     *
+     * Voltage scale factor.
+     */
     V_SF: number;
-    // Frequency
+
+    /**
+     * Hz
+     *
+     * Frequency.
+     */
     Hz: number;
+
+    /**
+     * Hz_SF
+     *
+     * Frequency scale factor.
+     */
     Hz_SF: number;
-    // Total Real Power
+
+    /**
+     * W
+     *
+     * Total Real Power.
+     */
     W: number;
-    // Real Power phase A
+
+    /**
+     * WphA
+     *
+     * Real Power phase A.
+     */
     WphA: number | null;
-    // Real Power phase B
+
+    /**
+     * WphB
+     *
+     * Real Power phase B.
+     */
     WphB: number | null;
-    // Real Power phase C
+
+    /**
+     * WphC
+     *
+     * Real Power phase C.
+     */
     WphC: number | null;
+
+    /**
+     * W_SF
+     *
+     * Real Power scale factor.
+     */
     W_SF: number;
-    // AC Apparent Power
+
+    /**
+     * VA
+     *
+     * AC Apparent Power.
+     */
     VA: number | null;
-    // Apparent Power phase A
+
+    /**
+     * VAphA
+     *
+     * Apparent Power phase A.
+     */
     VAphA: number | null;
-    // Apparent Power phase B
+
+    /**
+     * VAphB
+     *
+     * Apparent Power phase B.
+     */
     VAphB: number | null;
-    // Apparent Power phase C
+
+    /**
+     * VAphC
+     *
+     * Apparent Power phase C.
+     */
     VAphC: number | null;
+
+    /**
+     * VA_SF
+     *
+     * Apparent Power scale factor.
+     */
     VA_SF: number | null;
-    // Reactive Power
+
+    /**
+     * VAR
+     *
+     * Reactive Power.
+     */
     VAR: number | null;
-    // Reactive Power phase A
+
+    /**
+     * VARphA
+     *
+     * Reactive Power phase A.
+     */
     VARphA: number | null;
-    // Reactive Power phase B
+
+    /**
+     * VARphB
+     *
+     * Reactive Power phase B.
+     */
     VARphB: number | null;
-    // Reactive Power phase C
+
+    /**
+     * VARphC
+     *
+     * Reactive Power phase C.
+     */
     VARphC: number | null;
+
+    /**
+     * VAR_SF
+     *
+     * Reactive Power scale factor.
+     */
     VAR_SF: number | null;
-    // Power Factor
+
+    /**
+     * PF
+     *
+     * Power Factor.
+     */
     PF: number | null;
-    // Power Factor phase A
+
+    /**
+     * PFphA
+     *
+     * Power Factor phase A.
+     */
     PFphA: number | null;
-    // Power Factor phase B
+
+    /**
+     * PFphB
+     *
+     * Power Factor phase B.
+     */
     PFphB: number | null;
-    // Power Factor phase C
+
+    /**
+     * PFphC
+     *
+     * Power Factor phase C.
+     */
     PFphC: number | null;
+
+    /**
+     * PF_SF
+     *
+     * Power Factor scale factor.
+     */
     PF_SF: number | null;
-    // Total Real Energy Exported
+
+    /**
+     * TotWhExp
+     *
+     * Total Real Energy Exported.
+     */
     TotWhExp: number;
-    // Real Energy Exported phase A
+
+    /**
+     * TotWhExpPhA
+     *
+     * Real Energy Exported phase A.
+     */
     TotWhExpPhA: number | null;
-    // Real Energy Exported phase B
+
+    /**
+     * TotWhExpPhB
+     *
+     * Real Energy Exported phase B.
+     */
     TotWhExpPhB: number | null;
-    // Real Energy Exported phase C
+
+    /**
+     * TotWhExpPhC
+     *
+     * Real Energy Exported phase C.
+     */
     TotWhExpPhC: number | null;
-    // Total Real Energy Imported
+
+    /**
+     * TotWhImp
+     *
+     * Total Real Energy Imported.
+     */
     TotWhImp: number;
-    // Real Energy Imported phase A
+
+    /**
+     * TotWhImpPhA
+     *
+     * Real Energy Imported phase A.
+     */
     TotWhImpPhA: number | null;
-    // Real Energy Imported phase B
+
+    /**
+     * TotWhImpPhB
+     *
+     * Real Energy Imported phase B.
+     */
     TotWhImpPhB: number | null;
-    // Real Energy Imported phase C
+
+    /**
+     * TotWhImpPhC
+     *
+     * Real Energy Imported phase C.
+     */
     TotWhImpPhC: number | null;
+
+    /**
+     * TotWh_SF
+     *
+     * Real Energy scale factor.
+     */
     TotWh_SF: number;
-    // Total Apparent Energy Exported
+
+    /**
+     * TotVAhExp
+     *
+     * Total Apparent Energy Exported.
+     */
     TotVAhExp: number;
-    // Apparent Energy Exported phase A
+
+    /**
+     * TotVAhExpPhA
+     *
+     * Apparent Energy Exported phase A.
+     */
     TotVAhExpPhA: number | null;
-    // Apparent Energy Exported phase B
+
+    /**
+     * TotVAhExpPhB
+     *
+     * Apparent Energy Exported phase B.
+     */
     TotVAhExpPhB: number | null;
-    // Apparent Energy Exported phase C
+
+    /**
+     * TotVAhExpPhC
+     *
+     * Apparent Energy Exported phase C.
+     */
     TotVAhExpPhC: number | null;
-    // Total Apparent Energy Imported
+
+    /**
+     * TotVAhImp
+     *
+     * Total Apparent Energy Imported.
+     */
     TotVAhImp: number;
-    // Apparent Energy Imported phase A
+
+    /**
+     * TotVAhImpPhA
+     *
+     * Apparent Energy Imported phase A.
+     */
     TotVAhImpPhA: number | null;
-    // Apparent Energy Imported phase B
+
+    /**
+     * TotVAhImpPhB
+     *
+     * Apparent Energy Imported phase B.
+     */
     TotVAhImpPhB: number | null;
-    // Apparent Energy Imported phase C
+
+    /**
+     * TotVAhImpPhC
+     *
+     * Apparent Energy Imported phase C.
+     */
     TotVAhImpPhC: number | null;
+
+    /**
+     * TotVAh_SF
+     *
+     * Apparent Energy scale factor.
+     */
     TotVAh_SF: number | null;
-    // Total Reactive Energy Imported Quadrant 1
+
+    /**
+     * TotVArhImpQ1
+     *
+     * Total Reactive Energy Imported Quadrant 1.
+     */
     TotVArhImpQ1: number;
-    // Reactive Energy Imported Q1 phase A
+
+    /**
+     * TotVArhImpQ1PhA
+     *
+     * Reactive Energy Imported Q1 phase A.
+     */
     TotVArhImpQ1PhA: number | null;
-    // Reactive Energy Imported Q1 phase B
+
+    /**
+     * TotVArhImpQ1PhB
+     *
+     * Reactive Energy Imported Q1 phase B.
+     */
     TotVArhImpQ1PhB: number | null;
-    // Reactive Energy Imported Q1 phase C
+
+    /**
+     * TotVArhImpQ1PhC
+     *
+     * Reactive Energy Imported Q1 phase C.
+     */
     TotVArhImpQ1PhC: number | null;
-    // Total Reactive Power Imported Quadrant 2
+
+    /**
+     * TotVArhImpQ2
+     *
+     * Total Reactive Power Imported Quadrant 2.
+     */
     TotVArhImpQ2: number;
-    // Reactive Power Imported Q2 phase A
+
+    /**
+     * TotVArhImpQ2PhA
+     *
+     * Reactive Power Imported Q2 phase A.
+     */
     TotVArhImpQ2PhA: number | null;
-    // Reactive Power Imported Q2 phase B
+
+    /**
+     * TotVArhImpQ2PhB
+     *
+     * Reactive Power Imported Q2 phase B.
+     */
     TotVArhImpQ2PhB: number | null;
-    // Reactive Power Imported Q2 phase C
+
+    /**
+     * TotVArhImpQ2PhC
+     *
+     * Reactive Power Imported Q2 phase C.
+     */
     TotVArhImpQ2PhC: number | null;
-    // Total Reactive Power Exported Quadrant 3
+
+    /**
+     * TotVArhExpQ3
+     *
+     * Total Reactive Power Exported Quadrant 3.
+     */
     TotVArhExpQ3: number;
-    // Reactive Power Exported Q3 phase A
+
+    /**
+     * TotVArhExpQ3PhA
+     *
+     * Reactive Power Exported Q3 phase A.
+     */
     TotVArhExpQ3PhA: number | null;
-    // Reactive Power Exported Q3 phase B
+
+    /**
+     * TotVArhExpQ3PhB
+     *
+     * Reactive Power Exported Q3 phase B.
+     */
     TotVArhExpQ3PhB: number | null;
-    // Reactive Power Exported Q3 phase C
+
+    /**
+     * TotVArhExpQ3PhC
+     *
+     * Reactive Power Exported Q3 phase C.
+     */
     TotVArhExpQ3PhC: number | null;
-    // Total Reactive Power Exported Quadrant 4
+
+    /**
+     * TotVArhExpQ4
+     *
+     * Total Reactive Power Exported Quadrant 4.
+     */
     TotVArhExpQ4: number;
-    // Reactive Power Exported Q4 phase A
+
+    /**
+     * TotVArhExpQ4PhA
+     *
+     * Reactive Power Exported Q4 phase A.
+     */
     TotVArhExpQ4PhA: number | null;
-    // Reactive Power Exported Q4 phase B
+
+    /**
+     * TotVArhExpQ4PhB
+     *
+     * Reactive Power Exported Q4 phase B.
+     */
     TotVArhExpQ4PhB: number | null;
-    // Reactive Power Exported Q4 phase C
+
+    /**
+     * TotVArhExpQ4PhC
+     *
+     * Reactive Power Exported Q4 phase C.
+     */
     TotVArhExpQ4PhC: number | null;
+
+    /**
+     * TotVArh_SF
+     *
+     * Reactive Energy scale factor.
+     */
     TotVArh_SF: number | null;
-    // Meter Event Flags
+
+    /**
+     * Evt
+     *
+     * Meter Event Flags.
+     */
     Evt: MeterEvent;
 };
 
@@ -528,6 +912,11 @@ export const meterModel = sunSpecModelFactory<MeterModel>({
     },
 });
 
+/**
+ * MeterEvent Enumeration
+ *
+ * Bitmask values representing Meter Event Flags.
+ */
 export enum MeterEvent {
     PowerFailure = 1 << 2,
     UnderVoltage = 1 << 3,

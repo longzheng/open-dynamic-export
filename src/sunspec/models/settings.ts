@@ -9,72 +9,236 @@ import {
 } from '../helpers/converters.js';
 import { sunSpecModelFactory } from './sunSpecModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Settings
+ *
+ * Inverter Controls Basic Settings
+ */
 export type SettingsModel = {
-    // Model identifier
-    // Well-known value. Uniquely identifies this as a sunspec model nameplate
+    /**
+     * Model ID
+     *
+     * Model identifier
+     */
     ID: 121;
-    // Model length
+
+    /**
+     * Model Length
+     *
+     * Model length
+     */
     L: number;
-    // Setting for maximum power output. Default to WRtg.
+
+    /**
+     * WMax
+     *
+     * Setting for maximum power output. Default to WRtg.
+     */
     WMax: number;
-    // Voltage at the PCC.
+
+    /**
+     * VRef
+     *
+     * Voltage at the PCC.
+     */
     VRef: number;
-    // Offset from PCC to inverter.
+
+    /**
+     * VRefOfs
+     *
+     * Offset from PCC to inverter.
+     */
     VRefOfs: number;
-    // Setpoint for maximum voltage.
+
+    /**
+     * VMax
+     *
+     * Setpoint for maximum voltage.
+     */
     VMax: number | null;
-    // Setpoint for minimum voltage.
+
+    /**
+     * VMin
+     *
+     * Setpoint for minimum voltage.
+     */
     VMin: number | null;
-    // Setpoint for maximum apparent power. Default to VARtg.
+
+    /**
+     * VAMax
+     *
+     * Setpoint for maximum apparent power. Default to VARtg.
+     */
     VAMax: number | null;
-    // Setting for maximum reactive power in quadrant 1. Default to VArRtgQ1.
+
+    /**
+     * VArMaxQ1
+     *
+     * Setting for maximum reactive power in quadrant 1. Default to VArRtgQ1.
+     */
     VArMaxQ1: number;
-    // Setting for maximum reactive power in quadrant 2. Default to VArRtgQ2.
+
+    /**
+     * VArMaxQ2
+     *
+     * Setting for maximum reactive power in quadrant 2. Default to VArRtgQ2.
+     */
     VArMaxQ2: number | null;
-    // Setting for maximum reactive power in quadrant 3. Default to VArRtgQ3.
+
+    /**
+     * VArMaxQ3
+     *
+     * Setting for maximum reactive power in quadrant 3. Default to VArRtgQ3.
+     */
     VArMaxQ3: number | null;
-    // Setting for maximum reactive power in quadrant 4. Default to VArRtgQ4.
+
+    /**
+     * VArMaxQ4
+     *
+     * Setting for maximum reactive power in quadrant 4. Default to VArRtgQ4.
+     */
     VArMaxQ4: number;
-    // Default ramp rate of change of active power due to command or internal action.
+
+    /**
+     * WGra
+     *
+     * Default ramp rate of change of active power due to command or internal action.
+     */
     WGra: number | null;
-    // Setpoint for minimum power factor value in quadrant 1. Default to PFRtgQ1.
+
+    /**
+     * PFMinQ1
+     *
+     * Setpoint for minimum power factor value in quadrant 1. Default to PFRtgQ1.
+     */
     PFMinQ1: number;
-    // Setpoint for minimum power factor value in quadrant 2. Default to PFRtgQ2.
+
+    /**
+     * PFMinQ2
+     *
+     * Setpoint for minimum power factor value in quadrant 2. Default to PFRtgQ2.
+     */
     PFMinQ2: number | null;
-    // Setpoint for minimum power factor value in quadrant 3. Default to PFRtgQ3.
+
+    /**
+     * PFMinQ3
+     *
+     * Setpoint for minimum power factor value in quadrant 3. Default to PFRtgQ3.
+     */
     PFMinQ3: number | null;
-    // Setpoint for minimum power factor value in quadrant 4. Default to PFRtgQ4.
+
+    /**
+     * PFMinQ4
+     *
+     * Setpoint for minimum power factor value in quadrant 4. Default to PFRtgQ4.
+     */
     PFMinQ4: number;
-    // VAR action on change between charging and discharging: 1=switch 2=maintain VAR characterization.
+
+    /**
+     * VArAct
+     *
+     * VAR action on change between charging and discharging: 1=switch 2=maintain VAR characterization.
+     */
     VArAct: VArAct | null;
-    // Calculation method for total apparent power. 1=vector 2=arithmetic.
+
+    /**
+     * ClcTotVA
+     *
+     * Calculation method for total apparent power. 1=vector 2=arithmetic.
+     */
     ClcTotVA: ClcTotVA | null;
-    // Setpoint for maximum ramp rate as percentage of nominal maximum ramp rate. This setting will limit the rate that watts delivery to the grid can increase or decrease in response to intermittent PV generation.
+
+    /**
+     * MaxRmpRte
+     *
+     * Setpoint for maximum ramp rate as percentage of nominal maximum ramp rate. This setting will limit the rate that watts delivery to the grid can increase or decrease in response to intermittent PV generation.
+     */
     MaxRmpRte: number | null;
-    // Setpoint for nominal frequency at the ECP.
+
+    /**
+     * ECPNomHz
+     *
+     * Setpoint for nominal frequency at the ECP.
+     */
     ECPNomHz: number | null;
-    // Identity of connected phase for single phase inverters. A=1 B=2 C=3.
+
+    /**
+     * ConnPh
+     *
+     * Identity of connected phase for single phase inverters. A=1 B=2 C=3.
+     */
     ConnPh: ConnPh | null;
-    // Scale factor
+
+    /**
+     * WMax_SF
+     *
+     * Scale factor for real power.
+     */
     WMax_SF: number;
-    // Scale factor
+
+    /**
+     * VRef_SF
+     *
+     * Scale factor for voltage at the PCC.
+     */
     VRef_SF: number;
-    // Scale factor
+
+    /**
+     * VRefOfs_SF
+     *
+     * Scale factor for offset voltage.
+     */
     VRefOfs_SF: number;
-    // Scale factor
+
+    /**
+     * VMinMax_SF
+     *
+     * Scale factor for min/max voltages.
+     */
     VMinMax_SF: number | null;
-    // Scale factor
+
+    /**
+     * VAMax_SF
+     *
+     * Scale factor for apparent power.
+     */
     VAMax_SF: number | null;
-    // Scale factor
+
+    /**
+     * VArMax_SF
+     *
+     * Scale factor for reactive power.
+     */
     VArMax_SF: number | null;
-    // Scale factor
+
+    /**
+     * WGra_SF
+     *
+     * Scale factor for default ramp rate.
+     */
     WGra_SF: number | null;
-    // Scale factor
+
+    /**
+     * PFMin_SF
+     *
+     * Scale factor for minimum power factor.
+     */
     PFMin_SF: number | null;
-    // Scale factor
+
+    /**
+     * MaxRmpRte_SF
+     *
+     * Scale factor for maximum ramp percentage.
+     */
     MaxRmpRte_SF: number | null;
-    // Scale factor
+
+    /**
+     * ECPNomHz_SF
+     *
+     * Scale factor for nominal frequency.
+     */
     ECPNomHz_SF: number | null;
 };
 
@@ -244,16 +408,31 @@ export const settingsModel = sunSpecModelFactory<SettingsModel>({
     },
 });
 
+/**
+ * VArAct Enumeration
+ *
+ * Enumerated values representing VAR action on change between charging and discharging.
+ */
 export enum VArAct {
     SWITCH = 1,
     MAINTAIN = 2,
 }
 
+/**
+ * ClcTotVA Enumeration
+ *
+ * Enumerated values representing the calculation method for total apparent power.
+ */
 export enum ClcTotVA {
     VECTOR = 1,
     ARITHMETIC = 2,
 }
 
+/**
+ * ConnPh Enumeration
+ *
+ * Enumerated values representing the identity of connected phase for single phase inverters.
+ */
 export enum ConnPh {
     A = 1,
     B = 2,
