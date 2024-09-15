@@ -7,6 +7,7 @@ import type { DOEModesSupportedType } from './doeModesSupportedType.js';
 import { xmlns } from '../helpers/namespace.js';
 import { type ReactivePower } from './reactivePower.js';
 import { type VoltageRMS } from './voltageRms.js';
+import type { PowerFactor } from './powerFactor.js';
 
 export type DERCapability = {
     // Bitmap indicating the DER Controls implemented by the device
@@ -21,8 +22,14 @@ export type DERCapability = {
     rtgMaxW: ActivePower;
     // Maximum continuous reactive power delivered by the DER, in var.
     rtgMaxVar: ReactivePower;
+    // Maximum continuous reactive power received by the DER, in var. If absent, defaults to negative rtgMaxVar.
+    rtgMaxVarNeg?: ReactivePower | undefined;
+    // Minimum Power Factor displacement capability of the DER when injecting reactive power (over-excited); SHALL be a positive value between 0.0 (typically > 0.7) and 1.0. If absent, defaults to unity.
+    rtgMinPFOverExcited?: PowerFactor | undefined;
+    // Minimum Power Factor displacement capability of the DER when absorbing reactive power (under-excited); SHALL be a positive value between 0.0 (typically > 0.7) and 0.9999. If absent, defaults to rtgMinPFOverExcited.
+    rtgMinPFUnderExcited?: PowerFactor | undefined;
     // AC voltage nominal rating.
-    rtgVNom: VoltageRMS | undefined;
+    rtgVNom?: VoltageRMS | undefined;
     // TODO: partially implemented
 };
 
@@ -33,6 +40,9 @@ export function generateDerCapability({
     rtgMaxVA,
     rtgMaxW,
     rtgMaxVar,
+    rtgMaxVarNeg,
+    rtgMinPFOverExcited,
+    rtgMinPFUnderExcited,
     rtgVNom,
 }: DERCapability) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,6 +59,21 @@ export function generateDerCapability({
             rtgMaxVar,
         },
     };
+
+    if (rtgMaxVarNeg) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        response.DERCapability.rtgMaxVarNeg = rtgMaxVarNeg;
+    }
+
+    if (rtgMinPFOverExcited) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        response.DERCapability.rtgMinPFOverExcited = rtgMinPFOverExcited;
+    }
+
+    if (rtgMinPFUnderExcited) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        response.DERCapability.rtgMinPFUnderExcited = rtgMinPFUnderExcited;
+    }
 
     if (rtgVNom) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

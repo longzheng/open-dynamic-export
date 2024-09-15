@@ -309,10 +309,6 @@ export function getDerCapabilityResponseFromSunSpecArray(
             value: rtgMaxW.base,
             multiplier: rtgMaxW.pow10,
         },
-        // there's no way to get the nominal voltage from the SunSpec nameplate model
-        // VNom is available from the DER Capacity 702 model but it's not widely available
-        // https://sunspec.org/wp-content/uploads/2021/02/SunSpec-DER-Information-Model-Specification-V1-0-02-01-2021.pdf
-        rtgVNom: undefined,
     };
 }
 

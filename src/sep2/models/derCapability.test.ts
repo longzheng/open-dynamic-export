@@ -30,6 +30,18 @@ it('should generate DERCapability XML', () => {
             multiplier: 3,
             value: 2.5,
         },
+        rtgMaxVarNeg: {
+            multiplier: 3,
+            value: -2.5,
+        },
+        rtgMinPFOverExcited: {
+            displacement: 900,
+            multiplier: -3,
+        },
+        rtgMinPFUnderExcited: {
+            displacement: 900,
+            multiplier: -3,
+        },
         rtgVNom: {
             multiplier: 0,
             value: 230,
@@ -55,6 +67,18 @@ it('should generate DERCapability XML', () => {
         <multiplier>3</multiplier>
         <value>2.5</value>
     </rtgMaxVar>
+    <rtgMaxVarNeg>
+        <multiplier>3</multiplier>
+        <value>-2.5</value>
+    </rtgMaxVarNeg>
+    <rtgMinPFOverExcited>
+        <displacement>900</displacement>
+        <multiplier>-3</multiplier>
+    </rtgMinPFOverExcited>
+    <rtgMinPFUnderExcited>
+        <displacement>900</displacement>
+        <multiplier>-3</multiplier>
+    </rtgMinPFUnderExcited>
     <rtgVNom>
         <multiplier>0</multiplier>
         <value>230</value>
@@ -87,7 +111,6 @@ it('should generate DERCapability XML without optional fields', () => {
             multiplier: 3,
             value: 2.5,
         },
-        rtgVNom: undefined,
     });
 
     const xml = objectToXml(response);
