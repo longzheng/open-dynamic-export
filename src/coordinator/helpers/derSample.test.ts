@@ -94,8 +94,8 @@ describe('generateDerSample', () => {
             voltage: {
                 type: 'perPhase',
                 phaseA: 230.1,
-                phaseB: null,
-                phaseC: null,
+                phaseB: 227.7,
+                phaseC: 229,
             },
             frequency: 49.995,
         });

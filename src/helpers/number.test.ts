@@ -49,7 +49,7 @@ describe('sumNumbersArray', () => {
 describe('sumNumbersNullableArray', () => {
     it('should return null if any number is null', () => {
         const result = sumNumbersNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(4);
     });
 
     it('should avoid floating point errors', () => {
@@ -73,7 +73,7 @@ describe('averageNumbersArray', () => {
 describe('averageNumbersNullableArray', () => {
     it('should return null if any number is null', () => {
         const result = averageNumbersNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(2);
     });
 
     it('should avoid floating point errors', () => {
@@ -85,7 +85,7 @@ describe('averageNumbersNullableArray', () => {
 describe('mathMinNullbleArray', () => {
     it('should return null if any number is null', () => {
         const result = mathMinNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(1);
     });
 
     it('should return minimum value if all numbers are not null', () => {
@@ -97,7 +97,7 @@ describe('mathMinNullbleArray', () => {
 describe('mathMaxNullableArray', () => {
     it('should return null if any number is null', () => {
         const result = mathMaxNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(3);
     });
 
     it('should return maximum value if all numbers are not null', () => {

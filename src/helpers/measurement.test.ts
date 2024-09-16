@@ -271,22 +271,22 @@ describe('getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements', () => {
             average: {
                 type: 'perPhaseNet',
                 phaseA: 40, // (10 + 40 + 70) / 3 = 40
-                phaseB: null,
-                phaseC: null,
+                phaseB: 50,
+                phaseC: 45,
                 net: (60 + 100 + 150) / 3, // (60 + 100 + 150) / 3 = 103.33333333333333
             },
             maximum: {
                 type: 'perPhaseNet',
                 phaseA: 70,
-                phaseB: null,
-                phaseC: null,
+                phaseB: 80,
+                phaseC: 60,
                 net: 150,
             },
             minimum: {
                 type: 'perPhaseNet',
                 phaseA: 10,
-                phaseB: null,
-                phaseC: null,
+                phaseB: 20,
+                phaseC: 30,
                 net: 60,
             },
         } satisfies ReturnType<

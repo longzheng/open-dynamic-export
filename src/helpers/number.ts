@@ -39,11 +39,9 @@ export function sumNumbersArray(numbers: number[]) {
 }
 
 export function sumNumbersNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
-        return null;
-    }
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
 
-    return sumNumbersArray(numbers as number[]);
+    return sumNumbersArray(nonNullableNumbers);
 }
 
 export function averageNumbersArray(numbers: number[]) {
@@ -51,27 +49,21 @@ export function averageNumbersArray(numbers: number[]) {
 }
 
 export function averageNumbersNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
-        return null;
-    }
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
 
-    return averageNumbersArray(numbers as number[]);
+    return averageNumbersArray(nonNullableNumbers);
 }
 
 export function mathMinNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
-        return null;
-    }
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
 
-    return Math.min(...(numbers as number[]));
+    return Math.min(...nonNullableNumbers);
 }
 
 export function mathMaxNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
-        return null;
-    }
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
 
-    return Math.max(...(numbers as number[]));
+    return Math.max(...nonNullableNumbers);
 }
 
 export function convertNumberToBaseAndPow10Exponent(number: number): {
