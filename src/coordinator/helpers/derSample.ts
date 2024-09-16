@@ -4,7 +4,12 @@ import type {
     PerPhaseNetMeasurement,
 } from '../../helpers/measurement.js';
 import { assertNonNull } from '../../helpers/null.js';
-import { getAggregatedInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
+import {
+    averageNumbersArray,
+    averageNumbersNullableArray,
+    sumNumbersArray,
+} from '../../helpers/number.js';
+import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
 import type { InverterModel } from '../../sunspec/models/inverter.js';
 import type { SampleBase } from './sampleBase.js';
 
@@ -23,24 +28,36 @@ export function generateDerSample({
 }: {
     inverters: InverterModel[];
 }): DerSample {
-    const aggregatedInverterMetrics = getAggregatedInverterMetrics(inverters);
+    const inverterMetrics = inverters.map(getInverterMetrics);
 
     return {
         date: new Date(),
         realPower: {
             type: 'noPhase',
-            value: aggregatedInverterMetrics.W,
+            value: sumNumbersArray(inverterMetrics.map((metrics) => metrics.W)),
         },
         reactivePower: {
             type: 'noPhase',
-            value: aggregatedInverterMetrics.VAr ?? 0,
+            value: sumNumbersArray(
+                inverterMetrics.map((metrics) => metrics.VAr ?? 0),
+            ),
         },
         voltage: {
             type: 'perPhase',
-            phaseA: assertNonNull(aggregatedInverterMetrics.PhVphA),
-            phaseB: aggregatedInverterMetrics.PhVphB,
-            phaseC: aggregatedInverterMetrics.PhVphC,
+            phaseA: assertNonNull(
+                averageNumbersNullableArray(
+                    inverterMetrics.map((metrics) => metrics.PhVphA),
+                ),
+            ),
+            phaseB: averageNumbersNullableArray(
+                inverterMetrics.map((metrics) => metrics.PhVphB),
+            ),
+            phaseC: averageNumbersNullableArray(
+                inverterMetrics.map((metrics) => metrics.PhVphC),
+            ),
         },
-        frequency: aggregatedInverterMetrics.Hz,
+        frequency: averageNumbersArray(
+            inverterMetrics.map((metrics) => metrics.Hz),
+        ),
     };
 }
