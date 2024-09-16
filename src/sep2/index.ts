@@ -120,8 +120,6 @@ export function getSep2Limiter({
                 await putConnectionPointId({
                     connectionPointHref: endDevice.connectionPointLink.href,
                 });
-
-                await endDeviceListHelper.refresh();
             }
 
             if (endDevice.registrationLink) {
