@@ -19,13 +19,13 @@ it('should parse FunctionSetAssignmentsList XML', async () => {
     );
 
     expect(functionSetAssignments.href).toBe('/api/v2/edev/_EQLDEV3/fsa/2');
-    expect(functionSetAssignments.derProgramListLink.href).toBe(
+    expect(functionSetAssignments.derProgramListLink?.href).toBe(
         '/api/v2/edev/_EQLDEV3/fsa/2/derp',
     );
-    expect(functionSetAssignments.responseSetListLink.href).toBe(
+    expect(functionSetAssignments.responseSetListLink?.href).toBe(
         '/api/v2/rsps',
     );
-    expect(functionSetAssignments.timeLink.href).toBe('/api/v2/tm');
+    expect(functionSetAssignments.timeLink?.href).toBe('/api/v2/tm');
     expect(functionSetAssignments.mRID).toBe(
         'DE045D141A8B335F96AFDE5AFECDBA09',
     );

@@ -187,6 +187,10 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         try {
+            if (!this.config.der.derCapabilityLink) {
+                return;
+            }
+
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
         } catch (error) {
             this.logger.error(error, 'Error updating DER capability');
@@ -210,6 +214,10 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         try {
+            if (!this.config.der.derSettingsLink) {
+                return;
+            }
+
             await this.client.put(this.config.der.derSettingsLink.href, xml);
         } catch (error) {
             this.logger.error(error, 'Error updating DER settings');
@@ -229,6 +237,10 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         try {
+            if (!this.config.der.derStatusLink) {
+                return;
+            }
+
             await this.client.put(this.config.der.derStatusLink.href, xml);
         } catch (error) {
             this.logger.error(error, 'Error updating DER capability');

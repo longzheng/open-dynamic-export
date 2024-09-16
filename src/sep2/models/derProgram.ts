@@ -27,12 +27,12 @@ export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
     const defaultDerControlLink = xmlObject['DefaultDERControlLink']
         ? parseLinkXmlObject(xmlObject['DefaultDERControlLink'][0])
         : undefined;
-    const derControlListLink = parseListLinkXmlObject(
-        xmlObject['DERControlListLink'][0],
-    );
-    const derCurveListLink = parseListLinkXmlObject(
-        xmlObject['DERCurveListLink'][0],
-    );
+    const derControlListLink = xmlObject['DERControlListLink']
+        ? parseListLinkXmlObject(xmlObject['DERControlListLink'][0])
+        : undefined;
+    const derCurveListLink = xmlObject['DERCurveListLink']
+        ? parseListLinkXmlObject(xmlObject['DERCurveListLink'][0])
+        : undefined;
     const primacy = safeParseIntString(assertString(xmlObject['primacy'][0]));
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
