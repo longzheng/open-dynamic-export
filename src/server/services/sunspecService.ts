@@ -4,23 +4,11 @@ import {
     getSunSpecInvertersConnections,
     getSunSpecMeterConnection,
 } from '../../sunspec/connections.js';
-import {
-    getInverterMetrics,
-    getAggregatedInverterMetrics,
-} from '../../sunspec/helpers/inverterMetrics.js';
+import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
 import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
-import {
-    getNameplateMetrics,
-    getAggregatedNameplateMetrics,
-} from '../../sunspec/helpers/nameplateMetrics.js';
-import {
-    getSettingsMetrics,
-    getAggregatedSettingsMetrics,
-} from '../../sunspec/helpers/settingsMetrics.js';
-import {
-    getStatusMetrics,
-    getAggregatedStatusMetrics,
-} from '../../sunspec/helpers/statusMetrics.js';
+import { getNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
+import { getSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
+import { getStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
 
 export async function getSunSpecData() {
     const config = getConfig();
@@ -92,33 +80,6 @@ export async function getSunSpecData() {
                 };
             })(),
         })),
-        aggregatedMetrics: {
-            inveter: getAggregatedInverterMetrics(
-                invertersData.map((inverterData) => inverterData.inverter),
-            ),
-            nameplate: getAggregatedNameplateMetrics(
-                invertersData.map((inverterData) => inverterData.nameplate),
-            ),
-            settings: getAggregatedSettingsMetrics(
-                invertersData.map((inverterData) => inverterData.settings),
-            ),
-            status: (() => {
-                const aggregatedStatusMetrics = getAggregatedStatusMetrics(
-                    invertersData.map((inverterData) => inverterData.status),
-                );
-
-                return {
-                    ...aggregatedStatusMetrics,
-                    // remap bigint to string to avoid tsoa type error
-                    ActWh: aggregatedStatusMetrics.ActWh.toString(),
-                    ActVAh: aggregatedStatusMetrics.ActVAh.toString(),
-                    ActVArhQ1: aggregatedStatusMetrics.ActVArhQ1.toString(),
-                    ActVArhQ2: aggregatedStatusMetrics.ActVArhQ2.toString(),
-                    ActVArhQ3: aggregatedStatusMetrics.ActVArhQ3.toString(),
-                    ActVArhQ4: aggregatedStatusMetrics.ActVArhQ4.toString(),
-                };
-            })(),
-        },
         ...meter,
     };
 }

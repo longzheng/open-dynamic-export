@@ -1,8 +1,6 @@
 import {
     numberNullableWithPow10,
     numberWithPow10,
-    sumNumbersArray,
-    sumNumbersNullableArray,
 } from '../../helpers/number.js';
 import { type NameplateModel } from '../models/nameplate.js';
 
@@ -45,43 +43,5 @@ export function getNameplateMetrics(nameplate: NameplateModel) {
                       nameplate.MaxDisChaRte_SF,
                   )
                 : null,
-    };
-}
-
-export function getAggregatedNameplateMetrics(
-    nameplates: NameplateModel[],
-): ReturnType<typeof getNameplateMetrics> {
-    const metrics = nameplates.map(getNameplateMetrics);
-
-    return {
-        // get the highest value
-        DERTyp: Math.max(...metrics.map((metric) => metric.DERTyp)),
-        WRtg: sumNumbersArray(metrics.map((metric) => metric.WRtg)),
-        VARtg: sumNumbersArray(metrics.map((metric) => metric.VARtg)),
-        VArRtgQ1: sumNumbersArray(metrics.map((metric) => metric.VArRtgQ1)),
-        VArRtgQ2: sumNumbersNullableArray(
-            metrics.map((metric) => metric.VArRtgQ2),
-        ),
-        VArRtgQ3: sumNumbersNullableArray(
-            metrics.map((metric) => metric.VArRtgQ3),
-        ),
-        VArRtgQ4: sumNumbersArray(metrics.map((metric) => metric.VArRtgQ4)),
-        ARtg: sumNumbersArray(metrics.map((metric) => metric.ARtg)),
-        PFRtgQ1: sumNumbersArray(metrics.map((metric) => metric.PFRtgQ1)),
-        PFRtgQ2: sumNumbersNullableArray(
-            metrics.map((metric) => metric.PFRtgQ2),
-        ),
-        PFRtgQ3: sumNumbersNullableArray(
-            metrics.map((metric) => metric.PFRtgQ3),
-        ),
-        PFRtgQ4: sumNumbersArray(metrics.map((metric) => metric.PFRtgQ4)),
-        WHRtg: sumNumbersNullableArray(metrics.map((metric) => metric.WHRtg)),
-        AhrRtg: sumNumbersNullableArray(metrics.map((metric) => metric.AhrRtg)),
-        MaxChaRte: sumNumbersNullableArray(
-            metrics.map((metric) => metric.MaxChaRte),
-        ),
-        MaxDisChaRte: sumNumbersNullableArray(
-            metrics.map((metric) => metric.MaxDisChaRte),
-        ),
     };
 }

@@ -80,7 +80,7 @@ export function createCoordinator(): Coordinator {
         sep2?.mirrorUsagePointListHelper.addDerSample(derSample);
 
         inverterController.updateSunSpecInverterData({
-            inverters: invertersData,
+            invertersData,
             derSample,
         });
     });

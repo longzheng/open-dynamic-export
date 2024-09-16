@@ -1,8 +1,6 @@
 import {
     numberNullableWithPow10,
     numberWithPow10,
-    sumNumbersArray,
-    sumNumbersNullableArray,
 } from '../../helpers/number.js';
 import type { SettingsModel } from '../models/settings.js';
 
@@ -63,51 +61,5 @@ export function getSettingsMetrics(settings: SettingsModel) {
             settings.ECPNomHz && settings.ECPNomHz_SF
                 ? numberWithPow10(settings.ECPNomHz, settings.ECPNomHz_SF)
                 : null,
-    };
-}
-
-export function getAggregatedSettingsMetrics(
-    settings: SettingsModel[],
-): ReturnType<typeof getSettingsMetrics> {
-    const metrics = settings.map(getSettingsMetrics);
-
-    return {
-        WMax: sumNumbersArray(metrics.map((metric) => metric.WMax)),
-        VRef: sumNumbersArray(metrics.map((metric) => metric.VRef)),
-        VRefOfs: sumNumbersArray(metrics.map((metric) => metric.VRefOfs)),
-        VMax: sumNumbersNullableArray(metrics.map((metric) => metric.VMax)),
-        VMin: sumNumbersNullableArray(metrics.map((metric) => metric.VMin)),
-        VAMax: sumNumbersNullableArray(metrics.map((metric) => metric.VAMax)),
-        VArMaxQ1: sumNumbersNullableArray(
-            metrics.map((metric) => metric.VArMaxQ1),
-        ),
-        VArMaxQ2: sumNumbersNullableArray(
-            metrics.map((metric) => metric.VArMaxQ2),
-        ),
-        VArMaxQ3: sumNumbersNullableArray(
-            metrics.map((metric) => metric.VArMaxQ3),
-        ),
-        VArMaxQ4: sumNumbersNullableArray(
-            metrics.map((metric) => metric.VArMaxQ4),
-        ),
-        WGra: sumNumbersNullableArray(metrics.map((metric) => metric.WGra)),
-        PFMinQ1: sumNumbersNullableArray(
-            metrics.map((metric) => metric.PFMinQ1),
-        ),
-        PFMinQ2: sumNumbersNullableArray(
-            metrics.map((metric) => metric.PFMinQ2),
-        ),
-        PFMinQ3: sumNumbersNullableArray(
-            metrics.map((metric) => metric.PFMinQ3),
-        ),
-        PFMinQ4: sumNumbersNullableArray(
-            metrics.map((metric) => metric.PFMinQ4),
-        ),
-        MaxRmpRte: sumNumbersNullableArray(
-            metrics.map((metric) => metric.MaxRmpRte),
-        ),
-        ECPNomHz: sumNumbersNullableArray(
-            metrics.map((metric) => metric.ECPNomHz),
-        ),
     };
 }

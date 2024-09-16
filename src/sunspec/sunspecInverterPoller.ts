@@ -1,30 +1,14 @@
-import type { ControlsModel } from './models/controls.js';
-import type { InverterModel } from './models/inverter.js';
 import type { InverterSunSpecConnection } from './connection/inverter.js';
 import EventEmitter from 'events';
 import { logger as pinoLogger } from '../helpers/logger.js';
-import type { NameplateModel } from './models/nameplate.js';
-import type { SettingsModel } from './models/settings.js';
-import type { StatusModel } from './models/status.js';
-import { type DerSample } from '../coordinator/helpers/derSample.js';
-import { getAggregatedInverterMetrics } from './helpers/inverterMetrics.js';
-import { assertNonNull } from '../helpers/null.js';
+import { generateDerSample } from '../coordinator/helpers/derSample.js';
+import type { InvertersPolledData } from '../coordinator/helpers/inverterData.js';
+import { generateInverterData } from '../coordinator/helpers/inverterData.js';
 
 const logger = pinoLogger.child({ module: 'SunSpecInverterPoller' });
 
 export class SunSpecInverterPoller extends EventEmitter<{
-    data: [
-        {
-            invertersData: {
-                inverter: InverterModel;
-                nameplate: NameplateModel;
-                settings: SettingsModel;
-                status: StatusModel;
-                controls: ControlsModel;
-            }[];
-            derSample: DerSample;
-        },
-    ];
+    data: [InvertersPolledData];
 }> {
     private invertersConnections: InverterSunSpecConnection[];
 
@@ -44,7 +28,7 @@ export class SunSpecInverterPoller extends EventEmitter<{
         const start = performance.now();
 
         try {
-            const invertersData = await Promise.all(
+            const invertersModelData = await Promise.all(
                 this.invertersConnections.map(async (inverter) => {
                     // it's not practical to parallelize these calls because the ModBus connection can only practically handle one request at a time
                     // the best we can do is parallelize multiple inverters and meters which are independent connections
@@ -58,10 +42,14 @@ export class SunSpecInverterPoller extends EventEmitter<{
                 }),
             );
 
-            logger.trace({ invertersData }, 'received data');
+            logger.trace({ invertersModelData }, 'received data');
+
+            const invertersData = invertersModelData.map((data) =>
+                generateInverterData(data),
+            );
 
             const derSample = generateDerSample({
-                inverters: invertersData.map(({ inverter }) => inverter),
+                invertersData,
             });
 
             logger.trace({ derSample }, 'generated DER sample');
@@ -90,31 +78,4 @@ export class SunSpecInverterPoller extends EventEmitter<{
             }, delay);
         }
     }
-}
-
-export function generateDerSample({
-    inverters,
-}: {
-    inverters: InverterModel[];
-}): DerSample {
-    const aggregatedInverterMetrics = getAggregatedInverterMetrics(inverters);
-
-    return {
-        date: new Date(),
-        realPower: {
-            type: 'noPhase',
-            value: aggregatedInverterMetrics.W,
-        },
-        reactivePower: {
-            type: 'noPhase',
-            value: aggregatedInverterMetrics.VAr ?? 0,
-        },
-        voltage: {
-            type: 'perPhase',
-            phaseA: assertNonNull(aggregatedInverterMetrics.PhVphA),
-            phaseB: aggregatedInverterMetrics.PhVphB,
-            phaseC: aggregatedInverterMetrics.PhVphC,
-        },
-        frequency: aggregatedInverterMetrics.Hz,
-    };
 }
