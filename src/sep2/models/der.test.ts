@@ -17,16 +17,16 @@ it('should parse DER XML object', async () => {
     const der = parseDerXmlObject(derXmlObject);
 
     expect(der.subscribable).toBe(false);
-    expect(der.derAvailabilityLink.href).toBe(
+    expect(der.derAvailabilityLink?.href).toBe(
         '/api/v2/edev/_EQLDEV3/der/_EQLDEV3/dera',
     );
-    expect(der.derCapabilityLink.href).toBe(
+    expect(der.derCapabilityLink?.href).toBe(
         '/api/v2/edev/_EQLDEV3/der/_EQLDEV3/dercap',
     );
-    expect(der.derSettingsLink.href).toBe(
+    expect(der.derSettingsLink?.href).toBe(
         '/api/v2/edev/_EQLDEV3/der/_EQLDEV3/derg',
     );
-    expect(der.derStatusLink.href).toBe(
+    expect(der.derStatusLink?.href).toBe(
         '/api/v2/edev/_EQLDEV3/der/_EQLDEV3/ders',
     );
 });

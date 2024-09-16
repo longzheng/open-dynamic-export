@@ -5,24 +5,28 @@ import {
 } from './subscribableResource.js';
 
 export type DER = {
-    derAvailabilityLink: Link;
-    derCapabilityLink: Link;
-    derSettingsLink: Link;
-    derStatusLink: Link;
+    derAvailabilityLink: Link | undefined;
+    derCapabilityLink: Link | undefined;
+    derSettingsLink: Link | undefined;
+    derStatusLink: Link | undefined;
 } & SubscribableResource;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerXmlObject(xmlObject: any): DER {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
-    const derAvailabilityLink = parseLinkXmlObject(
-        xmlObject['DERAvailabilityLink'][0],
-    );
-    const derCapabilityLink = parseLinkXmlObject(
-        xmlObject['DERCapabilityLink'][0],
-    );
-    const derSettingsLink = parseLinkXmlObject(xmlObject['DERSettingsLink'][0]);
-    const derStatusLink = parseLinkXmlObject(xmlObject['DERStatusLink'][0]);
+    const derAvailabilityLink = xmlObject['DERAvailabilityLink']
+        ? parseLinkXmlObject(xmlObject['DERAvailabilityLink'][0])
+        : undefined;
+    const derCapabilityLink = xmlObject['DERCapabilityLink']
+        ? parseLinkXmlObject(xmlObject['DERCapabilityLink'][0])
+        : undefined;
+    const derSettingsLink = xmlObject['DERSettingsLink']
+        ? parseLinkXmlObject(xmlObject['DERSettingsLink'][0])
+        : undefined;
+    const derStatusLink = xmlObject['DERStatusLink']
+        ? parseLinkXmlObject(xmlObject['DERStatusLink'][0])
+        : undefined;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
