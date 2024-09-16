@@ -2,15 +2,13 @@ import type { InverterSunSpecConnection } from './connection/inverter.js';
 import EventEmitter from 'events';
 import { logger as pinoLogger } from '../helpers/logger.js';
 import { generateDerSample } from '../coordinator/helpers/derSample.js';
-import {
-    generateInverterData,
-    type InvertersData,
-} from '../coordinator/helpers/inverterData.js';
+import type { InvertersPolledData } from '../coordinator/helpers/inverterData.js';
+import { generateInverterData } from '../coordinator/helpers/inverterData.js';
 
 const logger = pinoLogger.child({ module: 'SunSpecInverterPoller' });
 
 export class SunSpecInverterPoller extends EventEmitter<{
-    data: [InvertersData];
+    data: [InvertersPolledData];
 }> {
     private invertersConnections: InverterSunSpecConnection[];
 
@@ -30,7 +28,7 @@ export class SunSpecInverterPoller extends EventEmitter<{
         const start = performance.now();
 
         try {
-            const invertersData = await Promise.all(
+            const invertersModelData = await Promise.all(
                 this.invertersConnections.map(async (inverter) => {
                     // it's not practical to parallelize these calls because the ModBus connection can only practically handle one request at a time
                     // the best we can do is parallelize multiple inverters and meters which are independent connections
@@ -44,14 +42,14 @@ export class SunSpecInverterPoller extends EventEmitter<{
                 }),
             );
 
-            logger.trace({ invertersData }, 'received data');
+            logger.trace({ invertersModelData }, 'received data');
 
-            const inverters = invertersData.map((data) =>
+            const invertersData = invertersModelData.map((data) =>
                 generateInverterData(data),
             );
 
             const derSample = generateDerSample({
-                inverters: invertersData.map(({ inverter }) => inverter),
+                invertersData,
             });
 
             logger.trace({ derSample }, 'generated DER sample');
@@ -61,7 +59,7 @@ export class SunSpecInverterPoller extends EventEmitter<{
             logger.trace({ duration: end - start }, 'run time');
 
             this.emit('data', {
-                inverters,
+                invertersData,
                 derSample,
             });
         } catch (error) {

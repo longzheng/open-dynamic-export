@@ -73,14 +73,14 @@ export function createCoordinator(): Coordinator {
         limiters,
     });
 
-    sunSpecInverterPoller.on('data', ({ inverters, derSample }) => {
+    sunSpecInverterPoller.on('data', ({ invertersData, derSample }) => {
         writeDerSamplePoints(derSample);
 
-        sep2?.derHelper.onInverterData(inverters);
+        sep2?.derHelper.onInverterData(invertersData);
         sep2?.mirrorUsagePointListHelper.addDerSample(derSample);
 
         inverterController.updateSunSpecInverterData({
-            inverters,
+            invertersData,
             derSample,
         });
     });

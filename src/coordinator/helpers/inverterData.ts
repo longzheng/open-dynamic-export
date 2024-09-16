@@ -1,4 +1,5 @@
 import { enumHasValue } from '../../helpers/enum.js';
+import { assertNonNull } from '../../helpers/null.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
 import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
@@ -14,7 +15,14 @@ import { PVConn } from '../../sunspec/models/status.js';
 import type { DerSample } from './derSample.js';
 
 export type InverterData = {
-    solarWatts: number;
+    inverter: {
+        realPower: number;
+        reactivePower: number;
+        voltagePhaseA: number;
+        voltagePhaseB: number | null;
+        voltagePhaseC: number | null;
+        frequency: number;
+    };
     nameplate: {
         type: DERTyp;
         maxW: number;
@@ -33,8 +41,8 @@ export type InverterData = {
     controls: ControlsModel;
 };
 
-export type InvertersData = {
-    inverters: InverterData[];
+export type InvertersPolledData = {
+    invertersData: InverterData[];
     derSample: DerSample;
 };
 
@@ -56,7 +64,14 @@ export function generateInverterData({
     const settingsMetrics = getSettingsMetrics(settings);
 
     return {
-        solarWatts: inverterMetrics.W,
+        inverter: {
+            realPower: inverterMetrics.W,
+            reactivePower: inverterMetrics.VAr ?? 0,
+            voltagePhaseA: assertNonNull(inverterMetrics.PhVphA),
+            voltagePhaseB: inverterMetrics.PhVphB,
+            voltagePhaseC: inverterMetrics.PhVphC,
+            frequency: inverterMetrics.Hz,
+        },
         nameplate: {
             type: nameplate.DERTyp,
             maxW: nameplateMetrics.WRtg,

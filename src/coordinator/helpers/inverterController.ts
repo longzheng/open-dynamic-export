@@ -21,7 +21,7 @@ import type { RampRateHelper } from './rampRate.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { LimiterType } from './limiter.js';
 import type { SiteSample } from '../../meters/siteSample.js';
-import type { InvertersData } from './inverterData.js';
+import type { InvertersPolledData } from './inverterData.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -55,7 +55,7 @@ const defaultValues = {
 
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];
-    private cachedInvertersData: InvertersData | null = null;
+    private cachedInvertersData: InvertersPolledData | null = null;
     private cachedSiteSample: SiteSample | null = null;
     private applyControl: boolean;
     private logger: Logger;
@@ -83,7 +83,7 @@ export class InverterController {
         void this.startLoop();
     }
 
-    updateSunSpecInverterData(data: InvertersData) {
+    updateSunSpecInverterData(data: InvertersPolledData) {
         this.logger.debug('Received inverter data, updating inverter controls');
         this.cachedInvertersData = data;
     }
@@ -160,7 +160,8 @@ export class InverterController {
         await Promise.all(
             this.inverterConnections.map(async (inverter, index) => {
                 // assume the inverter data is in the same order as the connections
-                const inverterData = this.cachedInvertersData?.inverters[index];
+                const inverterData =
+                    this.cachedInvertersData?.invertersData[index];
 
                 if (!inverterData) {
                     throw new Error('Inverter data not found');
@@ -194,7 +195,7 @@ export function calculateInverterConfiguration({
     rampRateHelper,
 }: {
     activeControlLimit: InverterControlLimit;
-    invertersData: InvertersData;
+    invertersData: InvertersPolledData;
     siteSample: SiteSample;
     rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
@@ -240,7 +241,7 @@ export function calculateInverterConfiguration({
     );
 
     const currentPowerRatio = getCurrentPowerRatio({
-        inverters: invertersData.inverters,
+        inverters: invertersData.invertersData,
         currentSolarWatts: solarWatts,
     });
 
@@ -370,11 +371,11 @@ export function getCurrentPowerRatio({
     inverters,
     currentSolarWatts,
 }: {
-    inverters: InvertersData['inverters'];
+    inverters: InvertersPolledData['invertersData'];
     currentSolarWatts: number;
 }) {
     return averageNumbersArray(
-        inverters.map(({ controls, solarWatts, nameplate }, invertersIndex) => {
+        inverters.map(({ controls, inverter, nameplate }, invertersIndex) => {
             // if the WMaxLim_Ena is not enabled, we are not yet controlling the inverter
             // we're not sure if the inverter is under any control that is invisible to SunSpec (e.g. export limit) that might be affecting the output
             // so we can't know definitely what the "actual" power ratio is
@@ -384,7 +385,7 @@ export function getCurrentPowerRatio({
             // which is a safe assumption, but we hope future update cycles will find the "correct" power ratio
             if (controls.WMaxLim_Ena !== WMaxLim_Ena.ENABLED) {
                 const estimatedPowerRatio = Math.min(
-                    solarWatts / nameplate.maxW,
+                    inverter.realPower / nameplate.maxW,
                     1, // cap maximum to 1 (possible due to inverter overclocking)
                 );
 

@@ -9,8 +9,7 @@ import {
     averageNumbersNullableArray,
     sumNumbersArray,
 } from '../../helpers/number.js';
-import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
-import type { InverterModel } from '../../sunspec/models/inverter.js';
+import type { InverterData } from './inverterData.js';
 import type { SampleBase } from './sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
@@ -24,40 +23,40 @@ export type DerSampleData = {
 export type DerSample = SampleBase & DerSampleData;
 
 export function generateDerSample({
-    inverters,
+    invertersData,
 }: {
-    inverters: InverterModel[];
+    invertersData: Pick<InverterData, 'inverter'>[];
 }): DerSample {
-    const inverterMetrics = inverters.map(getInverterMetrics);
-
     return {
         date: new Date(),
         realPower: {
             type: 'noPhase',
-            value: sumNumbersArray(inverterMetrics.map((metrics) => metrics.W)),
+            value: sumNumbersArray(
+                invertersData.map((data) => data.inverter.realPower),
+            ),
         },
         reactivePower: {
             type: 'noPhase',
             value: sumNumbersArray(
-                inverterMetrics.map((metrics) => metrics.VAr ?? 0),
+                invertersData.map((data) => data.inverter.reactivePower),
             ),
         },
         voltage: {
             type: 'perPhase',
             phaseA: assertNonNull(
                 averageNumbersNullableArray(
-                    inverterMetrics.map((metrics) => metrics.PhVphA),
+                    invertersData.map((data) => data.inverter.voltagePhaseA),
                 ),
             ),
             phaseB: averageNumbersNullableArray(
-                inverterMetrics.map((metrics) => metrics.PhVphB),
+                invertersData.map((data) => data.inverter.voltagePhaseB),
             ),
             phaseC: averageNumbersNullableArray(
-                inverterMetrics.map((metrics) => metrics.PhVphC),
+                invertersData.map((data) => data.inverter.voltagePhaseC),
             ),
         },
         frequency: averageNumbersArray(
-            inverterMetrics.map((metrics) => metrics.Hz),
+            invertersData.map((data) => data.inverter.frequency),
         ),
     };
 }
