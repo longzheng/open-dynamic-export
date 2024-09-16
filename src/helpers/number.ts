@@ -45,6 +45,10 @@ export function sumNumbersNullableArray(numbers: (number | null)[]) {
 }
 
 export function averageNumbersArray(numbers: number[]) {
+    if (numbers.length === 0) {
+        return 0;
+    }
+
     return new Decimal(sumNumbersArray(numbers)).div(numbers.length).toNumber();
 }
 

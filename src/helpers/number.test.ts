@@ -68,6 +68,11 @@ describe('averageNumbersArray', () => {
         const result = averageNumbersArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.2);
     });
+
+    it('should return 0 if emtpy array', () => {
+        const result = averageNumbersArray([]);
+        expect(result).toBe(0);
+    });
 });
 
 describe('averageNumbersNullableArray', () => {
