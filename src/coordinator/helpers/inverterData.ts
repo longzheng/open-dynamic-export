@@ -1,5 +1,4 @@
 import { enumHasValue } from '../../helpers/enum.js';
-import { assertNonNull } from '../../helpers/null.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
 import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
@@ -67,7 +66,7 @@ export function generateInverterData({
         inverter: {
             realPower: inverterMetrics.W,
             reactivePower: inverterMetrics.VAr ?? 0,
-            voltagePhaseA: assertNonNull(inverterMetrics.PhVphA),
+            voltagePhaseA: inverterMetrics.PhVphA,
             voltagePhaseB: inverterMetrics.PhVphB,
             voltagePhaseC: inverterMetrics.PhVphC,
             frequency: inverterMetrics.Hz,

@@ -3,7 +3,6 @@ import type {
     PerPhaseMeasurement,
     PerPhaseNetMeasurement,
 } from '../../helpers/measurement.js';
-import { assertNonNull } from '../../helpers/null.js';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
@@ -43,10 +42,8 @@ export function generateDerSample({
         },
         voltage: {
             type: 'perPhase',
-            phaseA: assertNonNull(
-                averageNumbersNullableArray(
-                    invertersData.map((data) => data.inverter.voltagePhaseA),
-                ),
+            phaseA: averageNumbersArray(
+                invertersData.map((data) => data.inverter.voltagePhaseA),
             ),
             phaseB: averageNumbersNullableArray(
                 invertersData.map((data) => data.inverter.voltagePhaseB),

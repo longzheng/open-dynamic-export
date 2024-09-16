@@ -17,7 +17,7 @@ export function getInverterMetrics(inverter: InverterModel) {
         PPVphAB: numberNullableWithPow10(inverter.PPVphAB, inverter.V_SF),
         PPVphBC: numberNullableWithPow10(inverter.PPVphBC, inverter.V_SF),
         PPVphCA: numberNullableWithPow10(inverter.PPVphCA, inverter.V_SF),
-        PhVphA: numberNullableWithPow10(inverter.PhVphA, inverter.V_SF),
+        PhVphA: numberWithPow10(inverter.PhVphA, inverter.V_SF),
         PhVphB: numberNullableWithPow10(inverter.PhVphB, inverter.V_SF),
         PhVphC: numberNullableWithPow10(inverter.PhVphC, inverter.V_SF),
         W: numberWithPow10(inverter.W, inverter.W_SF),
