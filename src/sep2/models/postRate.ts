@@ -9,8 +9,8 @@ export function parsePostRateXmlObject(
     xmlObject: any,
 ): PostRate {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const postRate = xmlObject['$']['postRate']
-        ? safeParseIntString(assertString(xmlObject['$']['postRate']))
+    const postRate = xmlObject['postRate']
+        ? safeParseIntString(assertString(xmlObject['postRate'][0]))
         : null;
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
