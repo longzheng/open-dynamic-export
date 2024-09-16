@@ -18,26 +18,15 @@ import { getTotalFromPerPhaseNetOrNoPhaseMeasurement } from '../../helpers/measu
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { RampRateHelper } from './rampRate.js';
-import type { NameplateModel } from '../../sunspec/models/nameplate.js';
-import type { InverterModel } from '../../sunspec/models/inverter.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { LimiterType } from './limiter.js';
 import type { SiteSample } from '../../meters/siteSample.js';
-import type { DerSample } from './derSample.js';
+import type { InvertersData } from './inverterData.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
     'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
 >;
-
-type SunSpecInverterData = {
-    inverters: {
-        inverter: InverterModel;
-        nameplate: NameplateModel;
-        controls: ControlsModel;
-    }[];
-    derSample: DerSample;
-};
 
 export type InverterControlLimit = {
     opModEnergize: boolean | undefined;
@@ -66,7 +55,7 @@ const defaultValues = {
 
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];
-    private cachedSunSpecData: SunSpecInverterData | null = null;
+    private cachedInvertersData: InvertersData | null = null;
     private cachedSiteSample: SiteSample | null = null;
     private applyControl: boolean;
     private logger: Logger;
@@ -94,9 +83,9 @@ export class InverterController {
         void this.startLoop();
     }
 
-    updateSunSpecInverterData(data: SunSpecInverterData) {
+    updateSunSpecInverterData(data: InvertersData) {
         this.logger.debug('Received inverter data, updating inverter controls');
-        this.cachedSunSpecData = data;
+        this.cachedInvertersData = data;
     }
 
     updateSiteSample(siteSample: SiteSample) {
@@ -136,7 +125,7 @@ export class InverterController {
     }
 
     private async updateInverterControlValues() {
-        if (!this.cachedSunSpecData) {
+        if (!this.cachedInvertersData) {
             this.logger.warn(
                 'Inverter data is not cached, cannot update inverter controls yet. Wait for next loop.',
             );
@@ -155,7 +144,7 @@ export class InverterController {
 
         const inverterConfiguration = calculateInverterConfiguration({
             activeControlLimit: getActiveInverterControlLimit,
-            sunSpecData: this.cachedSunSpecData,
+            invertersData: this.cachedInvertersData,
             siteSample: this.cachedSiteSample,
             rampRateHelper: this.rampRateHelper,
         });
@@ -171,7 +160,7 @@ export class InverterController {
         await Promise.all(
             this.inverterConnections.map(async (inverter, index) => {
                 // assume the inverter data is in the same order as the connections
-                const inverterData = this.cachedSunSpecData?.inverters[index];
+                const inverterData = this.cachedInvertersData?.inverters[index];
 
                 if (!inverterData) {
                     throw new Error('Inverter data not found');
@@ -200,12 +189,12 @@ export class InverterController {
 
 export function calculateInverterConfiguration({
     activeControlLimit,
-    sunSpecData,
+    invertersData,
     siteSample,
     rampRateHelper,
 }: {
     activeControlLimit: InverterControlLimit;
-    sunSpecData: SunSpecInverterData;
+    invertersData: InvertersData;
     siteSample: SiteSample;
     rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
@@ -228,7 +217,7 @@ export function calculateInverterConfiguration({
         siteSample.realPower,
     );
     const solarWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-        sunSpecData.derSample.realPower,
+        invertersData.derSample.realPower,
     );
 
     const exportLimitWatts =
@@ -251,7 +240,7 @@ export function calculateInverterConfiguration({
     );
 
     const currentPowerRatio = getCurrentPowerRatio({
-        inverters: sunSpecData.inverters,
+        inverters: invertersData.inverters,
         currentSolarWatts: solarWatts,
     });
 
@@ -381,11 +370,11 @@ export function getCurrentPowerRatio({
     inverters,
     currentSolarWatts,
 }: {
-    inverters: SunSpecInverterData['inverters'];
+    inverters: InvertersData['inverters'];
     currentSolarWatts: number;
 }) {
     return averageNumbersArray(
-        inverters.map(({ controls, inverter, nameplate }, invertersIndex) => {
+        inverters.map(({ controls, solarWatts, nameplate }, invertersIndex) => {
             // if the WMaxLim_Ena is not enabled, we are not yet controlling the inverter
             // we're not sure if the inverter is under any control that is invisible to SunSpec (e.g. export limit) that might be affecting the output
             // so we can't know definitely what the "actual" power ratio is
@@ -394,15 +383,8 @@ export function getCurrentPowerRatio({
             // because it will never be 100% efficient, this means that we should always underestimate the power ratio
             // which is a safe assumption, but we hope future update cycles will find the "correct" power ratio
             if (controls.WMaxLim_Ena !== WMaxLim_Ena.ENABLED) {
-                const solarWatts = numberWithPow10(inverter.W, inverter.W_SF);
-
-                const nameplateWatts = numberWithPow10(
-                    nameplate.WRtg,
-                    nameplate.WRtg_SF,
-                );
-
                 const estimatedPowerRatio = Math.min(
-                    solarWatts / nameplateWatts,
+                    solarWatts / nameplate.maxW,
                     1, // cap maximum to 1 (possible due to inverter overclocking)
                 );
 
@@ -413,7 +395,7 @@ export function getCurrentPowerRatio({
                             4,
                         ),
                         currentSolarWatts,
-                        nameplateWatts,
+                        nameplate,
                         invertersIndex,
                     },
                     'WMaxLim_Ena is not enabled, estimated power ratio',

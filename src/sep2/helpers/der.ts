@@ -11,23 +11,25 @@ import {
 import { objectToXml } from './xml.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
-import { DERTyp, type NameplateModel } from '../../sunspec/models/nameplate.js';
-import type { SettingsModel } from '../../sunspec/models/settings.js';
-import { PVConn, type StatusModel } from '../../sunspec/models/status.js';
+import { PVConn } from '../../sunspec/models/status.js';
 import type { PollRate } from '../models/pollRate.js';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import deepEqual from 'fast-deep-equal';
 import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
 import { DERControlType } from '../models/derControlType.js';
 import { enumHasValue } from '../../helpers/enum.js';
-import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
-import { getAggregatedNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
-import { getAggregatedSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
-import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
+import {
+    convertNumberToBaseAndPow10Exponent,
+    sumNumbersArray,
+    sumNumbersNullableArray,
+} from '../../helpers/number.js';
 import { ConnectStatus } from '../models/connectStatus.js';
 import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
-import { DERType } from '../models/derType.js';
-import { OperationalModeStatus } from '../models/operationModeStatus.js';
+import type { OperationalModeStatus } from '../models/operationModeStatus.js';
+import {
+    generateInverterDataStatus,
+    type InverterData,
+} from '../../coordinator/helpers/inverterData.js';
 
 type Config = {
     der: DER;
@@ -73,16 +75,8 @@ export class DerHelper {
         }
     }
 
-    public onInverterData(
-        data: {
-            nameplate: NameplateModel;
-            settings: SettingsModel;
-            status: StatusModel;
-        }[],
-    ) {
-        const derCapability = getDerCapabilityResponseFromSunSpecArray(
-            data.map((data) => data.nameplate),
-        );
+    public onInverterData(data: InverterData[]) {
+        const derCapability = getDerCapabilityResponseFromInverterData(data);
 
         this.logger.trace(
             {
@@ -103,8 +97,8 @@ export class DerHelper {
             this.lastSentDerCapability = derCapability;
         }
 
-        const derSettings = getDerSettingsResponseFromSunSpecArray({
-            settingsModels: data.map((data) => data.settings),
+        const derSettings = getDerSettingsResponseFromInverterData({
+            data,
             rampRateHelper: this.rampRateHelper,
         });
 
@@ -122,9 +116,7 @@ export class DerHelper {
             this.lastSentDerSettings = derSettings;
         }
 
-        const derStatus = getDerStatusResponseFromSunSpecArray(
-            data.map((data) => data.status),
-        );
+        const derStatus = getDerStatusResponseFromInverterData(data);
 
         this.logger.trace(
             {
@@ -161,9 +153,11 @@ export class DerHelper {
                 }),
             );
 
-            const derStatus = getDerStatusResponseFromSunSpecArray(
-                inverterData.map((data) => data.status),
-            );
+            const data = inverterData.map((data) => ({
+                status: generateInverterDataStatus(data),
+            }));
+
+            const derStatus = getDerStatusResponseFromInverterData(data);
 
             void this.putDerStatus({ derStatus });
 
@@ -274,13 +268,20 @@ export class DerHelper {
 const derControlTypeModes: DERControlType =
     DERControlType.opModConnect | DERControlType.opModEnergize;
 
-export function getDerCapabilityResponseFromSunSpecArray(
-    nameplateModels: NameplateModel[],
+export function getDerCapabilityResponseFromInverterData(
+    data: Pick<InverterData, 'nameplate'>[],
 ): DERCapability {
-    const metrics = getAggregatedNameplateMetrics(nameplateModels);
-    const rtgMaxVA = convertNumberToBaseAndPow10Exponent(metrics.VARtg);
-    const rtgMaxW = convertNumberToBaseAndPow10Exponent(metrics.WRtg);
-    const rtgMaxVar = convertNumberToBaseAndPow10Exponent(metrics.VArRtgQ1);
+    // get the highest DERTyp value
+    const type = Math.max(...data.map((d) => d.nameplate.type));
+    const rtgMaxVA = convertNumberToBaseAndPow10Exponent(
+        sumNumbersArray(data.map((d) => d.nameplate.maxVA)),
+    );
+    const rtgMaxW = convertNumberToBaseAndPow10Exponent(
+        sumNumbersArray(data.map((d) => d.nameplate.maxW)),
+    );
+    const rtgMaxVar = convertNumberToBaseAndPow10Exponent(
+        sumNumbersArray(data.map((d) => d.nameplate.maxVar)),
+    );
 
     return {
         // hard-coded modes
@@ -289,14 +290,7 @@ export function getDerCapabilityResponseFromSunSpecArray(
         doeModesSupported:
             DOEModesSupportedType.opModExpLimW |
             DOEModesSupportedType.opModGenLimW,
-        type: (() => {
-            switch (metrics.DERTyp) {
-                case DERTyp.PV:
-                    return DERType.PhotovoltaicSystem;
-                case DERTyp.PV_STOR:
-                    return DERType.CombinedPVAndStorage;
-            }
-        })(),
+        type,
         rtgMaxVA: {
             value: rtgMaxVA.base,
             multiplier: rtgMaxVA.pow10,
@@ -312,20 +306,21 @@ export function getDerCapabilityResponseFromSunSpecArray(
     };
 }
 
-export function getDerSettingsResponseFromSunSpecArray({
-    settingsModels,
+export function getDerSettingsResponseFromInverterData({
+    data,
     rampRateHelper,
 }: {
-    settingsModels: SettingsModel[];
+    data: InverterData[];
     rampRateHelper: RampRateHelper;
 }): DERSettings {
-    const metrics = getAggregatedSettingsMetrics(settingsModels);
-    const setMaxVA = metrics.VAMax
-        ? convertNumberToBaseAndPow10Exponent(metrics.VAMax)
-        : null;
-    const setMaxW = convertNumberToBaseAndPow10Exponent(metrics.WMax);
-    const setMaxVar = metrics.VArMaxQ1
-        ? convertNumberToBaseAndPow10Exponent(metrics.VArMaxQ1)
+    const maxVA = sumNumbersNullableArray(data.map((d) => d.settings.maxVA));
+    const setMaxVA = maxVA ? convertNumberToBaseAndPow10Exponent(maxVA) : null;
+    const setMaxW = convertNumberToBaseAndPow10Exponent(
+        sumNumbersArray(data.map((d) => d.settings.maxW)),
+    );
+    const maxVar = sumNumbersNullableArray(data.map((d) => d.settings.maxVar));
+    const setMaxVar = maxVar
+        ? convertNumberToBaseAndPow10Exponent(maxVar)
         : null;
 
     return {
@@ -354,19 +349,15 @@ export function getDerSettingsResponseFromSunSpecArray({
     };
 }
 
-export function getDerStatusResponseFromSunSpecArray(
-    statusModels: StatusModel[],
+export function getDerStatusResponseFromInverterData(
+    data: Pick<InverterData, 'status'>[],
 ): DERStatus {
-    const metrics = getAggregatedStatusMetrics(statusModels);
     const now = new Date();
-    const operationalModeStatus: OperationalModeStatus = enumHasValue(
-        metrics.PVConn,
-        PVConn.CONNECTED,
-    )
-        ? OperationalModeStatus.OperationalMode
-        : OperationalModeStatus.Off;
-    const genConnectStatus: ConnectStatus = getConnectStatusFromPVConn(
-        metrics.PVConn,
+    const operationalModeStatus: OperationalModeStatus = Math.max(
+        ...data.map((d) => d.status.operationalModeStatus),
+    );
+    const genConnectStatus: ConnectStatus = Math.max(
+        ...data.map((d) => d.status.genConnectStatus),
     );
 
     return {
