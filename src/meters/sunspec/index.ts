@@ -4,6 +4,7 @@ import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { assertNonNull } from '../../helpers/null.js';
 import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
 import type { MeterModel } from '../../sunspec/models/meter.js';
+import type { Result } from '../../helpers/result.js';
 
 export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     private meterConnection: MeterSunSpecConnection;
@@ -20,16 +21,27 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSampleData(): Promise<SiteSampleData> {
-        const meterModel = await this.meterConnection.getMeterModel();
+    override async getSiteSampleData(): Promise<Result<SiteSampleData>> {
+        try {
+            const meterModel = await this.meterConnection.getMeterModel();
 
-        this.logger.trace({ meterModel }, 'received data');
+            this.logger.trace({ meterModel }, 'received data');
 
-        const siteSample = generateSiteSample({
-            meter: meterModel,
-        });
+            const siteSample = generateSiteSample({
+                meter: meterModel,
+            });
 
-        return siteSample;
+            return { success: true, value: siteSample };
+        } catch (error) {
+            return {
+                success: false,
+                error: new Error(
+                    `Error loading SunSpec meter data: ${
+                        error instanceof Error ? error.message : 'Unknown error'
+                    }`,
+                ),
+            };
+        }
     }
 
     override onDestroy() {

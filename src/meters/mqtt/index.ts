@@ -4,6 +4,7 @@ import type { z } from 'zod';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { SiteSampleData } from '../siteSample.js';
 import { siteSampleDataSchema } from '../siteSample.js';
+import type { Result } from '../../helpers/result.js';
 
 export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     private client: mqtt.MqttClient;
@@ -45,8 +46,15 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
-    override async getSiteSampleData(): Promise<SiteSampleData | null> {
-        return this.cachedMessage;
+    override async getSiteSampleData(): Promise<Result<SiteSampleData>> {
+        if (!this.cachedMessage) {
+            return {
+                success: false,
+                error: new Error('No site sample data on MQTT'),
+            };
+        }
+
+        return { success: true, value: this.cachedMessage };
     }
 
     override onDestroy() {

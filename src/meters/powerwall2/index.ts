@@ -4,6 +4,7 @@ import { Powerwall2Client } from './client.js';
 import type { z } from 'zod';
 import type { metersSiteSchema } from './api.js';
 import type { Config } from '../../helpers/config.js';
+import type { Result } from '../../helpers/result.js';
 
 export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;
@@ -26,16 +27,25 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSampleData(): Promise<SiteSampleData | null> {
-        const metersSiteData = await this.client.getMetersSite();
+    override async getSiteSampleData(): Promise<Result<SiteSampleData>> {
+        try {
+            const metersSiteData = await this.client.getMetersSite();
 
-        this.logger.trace({ metersSiteData }, 'received data');
+            this.logger.trace({ metersSiteData }, 'received data');
 
-        const siteSample = generateSiteSample({
-            meter: metersSiteData,
-        });
+            const siteSample = generateSiteSample({
+                meter: metersSiteData,
+            });
 
-        return siteSample;
+            return { success: true, value: siteSample };
+        } catch (error) {
+            return {
+                success: false,
+                error: new Error(
+                    `Error loading Powerwall2 data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                ),
+            };
+        }
     }
 
     override onDestroy() {}
