@@ -171,16 +171,16 @@ describe('generateMirrorUsagePointResponse', () => {
         <nextUpdateTime>1659657180</nextUpdateTime>
         <version>0</version>
         <Reading>
-            <qualityFlags>0001</qualityFlags>
             <value>1500</value>
+            <qualityFlags>0001</qualityFlags>
         </Reading>
         <ReadingType>
             <commodity>1</commodity>
             <kind>37</kind>
             <dataQualifier>2</dataQualifier>
             <flowDirection>19</flowDirection>
-            <powerOfTenMultiplier>0</powerOfTenMultiplier>
             <intervalLength>300</intervalLength>
+            <powerOfTenMultiplier>0</powerOfTenMultiplier>
             <uom>38</uom>
             <phase>128</phase>
         </ReadingType>
@@ -192,16 +192,16 @@ describe('generateMirrorUsagePointResponse', () => {
         <nextUpdateTime>1659657180</nextUpdateTime>
         <version>0</version>
         <Reading>
-            <qualityFlags>0001</qualityFlags>
             <value>1500</value>
+            <qualityFlags>0001</qualityFlags>
         </Reading>
         <ReadingType>
             <commodity>1</commodity>
             <kind>37</kind>
             <dataQualifier>2</dataQualifier>
             <flowDirection>19</flowDirection>
-            <powerOfTenMultiplier>0</powerOfTenMultiplier>
             <intervalLength>300</intervalLength>
+            <powerOfTenMultiplier>0</powerOfTenMultiplier>
             <uom>38</uom>
             <phase>64</phase>
         </ReadingType>

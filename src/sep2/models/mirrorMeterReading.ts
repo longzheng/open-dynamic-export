@@ -9,22 +9,23 @@ import { PhaseCode } from './phaseCode.js';
 import type { QualityFlags } from './qualityFlags.js';
 import type { UomType } from './uomType.js';
 import type { IdentifiedObject } from './identifiedObject.js';
+import type { DateTimeInterval } from './dateTimeInterval.js';
 
 export type MirrorMeterReading = {
     lastUpdateTime: Date;
     nextUpdateTime: Date;
-    Reading: {
-        qualityFlags: QualityFlags;
+    Reading?: {
+        timePeriod?: DateTimeInterval;
+        qualityFlags?: QualityFlags;
         value: number;
     };
-    ReadingType: {
+    ReadingType?: {
         commodity: CommodityType;
         kind: KindType;
         dataQualifier: DataQualifierType;
         flowDirection: FlowDirectionType;
         phase: PhaseCode;
         powerOfTenMultiplier: number;
-        // Default interval length specified in seconds.
         intervalLength: number;
         uom: UomType;
     };
@@ -60,31 +61,51 @@ export function generateMirrorMeterReadingObject({
         lastUpdateTime: dateToStringSeconds(lastUpdateTime),
         nextUpdateTime: dateToStringSeconds(nextUpdateTime),
         version,
-        Reading: {
-            qualityFlags: numberToHex(Reading.qualityFlags).padStart(4, '0'),
+    };
+
+    if (Reading) {
+        response['Reading'] = {
             value: Reading.value,
-        },
-        ReadingType: {
+        };
+
+        if (Reading.qualityFlags) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            response['Reading']['qualityFlags'] = numberToHex(
+                Reading.qualityFlags,
+            ).padStart(4, '0');
+        }
+
+        if (Reading.timePeriod) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            response['Reading']['timePeriod'] = {
+                start: dateToStringSeconds(Reading.timePeriod.start),
+                duration: Reading.timePeriod.duration,
+            };
+        }
+    }
+
+    if (ReadingType) {
+        response['ReadingType'] = {
             commodity: ReadingType.commodity,
             kind: ReadingType.kind,
             dataQualifier: ReadingType.dataQualifier,
             flowDirection: ReadingType.flowDirection,
-            powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
             intervalLength: ReadingType.intervalLength,
+            powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
             uom: ReadingType.uom,
-        },
-    };
+        };
 
-    // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
-    // conditionally set phase if it's not 0
-    // {
-    //     "error": true,
-    //     "statusCode": "ERR-MONITOR-0000",
-    //     "statusMessage": "Unknown 0 Phase Code!"
-    //   }
-    if (ReadingType.phase !== PhaseCode.NotApplicable) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response['ReadingType'].phase = ReadingType.phase;
+        // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
+        // conditionally set phase if it's not 0
+        // {
+        //     "error": true,
+        //     "statusCode": "ERR-MONITOR-0000",
+        //     "statusMessage": "Unknown 0 Phase Code!"
+        //   }
+        if (ReadingType.phase !== PhaseCode.NotApplicable) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            response['ReadingType'].phase = ReadingType.phase;
+        }
     }
 
     return response;
