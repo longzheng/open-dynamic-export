@@ -10,7 +10,6 @@ import type { QualityFlags } from './qualityFlags.js';
 import type { UomType } from './uomType.js';
 import type { IdentifiedObject } from './identifiedObject.js';
 
-// reading MRID should be a random UUIDv4 with the PEN
 export type MirrorMeterReading = {
     lastUpdateTime: Date;
     nextUpdateTime: Date;
@@ -31,7 +30,21 @@ export type MirrorMeterReading = {
     };
 } & IdentifiedObject;
 
-export function generateMirrorMeterReadingResponse({
+export function generateMirrorMeterReadingResponse(
+    mirrorMeterReading: MirrorMeterReading,
+) {
+    const response = {
+        MirrorMeterReading: {
+            $: { xmlns: xmlns._ },
+            ...generateMirrorMeterReadingObject(mirrorMeterReading),
+        },
+    };
+
+    return response;
+}
+
+// MirrorMeterReading object to be nested inside MirrorUsagePoint
+export function generateMirrorMeterReadingObject({
     mRID,
     description,
     lastUpdateTime,
@@ -41,30 +54,24 @@ export function generateMirrorMeterReadingResponse({
     ReadingType,
 }: MirrorMeterReading) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { MirrorMeterReading: any } = {
-        MirrorMeterReading: {
-            $: { xmlns: xmlns._ },
-            mRID,
-            description,
-            lastUpdateTime: dateToStringSeconds(lastUpdateTime),
-            nextUpdateTime: dateToStringSeconds(nextUpdateTime),
-            version,
-            Reading: {
-                qualityFlags: numberToHex(Reading.qualityFlags).padStart(
-                    4,
-                    '0',
-                ),
-                value: Reading.value,
-            },
-            ReadingType: {
-                commodity: ReadingType.commodity,
-                kind: ReadingType.kind,
-                dataQualifier: ReadingType.dataQualifier,
-                flowDirection: ReadingType.flowDirection,
-                powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
-                intervalLength: ReadingType.intervalLength,
-                uom: ReadingType.uom,
-            },
+    const response: Record<string, any> = {
+        mRID,
+        description,
+        lastUpdateTime: dateToStringSeconds(lastUpdateTime),
+        nextUpdateTime: dateToStringSeconds(nextUpdateTime),
+        version,
+        Reading: {
+            qualityFlags: numberToHex(Reading.qualityFlags).padStart(4, '0'),
+            value: Reading.value,
+        },
+        ReadingType: {
+            commodity: ReadingType.commodity,
+            kind: ReadingType.kind,
+            dataQualifier: ReadingType.dataQualifier,
+            flowDirection: ReadingType.flowDirection,
+            powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
+            intervalLength: ReadingType.intervalLength,
+            uom: ReadingType.uom,
         },
     };
 
@@ -77,7 +84,7 @@ export function generateMirrorMeterReadingResponse({
     //   }
     if (ReadingType.phase !== PhaseCode.NotApplicable) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.MirrorMeterReading.ReadingType.phase = ReadingType.phase;
+        response['ReadingType'].phase = ReadingType.phase;
     }
 
     return response;

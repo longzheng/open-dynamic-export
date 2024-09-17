@@ -1,6 +1,10 @@
 import { numberToHex } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
+import {
+    generateMirrorMeterReadingObject,
+    type MirrorMeterReading,
+} from './mirrorMeterReading.js';
 import { parsePostRateXmlObject, type PostRate } from './postRate.js';
 import {
     parseUsagePointBaseXmlObject,
@@ -10,6 +14,7 @@ import {
 export type MirrorUsagePoint = {
     postRate?: PostRate;
     deviceLFDI: string;
+    mirrorMeterReading?: MirrorMeterReading[];
 } & UsagePointBase;
 
 export function parseMirrorUsagePointXml(
@@ -49,8 +54,10 @@ export function generateMirrorUsagePointResponse({
     serviceCategoryKind,
     status,
     deviceLFDI,
+    mirrorMeterReading,
 }: MirrorUsagePoint) {
-    return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response: { MirrorUsagePoint: any } = {
         MirrorUsagePoint: {
             $: { xmlns: xmlns._ },
             mRID,
@@ -61,4 +68,13 @@ export function generateMirrorUsagePointResponse({
             deviceLFDI,
         },
     };
+
+    if (mirrorMeterReading) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        response.MirrorUsagePoint.MirrorMeterReading = mirrorMeterReading.map(
+            (reading) => generateMirrorMeterReadingObject(reading),
+        );
+    }
+
+    return response;
 }
