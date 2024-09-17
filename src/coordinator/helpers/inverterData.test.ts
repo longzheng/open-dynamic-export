@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { getConnectStatusFromPVConn } from './inverterData.js';
+import { getGenConnectStatusFromPVConn } from './inverterData.js';
 import { PVConn } from '../../sunspec/models/status.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 
-describe('getConnectStatusFromPVConn', () => {
+describe('getGenConnectStatusFromPVConn', () => {
     it('should return value if inverter is disconnected', () => {
-        const result = getConnectStatusFromPVConn(0 as PVConn);
+        const result = getGenConnectStatusFromPVConn(0 as PVConn);
 
         expect(result).toEqual(0 as ConnectStatus);
     });
 
-    it('should return value if inverter is connected, available, operating', () => {
-        const result = getConnectStatusFromPVConn(
-            PVConn.AVAILABLE | PVConn.CONNECTED | PVConn.OPERATING,
+    it('should return correct value if inverter is connected, available, operating', () => {
+        const result = getGenConnectStatusFromPVConn(
+            PVConn.CONNECTED | PVConn.AVAILABLE | PVConn.OPERATING,
         );
 
         expect(result).toEqual(
@@ -20,5 +20,20 @@ describe('getConnectStatusFromPVConn', () => {
                 ConnectStatus.Connected |
                 ConnectStatus.Operating,
         );
+    });
+
+    it('should return correct value if inverter is available, operating (not connected)', () => {
+        const result = getGenConnectStatusFromPVConn(
+            PVConn.AVAILABLE | PVConn.OPERATING,
+        );
+
+        // this is subject to debate
+        // the following is the advise from SAPN
+        // The current SAPN interpretation is that operating would mean operating as expected, in which case it could only be considered operating if it is connected and available. Therefore a connectstatus of 6 would not be possible in our implementation.
+        // Our interpretation would be as follows:
+        // Bit 0: Connected = AC connected
+        // Bit 1: Available = AC connected and available to react to controls to increase or reduce energy dispatch
+        // Bit 2: Operating = Connected, available, and currently observing a powerflow or carrying out a control to increase or reduce energy dispatch (eg. Includes opmodgenlimw = 0 but excludes opmodenergize = false)
+        expect(result).toEqual(0);
     });
 });

@@ -101,27 +101,35 @@ export function generateInverterDataStatus({
         )
             ? OperationalModeStatus.OperationalMode
             : OperationalModeStatus.Off,
-        genConnectStatus: getConnectStatusFromPVConn(statusMetrics.PVConn),
+        genConnectStatus: getGenConnectStatusFromPVConn(statusMetrics.PVConn),
     };
 }
 
-export function getConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
+export function getGenConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
     let result: ConnectStatus = 0 as ConnectStatus;
 
     if (enumHasValue(pvConn, PVConn.CONNECTED)) {
         result += ConnectStatus.Connected;
+    } else {
+        return result;
     }
 
     if (enumHasValue(pvConn, PVConn.AVAILABLE)) {
         result += ConnectStatus.Available;
+    } else {
+        return result;
     }
 
     if (enumHasValue(pvConn, PVConn.OPERATING)) {
         result += ConnectStatus.Operating;
+    } else {
+        return result;
     }
 
     if (enumHasValue(pvConn, PVConn.TEST)) {
         result += ConnectStatus.Test;
+    } else {
+        return result;
     }
 
     return result;
