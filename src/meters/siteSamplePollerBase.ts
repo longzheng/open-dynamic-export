@@ -65,7 +65,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
                 siteSample,
             });
         } else {
-            this.logger.warn('Error loading site sample data');
+            this.logger.error('Error loading site sample data');
         }
 
         const end = performance.now();
