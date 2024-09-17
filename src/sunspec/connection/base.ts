@@ -140,6 +140,8 @@ export abstract class SunSpecConnection {
                             `SunSpec Modbus client error caching model addresses`,
                         );
 
+                        this.modelAddressById = { type: 'notCached' };
+
                         throw error;
                     }
                 })();
