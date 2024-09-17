@@ -30,6 +30,7 @@ import {
     generateInverterDataStatus,
     type InverterData,
 } from '../../coordinator/helpers/inverterData.js';
+import { DERType } from '../models/derType.js';
 
 type Config = {
     der: DER;
@@ -284,7 +285,11 @@ export function getDerCapabilityResponseFromInverterData(
     data: Pick<InverterData, 'nameplate'>[],
 ): DERCapability {
     // get the highest DERTyp value
-    const type = Math.max(...data.map((d) => d.nameplate.type));
+    const type: DERType = Math.max(
+        ...data.map((d) => d.nameplate.type),
+        // fallback to NA if no inverters are connected
+        DERType.NotApplicable,
+    );
     const rtgMaxVA = convertNumberToBaseAndPow10Exponent(
         sumNumbersArray(data.map((d) => d.nameplate.maxVA)),
     );
