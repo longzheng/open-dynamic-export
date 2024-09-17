@@ -37,10 +37,24 @@ describe('generateUsagePointMrid', () => {
     });
 });
 
-it('should generate meter reading MRID', () => {
-    const result = sep2Client.generateMeterReadingMrid();
-    const result2 = sep2Client.generateMeterReadingMrid();
+describe('generateMeterReadingMrid', () => {
+    it('should generate meter reading MRID with PEN', () => {
+        const result = sep2Client.generateMeterReadingMrid(
+            'Average Real Power (W)',
+        );
 
-    expect(result).toContain('00012345');
-    expect(result).not.toBe(result2);
+        expect(result).toContain('00012345');
+    });
+
+    it('should generate meter reading MRID based on hash', () => {
+        const result = sep2Client.generateMeterReadingMrid(
+            'Average Real Power (W)',
+        );
+        const result2 = sep2Client.generateMeterReadingMrid(
+            'Minimum Real Power (W)',
+        );
+
+        expect(result).toBe('FC5ACDBAD6E6F0362CC0C1B800012345');
+        expect(result).not.toBe(result2);
+    });
 });
