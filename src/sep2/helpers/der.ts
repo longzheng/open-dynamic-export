@@ -25,7 +25,7 @@ import {
 } from '../../helpers/number.js';
 import { ConnectStatus } from '../models/connectStatus.js';
 import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
-import type { OperationalModeStatus } from '../models/operationModeStatus.js';
+import { OperationalModeStatus } from '../models/operationModeStatus.js';
 import {
     generateInverterDataStatus,
     type InverterData,
@@ -367,9 +367,13 @@ export function getDerStatusResponseFromInverterData(
     const now = new Date();
     const operationalModeStatus: OperationalModeStatus = Math.max(
         ...data.map((d) => d.status.operationalModeStatus),
+        // fallback to Off if no inverters are connected
+        OperationalModeStatus.Off,
     );
     const genConnectStatus: ConnectStatus = Math.max(
         ...data.map((d) => d.status.genConnectStatus),
+        // fallback to 0 if no inverters are connected
+        0,
     );
 
     return {
