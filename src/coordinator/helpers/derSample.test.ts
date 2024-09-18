@@ -36,11 +36,11 @@ describe('generateDerSample', () => {
             date: now,
             realPower: {
                 type: 'noPhase',
-                value: 6990,
+                net: 6990,
             },
             reactivePower: {
                 type: 'noPhase',
-                value: -25,
+                net: -25,
             },
             voltage: {
                 type: 'perPhase',
@@ -85,11 +85,11 @@ describe('generateDerSample', () => {
             date: now,
             realPower: {
                 type: 'noPhase',
-                value: 13980,
+                net: 13980,
             },
             reactivePower: {
                 type: 'noPhase',
-                value: -50,
+                net: -50,
             },
             voltage: {
                 type: 'perPhase',

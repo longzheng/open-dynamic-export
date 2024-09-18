@@ -65,7 +65,7 @@ export function generateSiteSample({
                   phaseC: meterMetrics.WphC,
                   net: meterMetrics.W,
               }
-            : { type: 'noPhase', value: meterMetrics.W },
+            : { type: 'noPhase', net: meterMetrics.W },
         reactivePower: meterMetrics.VARphA
             ? {
                   type: 'perPhaseNet',
@@ -76,7 +76,7 @@ export function generateSiteSample({
               }
             : {
                   type: 'noPhase',
-                  value: assertNonNull(meterMetrics.VAR),
+                  net: assertNonNull(meterMetrics.VAR),
               },
         voltage: {
             type: 'perPhase',
