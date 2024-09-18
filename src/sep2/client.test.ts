@@ -39,22 +39,51 @@ describe('generateUsagePointMrid', () => {
 
 describe('generateMeterReadingMrid', () => {
     it('should generate meter reading MRID with PEN', () => {
-        const result = sep2Client.generateMeterReadingMrid(
-            'Average Real Power (W)',
-        );
+        const result = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isDER |
+                RoleFlagsType.isSubmeter,
+            description: 'Average Real Power (W)',
+        });
 
         expect(result).toContain('00012345');
     });
 
-    it('should generate meter reading MRID based on hash', () => {
-        const result = sep2Client.generateMeterReadingMrid(
-            'Average Real Power (W)',
-        );
-        const result2 = sep2Client.generateMeterReadingMrid(
-            'Minimum Real Power (W)',
-        );
+    it('should generate meter reading MRID based on roleFlags', () => {
+        const result = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isDER |
+                RoleFlagsType.isSubmeter,
+            description: 'Average Real Power (W)',
+        });
+        const result2 = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isPremisesAggregationPoint,
+            description: 'Average Real Power (W)',
+        });
 
-        expect(result).toBe('FC5ACDBAD6E6F0362CC0C1B800012345');
+        expect(result).toBe('FC5ACDBAD6E6F0362CC0C14900012345');
+        expect(result).not.toBe(result2);
+    });
+
+    it('should generate meter reading MRID based on description hash', () => {
+        const result = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isPremisesAggregationPoint,
+            description: 'Average Real Power (W)',
+        });
+        const result2 = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isPremisesAggregationPoint,
+            description: 'Minimum Real Power (W)',
+        });
+
+        expect(result).toBe('FC5ACDBAD6E6F0362CC0C10300012345');
         expect(result).not.toBe(result2);
     });
 });

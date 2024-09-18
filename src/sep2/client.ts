@@ -156,8 +156,14 @@ response data: ${JSON.stringify(error.response?.data, null, 2)}`,
     // From the SEP2 Client Handbook
     // The mRID of each MeterReading needs to be unique for that EndDevice
     // hash the description to generate a consistent mRID for the "type" of MeterReadingMrid
-    generateMeterReadingMrid(description: string) {
-        return `${createHash('sha256').update(description).digest('hex').substring(0, 24).toUpperCase()}${this.pen}`;
+    generateMeterReadingMrid({
+        description,
+        roleFlags,
+    }: {
+        description: string;
+        roleFlags: RoleFlagsType;
+    }) {
+        return `${createHash('sha256').update(description).digest('hex').substring(0, 22).toUpperCase()}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
     }
 }
 
