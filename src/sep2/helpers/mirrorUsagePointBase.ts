@@ -17,6 +17,7 @@ import { numberWithPow10 } from '../../helpers/number.js';
 import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
+import { addMilliseconds } from 'date-fns';
 
 export type MirrorMeterReadingDefinitions = Required<
     Pick<MirrorMeterReading, 'description'> & {
@@ -132,11 +133,13 @@ export abstract class MirrorUsagePointHelperBase<
         // without samples, the reading values min/max will be infinity
         // we won't know what reading types we have
         if (samples.length > 0) {
+            const now = new Date();
             const reading = this.getReadingFromSamples(samples);
             const sampleTimePeriod = getSampleTimePeriod(samples);
-            const lastUpdateTime = new Date();
-            const nextUpdateTime = new Date(
-                Date.now() + getNextUpdateMilliseconds(),
+            const lastUpdateTime = now;
+            const nextUpdateTime = addMilliseconds(
+                now,
+                getNextUpdateMilliseconds(),
             );
             const mirrorMeterReadings = this.getReadingValues({
                 reading,
