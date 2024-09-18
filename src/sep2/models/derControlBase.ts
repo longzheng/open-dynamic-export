@@ -1,6 +1,7 @@
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringToBoolean } from '../helpers/boolean.js';
+import { stripNamespacePrefix } from '../helpers/stripNamespacePrefix.js';
 import { parseActivePowerXmlObject, type ActivePower } from './activePower.js';
 
 export type DERControlBase = {
@@ -22,18 +23,23 @@ export type DERControlBase = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
+    // the server might send CSIP-AUS namespace with a different prefix
+    // strip the prefix from all the property keys
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const xmlObjectWithoutPrefix = stripNamespacePrefix(xmlObject);
+
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const opModImpLimW = parseLimitWattsXmlObjectOptional(
-        xmlObject['ns2:opModImpLimW'],
+        xmlObjectWithoutPrefix['opModImpLimW'],
     );
     const opModExpLimW = parseLimitWattsXmlObjectOptional(
-        xmlObject['ns2:opModExpLimW'],
+        xmlObjectWithoutPrefix['opModExpLimW'],
     );
     const opModGenLimW = parseLimitWattsXmlObjectOptional(
-        xmlObject['ns2:opModGenLimW'],
+        xmlObjectWithoutPrefix['opModGenLimW'],
     );
     const opModLoadLimW = parseLimitWattsXmlObjectOptional(
-        xmlObject['ns2:opModLoadLimW'],
+        xmlObjectWithoutPrefix['opModLoadLimW'],
     );
     const opModEnergize = xmlObject['opModEnergize']
         ? stringToBoolean(assertString(xmlObject['opModEnergize'][0]))

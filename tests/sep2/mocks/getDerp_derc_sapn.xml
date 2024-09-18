@@ -1,0 +1,75 @@
+<DERControlList xsi:schemaLocation="urn:ieee:std:2030.5:ns sep.xsd"
+    xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:csipaus = "https://csipaus.org/ns" href="/edev/2dbac664c4e406e56169858ee224ca415849bc43/derp/1/derc" all="3" results="3">
+    <DERControl href="/edev/2dbac664c4e406e56169858ee224ca415849bc43/derp/1/derc/f51df42347494526b7cc2fe85c98aec3" replyTo="/rsps/2dbac664c4e406e56169858ee224ca415849bc43/rsp" responseRequired="03">
+        <mRID>f51df42347494526b7cc2fe85c98aec3</mRID>
+        <description>f51df42347494526b7cc2fe85c98aec3</description>
+        <version>1</version>
+        <creationTime>1726632956</creationTime>
+        <EventStatus>
+            <currentStatus>2</currentStatus>
+            <dateTime>1726633064</dateTime>
+            <potentiallySuperseded>false</potentiallySuperseded>
+            <reason>Created</reason>
+        </EventStatus>
+        <interval>
+            <duration>300</duration>
+            <start>1726632956</start>
+        </interval>
+        <randomizeStart>0</randomizeStart>
+        <DERControlBase>
+            <csipaus:opModExpLimW>
+                <multiplier>0</multiplier>
+                <value>10000</value>
+            </csipaus:opModExpLimW>
+        </DERControlBase>
+    </DERControl>
+    <DERControl href="/edev/2dbac664c4e406e56169858ee224ca415849bc43/derp/1/derc/1e0728fb29804b9ca1c914ac69935f6c" replyTo="/rsps/2dbac664c4e406e56169858ee224ca415849bc43/rsp" responseRequired="03">
+        <mRID>1e0728fb29804b9ca1c914ac69935f6c</mRID>
+        <description>1e0728fb29804b9ca1c914ac69935f6c</description>
+        <version>1</version>
+        <creationTime>1726632966</creationTime>
+        <EventStatus>
+            <currentStatus>2</currentStatus>
+            <dateTime>1726633064</dateTime>
+            <potentiallySuperseded>false</potentiallySuperseded>
+            <reason>Created</reason>
+        </EventStatus>
+        <interval>
+            <duration>300</duration>
+            <start>1726632962</start>
+        </interval>
+        <randomizeStart>0</randomizeStart>
+        <DERControlBase>
+            <csipaus:opModExpLimW>
+                <multiplier>0</multiplier>
+                <value>10000</value>
+            </csipaus:opModExpLimW>
+        </DERControlBase>
+    </DERControl>
+    <DERControl href="/edev/2dbac664c4e406e56169858ee224ca415849bc43/derp/1/derc/8f20816bba3542a98b46774f20ee3dd9" replyTo="/rsps/2dbac664c4e406e56169858ee224ca415849bc43/rsp" responseRequired="03">
+        <mRID>8f20816bba3542a98b46774f20ee3dd9</mRID>
+        <description>8f20816bba3542a98b46774f20ee3dd9</description>
+        <version>1</version>
+        <creationTime>1726633064</creationTime>
+        <EventStatus>
+            <currentStatus>1</currentStatus>
+            <dateTime>1726633069</dateTime>
+            <potentiallySuperseded>false</potentiallySuperseded>
+            <reason>Created</reason>
+        </EventStatus>
+        <interval>
+            <duration>600</duration>
+            <start>1726633063</start>
+        </interval>
+        <randomizeStart>0</randomizeStart>
+        <DERControlBase>
+            <csipaus:opModExpLimW>
+                <multiplier>0</multiplier>
+                <value>0</value>
+            </csipaus:opModExpLimW>
+        </DERControlBase>
+    </DERControl>
+</DERControlList>
+
