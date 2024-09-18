@@ -30,13 +30,13 @@ export function generateDerSample({
         date: new Date(),
         realPower: {
             type: 'noPhase',
-            value: sumNumbersArray(
+            net: sumNumbersArray(
                 invertersData.map((data) => data.inverter.realPower),
             ),
         },
         reactivePower: {
             type: 'noPhase',
-            value: sumNumbersArray(
+            net: sumNumbersArray(
                 invertersData.map((data) => data.inverter.reactivePower),
             ),
         },

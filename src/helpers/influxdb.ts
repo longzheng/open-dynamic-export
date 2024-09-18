@@ -27,7 +27,7 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                     .timestamp(siteSample.date)
                     .tag('type', 'site')
                     .tag('phase', 'none')
-                    .floatField('realPower', siteSample.realPower.value),
+                    .floatField('realPower', siteSample.realPower.net),
             );
             break;
         }
@@ -77,10 +77,7 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                     .timestamp(siteSample.date)
                     .tag('type', 'site')
                     .tag('phase', 'none')
-                    .floatField(
-                        'reactivePower',
-                        siteSample.reactivePower.value,
-                    ),
+                    .floatField('reactivePower', siteSample.reactivePower.net),
             );
             break;
         }
@@ -183,7 +180,7 @@ export function writeDerSamplePoints(derSample: DerSample) {
                     .timestamp(derSample.date)
                     .tag('type', 'der')
                     .tag('phase', 'none')
-                    .floatField('realPower', derSample.realPower.value),
+                    .floatField('realPower', derSample.realPower.net),
             );
             break;
         }
@@ -233,7 +230,7 @@ export function writeDerSamplePoints(derSample: DerSample) {
                     .timestamp(derSample.date)
                     .tag('type', 'der')
                     .tag('phase', 'none')
-                    .floatField('reactivePower', derSample.reactivePower.value),
+                    .floatField('reactivePower', derSample.reactivePower.net),
             );
             break;
         }

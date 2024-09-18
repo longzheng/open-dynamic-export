@@ -10,19 +10,19 @@ import {
 import type { Config } from '../helpers/config.js';
 import type { RoleFlagsType } from './models/roleFlagsType.js';
 import { numberToHex } from '../helpers/number.js';
-import { randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
 import axiosRetry from 'axios-retry';
 
 const USER_AGENT = 'open-dynamic-export';
 
 export class SEP2Client {
-    private host: string;
-    private dcapUri: string;
-    private pen: string;
-    public lfdi: string;
-    public sfdi: string;
-    private axiosInstance: AxiosInstance;
+    private readonly host: string;
+    private readonly dcapUri: string;
+    public readonly pen: string;
+    public readonly lfdi: string;
+    public readonly sfdi: string;
+    private readonly axiosInstance: AxiosInstance;
 
     constructor({
         sep2Config,
@@ -155,8 +155,15 @@ response data: ${JSON.stringify(error.response?.data, null, 2)}`,
 
     // From the SEP2 Client Handbook
     // The mRID of each MeterReading needs to be unique for that EndDevice
-    generateMeterReadingMrid() {
-        return `${randomUUID().replace(/-/g, '').substring(0, 24)}${this.pen}`;
+    // hash the description to generate a consistent mRID for the "type" of MeterReadingMrid
+    generateMeterReadingMrid({
+        description,
+        roleFlags,
+    }: {
+        description: string;
+        roleFlags: RoleFlagsType;
+    }) {
+        return `${createHash('sha256').update(description).digest('hex').substring(0, 22).toUpperCase()}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
     }
 }
 

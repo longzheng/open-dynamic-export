@@ -43,8 +43,8 @@ describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
 
     it('should return noPhase when only noPhase measurements are present', () => {
         const noPhaseMeasurements: NoPhaseMeasurement[] = [
-            { type: 'noPhase', value: 100 },
-            { type: 'noPhase', value: 200 },
+            { type: 'noPhase', net: 100 },
+            { type: 'noPhase', net: 200 },
         ];
 
         const result =
@@ -67,7 +67,7 @@ describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
                 phaseC: 30,
                 net: 60,
             },
-            { type: 'noPhase', value: 100 },
+            { type: 'noPhase', net: 100 },
             {
                 type: 'perPhaseNet',
                 phaseA: 40,
@@ -116,7 +116,7 @@ describe('getTotalFromPerPhaseOrNoPhaseMeasurement', () => {
     it('should return the value from noPhase measurement', () => {
         const noPhaseMeasurement: NoPhaseMeasurement = {
             type: 'noPhase',
-            value: 100,
+            net: 100,
         };
 
         const result =
@@ -159,18 +159,18 @@ describe('getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements', () => {
             {
                 type: 'noPhase',
                 measurements: [
-                    { type: 'noPhase', value: 100 },
-                    { type: 'noPhase', value: 200 },
-                    { type: 'noPhase', value: 300 },
+                    { type: 'noPhase', net: 100 },
+                    { type: 'noPhase', net: 200 },
+                    { type: 'noPhase', net: 300 },
                 ],
             };
 
         const result =
             getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(noPhaseMeasurements);
         expect(result).toEqual({
-            average: { type: 'noPhase', value: 200 }, // (100 + 200 + 300) / 3 = 200
-            maximum: { type: 'noPhase', value: 300 },
-            minimum: { type: 'noPhase', value: 100 },
+            average: { type: 'noPhase', net: 200 }, // (100 + 200 + 300) / 3 = 200
+            maximum: { type: 'noPhase', net: 300 },
+            minimum: { type: 'noPhase', net: 100 },
         });
     });
 

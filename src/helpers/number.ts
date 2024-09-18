@@ -74,6 +74,10 @@ export function convertNumberToBaseAndPow10Exponent(number: number): {
     base: number;
     pow10: number;
 } {
+    if (Number.isNaN(number) || !Number.isFinite(number)) {
+        return { base: 0, pow10: 0 };
+    }
+
     let decimal = new Decimal(number);
 
     // Special case for 0

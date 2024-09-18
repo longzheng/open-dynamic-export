@@ -37,10 +37,53 @@ describe('generateUsagePointMrid', () => {
     });
 });
 
-it('should generate meter reading MRID', () => {
-    const result = sep2Client.generateMeterReadingMrid();
-    const result2 = sep2Client.generateMeterReadingMrid();
+describe('generateMeterReadingMrid', () => {
+    it('should generate meter reading MRID with PEN', () => {
+        const result = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isDER |
+                RoleFlagsType.isSubmeter,
+            description: 'Average Real Power (W)',
+        });
 
-    expect(result).toContain('00012345');
-    expect(result).not.toBe(result2);
+        expect(result).toContain('00012345');
+    });
+
+    it('should generate meter reading MRID based on roleFlags', () => {
+        const result = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isDER |
+                RoleFlagsType.isSubmeter,
+            description: 'Average Real Power (W)',
+        });
+        const result2 = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isPremisesAggregationPoint,
+            description: 'Average Real Power (W)',
+        });
+
+        expect(result).toBe('FC5ACDBAD6E6F0362CC0C14900012345');
+        expect(result).not.toBe(result2);
+    });
+
+    it('should generate meter reading MRID based on description hash', () => {
+        const result = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isPremisesAggregationPoint,
+            description: 'Average Real Power (W)',
+        });
+        const result2 = sep2Client.generateMeterReadingMrid({
+            roleFlags:
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isPremisesAggregationPoint,
+            description: 'Minimum Real Power (W)',
+        });
+
+        expect(result).toBe('FC5ACDBAD6E6F0362CC0C10300012345');
+        expect(result).not.toBe(result2);
+    });
 });

@@ -13,23 +13,40 @@ import { ServiceKind } from '../models/serviceKind.js';
 import { objectToXml } from './xml.js';
 import type { Logger } from 'pino';
 import { UsagePointBaseStatus } from '../models/usagePointBase.js';
-import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
-import { CommodityType } from '../models/commodityType.js';
-import type { DataQualifierType } from '../models/dataQualifierType.js';
-import type { FlowDirectionType } from '../models/flowDirectionType.js';
-import { KindType } from '../models/kindType.js';
-import type { PhaseCode } from '../models/phaseCode.js';
-import { QualityFlags } from '../models/qualityFlags.js';
-import type { UomType } from '../models/uomType.js';
+import { numberWithPow10 } from '../../helpers/number.js';
+import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
+import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
+import { objectEntriesWithType } from '../../helpers/object.js';
 
-export abstract class MirrorUsagePointHelperBase<Sample, Reading> {
+export type MirrorMeterReadingDefinitions = Required<
+    Pick<MirrorMeterReading, 'description'> & {
+        ReadingType: Required<
+            Pick<
+                NonNullable<MirrorMeterReading['ReadingType']>,
+                | 'commodity'
+                | 'kind'
+                | 'dataQualifier'
+                | 'flowDirection'
+                | 'phase'
+                | 'powerOfTenMultiplier'
+                | 'uom'
+            >
+        >;
+    }
+>;
+
+export abstract class MirrorUsagePointHelperBase<
+    Sample extends SampleBase,
+    Reading,
+    MirrorMeterReadingKeys extends string,
+> {
     protected client: SEP2Client;
     protected mirrorUsagePointListHref: string | null = null;
     protected mirrorUsagePoint: MirrorUsagePoint | null = null;
     protected samples: Sample[] = [];
     protected abstract description: string;
     protected abstract roleFlags: RoleFlagsType;
-    protected postTimer: NodeJS.Timeout | null = null;
+    protected mirrorMeterReadingPostTimer: NodeJS.Timeout | null = null;
     protected abstract logger: Logger;
 
     constructor({ client }: { client: SEP2Client }) {
@@ -45,39 +62,36 @@ export abstract class MirrorUsagePointHelperBase<Sample, Reading> {
     }) {
         this.mirrorUsagePointListHref = mirrorUsagePointListHref;
 
-        // use existing mirrorUsagePoint if it has already been created before
-        const existingMirrorUsagePoint = mirrorUsagePoints.find(
-            (point) =>
-                point.deviceLFDI === this.client.lfdi &&
-                point.status === UsagePointBaseStatus.On &&
-                point.roleFlags === this.roleFlags,
-        );
-
-        if (existingMirrorUsagePoint) {
-            this.mirrorUsagePoint = existingMirrorUsagePoint;
-            this.startPosting();
-            return;
+        if (!this.mirrorUsagePoint) {
+            // set up MirrorUsagePoint with MirrorMeterReading definitions
+            // MirrorUsasgePoint must require at least one MirrorMeterReading definition
+            // we define the MirrorMeterReading.ReadingType defintion upfront because they won't change
+            // we also want to set this up early so we know the correct postRate (set by the server)
+            this.mirrorUsagePoint = await this.postMirrorUsagePoint({
+                mirrorUsagePoint: {
+                    mRID: this.client.generateUsagePointMrid(this.roleFlags),
+                    description: this.description,
+                    roleFlags: this.roleFlags,
+                    serviceCategoryKind: ServiceKind.Electricity,
+                    status: UsagePointBaseStatus.On,
+                    deviceLFDI: this.client.lfdi,
+                    mirrorMeterReading:
+                        this.getMirrorMeterReadingsWithReadingType(),
+                },
+            });
         }
 
-        // if does not exist, create new mirrorUsagePoint
-        this.mirrorUsagePoint = await this.postMirrorUsagePoint({
-            mirrorUsagePoint: {
-                mRID: this.client.generateUsagePointMrid(this.roleFlags),
-                description: this.description,
-                roleFlags: this.roleFlags,
-                serviceCategoryKind: ServiceKind.Electricity,
-                status: UsagePointBaseStatus.On,
-                deviceLFDI: this.client.lfdi,
-            },
-        });
+        const mirrorUsagePoint = mirrorUsagePoints.find(
+            (mup) => mup.mRID === this.mirrorUsagePoint!.mRID,
+        );
 
-        this.startPosting();
-    }
+        // the server may change the PostRate of the MirrorUsagePoint
+        // update the post rate from polled MirrorUsagePointList data
+        if (mirrorUsagePoint) {
+            this.mirrorUsagePoint.postRate = mirrorUsagePoint.postRate;
+        }
 
-    protected startPosting() {
-        if (this.postTimer) return;
-
-        void this.post();
+        this.queueMirrorMeterReadingPost();
     }
 
     public addSample(sample: Sample) {
@@ -86,150 +100,123 @@ export abstract class MirrorUsagePointHelperBase<Sample, Reading> {
 
     protected abstract getReadingFromSamples(samples: Sample[]): Reading;
 
-    public post() {
-        const nextUpdateMilliseconds = getMillisecondsToNextHourMinutesInterval(
-            (this.mirrorUsagePoint?.postRate ??
-                defaultPollPushRates.mirrorUsagePointPush) / 60,
-        );
+    protected abstract getReadingMrid(key: MirrorMeterReadingKeys): string;
 
-        this.postTimer = setTimeout(() => {
-            void this.post();
-        }, nextUpdateMilliseconds);
+    protected abstract getReadingDefintions(): Record<
+        MirrorMeterReadingKeys,
+        MirrorMeterReadingDefinitions
+    >;
+
+    protected abstract getReadingValues({
+        reading,
+    }: {
+        reading: Reading;
+    }): Record<MirrorMeterReadingKeys, number | null>;
+
+    private getPostRate() {
+        return (
+            (this.mirrorUsagePoint?.postRate ??
+                defaultPollPushRates.mirrorUsagePointPush) / 60
+        );
+    }
+
+    public async mirrorMeterReadingsPost() {
+        // this is a function because we want to evaluate `this.mirrorUsagePoint?.postRate` every time
+        // the mirrorUsagePoint may be updated after we post to it so we want to get the latest postRate
+        const getNextUpdateMilliseconds = () =>
+            getMillisecondsToNextHourMinutesInterval(this.getPostRate());
 
         const samples = this.getSamplesAndClear();
 
+        // we only want to post if we have samples
+        // without samples, the reading values min/max will be infinity
+        // we won't know what reading types we have
         if (samples.length > 0) {
             const reading = this.getReadingFromSamples(samples);
+            const sampleTimePeriod = getSampleTimePeriod(samples);
             const lastUpdateTime = new Date();
             const nextUpdateTime = new Date(
-                Date.now() + nextUpdateMilliseconds,
+                Date.now() + getNextUpdateMilliseconds(),
+            );
+            const mirrorMeterReadings = this.getReadingValues({
+                reading,
+            });
+
+            const mirrorMeterReadingDefinitions = this.getReadingDefintions();
+
+            await Promise.all(
+                objectEntriesWithType(mirrorMeterReadings).map(
+                    async ([key, value]) => {
+                        // don't post null reading values
+                        if (value === null) {
+                            return;
+                        }
+
+                        return await this.postMirrorMeterReading({
+                            mirrorMeterReading: {
+                                mRID: this.getReadingMrid(key),
+                                lastUpdateTime,
+                                nextUpdateTime,
+                                Reading: {
+                                    // the value must not contain a decimal point
+                                    // shift the base value by the power of 10 multiplier
+                                    value: Math.round(
+                                        numberWithPow10(
+                                            value,
+                                            -mirrorMeterReadingDefinitions[key]
+                                                .ReadingType
+                                                .powerOfTenMultiplier,
+                                        ),
+                                    ),
+
+                                    timePeriod: {
+                                        start: sampleTimePeriod.start,
+                                        duration:
+                                            sampleTimePeriod.durationSeconds,
+                                    },
+                                },
+                            },
+                        });
+                    },
+                ),
             );
 
-            try {
-                this.postRealPower({
-                    reading,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                });
-
-                this.postReactivePower({
-                    reading,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                });
-
-                this.postVoltage({
-                    reading,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                });
-
-                this.postFrequency({
-                    reading,
-                    lastUpdateTime,
-                    nextUpdateTime,
-                });
-            } catch (error) {
-                this.logger.error(
-                    { error },
-                    'Error posting one of MirrorMeterReading during scheduled pushing',
-                );
-            }
+            this.logger.debug('Sent MirrorMeterReadings');
         }
+
+        this.queueMirrorMeterReadingPost();
     }
 
-    protected abstract postRealPower({
-        reading,
-        lastUpdateTime,
-        nextUpdateTime,
-    }: {
-        reading: Reading;
-        lastUpdateTime: Date;
-        nextUpdateTime: Date;
-    }): void;
+    private queueMirrorMeterReadingPost() {
+        if (this.mirrorMeterReadingPostTimer) {
+            clearTimeout(this.mirrorMeterReadingPostTimer);
+        }
 
-    protected abstract postReactivePower({
-        reading,
-        lastUpdateTime,
-        nextUpdateTime,
-    }: {
-        reading: Reading;
-        lastUpdateTime: Date;
-        nextUpdateTime: Date;
-    }): void;
+        this.mirrorMeterReadingPostTimer = setTimeout(() => {
+            void this.mirrorMeterReadingsPost();
+        }, getMillisecondsToNextHourMinutesInterval(this.getPostRate()));
+    }
 
-    protected abstract postVoltage({
-        reading,
-        lastUpdateTime,
-        nextUpdateTime,
-    }: {
-        reading: Reading;
-        lastUpdateTime: Date;
-        nextUpdateTime: Date;
-    }): void;
-
-    protected abstract postFrequency({
-        reading,
-        lastUpdateTime,
-        nextUpdateTime,
-    }: {
-        reading: Reading;
-        lastUpdateTime: Date;
-        nextUpdateTime: Date;
-    }): void;
+    private getMirrorMeterReadingsWithReadingType(): Omit<
+        MirrorMeterReading,
+        'Reading'
+    >[] {
+        return objectEntriesWithType(this.getReadingDefintions()).map(
+            ([key, readingDefinition]): Omit<MirrorMeterReading, 'Reading'> => {
+                return {
+                    mRID: this.getReadingMrid(key),
+                    description: readingDefinition.description,
+                    ReadingType: readingDefinition.ReadingType,
+                };
+            },
+        );
+    }
 
     protected getSamplesAndClear(): Sample[] {
         const cache = this.samples;
         this.samples = [];
         return cache;
     }
-
-    protected sendMirrorMeterReading = ({
-        phase,
-        flowDirection,
-        dataQualifier,
-        description,
-        value,
-        uom,
-        lastUpdateTime,
-        nextUpdateTime,
-        intervalLength,
-    }: {
-        phase: PhaseCode;
-        flowDirection: FlowDirectionType;
-        dataQualifier: DataQualifierType;
-        description: string;
-        value: number;
-        uom: UomType;
-        lastUpdateTime: Date;
-        nextUpdateTime: Date;
-        intervalLength: number;
-    }) => {
-        const exponentValue = convertNumberToBaseAndPow10Exponent(value);
-
-        void this.postMirrorMeterReading({
-            mirrorMeterReading: {
-                mRID: this.client.generateMeterReadingMrid(),
-                description,
-                lastUpdateTime,
-                nextUpdateTime,
-                Reading: {
-                    value: exponentValue.base,
-                    qualityFlags: QualityFlags.Valid,
-                },
-                ReadingType: {
-                    commodity: CommodityType.ElectricitySecondaryMeteredValue,
-                    kind: KindType.Power,
-                    dataQualifier,
-                    flowDirection,
-                    intervalLength,
-                    phase,
-                    powerOfTenMultiplier: exponentValue.pow10,
-                    uom,
-                },
-            },
-        });
-    };
 
     private async postMirrorUsagePoint({
         mirrorUsagePoint,
@@ -271,6 +258,11 @@ export abstract class MirrorUsagePointHelperBase<Sample, Reading> {
         const data = generateMirrorMeterReadingResponse(mirrorMeterReading);
         const xml = objectToXml(data);
 
-        await this.client.post(this.mirrorUsagePoint.href, xml);
+        const response = await this.client.post(
+            this.mirrorUsagePoint.href,
+            xml,
+        );
+
+        return response;
     }
 }

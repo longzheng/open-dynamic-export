@@ -1,6 +1,9 @@
-import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
+import {
+    parseDateTimeIntervalXmlObject,
+    type DateTimeInterval,
+} from './dateTimeInterval.js';
 import { parseEventStatusXmlObject, type EventStatus } from './eventStatus.js';
 import {
     parseIdentifiedObjectXmlObject,
@@ -15,15 +18,9 @@ import {
     type SubscribableResource,
 } from './subscribableResource.js';
 
-type Interval = {
-    // duration in seconds
-    duration: number;
-    start: Date;
-};
-
 export type Event = {
     creationTime: Date;
-    interval: Interval;
+    interval: DateTimeInterval;
     eventStatus: EventStatus;
 } & RespondableResource &
     SubscribableResource &
@@ -40,7 +37,7 @@ export function parseEventXmlObject(
     const creationTime = stringIntToDate(
         assertString(xmlObject['creationTime'][0]),
     );
-    const interval = parseIntervalXmlObject(xmlObject['interval'][0]);
+    const interval = parseDateTimeIntervalXmlObject(xmlObject['interval'][0]);
     const eventStatus = parseEventStatusXmlObject(xmlObject['EventStatus'][0]);
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
@@ -51,20 +48,5 @@ export function parseEventXmlObject(
         creationTime,
         interval,
         eventStatus,
-    };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseIntervalXmlObject(xmlObject: any): Interval {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    const start = stringIntToDate(assertString(xmlObject['start'][0]));
-    const durationSeconds = safeParseIntString(
-        assertString(xmlObject['duration'][0]),
-    );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
-
-    return {
-        start,
-        duration: durationSeconds,
     };
 }
