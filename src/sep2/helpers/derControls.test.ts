@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import type { MergedControlsData } from './derControls.js';
@@ -11,6 +11,8 @@ import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import type { DERControl } from '../models/derControl.js';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 
 const sep2Client = new SEP2Client({
     sep2Config: {
@@ -21,6 +23,20 @@ const sep2Client = new SEP2Client({
     key: mockKey,
     pen: '12345',
 });
+
+const mockRestHandlers = [
+    http.post(`http://example.com/*`, () => {
+        return HttpResponse.xml();
+    }),
+];
+
+const mockServer = setupServer(...mockRestHandlers);
+
+// Start server before all tests
+beforeAll(() => mockServer.listen({ onUnhandledRequest: 'error' }));
+
+//  Close server after all tests
+afterAll(() => mockServer.close());
 
 describe('DerControlsHelper', () => {
     it('should respond to new DERControls', () => {
