@@ -77,10 +77,7 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                     .timestamp(siteSample.date)
                     .tag('type', 'site')
                     .tag('phase', 'none')
-                    .floatField(
-                        'reactivePower',
-                        siteSample.reactivePower.net,
-                    ),
+                    .floatField('reactivePower', siteSample.reactivePower.net),
             );
             break;
         }
