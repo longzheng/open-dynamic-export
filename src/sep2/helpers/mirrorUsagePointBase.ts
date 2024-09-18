@@ -54,38 +54,44 @@ export abstract class MirrorUsagePointHelperBase<
     }
 
     public async updateMirrorUsagePointList({
+        mirrorUsagePoints,
         mirrorUsagePointListHref,
     }: {
+        mirrorUsagePoints: MirrorUsagePoint[];
         mirrorUsagePointListHref: string;
     }) {
         this.mirrorUsagePointListHref = mirrorUsagePointListHref;
 
-        // set up MirrorUsagePoint with MirrorMeterReading definitions
-        // MirrorUsasgePoint must require at least one MirrorMeterReading definition
-        // we define the MirrorMeterReading.ReadingType defintion upfront because they won't change
-        // we also want to set this up early so we know the correct postRate (set by the server)
-        this.mirrorUsagePoint = await this.postMirrorUsagePoint({
-            mirrorUsagePoint: {
-                mRID: this.client.generateUsagePointMrid(this.roleFlags),
-                description: this.description,
-                roleFlags: this.roleFlags,
-                serviceCategoryKind: ServiceKind.Electricity,
-                status: UsagePointBaseStatus.On,
-                deviceLFDI: this.client.lfdi,
-                mirrorMeterReading:
-                    this.getMirrorMeterReadingsWithReadingType(),
-            },
-        });
-
-        this.startMirrorMeterReadingsPost();
-    }
-
-    protected startMirrorMeterReadingsPost() {
-        if (this.mirrorMeterReadingPostTimer) {
-            return;
+        if (!this.mirrorUsagePoint) {
+            // set up MirrorUsagePoint with MirrorMeterReading definitions
+            // MirrorUsasgePoint must require at least one MirrorMeterReading definition
+            // we define the MirrorMeterReading.ReadingType defintion upfront because they won't change
+            // we also want to set this up early so we know the correct postRate (set by the server)
+            this.mirrorUsagePoint = await this.postMirrorUsagePoint({
+                mirrorUsagePoint: {
+                    mRID: this.client.generateUsagePointMrid(this.roleFlags),
+                    description: this.description,
+                    roleFlags: this.roleFlags,
+                    serviceCategoryKind: ServiceKind.Electricity,
+                    status: UsagePointBaseStatus.On,
+                    deviceLFDI: this.client.lfdi,
+                    mirrorMeterReading:
+                        this.getMirrorMeterReadingsWithReadingType(),
+                },
+            });
         }
 
-        void this.mirrorMeterReadingsPost();
+        const mirrorUsagePoint = mirrorUsagePoints.find(
+            (mup) => mup.mRID === this.mirrorUsagePoint!.mRID,
+        );
+
+        // the server may change the PostRate of the MirrorUsagePoint
+        // update the post rate from polled MirrorUsagePointList data
+        if (mirrorUsagePoint) {
+            this.mirrorUsagePoint.postRate = mirrorUsagePoint.postRate;
+        }
+
+        this.queueMirrorMeterReadingPost();
     }
 
     public addSample(sample: Sample) {
@@ -178,9 +184,17 @@ export abstract class MirrorUsagePointHelperBase<
             this.logger.debug('Sent MirrorMeterReadings');
         }
 
+        this.queueMirrorMeterReadingPost();
+    }
+
+    private queueMirrorMeterReadingPost() {
+        if (this.mirrorMeterReadingPostTimer) {
+            clearTimeout(this.mirrorMeterReadingPostTimer);
+        }
+
         this.mirrorMeterReadingPostTimer = setTimeout(() => {
             void this.mirrorMeterReadingsPost();
-        }, getNextUpdateMilliseconds());
+        }, getMillisecondsToNextHourMinutesInterval(this.getPostRate()));
     }
 
     private getMirrorMeterReadingsWithReadingType(): Omit<

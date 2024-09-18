@@ -41,12 +41,14 @@ export class MirrorUsagePointListHelper {
                     url: href,
                     defaultPollRateSeconds:
                         defaultPollPushRates.mirrorUsagePointPush,
-                }).on('data', () => {
+                }).on('data', (data) => {
                     void this.mirrorUsagePointSite?.updateMirrorUsagePointList({
+                        mirrorUsagePoints: data.mirrorUsagePoints,
                         mirrorUsagePointListHref: href,
                     });
 
                     void this.mirrorUsagePointDer?.updateMirrorUsagePointList({
+                        mirrorUsagePoints: data.mirrorUsagePoints,
                         mirrorUsagePointListHref: href,
                     });
                 });
