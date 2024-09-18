@@ -13,9 +13,6 @@
 				"${workspaceFolder}/docker-compose.yml",
 				"${workspaceFolder}/docker-compose.debug.yml"
 			  ]
-			},
-			"presentation": {
-				"close": true
 			}
 		  }
 	  
