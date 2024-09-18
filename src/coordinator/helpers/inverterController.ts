@@ -178,7 +178,7 @@ export class InverterController {
                         await inverter.writeControlsModel(writeControlsModel);
                     } catch (error) {
                         this.logger.error(
-                            error,
+                            { error },
                             'Error writing inverter controls value',
                         );
                     }
