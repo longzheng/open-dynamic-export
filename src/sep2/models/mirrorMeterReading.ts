@@ -12,8 +12,8 @@ import type { IdentifiedObject } from './identifiedObject.js';
 import type { DateTimeInterval } from './dateTimeInterval.js';
 
 export type MirrorMeterReading = {
-    lastUpdateTime: Date;
-    nextUpdateTime: Date;
+    lastUpdateTime?: Date;
+    nextUpdateTime?: Date;
     Reading?: {
         timePeriod?: DateTimeInterval;
         qualityFlags?: QualityFlags;
@@ -26,7 +26,7 @@ export type MirrorMeterReading = {
         flowDirection: FlowDirectionType;
         phase: PhaseCode;
         powerOfTenMultiplier: number;
-        intervalLength: number;
+        intervalLength?: number;
         uom: UomType;
     };
 } & IdentifiedObject;
@@ -57,11 +57,23 @@ export function generateMirrorMeterReadingObject({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response: Record<string, any> = {
         mRID,
-        description,
-        lastUpdateTime: dateToStringSeconds(lastUpdateTime),
-        nextUpdateTime: dateToStringSeconds(nextUpdateTime),
-        version,
     };
+
+    if (description) {
+        response['description'] = description;
+    }
+
+    if (lastUpdateTime) {
+        response['lastUpdateTime'] = dateToStringSeconds(lastUpdateTime);
+    }
+
+    if (nextUpdateTime) {
+        response['nextUpdateTime'] = dateToStringSeconds(nextUpdateTime);
+    }
+
+    if (version !== undefined) {
+        response['version'] = version;
+    }
 
     if (Reading) {
         response['Reading'] = {
@@ -90,10 +102,14 @@ export function generateMirrorMeterReadingObject({
             kind: ReadingType.kind,
             dataQualifier: ReadingType.dataQualifier,
             flowDirection: ReadingType.flowDirection,
-            intervalLength: ReadingType.intervalLength,
             powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
             uom: ReadingType.uom,
         };
+
+        if (ReadingType.intervalLength !== undefined) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            response['ReadingType'].intervalLength = ReadingType.intervalLength;
+        }
 
         // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
         // conditionally set phase if it's not 0

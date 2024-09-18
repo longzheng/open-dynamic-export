@@ -61,9 +61,9 @@ it('should generate MirrorMeterReading XML', () => {
         <kind>37</kind>
         <dataQualifier>2</dataQualifier>
         <flowDirection>19</flowDirection>
-        <intervalLength>300</intervalLength>
         <powerOfTenMultiplier>0</powerOfTenMultiplier>
         <uom>38</uom>
+        <intervalLength>300</intervalLength>
         <phase>128</phase>
     </ReadingType>
 </MirrorMeterReading>`);
@@ -110,9 +110,9 @@ it('should generate MirrorMeterReading object', () => {
         <kind>37</kind>
         <dataQualifier>2</dataQualifier>
         <flowDirection>19</flowDirection>
-        <intervalLength>300</intervalLength>
         <powerOfTenMultiplier>0</powerOfTenMultiplier>
         <uom>38</uom>
+        <intervalLength>300</intervalLength>
         <phase>128</phase>
     </ReadingType>
 </root>`);
