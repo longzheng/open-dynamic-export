@@ -147,6 +147,18 @@ describe('convertNumberToBaseAndPow10Exponent', () => {
         const result = convertNumberToBaseAndPow10Exponent(0.0);
         expect(result).toEqual({ base: 0, pow10: 0 });
     });
+
+    it('should convert NaN', () => {
+        const result = convertNumberToBaseAndPow10Exponent(Number.NaN);
+        expect(result).toEqual({ base: 0, pow10: 0 });
+    });
+
+    it('should convert Infinity', () => {
+        const result = convertNumberToBaseAndPow10Exponent(
+            Number.POSITIVE_INFINITY,
+        );
+        expect(result).toEqual({ base: 0, pow10: 0 });
+    });
 });
 
 describe('sumBigIntArray', () => {
