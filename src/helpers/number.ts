@@ -38,8 +38,14 @@ export function sumNumbersArray(numbers: number[]) {
         .toNumber();
 }
 
-export function sumNumbersNullableArray(numbers: (number | null)[]) {
+export function sumNumbersNullableArray(
+    numbers: (number | null)[],
+): number | null {
     const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
+        return null;
+    }
 
     return sumNumbersArray(nonNullableNumbers);
 }
@@ -52,20 +58,38 @@ export function averageNumbersArray(numbers: number[]) {
     return new Decimal(sumNumbersArray(numbers)).div(numbers.length).toNumber();
 }
 
-export function averageNumbersNullableArray(numbers: (number | null)[]) {
+export function averageNumbersNullableArray(
+    numbers: (number | null)[],
+): number | null {
     const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
+        return null;
+    }
 
     return averageNumbersArray(nonNullableNumbers);
 }
 
-export function mathMinNullableArray(numbers: (number | null)[]) {
+export function mathMinNullableArray(
+    numbers: (number | null)[],
+): number | null {
     const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
+        return null;
+    }
 
     return Math.min(...nonNullableNumbers);
 }
 
-export function mathMaxNullableArray(numbers: (number | null)[]) {
+export function mathMaxNullableArray(
+    numbers: (number | null)[],
+): number | null {
     const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
+        return null;
+    }
 
     return Math.max(...nonNullableNumbers);
 }
