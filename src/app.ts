@@ -2,7 +2,7 @@ import express, { json, urlencoded } from 'express';
 import { RegisterRoutes } from '../dist/routes.js';
 import type { Response as ExResponse, Request as ExRequest } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJson from '../dist/swagger.json';
+import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 
 const port = 3000;
 
