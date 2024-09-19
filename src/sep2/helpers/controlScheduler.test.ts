@@ -32,7 +32,7 @@ describe('filterControlsOfType', () => {
     it('should return controls of type', () => {
         type Data = Parameters<
             typeof filterControlsOfType
-        >[0]['controls'][number];
+        >[0]['activeOrScheduledControls'][number];
 
         const control1: Data = {
             control: {
@@ -76,7 +76,7 @@ describe('filterControlsOfType', () => {
         };
 
         const result = filterControlsOfType({
-            controls: [control1, control2, control3, control4],
+            activeOrScheduledControls: [control1, control2, control3, control4],
             type: 'opModExpLimW',
         });
 
@@ -86,7 +86,7 @@ describe('filterControlsOfType', () => {
     it('should handle undefined', () => {
         type Data = Parameters<
             typeof filterControlsOfType
-        >[0]['controls'][number];
+        >[0]['activeOrScheduledControls'][number];
 
         const control1: Data = {
             control: {
@@ -109,7 +109,7 @@ describe('filterControlsOfType', () => {
         };
 
         const result = filterControlsOfType({
-            controls: [control1, control2],
+            activeOrScheduledControls: [control1, control2],
             type: 'opModExpLimW',
         });
 
@@ -134,7 +134,7 @@ describe('generateControlsSchedule', () => {
 
     it('should generate schedule from no controls', () => {
         const result = generateControlsSchedule({
-            activeOrScheduledControls: [],
+            activeOrScheduledControlsOfType: [],
         });
 
         expect(result).toStrictEqual([] satisfies ControlSchedule[]);
@@ -164,7 +164,7 @@ describe('generateControlsSchedule', () => {
         };
 
         const result = generateControlsSchedule({
-            activeOrScheduledControls: [controlA],
+            activeOrScheduledControlsOfType: [controlA],
         });
 
         expect(result.length).toStrictEqual(1);
@@ -245,7 +245,7 @@ describe('generateControlsSchedule', () => {
         };
 
         const result = generateControlsSchedule({
-            activeOrScheduledControls: [controlA, controlB, controlC],
+            activeOrScheduledControlsOfType: [controlA, controlB, controlC],
         });
 
         expect(result.length).toStrictEqual(3);
@@ -367,7 +367,7 @@ describe('generateControlsSchedule', () => {
         };
 
         const result = generateControlsSchedule({
-            activeOrScheduledControls: [controlA, controlB, controlC, controlD],
+            activeOrScheduledControlsOfType: [controlA, controlB, controlC, controlD],
         });
 
         expect(result.length).toStrictEqual(5);

@@ -13,7 +13,6 @@ import {
     getDerControlEndDate,
     sortByProgramPrimacyAndEventCreationTime,
 } from './derControl.js';
-import { CurrentStatus } from '../models/eventStatus.js';
 import { randomInt } from 'crypto';
 import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
@@ -72,22 +71,19 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
     }
 
-    updateControlsData(data: DerControlsHelperChangedData) {
-        this.fallbackControl = data.fallbackControl;
-
-        const activeOrScheduledControls = data.controls.filter(
-            ({ control }) =>
-                control.eventStatus.currentStatus === CurrentStatus.Active ||
-                control.eventStatus.currentStatus === CurrentStatus.Scheduled,
-        );
+    updateControlsData({
+        activeOrScheduledControls,
+        fallbackControl,
+    }: DerControlsHelperChangedData) {
+        this.fallbackControl = fallbackControl;
 
         const controlsOfType = filterControlsOfType({
-            controls: activeOrScheduledControls,
+            activeOrScheduledControls,
             type: this.controlType,
         });
 
         const generatedControlSchedules = generateControlsSchedule({
-            activeOrScheduledControls: controlsOfType,
+            activeOrScheduledControlsOfType: controlsOfType,
             onSupersededControl: ({
                 supersededControl,
                 supersedingControl,
@@ -257,8 +253,14 @@ export function filterControlsOfType<
     T extends {
         control: Pick<MergedControlsData['control'], 'derControlBase'>;
     },
->({ controls, type }: { controls: T[]; type: ControlType }) {
-    return controls.filter(
+>({
+    activeOrScheduledControls,
+    type,
+}: {
+    activeOrScheduledControls: T[];
+    type: ControlType;
+}) {
+    return activeOrScheduledControls.filter(
         ({ control }) =>
             Object.keys(control.derControlBase).includes(type) &&
             control.derControlBase[type] !== undefined,
@@ -266,22 +268,22 @@ export function filterControlsOfType<
 }
 
 export function generateControlsSchedule({
-    activeOrScheduledControls,
+    activeOrScheduledControlsOfType,
     onSupersededControl,
 }: {
     // assume only active or scheduled controls
-    activeOrScheduledControls: MergedControlsData[];
+    activeOrScheduledControlsOfType: MergedControlsData[];
     onSupersededControl?: (controls: {
         supersededControl: DERControl;
         supersedingControl: DERControl;
     }) => void;
 }): ControlSchedule[] {
     const sortedDatetimes = getSortedUniqueDatetimesFromControls(
-        activeOrScheduledControls,
+        activeOrScheduledControlsOfType,
     );
     const chunkedControlsScheduleByPriority =
         buildChunkedControlsScheduleByPriority({
-            activeOrScheduledControls,
+            activeOrScheduledControls: activeOrScheduledControlsOfType,
             sortedDatetimes,
             onSupersededControl,
         });

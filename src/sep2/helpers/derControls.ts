@@ -34,7 +34,7 @@ export type FallbackControl =
       };
 
 export type DerControlsHelperChangedData = {
-    controls: MergedControlsData[];
+    activeOrScheduledControls: MergedControlsData[];
     fallbackControl: FallbackControl;
 };
 
@@ -55,6 +55,8 @@ export class DerControlsHelper extends EventEmitter<{
     }
 
     async updateFsaData(fsaData: FunctionSetAssignmentsListData) {
+        const now = new Date();
+
         // assumptions
         // - events are considered immutable besides the status
         //      from the IEEE 2030.5-2018 spec page 90
@@ -72,7 +74,19 @@ export class DerControlsHelper extends EventEmitter<{
             // sort all controls across all programs and FSAs
             .sort(sortMergedControlsDataByStartTimeAscending);
 
-        const now = new Date();
+        // to handle missing/delete controls which are not considered cancelled
+        const activeOrScheduledControls = this.cachedControlsData.filter(
+            (controlData) =>
+                // get existing controls that have not ended
+                getDerControlEndDate(controlData.control) > now &&
+                // get existing controls that are not in the new controls
+                !newControlsData.some(
+                    (newControl) =>
+                        newControl.control.mRID === controlData.control.mRID &&
+                        newControl.program.mRID === controlData.program.mRID &&
+                        newControl.fsa.mRID === controlData.fsa.mRID,
+                ),
+        );
 
         for (const controlData of newControlsData) {
             // always send event received responses for new events
@@ -106,13 +120,12 @@ export class DerControlsHelper extends EventEmitter<{
                 // seconds. This Status.type SHALL NOT be used with “regular” Events, only with specializations of RandomizableEvent.
                 case CurrentStatus.Cancelled:
                 case CurrentStatus.CancelledWithRandomization: {
-                    // respond to
                     await this.derControlResponseHelper.respondDerControl({
                         derControl: controlData.control,
                         status: ResponseStatus.EventCancelled,
                     });
 
-                    break;
+                    continue;
                 }
 
                 // control response handled by ControlScheduler logic
@@ -122,32 +135,17 @@ export class DerControlsHelper extends EventEmitter<{
                     break;
                 }
             }
+
+            // add control to active controls
+            activeOrScheduledControls.push(controlData);
         }
 
-        // to handle missing/delete controls which are not considered cancelled
-        // get existing controls that have not ended and are not in the new controls
-        const existingMissingActiveControls = this.cachedControlsData.filter(
-            (controlData) =>
-                getDerControlEndDate(controlData.control) > now &&
-                !newControlsData.some(
-                    (newControl) =>
-                        newControl.control.mRID === controlData.control.mRID &&
-                        newControl.program.mRID === controlData.program.mRID &&
-                        newControl.fsa.mRID === controlData.fsa.mRID,
-                ),
-        );
-
-        const allControlsData = [
-            ...existingMissingActiveControls,
-            ...newControlsData,
-        ];
-
         this.emit('data', {
-            controls: allControlsData,
+            activeOrScheduledControls,
             fallbackControl: defaultControl,
         });
 
-        this.cachedControlsData = allControlsData;
+        this.cachedControlsData = activeOrScheduledControls;
     }
 }
 
