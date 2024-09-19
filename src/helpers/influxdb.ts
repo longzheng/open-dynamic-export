@@ -26,7 +26,7 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                 new Point('sample')
                     .timestamp(siteSample.date)
                     .tag('type', 'site')
-                    .tag('phase', 'none')
+                    .tag('phase', 'net')
                     .floatField('realPower', siteSample.realPower.net),
             );
             break;
@@ -76,7 +76,7 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                 new Point('sample')
                     .timestamp(siteSample.date)
                     .tag('type', 'site')
-                    .tag('phase', 'none')
+                    .tag('phase', 'net')
                     .floatField('reactivePower', siteSample.reactivePower.net),
             );
             break;
@@ -162,7 +162,6 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
             new Point('sample')
                 .timestamp(siteSample.date)
                 .tag('type', 'site')
-                .tag('phase', 'none')
                 .floatField('frequency', siteSample.frequency),
         );
     }
@@ -175,7 +174,7 @@ export function writeDerSamplePoints(derSample: DerSample) {
                 new Point('sample')
                     .timestamp(derSample.date)
                     .tag('type', 'der')
-                    .tag('phase', 'none')
+                    .tag('phase', 'net')
                     .floatField('realPower', derSample.realPower.net),
             );
             break;
@@ -225,7 +224,7 @@ export function writeDerSamplePoints(derSample: DerSample) {
                 new Point('sample')
                     .timestamp(derSample.date)
                     .tag('type', 'der')
-                    .tag('phase', 'none')
+                    .tag('phase', 'net')
                     .floatField('reactivePower', derSample.reactivePower.net),
             );
             break;
@@ -313,7 +312,6 @@ export function writeDerSamplePoints(derSample: DerSample) {
             new Point('sample')
                 .timestamp(derSample.date)
                 .tag('type', 'der')
-                .tag('phase', 'none')
                 .floatField('frequency', derSample.frequency),
         );
     }
