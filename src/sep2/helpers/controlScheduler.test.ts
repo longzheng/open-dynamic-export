@@ -16,8 +16,8 @@ import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { randomInt } from 'crypto';
 
-vi.mock(import('crypto'), async (importOriginal) => {
-    const actual = await importOriginal();
+vi.mock('crypto', async () => {
+    const actual = await import('crypto');
     return {
         ...actual,
         randomInt: vi.fn(actual.randomInt),

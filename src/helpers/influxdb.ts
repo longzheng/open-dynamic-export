@@ -129,36 +129,32 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
         }
     }
 
-    switch (siteSample.voltage.type) {
-        case 'perPhase': {
-            influxDbWriteApi.writePoint(
-                new Point('sample')
-                    .timestamp(siteSample.date)
-                    .tag('type', 'site')
-                    .tag('phase', 'A')
-                    .floatField('voltage', siteSample.voltage.phaseA),
-            );
+    influxDbWriteApi.writePoint(
+        new Point('sample')
+            .timestamp(siteSample.date)
+            .tag('type', 'site')
+            .tag('phase', 'A')
+            .floatField('voltage', siteSample.voltage.phaseA),
+    );
 
-            if (siteSample.voltage.phaseB) {
-                influxDbWriteApi.writePoint(
-                    new Point('sample')
-                        .timestamp(siteSample.date)
-                        .tag('type', 'site')
-                        .tag('phase', 'B')
-                        .floatField('voltage', siteSample.voltage.phaseB),
-                );
-            }
+    if (siteSample.voltage.phaseB) {
+        influxDbWriteApi.writePoint(
+            new Point('sample')
+                .timestamp(siteSample.date)
+                .tag('type', 'site')
+                .tag('phase', 'B')
+                .floatField('voltage', siteSample.voltage.phaseB),
+        );
+    }
 
-            if (siteSample.voltage.phaseC) {
-                influxDbWriteApi.writePoint(
-                    new Point('sample')
-                        .timestamp(siteSample.date)
-                        .tag('type', 'site')
-                        .tag('phase', 'C')
-                        .floatField('voltage', siteSample.voltage.phaseC),
-                );
-            }
-        }
+    if (siteSample.voltage.phaseC) {
+        influxDbWriteApi.writePoint(
+            new Point('sample')
+                .timestamp(siteSample.date)
+                .tag('type', 'site')
+                .tag('phase', 'C')
+                .floatField('voltage', siteSample.voltage.phaseC),
+        );
     }
 
     if (siteSample.frequency) {
