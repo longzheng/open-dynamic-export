@@ -424,6 +424,10 @@ export function calculateTargetSolarPowerRatio({
     // the current power ratio expressed as a decimal (0.0-1.0)
     currentPowerRatio: number;
 }) {
+    if (targetSolarWatts === 0) {
+        return 0;
+    }
+
     // edge case if the current power ratio is 0
     // there is no way to calculate the target power ratio because we cannot divide by 0
     // set a hard-coded power ratio
@@ -441,6 +445,7 @@ export function calculateTargetSolarPowerRatio({
     const estimatedSolarCapacity = new Decimal(currentSolarWatts).div(
         currentPowerRatio,
     );
+
     const targetPowerRatio = new Decimal(targetSolarWatts).div(
         estimatedSolarCapacity,
     );

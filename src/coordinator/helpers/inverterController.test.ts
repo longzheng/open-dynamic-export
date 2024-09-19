@@ -88,6 +88,16 @@ describe('calculateTargetSolarPowerRatio', () => {
 
         expect(targetPowerRatio).toBe(0.09);
     });
+
+    it('should handle solar and target as 0', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            currentSolarWatts: 0,
+            currentPowerRatio: 0.15,
+            targetSolarWatts: 0,
+        });
+
+        expect(targetPowerRatio).toBe(0);
+    });
 });
 
 describe('calculateTargetSolarWatts', () => {
