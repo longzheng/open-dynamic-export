@@ -10,7 +10,7 @@ import type { DerSample } from '../coordinator/helpers/derSample.js';
 import type { InverterControlLimit } from '../coordinator/helpers/inverterController.js';
 
 const influxDB = new InfluxDB({
-    url: `http://influxdb:${process.env['INFLUXDB_PORT']}`,
+    url: `http://influxdb:${process.env['INFLUXDB_PORT'] ?? 8086}`,
     token: process.env['INFLUXDB_ADMIN_TOKEN'],
 });
 
