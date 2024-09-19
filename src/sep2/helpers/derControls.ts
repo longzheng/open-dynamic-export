@@ -99,14 +99,6 @@ export class DerControlsHelper extends EventEmitter<{
             // Current Time), this Event SHALL be ignored. Note that the Duration Randomization is not used in
             // this calculation.
             if (getDerControlEndDate(controlData.control) < now) {
-                // For function sets with direct control, if the Event responseRequired indicates, clients SHALL
-                // POST a Response to the replyTo URI with a Status of “Rejected - Event was received after it
-                // had expired”.
-                await this.derControlResponseHelper.respondDerControl({
-                    derControl: controlData.control,
-                    status: ResponseStatus.EventExpired,
-                });
-
                 continue;
             }
 
