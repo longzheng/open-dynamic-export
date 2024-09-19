@@ -155,7 +155,7 @@ export function getSep2Limiter({
                 'Received SEP2 function set assignments list',
             );
 
-            derControlsHelper.updateFsaData(functionSetAssignmentsList);
+            void derControlsHelper.updateFsaData(functionSetAssignmentsList);
         },
     );
 
