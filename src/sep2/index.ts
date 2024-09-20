@@ -1,4 +1,4 @@
-import type { RampRateHelper } from '../coordinator/helpers/rampRate.js';
+import type { RampRateHelper } from './helpers/rampRate.js';
 import type { Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
 import { logger } from '../helpers/logger.js';

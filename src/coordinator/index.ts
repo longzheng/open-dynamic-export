@@ -4,7 +4,7 @@ import { getSunSpecInvertersConnections } from '../sunspec/connections.js';
 import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller.js';
 import { logger as pinoLogger } from '../helpers/logger.js';
 import { InverterController } from './helpers/inverterController.js';
-import { RampRateHelper } from './helpers/rampRate.js';
+import { RampRateHelper } from '../sep2/helpers/rampRate.js';
 import {
     writeDerSamplePoints,
     writeSiteSamplePoints,
@@ -69,12 +69,13 @@ export function createCoordinator(): Coordinator {
     const inverterController = new InverterController({
         invertersConnections,
         applyControl: config.inverterControl,
-        rampRateHelper,
         limiters,
     });
 
     sunSpecInverterPoller.on('data', ({ invertersData, derSample }) => {
         writeDerSamplePoints(derSample);
+
+        rampRateHelper.onInverterData(invertersData);
 
         sep2?.derHelper.onInverterData(invertersData);
         sep2?.mirrorUsagePointListHelper.addDerSample(derSample);

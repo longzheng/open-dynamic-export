@@ -15,7 +15,7 @@ import { PVConn } from '../../sunspec/models/status.js';
 import type { PollRate } from '../models/pollRate.js';
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import deepEqual from 'fast-deep-equal';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
+import type { RampRateHelper } from './rampRate.js';
 import { DERControlType } from '../models/derControlType.js';
 import { enumHasValue } from '../../helpers/enum.js';
 import {
