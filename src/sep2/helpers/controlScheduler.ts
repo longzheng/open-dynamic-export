@@ -16,13 +16,14 @@ import {
 import { randomInt } from 'crypto';
 import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
 import type { DERControl } from '../models/derControl.js';
 
 export type ControlType = keyof DERControlBase;
 
-type DERControlBaseValueOfType<ControlKey extends ControlType> =
-    DERControlBase[ControlKey];
+type DERControlBaseValueOfType<ControlKey extends ControlType> = {
+    control: DERControlBase[ControlKey];
+    rampTms: DERControlBase['rampTms'];
+};
 
 export type RandomizedControlSchedule = ControlSchedule & {
     effectiveStartInclusive: Date;
@@ -42,7 +43,6 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     private client: SEP2Client;
     private derControlResponseHelper: DerControlResponseHelper;
     private logger: Logger;
-    private rampRateHelper: RampRateHelper;
     private controlType: ControlKey;
     private fallbackControl: FallbackControl = {
         type: 'none',
@@ -53,14 +53,11 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     constructor({
         client,
         controlType,
-        rampRateHelper,
     }: {
         client: SEP2Client;
         controlType: ControlKey;
-        rampRateHelper: RampRateHelper;
     }) {
         this.client = client;
-        this.rampRateHelper = rampRateHelper;
         this.controlType = controlType;
         this.derControlResponseHelper = new DerControlResponseHelper({
             client,
@@ -183,17 +180,6 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 derControl: newActiveControlSchedule.data.control,
                 status: ResponseStatus.EventStarted,
             });
-
-            // if the control has a ramp time, start the ramp
-            // note: this may not be the best place to start the ramp because different controlTypes of the same control
-            // will start the ramp multiple times with different randomization
-            // however this is the simplest way to implement it and it shouldn't have a significant negative effect
-            if (newActiveControlSchedule.data.control.derControlBase.rampTms) {
-                this.rampRateHelper.startControlRampTms(
-                    newActiveControlSchedule.data.control.derControlBase
-                        .rampTms,
-                );
-            }
         } else {
             this.logger.info(
                 { defaultControl: this.fallbackControl, now },
@@ -205,9 +191,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         this.activeControlSchedule = newActiveControlSchedule;
     }
 
-    private getCurrentControlBaseValue():
-        | DERControlBaseValueOfType<ControlKey>
-        | undefined {
+    private getCurrentControlBaseValue(): DERControlBaseValueOfType<ControlKey> {
         writeControlSchedulerPoints({
             activeControlSchedule: this.activeControlSchedule,
             controlType: this.controlType,
@@ -215,18 +199,25 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
 
         if (this.activeControlSchedule) {
-            return this.activeControlSchedule.data.control.derControlBase[
-                this.controlType
-            ];
+            const controlBase =
+                this.activeControlSchedule.data.control.derControlBase;
+            return {
+                control: controlBase[this.controlType],
+                rampTms: controlBase.rampTms,
+            };
         }
 
         switch (this.fallbackControl.type) {
-            case 'default':
-                return this.fallbackControl.data.defaultControl.derControlBase[
-                    this.controlType
-                ];
+            case 'default': {
+                const controlBase =
+                    this.fallbackControl.data.defaultControl.derControlBase;
+                return {
+                    control: controlBase[this.controlType],
+                    rampTms: controlBase.rampTms,
+                };
+            }
             case 'none':
-                return undefined;
+                return { control: undefined, rampTms: undefined };
         }
     }
 

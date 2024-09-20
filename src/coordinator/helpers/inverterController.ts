@@ -18,7 +18,6 @@ import {
 import { getTotalFromPerPhaseNetOrNoPhaseMeasurement } from '../../helpers/measurement.js';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { RampRateHelper } from './rampRate.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { LimiterType } from './limiter.js';
 import type { SiteSample } from '../../meters/siteSample.js';
@@ -42,7 +41,6 @@ type InverterConfiguration =
           type: 'limit';
           currentPowerRatio: number;
           targetSolarPowerRatio: number;
-          rampedTargetSolarPowerRatio: number;
       };
 
 const defaultValues = {
@@ -60,25 +58,21 @@ export class InverterController {
     private cachedSiteSample: SiteSample | null = null;
     private applyControl: boolean;
     private logger: Logger;
-    private rampRateHelper: RampRateHelper;
     private limiters: LimiterType[];
 
     constructor({
         invertersConnections,
         applyControl,
-        rampRateHelper,
         limiters,
     }: {
         invertersConnections: InverterSunSpecConnection[];
         applyControl: boolean;
-        rampRateHelper: RampRateHelper;
         limiters: LimiterType[];
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.applyControl = applyControl;
         this.inverterConnections = invertersConnections;
-        this.rampRateHelper = rampRateHelper;
         this.limiters = limiters;
 
         void this.startLoop();
@@ -147,7 +141,6 @@ export class InverterController {
             activeControlLimit: getActiveInverterControlLimit,
             invertersData: this.cachedInvertersData,
             siteSample: this.cachedSiteSample,
-            rampRateHelper: this.rampRateHelper,
         });
 
         this.logger.info(
@@ -165,7 +158,12 @@ export class InverterController {
                     this.cachedInvertersData?.invertersData[index];
 
                 if (!inverterData) {
-                    throw new Error('Inverter data not found');
+                    this.logger.error(
+                        { index },
+                        `Can't generate control model for inverter, inverter data not available`,
+                    );
+
+                    return;
                 }
 
                 const writeControlsModel =
@@ -193,12 +191,10 @@ export function calculateInverterConfiguration({
     activeControlLimit,
     invertersData,
     siteSample,
-    rampRateHelper,
 }: {
     activeControlLimit: InverterControlLimit;
     invertersData: InvertersPolledData;
     siteSample: SiteSample;
-    rampRateHelper: RampRateHelper;
 }): InverterConfiguration {
     const logger = pinoLogger.child({ module: 'calculateDynamicExportConfig' });
 
@@ -251,18 +247,12 @@ export function calculateInverterConfiguration({
         targetSolarWatts,
     });
 
-    const rampedTargetSolarPowerRatio = rampRateHelper.calculateRampValue({
-        currentPowerRatio,
-        targetPowerRatio: targetSolarPowerRatio,
-    });
-
     writeInverterControllerPoints({
         deenergize,
         siteWatts,
         solarWatts,
         exportLimitWatts,
         exportLimitTargetSolarWatts,
-        rampedTargetSolarPowerRatio,
         generationLimitWatts,
         targetSolarWatts,
         currentPowerRatio,
@@ -276,7 +266,6 @@ export function calculateInverterConfiguration({
             solarWatts,
             exportLimitWatts,
             exportLimitTargetSolarWatts,
-            rampedTargetSolarPowerRatio,
             generationLimitWatts,
             targetSolarWatts,
             currentPowerRatio,
@@ -293,10 +282,6 @@ export function calculateInverterConfiguration({
         type: 'limit',
         currentPowerRatio: roundToDecimals(currentPowerRatio, 4),
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
-        rampedTargetSolarPowerRatio: roundToDecimals(
-            rampedTargetSolarPowerRatio,
-            4,
-        ),
     };
 }
 
@@ -333,7 +318,7 @@ export function generateControlsModelWriteFromInverterConfiguration({
                 WMaxLim_Ena: WMaxLim_Ena.ENABLED,
                 WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
                     targetSolarPowerRatio:
-                        inverterConfiguration.rampedTargetSolarPowerRatio,
+                        inverterConfiguration.targetSolarPowerRatio,
                     controlsModel,
                 }),
                 // revert WMaxLimtPct in 60 seconds
@@ -520,6 +505,15 @@ export function getAggregatedInverterControlLimit(
                 opModExpLimW = controlLimit.opModExpLimW;
             }
         }
+    }
+
+    // round numeric values
+    if (opModGenLimW !== undefined) {
+        opModGenLimW = Math.round(opModGenLimW);
+    }
+
+    if (opModExpLimW !== undefined) {
+        opModExpLimW = Math.round(opModExpLimW);
     }
 
     return {
