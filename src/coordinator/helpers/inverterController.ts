@@ -10,7 +10,6 @@ import {
 import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import { Decimal } from 'decimal.js';
 import {
-    averageNumbersArray,
     numberWithPow10,
     roundToDecimals,
     sumNumbersArray,
@@ -39,7 +38,6 @@ type InverterConfiguration =
     | { type: 'deenergize' }
     | {
           type: 'limit';
-          currentPowerRatio: number;
           targetSolarPowerRatio: number;
       };
 
@@ -134,18 +132,17 @@ export class InverterController {
             return;
         }
 
-        const getActiveInverterControlLimit =
-            this.getActiveInverterControlLimit();
+        const activeInverterControlLimit = this.getActiveInverterControlLimit();
 
         const inverterConfiguration = calculateInverterConfiguration({
-            activeControlLimit: getActiveInverterControlLimit,
+            activeInverterControlLimit,
             invertersData: this.cachedInvertersData,
             siteSample: this.cachedSiteSample,
         });
 
         this.logger.info(
             {
-                getActiveInverterControlLimit,
+                activeInverterControlLimit,
                 inverterConfiguration,
             },
             'Updating inverter control values',
@@ -188,41 +185,46 @@ export class InverterController {
 }
 
 export function calculateInverterConfiguration({
-    activeControlLimit,
+    activeInverterControlLimit,
     invertersData,
     siteSample,
 }: {
-    activeControlLimit: InverterControlLimit;
+    activeInverterControlLimit: InverterControlLimit;
     invertersData: InvertersPolledData;
     siteSample: SiteSample;
 }): InverterConfiguration {
-    const logger = pinoLogger.child({ module: 'calculateDynamicExportConfig' });
+    const logger = pinoLogger.child({
+        module: 'calculateInverterConfiguration',
+    });
 
     logger.trace(
         {
-            activeDerControlBaseValues: activeControlLimit,
+            activeInverterControlLimit,
         },
-        'activeDerControlBaseValue',
+        'activeInverterControlLimit',
     );
 
     const energize =
-        activeControlLimit.opModEnergize ?? defaultValues.opModEnergize;
+        activeInverterControlLimit.opModEnergize ?? defaultValues.opModEnergize;
+
     const connect =
-        activeControlLimit.opModConnect ?? defaultValues.opModConnect;
+        activeInverterControlLimit.opModConnect ?? defaultValues.opModConnect;
+
     const deenergize = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
         siteSample.realPower,
     );
+
     const solarWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
         invertersData.derSample.realPower,
     );
 
     const exportLimitWatts =
-        activeControlLimit.opModExpLimW ?? defaultValues.opModExpLimW;
+        activeInverterControlLimit.opModExpLimW ?? defaultValues.opModExpLimW;
 
     const generationLimitWatts =
-        activeControlLimit.opModGenLimW ?? defaultValues.opModGenLimW;
+        activeInverterControlLimit.opModGenLimW ?? defaultValues.opModGenLimW;
 
     const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
@@ -237,11 +239,6 @@ export function calculateInverterConfiguration({
         generationLimitWatts,
     );
 
-    const currentPowerRatio = getCurrentPowerRatio({
-        inverters: invertersData.invertersData,
-        currentSolarWatts: solarWatts,
-    });
-
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         inverters: invertersData.invertersData,
         targetSolarWatts,
@@ -255,7 +252,6 @@ export function calculateInverterConfiguration({
         exportLimitTargetSolarWatts,
         generationLimitWatts,
         targetSolarWatts,
-        currentPowerRatio,
         targetSolarPowerRatio,
     });
 
@@ -268,7 +264,6 @@ export function calculateInverterConfiguration({
             exportLimitTargetSolarWatts,
             generationLimitWatts,
             targetSolarWatts,
-            currentPowerRatio,
             targetSolarPowerRatio,
         },
         'calculated values',
@@ -280,7 +275,6 @@ export function calculateInverterConfiguration({
 
     return {
         type: 'limit',
-        currentPowerRatio: roundToDecimals(currentPowerRatio, 4),
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
     };
 }
@@ -349,66 +343,6 @@ export function getWMaxLimPctFromTargetSolarPowerRatio({
                 .toNumber(),
             -controlsModel.WMaxLimPct_SF,
         ),
-    );
-}
-
-export function getCurrentPowerRatio({
-    inverters,
-    currentSolarWatts,
-}: {
-    inverters: {
-        inverter: Pick<
-            InvertersPolledData['invertersData'][number]['inverter'],
-            'realPower'
-        >;
-        nameplate: Pick<
-            InvertersPolledData['invertersData'][number]['nameplate'],
-            'maxW'
-        >;
-        controls: Pick<
-            InvertersPolledData['invertersData'][number]['controls'],
-            'WMaxLim_Ena' | 'WMaxLimPct' | 'WMaxLimPct_SF'
-        >;
-    }[];
-    currentSolarWatts: number;
-}) {
-    return averageNumbersArray(
-        inverters.map(({ controls, inverter, nameplate }, invertersIndex) => {
-            // if the WMaxLim_Ena is not enabled, we are not yet controlling the inverter
-            // we're not sure if the inverter is under any control that is invisible to SunSpec (e.g. export limit) that might be affecting the output
-            // so we can't know definitely what the "actual" power ratio is
-            // this is a dangerous scenario because if we miscalculate the power ratio at the first instance of control, we might exceed the export limit
-            // the most conservative estimate we can make is the current solar / nameplate ratio which assumes a 100% efficiency
-            // because it will never be 100% efficient, this means that we should always underestimate the power ratio
-            // which is a safe assumption, but we hope future update cycles will find the "correct" power ratio
-            if (controls.WMaxLim_Ena !== WMaxLim_Ena.ENABLED) {
-                const estimatedPowerRatio = Math.min(
-                    inverter.realPower / nameplate.maxW,
-                    1, // cap maximum to 1 (possible due to inverter overclocking)
-                );
-
-                pinoLogger.debug(
-                    {
-                        estimatedPowerRatio: roundToDecimals(
-                            estimatedPowerRatio,
-                            4,
-                        ),
-                        currentSolarWatts,
-                        nameplate,
-                        invertersIndex,
-                    },
-                    'WMaxLim_Ena is not enabled, estimated power ratio',
-                );
-
-                return estimatedPowerRatio;
-            }
-
-            return (
-                // the value is expressed from 0-100, divide to get ratio
-                numberWithPow10(controls.WMaxLimPct, controls.WMaxLimPct_SF) /
-                100
-            );
-        }),
     );
 }
 

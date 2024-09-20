@@ -479,7 +479,6 @@ export function writeInverterControllerPoints({
     exportLimitTargetSolarWatts,
     generationLimitWatts,
     targetSolarWatts,
-    currentPowerRatio,
     targetSolarPowerRatio,
 }: {
     deenergize: boolean;
@@ -489,7 +488,6 @@ export function writeInverterControllerPoints({
     exportLimitTargetSolarWatts: number;
     generationLimitWatts: number;
     targetSolarWatts: number;
-    currentPowerRatio: number;
     targetSolarPowerRatio: number;
 }) {
     influxDbWriteApi.writePoint(
@@ -504,7 +502,6 @@ export function writeInverterControllerPoints({
             )
             .floatField('generationLimitWatts', generationLimitWatts)
             .floatField('targetSolarWatts', targetSolarWatts)
-            .floatField('currentPowerRatio', currentPowerRatio)
             .floatField('targetSolarPowerRatio', targetSolarPowerRatio),
     );
 }
