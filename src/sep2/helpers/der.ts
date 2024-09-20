@@ -13,7 +13,6 @@ import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
 import { PVConn } from '../../sunspec/models/status.js';
 import type { PollRate } from '../models/pollRate.js';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import deepEqual from 'fast-deep-equal';
 import type { RampRateHelper } from './rampRate.js';
 import { DERControlType } from '../models/derControlType.js';
@@ -26,10 +25,7 @@ import {
 import { ConnectStatus } from '../models/connectStatus.js';
 import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
 import { OperationalModeStatus } from '../models/operationModeStatus.js';
-import {
-    generateInverterDataStatus,
-    type InverterData,
-} from '../../coordinator/helpers/inverterData.js';
+import { type InverterData } from '../../coordinator/helpers/inverterData.js';
 import { DERType } from '../models/derType.js';
 
 type Config = {
@@ -47,21 +43,17 @@ export class DerHelper {
     private lastSentDerCapability: DERCapability | null = null;
     private lastSentDerSettings: DERSettings | null = null;
     private lastSentDerStatus: DERStatus | null = null;
-    private invertersConnections: InverterSunSpecConnection[];
     private pollTimer: NodeJS.Timeout | null = null;
     private rampRateHelper: RampRateHelper;
 
     constructor({
         client,
-        invertersConnections,
         rampRateHelper,
     }: {
         client: SEP2Client;
-        invertersConnections: InverterSunSpecConnection[];
         rampRateHelper: RampRateHelper;
     }) {
         this.client = client;
-        this.invertersConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
 
         this.logger = pinoLogger.child({ module: 'DerHelper' });
@@ -72,7 +64,15 @@ export class DerHelper {
         this.config = config;
 
         if (!this.pollTimer) {
-            void this.poll();
+            this.pollTimer = setTimeout(
+                () => {
+                    void this.poll();
+                },
+                this.config.pollRate
+                    ? this.config.pollRate * 1000
+                    : // fallback to default poll rate for EndDeviceList
+                      defaultPollPushRates.endDeviceListPoll * 1000,
+            );
         }
     }
 
@@ -135,34 +135,12 @@ export class DerHelper {
     }
 
     private async poll() {
-        this.pollTimer = setTimeout(
-            () => {
-                void this.poll();
-            },
-            this.config?.pollRate
-                ? this.config.pollRate * 1000
-                : // fallback to default poll rate for EndDeviceList
-                  defaultPollPushRates.endDeviceListPoll * 1000,
-        );
-
         try {
-            const inverterData = await Promise.all(
-                this.invertersConnections.map(async (inverter) => {
-                    return {
-                        status: await inverter.getStatusModel(),
-                    };
-                }),
-            );
+            if (!this.lastSentDerStatus) {
+                throw new Error('DER status has not been cached');
+            }
 
-            const data = inverterData.map((data) => ({
-                status: generateInverterDataStatus(data),
-            }));
-
-            const derStatus = getDerStatusResponseFromInverterData(data);
-
-            void this.putDerStatus({ derStatus });
-
-            this.lastSentDerStatus = derStatus;
+            await this.putDerStatus({ derStatus: this.lastSentDerStatus });
         } catch (error) {
             this.logger.error(
                 { error },

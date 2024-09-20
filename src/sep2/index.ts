@@ -2,7 +2,6 @@ import type { RampRateHelper } from './helpers/rampRate.js';
 import type { Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
 import { logger } from '../helpers/logger.js';
-import type { InverterSunSpecConnection } from '../sunspec/connection/inverter.js';
 import { SEP2Client } from './client.js';
 import { Sep2Limiter } from '../limiters/sep2/index.js';
 import { DerHelper } from './helpers/der.js';
@@ -24,11 +23,9 @@ import { RegistrationHelper } from './helpers/registration.js';
 
 export function getSep2Limiter({
     config,
-    invertersConnections,
     rampRateHelper,
 }: {
     config: Config;
-    invertersConnections: InverterSunSpecConnection[];
     rampRateHelper: RampRateHelper;
 }) {
     if (!config.limiters.sep2) {
@@ -62,7 +59,6 @@ export function getSep2Limiter({
 
     const derHelper = new DerHelper({
         client: sep2Client,
-        invertersConnections,
         rampRateHelper,
     });
 

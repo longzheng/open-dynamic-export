@@ -40,7 +40,6 @@ export function createCoordinator(): Coordinator {
 
     const sep2 = getSep2Limiter({
         config,
-        invertersConnections,
         rampRateHelper,
     });
 
