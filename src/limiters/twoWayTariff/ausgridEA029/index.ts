@@ -57,6 +57,7 @@ const chargeWindow: Window = {
 
 // Customers receive a payment or credit of 2.3 cents/kWh for the electricity exported during the peak demand period (4pm to 9pm).
 // TODO: reduce load or export battery during reward window
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const rewardWindow: Window = {
     startHourOfDay: 16,
     endHourOfDay: 22,

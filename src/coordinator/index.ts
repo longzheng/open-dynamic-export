@@ -97,6 +97,8 @@ export function createCoordinator(): Coordinator {
     return {
         siteSamplePoller,
         destroy: () => {
+            logger.info('Destroying coordinator');
+
             siteSamplePoller.destroy();
         },
     };
