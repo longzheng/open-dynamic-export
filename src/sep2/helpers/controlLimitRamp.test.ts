@@ -17,7 +17,7 @@ describe('ControlLimitRampHelper', () => {
         helper = new ControlLimitRampHelper({ rampRateHelper });
     });
 
-    it('should return correct value for no limit and no total nameplate', () => {
+    it('should return no value for no target and no total nameplate', () => {
         helper.updateTarget({ value: undefined, rampTimeSeconds: undefined });
 
         // cache initial value
@@ -26,7 +26,7 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(undefined);
     });
 
-    it('should return correct value for no limit with total nameplate', () => {
+    it('should return nameplate value for no target with total nameplate', () => {
         rampRateHelper.onInverterData([
             {
                 nameplate: { maxW: 10000 },
@@ -165,6 +165,29 @@ describe('ControlLimitRampHelper', () => {
         vi.setSystemTime(new Date('2021-01-01T01:01:00Z'));
         const rampedValue2 = helper.getRampedValue();
         expect(rampedValue2).toBe(rampedValue1! + 10000 * (1 / 100) * 30);
+    });
+
+    it('should return ramped value with no limit ramp rate', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(0);
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+        helper.updateTarget({ value: 5000, rampTimeSeconds: undefined });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(5000);
+
+        // new target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(5000);
+
+        helper.updateTarget({ value: 1500, rampTimeSeconds: undefined });
+
+        expect(helper.getRampedValue()).toBe(1500);
     });
 });
 
