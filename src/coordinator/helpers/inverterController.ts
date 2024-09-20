@@ -13,6 +13,7 @@ import {
     averageNumbersArray,
     numberWithPow10,
     roundToDecimals,
+    sumNumbersArray,
 } from '../../helpers/number.js';
 import { getTotalFromPerPhaseNetOrNoPhaseMeasurement } from '../../helpers/measurement.js';
 import { type Logger } from 'pino';
@@ -246,8 +247,7 @@ export function calculateInverterConfiguration({
     });
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
-        currentPowerRatio,
-        currentSolarWatts: solarWatts,
+        inverters: invertersData.invertersData,
         targetSolarWatts,
     });
 
@@ -371,7 +371,20 @@ export function getCurrentPowerRatio({
     inverters,
     currentSolarWatts,
 }: {
-    inverters: InvertersPolledData['invertersData'];
+    inverters: {
+        inverter: Pick<
+            InvertersPolledData['invertersData'][number]['inverter'],
+            'realPower'
+        >;
+        nameplate: Pick<
+            InvertersPolledData['invertersData'][number]['nameplate'],
+            'maxW'
+        >;
+        controls: Pick<
+            InvertersPolledData['invertersData'][number]['controls'],
+            'WMaxLim_Ena' | 'WMaxLimPct' | 'WMaxLimPct_SF'
+        >;
+    }[];
     currentSolarWatts: number;
 }) {
     return averageNumbersArray(
@@ -415,39 +428,27 @@ export function getCurrentPowerRatio({
 }
 
 export function calculateTargetSolarPowerRatio({
-    currentSolarWatts,
+    inverters,
     targetSolarWatts,
-    currentPowerRatio,
 }: {
-    currentSolarWatts: number;
+    inverters: {
+        nameplate: Pick<
+            InvertersPolledData['invertersData'][number]['nameplate'],
+            'maxW'
+        >;
+    }[];
     targetSolarWatts: number;
-    // the current power ratio expressed as a decimal (0.0-1.0)
-    currentPowerRatio: number;
 }) {
-    if (targetSolarWatts === 0) {
+    const nameplateWattsTotal = sumNumbersArray(
+        inverters.map(({ nameplate }) => nameplate.maxW),
+    );
+
+    if (nameplateWattsTotal === 0) {
         return 0;
     }
 
-    // edge case if the current power ratio is 0
-    // there is no way to calculate the target power ratio because we cannot divide by 0
-    // set a hard-coded power ratio
-    // hopefully at a future cycle then it will be able to calculate the target power ratio
-    if (currentPowerRatio === 0 || isNaN(currentPowerRatio)) {
-        if (targetSolarWatts > currentSolarWatts) {
-            // if the target is higher than the current, set a hard-coded power ratio of 0.01
-            return 0.01;
-        } else {
-            // if the target is lower than the current, set a hard-coded power ratio of 0
-            return 0;
-        }
-    }
-
-    const estimatedSolarCapacity = new Decimal(currentSolarWatts).div(
-        currentPowerRatio,
-    );
-
     const targetPowerRatio = new Decimal(targetSolarWatts).div(
-        estimatedSolarCapacity,
+        sumNumbersArray(inverters.map(({ nameplate }) => nameplate.maxW)),
     );
 
     // cap the target power ratio to 1.0

@@ -8,31 +8,31 @@ import {
 } from './inverterController.js';
 
 describe('calculateTargetSolarPowerRatio', () => {
-    it('should calculate higher target ratio', () => {
+    it('should calculate target ratio', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 5000,
-            currentPowerRatio: 0.4,
-            targetSolarWatts: 10000,
+            inverters: [
+                {
+                    nameplate: {
+                        maxW: 10000,
+                    },
+                },
+            ],
+            targetSolarWatts: 5000,
         });
 
-        expect(targetPowerRatio).toBe(0.8);
-    });
-
-    it('should calculate lower target ratio', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 5000,
-            currentPowerRatio: 0.4,
-            targetSolarWatts: 4000,
-        });
-
-        expect(targetPowerRatio).toBe(0.32);
+        expect(targetPowerRatio).toBe(0.5);
     });
 
     it('should cap target power ratio above 1.0 to 1.0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 5000,
-            currentPowerRatio: 0.5,
-            targetSolarWatts: 20000,
+            inverters: [
+                {
+                    nameplate: {
+                        maxW: 10000,
+                    },
+                },
+            ],
+            targetSolarWatts: 15000,
         });
 
         expect(targetPowerRatio).toBe(1);
@@ -40,38 +40,13 @@ describe('calculateTargetSolarPowerRatio', () => {
 
     it('should not return target power ratio lower than 0.0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 10,
-            currentPowerRatio: 0,
-            targetSolarWatts: 0,
-        });
-
-        expect(targetPowerRatio).toBe(0);
-    });
-
-    it('should return a hard-coded power ratio of 0.01 if current power ratio is 0 and target is greater', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 70.52,
-            currentPowerRatio: 0,
-            targetSolarWatts: 9000,
-        });
-
-        expect(targetPowerRatio).toBe(0.01);
-    });
-
-    it('should return a hard-coded power ratio of 0.01 if current power ratio is NaN and target is greater', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 70.52,
-            currentPowerRatio: Number.NaN,
-            targetSolarWatts: 9000,
-        });
-
-        expect(targetPowerRatio).toBe(0.01);
-    });
-
-    it('should return a hard-coded power ratio of 0 if current power ratio is 0 and target is lower', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 70.52,
-            currentPowerRatio: 0,
+            inverters: [
+                {
+                    nameplate: {
+                        maxW: 10000,
+                    },
+                },
+            ],
             targetSolarWatts: 0,
         });
 
@@ -81,18 +56,37 @@ describe('calculateTargetSolarPowerRatio', () => {
     it('avoid floating point errors', () => {
         // these values don't make sense practically but is designed to test floating point errors
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 3,
-            currentPowerRatio: 1,
+            inverters: [
+                {
+                    nameplate: {
+                        maxW: 3,
+                    },
+                },
+            ],
             targetSolarWatts: 0.27,
         });
 
         expect(targetPowerRatio).toBe(0.09);
     });
 
-    it('should handle solar and target as 0', () => {
+    it('should handle nameplate as 0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 0,
-            currentPowerRatio: 0.15,
+            inverters: [
+                {
+                    nameplate: {
+                        maxW: 0,
+                    },
+                },
+            ],
+            targetSolarWatts: 0,
+        });
+
+        expect(targetPowerRatio).toBe(0);
+    });
+
+    it('should handle no inverters', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            inverters: [],
             targetSolarWatts: 0,
         });
 
