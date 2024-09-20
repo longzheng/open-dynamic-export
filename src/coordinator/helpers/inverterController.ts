@@ -44,11 +44,11 @@ type InverterConfiguration =
 const defaultValues = {
     opModGenLimW: Number.MAX_SAFE_INTEGER,
     opModLoadLimW: Number.MAX_SAFE_INTEGER,
-    opModExpLimW: 1500,
-    opModImpLimW: 1500,
+    opModExpLimW: Number.MAX_SAFE_INTEGER,
+    opModImpLimW: Number.MAX_SAFE_INTEGER,
     opModEnergize: true,
     opModConnect: true,
-};
+} as const satisfies Record<ControlType, unknown>;
 
 export class InverterController {
     private inverterConnections: InverterSunSpecConnection[];

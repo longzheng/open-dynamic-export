@@ -18,7 +18,7 @@ import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
 import type { DERControl } from '../models/derControl.js';
 
-export type ControlType = keyof DERControlBase;
+export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 
 type DERControlBaseValueOfType<ControlKey extends ControlType> = {
     control: DERControlBase[ControlKey];
