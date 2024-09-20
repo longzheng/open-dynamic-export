@@ -277,7 +277,7 @@ The initial plan is to implement a direct gateway client that interacts directly
   - [x] DER status/capability/settings reporting
   - [x] DER control scheduling and default DER control fallback
   - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
-- [x] Software-based `setGradW` ramping
+  - [x] Software-based limit ramping (`setGradW` or `rampTms`)
 - [x] Metrics logging in InfluxDB
 
 Future
