@@ -3,11 +3,11 @@ import type {
     ControlType,
     RandomizedControlSchedule,
 } from '../sep2/helpers/controlScheduler.js';
-import type { FallbackControl } from '../sep2/helpers/derControls.js';
 import { numberWithPow10 } from './number.js';
 import type { SiteSample } from '../meters/siteSample.js';
 import type { DerSample } from '../coordinator/helpers/derSample.js';
 import type { InverterControlLimit } from '../coordinator/helpers/inverterController.js';
+import type { FallbackControl } from '../sep2/helpers/fallbackControl.js';
 
 const influxDB = new InfluxDB({
     url: `http://influxdb:${process.env['INFLUXDB_PORT'] ?? 8086}`,

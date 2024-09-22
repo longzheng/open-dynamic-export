@@ -5,7 +5,6 @@ import { ResponseStatus } from '../models/derControlResponse.js';
 import type { DERControlBase } from '../models/derControlBase.js';
 import type {
     DerControlsHelperChangedData,
-    FallbackControl,
     MergedControlsData,
 } from './derControls.js';
 import { DerControlResponseHelper } from './derControlResponse.js';
@@ -17,6 +16,7 @@ import { randomInt } from 'crypto';
 import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
 import type { DERControl } from '../models/derControl.js';
+import type { FallbackControl } from './fallbackControl.js';
 
 export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 
@@ -68,11 +68,15 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
     }
 
+    updateFallbackControl(fallbackControl: FallbackControl) {
+        this.fallbackControl = fallbackControl;
+    }
+
     updateControlsData({
         activeOrScheduledControls,
         fallbackControl,
     }: DerControlsHelperChangedData) {
-        this.fallbackControl = fallbackControl;
+        this.updateFallbackControl(fallbackControl);
 
         const controlsOfType = filterControlsOfType({
             activeOrScheduledControls,

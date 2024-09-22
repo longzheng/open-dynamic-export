@@ -1,11 +1,14 @@
+import 'dotenv/config';
 import z from 'zod';
 import { safeParseIntString } from './number.js';
 import { logger } from './logger.js';
 
 const envSchema = z.object({
+    TZ: z.string(),
     SERVER_PORT: z.string().transform(safeParseIntString),
-    SEP2_CERT_PATH: z.string(),
-    SEP2_KEY_PATH: z.string(),
+    CONFIG_DIR: z.string(),
+    SEP2_CERT_FILE: z.string(),
+    SEP2_KEY_FILE: z.string(),
     SEP2_PEN: z.string(),
     INFLUXDB_USERNAME: z.string(),
     INFLUXDB_PASSWORD: z.string(),

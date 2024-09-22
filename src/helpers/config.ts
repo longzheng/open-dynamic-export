@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { readFileSync } from 'fs';
+import { env } from './env.js';
 
 const sunspecModbusSchema = {
     ip: z
@@ -162,10 +163,14 @@ export const configSchema = z.object({
 
 export type Config = z.infer<typeof configSchema>;
 
+export function getConfigPath() {
+    return `${env.CONFIG_DIR}/config.json`;
+}
+
 export function getConfig() {
     const configJson = (() => {
         try {
-            return readFileSync('./config/config.json', 'utf8');
+            return readFileSync(getConfigPath(), 'utf8');
         } catch {
             throw new Error(`Error reading ./config/config.json`);
         }
