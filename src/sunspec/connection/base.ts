@@ -63,7 +63,7 @@ export abstract class SunSpecConnection {
         this.client.on('error', (error) => {
             this.state = { type: 'disconnected' };
 
-            this.logger.error({ error }, `SunSpec Modbus client error`);
+            this.logger.error(error, `SunSpec Modbus client error`);
         });
 
         this.connect().catch(() => {

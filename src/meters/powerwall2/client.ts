@@ -83,17 +83,9 @@ export class Powerwall2Client {
 
                         return token;
                     } catch (error) {
-                        if (error instanceof AxiosError) {
-                            throw new Error(
-                                `Powerwall2 get token error
-            message: ${error.message}
-            url: ${error.config?.url}
-            response status: ${error.response?.status}
-            response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                            );
-                        }
+                        this.logger.error(error);
 
-                        throw error;
+                        throw new Error(`Powerwall2 get token error`);
                     }
                 })();
 
@@ -131,13 +123,7 @@ export class Powerwall2Client {
                     return this.get(url, params);
                 }
 
-                throw new Error(
-                    `Powerwall2Client GET error
-message: ${error.message}
-url: ${error.config?.url}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
+                throw error;
             }
 
             throw error;

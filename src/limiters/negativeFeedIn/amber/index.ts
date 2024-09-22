@@ -104,7 +104,7 @@ export class AmberLimiter implements LimiterType {
         try {
             await this.getSiteFeedInPrices();
         } catch (error) {
-            this.logger.error({ error }, 'Failed to poll Amber API');
+            this.logger.error(error, 'Failed to poll Amber API');
         } finally {
             setTimeout(
                 () => {
