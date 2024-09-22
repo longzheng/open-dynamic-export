@@ -49,10 +49,7 @@ export abstract class PollableResource<
             try {
                 return await this.get({ client: this.client, url: this.url });
             } catch (error) {
-                logger.error(
-                    { error, url: this.url },
-                    `Error polling resource`,
-                );
+                logger.error(error, 'Failed to poll resource');
 
                 return null;
             }

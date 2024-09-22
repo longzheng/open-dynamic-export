@@ -1,5 +1,5 @@
 import type { AxiosInstance, AxiosResponse } from 'axios';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
 import {
@@ -75,69 +75,25 @@ export class SEP2Client {
     }
 
     async get(link: string, params?: Record<string, string>): Promise<unknown> {
-        try {
-            const url = `${this.host}${link}`;
-            const response = await this.axiosInstance.get<string>(url, {
-                params,
-            });
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.get<string>(url, {
+            params,
+        });
 
-            return await parseStringPromise(response.data);
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                throw new Error(
-                    `SEP2Client GET error
-message: ${error.message}
-url: ${error.config?.url}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
-            }
-
-            throw error;
-        }
+        return await parseStringPromise(response.data);
     }
 
     async post(link: string, data: unknown): Promise<AxiosResponse> {
-        try {
-            const url = `${this.host}${link}`;
-            const response = await this.axiosInstance.post<string>(url, data);
-            return response;
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                throw new Error(
-                    `SEP2Client POST error
-message: ${error.message}
-url: ${error.config?.url}
-request data: ${JSON.stringify(data, null, 2)}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
-            }
-
-            throw error;
-        }
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.post<string>(url, data);
+        return response;
     }
 
     async put(link: string, data: unknown): Promise<AxiosResponse> {
-        try {
-            const url = `${this.host}${link}`;
-            const response = await this.axiosInstance.put<string>(url, data);
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.put<string>(url, data);
 
-            return response;
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                throw new Error(
-                    `SEP2Client PUT error
-message: ${error.message}
-url: ${error.config?.url}
-request data: ${JSON.stringify(data, null, 2)}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
-            }
-
-            throw error;
-        }
+        return response;
     }
 
     public discover() {

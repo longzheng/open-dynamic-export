@@ -143,7 +143,7 @@ export class DerHelper {
             await this.putDerStatus({ derStatus: this.lastSentDerStatus });
         } catch (error) {
             this.logger.error(
-                { error },
+                error,
                 'Error updating DER status during scheduled poll',
             );
         }
@@ -172,7 +172,7 @@ export class DerHelper {
 
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
         } catch (error) {
-            this.logger.error({ error }, 'Error updating DER capability');
+            this.logger.error(error, 'Error updating DER capability');
         }
     }
 
@@ -199,7 +199,7 @@ export class DerHelper {
 
             await this.client.put(this.config.der.derSettingsLink.href, xml);
         } catch (error) {
-            this.logger.error({ error }, 'Error updating DER settings');
+            this.logger.error(error, 'Error updating DER settings');
         }
     }
 
@@ -222,7 +222,7 @@ export class DerHelper {
 
             await this.client.put(this.config.der.derStatusLink.href, xml);
         } catch (error) {
-            this.logger.error({ error }, 'Error updating DER capability');
+            this.logger.error(error, 'Error updating DER capability');
         }
     }
 

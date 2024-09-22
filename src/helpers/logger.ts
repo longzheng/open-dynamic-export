@@ -1,9 +1,43 @@
-import { pino, stdTimeFunctions } from 'pino';
+import { AxiosError } from 'axios';
+import { pino, stdTimeFunctions, stdSerializers } from 'pino';
 
 export const logger = pino({
     level: 'trace',
     base: null, // disable PID and hostname
     timestamp: stdTimeFunctions.isoTime, // write ISO time to log file
+    serializers: {
+        ...stdSerializers,
+        err: (error) => {
+            if (error instanceof AxiosError) {
+                return {
+                    message: error.message,
+                    code: error.code,
+                    url: error.config?.url,
+                    method: error.config?.method,
+
+                    request: error.request
+                        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                          { headers: error.request?.getHeaders?.() }
+                        : undefined,
+                    response: error.response
+                        ? {
+                              status: error.response.status,
+                              headers: error.response.headers,
+                              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                              data: error.response.data,
+                          }
+                        : undefined,
+                };
+            }
+
+            if (error instanceof Error) {
+                return stdSerializers.err(error);
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return error;
+        },
+    },
     transport: {
         targets: [
             {

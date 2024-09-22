@@ -100,10 +100,7 @@ export class InverterController {
         try {
             await this.updateInverterControlValues();
         } catch (error) {
-            this.logger.error(
-                { error },
-                'Failed to push inverter control values',
-            );
+            this.logger.error(error, 'Failed to push inverter control values');
         } finally {
             const end = performance.now();
             const duration = end - start;
@@ -174,7 +171,7 @@ export class InverterController {
                         await inverter.writeControlsModel(writeControlsModel);
                     } catch (error) {
                         this.logger.error(
-                            { error },
+                            error,
                             'Error writing inverter controls value',
                         );
                     }

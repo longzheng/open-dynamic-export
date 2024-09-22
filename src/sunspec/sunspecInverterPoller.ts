@@ -52,7 +52,7 @@ export class SunSpecInverterPoller extends EventEmitter<{
                             value: inverterData,
                         };
                     } catch (error) {
-                        logger.error({ error }, 'Failed to get inverter data');
+                        logger.error(error, 'Failed to get inverter data');
 
                         return {
                             success: false,
