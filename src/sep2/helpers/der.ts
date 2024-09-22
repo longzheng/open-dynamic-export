@@ -94,8 +94,6 @@ export class DerHelper {
             )
         ) {
             void this.putDerCapability({ derCapability });
-
-            this.lastSentDerCapability = derCapability;
         }
 
         const derSettings = getDerSettingsResponseFromInverterData({
@@ -113,8 +111,6 @@ export class DerHelper {
 
         if (!this.isDerSettingsEqual(derSettings, this.lastSentDerSettings)) {
             void this.putDerSettings({ derSettings });
-
-            this.lastSentDerSettings = derSettings;
         }
 
         const derStatus = getDerStatusResponseFromInverterData(data);
@@ -129,8 +125,6 @@ export class DerHelper {
 
         if (!this.isDerStatusEqual(derStatus, this.lastSentDerStatus)) {
             void this.putDerStatus({ derStatus });
-
-            this.lastSentDerStatus = derStatus;
         }
     }
 
@@ -171,6 +165,8 @@ export class DerHelper {
             }
 
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
+
+            this.lastSentDerCapability = derCapability;
         } catch (error) {
             this.logger.error(error, 'Error updating DER capability');
         }
@@ -198,6 +194,8 @@ export class DerHelper {
             }
 
             await this.client.put(this.config.der.derSettingsLink.href, xml);
+
+            this.lastSentDerSettings = derSettings;
         } catch (error) {
             this.logger.error(error, 'Error updating DER settings');
         }
@@ -221,6 +219,8 @@ export class DerHelper {
             }
 
             await this.client.put(this.config.der.derStatusLink.href, xml);
+
+            this.lastSentDerStatus = derStatus;
         } catch (error) {
             this.logger.error(error, 'Error updating DER capability');
         }
