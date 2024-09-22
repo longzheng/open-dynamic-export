@@ -14,6 +14,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
     protected logger: Logger;
     private pollingIntervalMs;
     private pollingTimer: NodeJS.Timeout | null = null;
+    private siteSampleCache: SiteSample | null = null;
 
     constructor({
         meterName,
@@ -44,6 +45,10 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
 
     abstract onDestroy(): void;
 
+    get getSiteSampleCache(): SiteSample | null {
+        return this.siteSampleCache;
+    }
+
     protected async startPolling() {
         const start = performance.now();
         const now = new Date();
@@ -60,6 +65,8 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
             };
 
             this.logger.trace({ siteSample }, 'generated site sample data');
+
+            this.siteSampleCache = siteSample;
 
             this.emit('data', {
                 siteSample,

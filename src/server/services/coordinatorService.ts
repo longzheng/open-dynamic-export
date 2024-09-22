@@ -1,5 +1,7 @@
 import type { Coordinator } from '../../coordinator/index.js';
 import { createCoordinator } from '../../coordinator/index.js';
+import type { SiteSampleData } from '../../meters/siteSample.js';
+import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 
 export type CoordinatorResponse = {
     running: boolean;
@@ -33,6 +35,15 @@ class CoordinatorService {
 
         this.coordinator.destroy();
         this.coordinator = null;
+    }
+
+    public siteSample(): // workaround tsoa type issue with zod
+    (SampleBase & SiteSampleData) | null {
+        if (!this.coordinator) {
+            throw new Error("Coordinator isn't running");
+        }
+
+        return this.coordinator.siteSamplePoller.getSiteSampleCache;
     }
 }
 

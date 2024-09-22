@@ -17,4 +17,9 @@ export class CoordinatorController extends Controller {
     public stop() {
         return coordinatorService.stop();
     }
+
+    @Get('siteSample')
+    public siteSample() {
+        return coordinatorService.siteSample();
+    }
 }
