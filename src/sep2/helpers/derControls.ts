@@ -11,6 +11,7 @@ import EventEmitter from 'events';
 import { CurrentStatus } from '../models/eventStatus.js';
 import { DerControlResponseHelper } from './derControlResponse.js';
 import { getDerControlEndDate, sortByProgramPrimacy } from './derControl.js';
+import type { FallbackControl } from './fallbackControl.js';
 
 export type MergedControlsData = {
     fsa: FunctionSetAssignments;
@@ -23,15 +24,6 @@ export type MergedDefaultControlsData = {
     program: DERProgram;
     defaultControl: DefaultDERControl;
 };
-
-export type FallbackControl =
-    | {
-          type: 'default';
-          data: MergedDefaultControlsData;
-      }
-    | {
-          type: 'none';
-      };
 
 export type DerControlsHelperChangedData = {
     activeOrScheduledControls: MergedControlsData[];

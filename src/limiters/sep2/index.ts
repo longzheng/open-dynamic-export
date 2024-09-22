@@ -8,18 +8,17 @@ import type { SEP2Client } from '../../sep2/client.js';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
-import EventEmitter from 'events';
 import type { LimiterType } from '../../coordinator/helpers/limiter.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
+import {
+    cacheFallbackControl,
+    getCachedFallbackControl,
+    type FallbackControl,
+} from '../../sep2/helpers/fallbackControl.js';
 
-export class Sep2Limiter
-    extends EventEmitter<{
-        changed: [];
-    }>
-    implements LimiterType
-{
+export class Sep2Limiter implements LimiterType {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
     };
@@ -34,8 +33,6 @@ export class Sep2Limiter
         client: SEP2Client;
         rampRateHelper: RampRateHelper;
     }) {
-        super();
-
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.schedulerByControlType = {
@@ -57,6 +54,12 @@ export class Sep2Limiter
             }),
         };
 
+        const cachedFallbackControl = getCachedFallbackControl();
+
+        if (cachedFallbackControl) {
+            this.updateFallbackControl(cachedFallbackControl);
+        }
+
         this.opModExpLimWRampRateHelper = new ControlLimitRampHelper({
             rampRateHelper,
         });
@@ -71,7 +74,7 @@ export class Sep2Limiter
             scheduler.updateControlsData(data);
         }
 
-        this.emit('changed');
+        cacheFallbackControl(data.fallbackControl);
     }
 
     getInverterControlLimit(): InverterControlLimit {
@@ -115,5 +118,11 @@ export class Sep2Limiter
         writeControlLimit({ limit, name: 'sep2' });
 
         return limit;
+    }
+
+    private updateFallbackControl(fallbackControl: FallbackControl) {
+        for (const scheduler of Object.values(this.schedulerByControlType)) {
+            scheduler.updateFallbackControl(fallbackControl);
+        }
     }
 }
