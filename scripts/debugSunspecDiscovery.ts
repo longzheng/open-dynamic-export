@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { getConfig } from '../src/helpers/config.js';
 import { logger } from '../src/helpers/logger.js';
 import {
-    getSunSpecInvertersConnections,
+    getSunSpecInvertersConnection,
     getSunSpecMeterConnection,
 } from '../src/sunspec/connections.js';
 
@@ -13,7 +13,10 @@ import {
 const config = getConfig();
 
 void (async () => {
-    const invertersConnections = getSunSpecInvertersConnections(config);
+    const invertersConnections = config.inverters
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        .filter((inverter) => inverter.type === 'sunspec')
+        .map((inverter) => getSunSpecInvertersConnection(inverter));
 
     for (const inverterConnection of invertersConnections) {
         const inverterLogger = logger.child({

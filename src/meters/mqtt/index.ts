@@ -16,7 +16,7 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
         config: Extract<Config['meter'], { type: 'mqtt' }>;
     }) {
         super({
-            meterName: 'mqtt',
+            name: 'mqtt',
             pollingIntervalMs: 200,
         });
 

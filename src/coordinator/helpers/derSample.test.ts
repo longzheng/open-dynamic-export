@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateDerSample } from './derSample.js';
-import type { InverterData } from './inverterData.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 
 describe('generateDerSample', () => {
     beforeEach(() => {

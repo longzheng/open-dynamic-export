@@ -2,7 +2,7 @@ import type { Config } from '../helpers/config.js';
 import { InverterSunSpecConnection } from './connection/inverter.js';
 import { MeterSunSpecConnection } from './connection/meter.js';
 
-function getInverterConnectionKey({
+function getConnectionKey({
     ip,
     port,
     unitId,
@@ -16,38 +16,40 @@ function getInverterConnectionKey({
 
 const inverterConnectionsMap = new Map<string, InverterSunSpecConnection>();
 
-export function getSunSpecInvertersConnections(config: Config) {
-    return config.inverters.map(({ ip, port, unitId }) => {
-        const key = getInverterConnectionKey({ ip, port, unitId });
+export function getSunSpecInvertersConnection({
+    ip,
+    port,
+    unitId,
+}: Extract<Config['inverters'][number], { type: 'sunspec' }>) {
+    const key = getConnectionKey({ ip, port, unitId });
 
-        if (inverterConnectionsMap.has(key)) {
-            return inverterConnectionsMap.get(key)!;
-        }
-
-        const connection = new InverterSunSpecConnection({ ip, port, unitId });
-
-        inverterConnectionsMap.set(key, connection);
-
-        return connection;
-    });
-}
-
-let meterConnectionCache: MeterSunSpecConnection | null = null;
-
-export function getSunSpecMeterConnection(
-    meterConfig: Extract<Config['meter'], { type: 'sunspec' }>,
-) {
-    if (meterConnectionCache) {
-        return meterConnectionCache;
+    if (inverterConnectionsMap.has(key)) {
+        return inverterConnectionsMap.get(key)!;
     }
 
-    const meterConnection = new MeterSunSpecConnection({
-        ip: meterConfig.ip,
-        port: meterConfig.port,
-        unitId: meterConfig.unitId,
-    });
+    const connection = new InverterSunSpecConnection({ ip, port, unitId });
 
-    meterConnectionCache = meterConnection;
+    inverterConnectionsMap.set(key, connection);
 
-    return meterConnection;
+    return connection;
+}
+
+const meterConnectionsMap = new Map<string, MeterSunSpecConnection>();
+
+export function getSunSpecMeterConnection({
+    ip,
+    port,
+    unitId,
+}: Extract<Config['meter'], { type: 'sunspec' }>) {
+    const key = getConnectionKey({ ip, port, unitId });
+
+    if (meterConnectionsMap.has(key)) {
+        return meterConnectionsMap.get(key)!;
+    }
+
+    const connection = new MeterSunSpecConnection({ ip, port, unitId });
+
+    meterConnectionsMap.set(key, connection);
+
+    return connection;
 }

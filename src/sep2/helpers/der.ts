@@ -25,7 +25,7 @@ import {
 import { ConnectStatus } from '../models/connectStatus.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
 import { OperationalModeStatus } from '../models/operationModeStatus.js';
-import { type InverterData } from '../../coordinator/helpers/inverterData.js';
+import { type InverterData } from '../../inverter/inverterData.js';
 import { DERType } from '../models/derType.js';
 
 type Config = {

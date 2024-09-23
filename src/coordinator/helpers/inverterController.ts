@@ -1,13 +1,5 @@
 import type { ControlType } from '../../sep2/helpers/controlScheduler.js';
-import {
-    Conn,
-    OutPFSet_Ena,
-    VArPct_Ena,
-    WMaxLim_Ena,
-    type ControlsModel,
-    type ControlsModelWrite,
-} from '../../sunspec/models/controls.js';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
+import { type ControlsModel } from '../../sunspec/models/controls.js';
 import { Decimal } from 'decimal.js';
 import {
     numberWithPow10,
@@ -20,7 +12,7 @@ import { logger as pinoLogger } from '../../helpers/logger.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { LimiterType } from './limiter.js';
 import type { SiteSample } from '../../meters/siteSample.js';
-import type { InvertersPolledData } from './inverterData.js';
+import type { InvertersData } from './inverterSample.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -34,8 +26,8 @@ export type InverterControlLimit = {
     opModExpLimW: number | undefined;
 };
 
-type InverterConfiguration =
-    | { type: 'deenergize' }
+export type InverterConfiguration =
+    | { type: 'disconnect' }
     | {
           type: 'limit';
           targetSolarPowerRatio: number;
@@ -51,32 +43,32 @@ const defaultValues = {
 } as const satisfies Record<ControlType, unknown>;
 
 export class InverterController {
-    private inverterConnections: InverterSunSpecConnection[];
-    private cachedInvertersData: InvertersPolledData | null = null;
+    private cachedInvertersData: InvertersData | null = null;
     private cachedSiteSample: SiteSample | null = null;
-    private applyControl: boolean;
     private logger: Logger;
     private limiters: LimiterType[];
+    private onControl: (
+        inverterConfiguration: InverterConfiguration,
+    ) => Promise<void>;
 
     constructor({
-        invertersConnections,
-        applyControl,
         limiters,
+        onControl,
     }: {
-        invertersConnections: InverterSunSpecConnection[];
-        applyControl: boolean;
         limiters: LimiterType[];
+        onControl: (
+            inverterConfiguration: InverterConfiguration,
+        ) => Promise<void>;
     }) {
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
-        this.applyControl = applyControl;
-        this.inverterConnections = invertersConnections;
         this.limiters = limiters;
+        this.onControl = onControl;
 
         void this.startLoop();
     }
 
-    updateSunSpecInverterData(data: InvertersPolledData) {
+    updateSunSpecInverterData(data: InvertersData) {
         this.logger.debug('Received inverter data, updating inverter controls');
         this.cachedInvertersData = data;
     }
@@ -145,39 +137,7 @@ export class InverterController {
             'Updating inverter control values',
         );
 
-        await Promise.all(
-            this.inverterConnections.map(async (inverter, index) => {
-                // assume the inverter data is in the same order as the connections
-                const inverterData =
-                    this.cachedInvertersData?.invertersData[index];
-
-                if (!inverterData) {
-                    this.logger.error(
-                        { index },
-                        `Can't generate control model for inverter, inverter data not available`,
-                    );
-
-                    return;
-                }
-
-                const writeControlsModel =
-                    generateControlsModelWriteFromInverterConfiguration({
-                        inverterConfiguration,
-                        controlsModel: inverterData.controls,
-                    });
-
-                if (this.applyControl) {
-                    try {
-                        await inverter.writeControlsModel(writeControlsModel);
-                    } catch (error) {
-                        this.logger.error(
-                            error,
-                            'Error writing inverter controls value',
-                        );
-                    }
-                }
-            }),
-        );
+        await this.onControl(inverterConfiguration);
     }
 }
 
@@ -187,7 +147,7 @@ export function calculateInverterConfiguration({
     siteSample,
 }: {
     activeInverterControlLimit: InverterControlLimit;
-    invertersData: InvertersPolledData;
+    invertersData: InvertersData;
     siteSample: SiteSample;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
@@ -207,7 +167,7 @@ export function calculateInverterConfiguration({
     const connect =
         activeInverterControlLimit.opModConnect ?? defaultValues.opModConnect;
 
-    const deenergize = energize === false || connect === false;
+    const disconnect = energize === false || connect === false;
 
     const siteWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
         siteSample.realPower,
@@ -242,7 +202,7 @@ export function calculateInverterConfiguration({
     });
 
     writeInverterControllerPoints({
-        deenergize,
+        disconnect,
         siteWatts,
         solarWatts,
         exportLimitWatts,
@@ -254,7 +214,7 @@ export function calculateInverterConfiguration({
 
     logger.trace(
         {
-            deenergize,
+            disconnect,
             siteWatts,
             solarWatts,
             exportLimitWatts,
@@ -267,60 +227,13 @@ export function calculateInverterConfiguration({
     );
 
     if (energize === false || connect === false) {
-        return { type: 'deenergize' };
+        return { type: 'disconnect' };
     }
 
     return {
         type: 'limit',
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
     };
-}
-
-export function generateControlsModelWriteFromInverterConfiguration({
-    inverterConfiguration,
-    controlsModel,
-}: {
-    inverterConfiguration: InverterConfiguration;
-    controlsModel: ControlsModel;
-}): ControlsModelWrite {
-    switch (inverterConfiguration.type) {
-        case 'deenergize':
-            return {
-                ...controlsModel,
-                Conn: Conn.DISCONNECT,
-                // revert Conn in 60 seconds
-                // this is a safety measure in case the SunSpec connection is lost
-                // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another config witin 60 seconds to reset this timeout
-                Conn_RvrtTms: 60,
-                WMaxLim_Ena: WMaxLim_Ena.DISABLED,
-                // set value to 0 to gracefully handle re-energising and calculating target power ratio
-                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
-                    targetSolarPowerRatio: 0,
-                    controlsModel,
-                }),
-                VArPct_Ena: VArPct_Ena.DISABLED,
-                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
-            };
-        case 'limit':
-            return {
-                ...controlsModel,
-                Conn: Conn.CONNECT,
-                WMaxLim_Ena: WMaxLim_Ena.ENABLED,
-                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
-                    targetSolarPowerRatio:
-                        inverterConfiguration.targetSolarPowerRatio,
-                    controlsModel,
-                }),
-                // revert WMaxLimtPct in 60 seconds
-                // this is a safety measure in case the SunSpec connection is lost
-                // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another config witin 60 seconds to reset this timeout
-                WMaxLimPct_RvrtTms: 60,
-                VArPct_Ena: VArPct_Ena.DISABLED,
-                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
-            };
-    }
 }
 
 export function getWMaxLimPctFromTargetSolarPowerRatio({
@@ -349,7 +262,7 @@ export function calculateTargetSolarPowerRatio({
 }: {
     inverters: {
         nameplate: Pick<
-            InvertersPolledData['invertersData'][number]['nameplate'],
+            InvertersData['invertersData'][number]['nameplate'],
             'maxW'
         >;
     }[];

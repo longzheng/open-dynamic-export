@@ -1,7 +1,5 @@
 import 'dotenv/config';
 import { getConfig } from '../helpers/config.js';
-import { getSunSpecInvertersConnections } from '../sunspec/connections.js';
-import { SunSpecInverterPoller } from '../sunspec/sunspecInverterPoller.js';
 import { logger as pinoLogger } from '../helpers/logger.js';
 import { InverterController } from './helpers/inverterController.js';
 import { RampRateHelper } from '../sep2/helpers/rampRate.js';
@@ -17,6 +15,7 @@ import { SapnRELE2WLimiter } from '../limiters/twoWayTariff/sapnRELE2W/index.js'
 import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
 import { MqttLimiter } from '../limiters/mqtt/index.js';
 import type { SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
+import { InvertersPoller } from './helpers/inverterSample.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -28,13 +27,9 @@ export type Coordinator = {
 export function createCoordinator(): Coordinator {
     const config = getConfig();
 
-    const invertersConnections = getSunSpecInvertersConnections(config);
+    const invertersPoller = new InvertersPoller({ config });
 
     const siteSamplePoller = getSiteSamplePollerInstance(config);
-
-    const sunSpecInverterPoller = new SunSpecInverterPoller({
-        invertersConnections,
-    });
 
     const rampRateHelper = new RampRateHelper();
 
@@ -66,12 +61,12 @@ export function createCoordinator(): Coordinator {
     ].filter((controlLimit) => !!controlLimit);
 
     const inverterController = new InverterController({
-        invertersConnections,
-        applyControl: config.inverterControl,
         limiters,
+        onControl: (InverterController) =>
+            invertersPoller.onControl(InverterController),
     });
 
-    sunSpecInverterPoller.on('data', ({ invertersData, derSample }) => {
+    invertersPoller.on('data', ({ invertersData, derSample }) => {
         writeDerSamplePoints(derSample);
 
         rampRateHelper.onInverterData(invertersData);

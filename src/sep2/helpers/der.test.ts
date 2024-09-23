@@ -5,7 +5,7 @@ import { DERControlType } from '../../sep2/models/derControlType.js';
 import { DOEControlType } from '../../sep2/models/doeModesSupportedType.js';
 import { getDerCapabilityResponseFromInverterData } from './der.js';
 import { DERType } from '../../sep2/models/derType.js';
-import type { InverterData } from '../../coordinator/helpers/inverterData.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 
 describe('getDerCapabilityResponseFromInverterData', () => {
     it('should return the correct DERCapabilityResponse for valid nameplateModels', () => {

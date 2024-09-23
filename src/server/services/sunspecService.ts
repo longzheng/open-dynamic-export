@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { getConfig } from '../../helpers/config.js';
 import {
-    getSunSpecInvertersConnections,
+    getSunSpecInvertersConnection,
     getSunSpecMeterConnection,
 } from '../../sunspec/connections.js';
 import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
@@ -13,7 +13,11 @@ import { getStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
 export async function getSunSpecData() {
     const config = getConfig();
 
-    const invertersConnections = getSunSpecInvertersConnections(config);
+    const invertersConnections = config.inverters
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        .filter((inverter) => inverter.type === 'sunspec')
+        .map((inverter) => getSunSpecInvertersConnection(inverter));
+
     const invertersData = await Promise.all(
         invertersConnections.map(async (inverter) => {
             return {
