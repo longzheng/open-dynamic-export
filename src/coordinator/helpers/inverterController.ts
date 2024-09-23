@@ -10,9 +10,11 @@ import { getTotalFromPerPhaseNetOrNoPhaseMeasurement } from '../../helpers/measu
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
-import type { LimiterType } from './limiter.js';
 import type { SiteSample } from '../../meters/siteSample.js';
 import type { InvertersData } from './inverterSample.js';
+import type { Limiters } from '../../limiters/index.js';
+import { objectEntriesWithType } from '../../helpers/object.js';
+import type { LimiterKeys } from '../../helpers/config.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -46,7 +48,15 @@ export class InverterController {
     private cachedInvertersData: InvertersData | null = null;
     private cachedSiteSample: SiteSample | null = null;
     private logger: Logger;
-    private limiters: LimiterType[];
+    private limiters: Limiters;
+    private cachedData: {
+        controlLimitsByLimiter: Record<
+            LimiterKeys,
+            InverterControlLimit | null
+        >;
+        activeInverterControlLimit: InverterControlLimit;
+        inverterConfiguration: InverterConfiguration;
+    } | null = null;
     private onControl: (
         inverterConfiguration: InverterConfiguration,
     ) => Promise<void>;
@@ -55,7 +65,7 @@ export class InverterController {
         limiters,
         onControl,
     }: {
-        limiters: LimiterType[];
+        limiters: Limiters;
         onControl: (
             inverterConfiguration: InverterConfiguration,
         ) => Promise<void>;
@@ -78,12 +88,8 @@ export class InverterController {
         this.cachedSiteSample = siteSample;
     }
 
-    private getActiveInverterControlLimit(): InverterControlLimit {
-        const controlLimits = this.limiters.map((controlLimit) =>
-            controlLimit.getInverterControlLimit(),
-        );
-
-        return getAggregatedInverterControlLimit(controlLimits);
+    public get getCachedData() {
+        return this.cachedData;
     }
 
     private async startLoop() {
@@ -121,13 +127,28 @@ export class InverterController {
             return;
         }
 
-        const activeInverterControlLimit = this.getActiveInverterControlLimit();
+        const controlLimitsByLimiter = Object.fromEntries(
+            objectEntriesWithType(this.limiters).map(([key, limiter]) => [
+                key,
+                limiter?.getInverterControlLimit() ?? null,
+            ]),
+        ) as Record<LimiterKeys, InverterControlLimit | null>;
+
+        const activeInverterControlLimit = getAggregatedInverterControlLimit(
+            Object.values(controlLimitsByLimiter),
+        );
 
         const inverterConfiguration = calculateInverterConfiguration({
             activeInverterControlLimit,
             invertersData: this.cachedInvertersData,
             siteSample: this.cachedSiteSample,
         });
+
+        this.cachedData = {
+            controlLimitsByLimiter,
+            activeInverterControlLimit,
+            inverterConfiguration,
+        };
 
         this.logger.info(
             {
@@ -308,7 +329,7 @@ export function calculateTargetSolarWatts({
 }
 
 export function getAggregatedInverterControlLimit(
-    controlLimits: InverterControlLimit[],
+    controlLimits: (InverterControlLimit | null)[],
 ) {
     let opModEnergize: boolean | undefined = undefined;
     let opModConnect: boolean | undefined = undefined;
@@ -316,6 +337,10 @@ export function getAggregatedInverterControlLimit(
     let opModExpLimW: number | undefined = undefined;
 
     for (const controlLimit of controlLimits) {
+        if (!controlLimit) {
+            continue;
+        }
+
         if (controlLimit.opModEnergize !== undefined) {
             if (opModEnergize === undefined) {
                 opModEnergize = controlLimit.opModEnergize;

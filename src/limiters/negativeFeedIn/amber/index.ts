@@ -1,7 +1,7 @@
 import type { Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
 import type { paths } from './api.js';
-import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../../limiter.js';
 import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import type { Logger } from 'pino';
 import { logger as pinoLogger } from '../../../helpers/logger.js';

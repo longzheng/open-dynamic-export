@@ -21,13 +21,20 @@ import { objectToXml } from './helpers/xml.js';
 import { generateConnectionPointResponse } from './models/connectionPoint.js';
 import { RegistrationHelper } from './helpers/registration.js';
 
-export function getSep2Limiter({
+export type Sep2Instance = {
+    sep2Client: SEP2Client;
+    derHelper: DerHelper;
+    mirrorUsagePointListHelper: MirrorUsagePointListHelper;
+    limiter: Sep2Limiter;
+};
+
+export function getSep2Instance({
     config,
     rampRateHelper,
 }: {
     config: Config;
     rampRateHelper: RampRateHelper;
-}) {
+}): Sep2Instance | null {
     if (!config.limiters.sep2) {
         return null;
     }
@@ -71,7 +78,7 @@ export function getSep2Limiter({
         client: sep2Client,
     });
 
-    const sep2Limiter = new Sep2Limiter({
+    const limiter = new Sep2Limiter({
         client: sep2Client,
         rampRateHelper,
     });
@@ -81,7 +88,7 @@ export function getSep2Limiter({
     }).on('data', (data) => {
         logger.debug(data, 'DER controls data changed');
 
-        sep2Limiter.updateSep2ControlsData(data);
+        limiter.updateSep2ControlsData(data);
 
         rampRateHelper.setDefaultDERControlRampRate(
             data.fallbackControl.type === 'default'
@@ -250,6 +257,6 @@ export function getSep2Limiter({
         sep2Client,
         derHelper,
         mirrorUsagePointListHelper,
-        sep2Limiter,
+        limiter,
     };
 }

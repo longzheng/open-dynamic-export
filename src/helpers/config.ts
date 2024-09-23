@@ -163,6 +163,8 @@ export const configSchema = z.object({
 
 export type Config = z.infer<typeof configSchema>;
 
+export type LimiterKeys = keyof Config['limiters'];
+
 export function getConfigPath() {
     return `${env.CONFIG_DIR}/config.json`;
 }

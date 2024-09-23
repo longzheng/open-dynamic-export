@@ -1,9 +1,13 @@
+import type {
+    InverterConfiguration,
+    InverterControlLimit,
+} from '../../coordinator/helpers/inverterController.js';
 import type { Coordinator } from '../../coordinator/index.js';
 import { createCoordinator } from '../../coordinator/index.js';
 import type { Result } from '../../helpers/result.js';
 import type { InverterData } from '../../inverter/inverterData.js';
 
-export type CoordinatorResponse =
+type CoordinatorResponse =
     | {
           running: true;
           invertersDataCache: Result<InverterData>[] | null;
@@ -52,6 +56,14 @@ class CoordinatorService {
 
         this.coordinator.destroy();
         this.coordinator = null;
+    }
+
+    public inverterControllerData(): InverterControllerData | null {
+        if (!this.coordinator) {
+            throw new Error('Coordinator is not running');
+        }
+
+        return this.coordinator.inverterController.getCachedData;
     }
 }
 
@@ -126,4 +138,13 @@ type SiteSample = {
         phaseC: number | null;
     };
     frequency: number | null;
+};
+
+type InverterControllerData = {
+    controlLimitsByLimiter: Record<
+        'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
+        InverterControlLimit | null
+    >;
+    activeInverterControlLimit: InverterControlLimit;
+    inverterConfiguration: InverterConfiguration;
 };

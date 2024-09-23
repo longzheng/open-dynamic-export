@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../../limiter.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { logger as pinoLogger } from '../../../helpers/logger.js';
 
