@@ -8,7 +8,7 @@ import {
     averageNumbersNullableArray,
     sumNumbersArray,
 } from '../../helpers/number.js';
-import type { InverterData } from './inverterData.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 import type { SampleBase } from './sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring

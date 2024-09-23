@@ -1,7 +1,7 @@
 import { Decimal } from 'decimal.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
-import type { InverterData } from '../../coordinator/helpers/inverterData.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 import { sumNumbersArray } from '../../helpers/number.js';
 
 // The default ramp-rate derived from 16.67% per minute (roughly 0.28% per second)

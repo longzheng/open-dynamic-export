@@ -472,7 +472,7 @@ export function writeControlSchedulerPoints({
 }
 
 export function writeInverterControllerPoints({
-    deenergize,
+    disconnect,
     siteWatts,
     solarWatts,
     exportLimitWatts,
@@ -481,7 +481,7 @@ export function writeInverterControllerPoints({
     targetSolarWatts,
     targetSolarPowerRatio,
 }: {
-    deenergize: boolean;
+    disconnect: boolean;
     siteWatts: number;
     solarWatts: number;
     exportLimitWatts: number;
@@ -492,7 +492,7 @@ export function writeInverterControllerPoints({
 }) {
     influxDbWriteApi.writePoint(
         new Point('inverterControl')
-            .booleanField('deenergize', deenergize)
+            .booleanField('disconnect', disconnect)
             .floatField('siteWatts', siteWatts)
             .floatField('solarWatts', solarWatts)
             .floatField('exportLimitWatts', exportLimitWatts)

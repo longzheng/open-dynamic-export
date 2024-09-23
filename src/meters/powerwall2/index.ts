@@ -15,7 +15,7 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
         config: Extract<Config['meter'], { type: 'powerwall2' }>;
     }) {
         super({
-            meterName: 'powerwall2',
+            name: 'powerwall2',
             pollingIntervalMs: 200,
         });
 

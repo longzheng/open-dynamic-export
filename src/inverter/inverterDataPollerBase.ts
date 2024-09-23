@@ -1,36 +1,37 @@
 import type { Logger } from 'pino';
 import { logger as pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
-import type { SiteSample, SiteSampleData } from './siteSample.js';
 import type { Result } from '../helpers/result.js';
+import type { InverterData } from './inverterData.js';
+import type { InverterConfiguration } from '../coordinator/helpers/inverterController.js';
 
-export abstract class SiteSamplePollerBase extends EventEmitter<{
-    data: [
-        {
-            siteSample: SiteSample;
-        },
-    ];
+export abstract class InverterDataPollerBase extends EventEmitter<{
+    data: [Result<InverterData>];
 }> {
     protected logger: Logger;
     private pollingIntervalMs;
     private pollingTimer: NodeJS.Timeout | null = null;
-    private siteSampleCache: SiteSample | null = null;
+    private inverterDataCache: Result<InverterData> | null = null;
+    protected applyControl: boolean;
 
     constructor({
         name,
         pollingIntervalMs,
+        applyControl,
     }: {
         name: string;
         // how frequently at most to poll the data
         pollingIntervalMs: number;
+        applyControl: boolean;
     }) {
         super();
 
         this.pollingIntervalMs = pollingIntervalMs;
         this.logger = pinoLogger.child({
-            module: 'SiteSamplePollerBase',
-            meterPollerName: name,
+            module: 'InverterDataPollerBase',
+            inverterPollerName: name,
         });
+        this.applyControl = applyControl;
     }
 
     public destroy() {
@@ -41,39 +42,30 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
         this.onDestroy();
     }
 
-    abstract getSiteSampleData(): Promise<Result<SiteSampleData>>;
+    abstract getInverterData(): Promise<Result<InverterData>>;
+
+    abstract onControl(
+        inverterConfiguration: InverterConfiguration,
+    ): Promise<void>;
 
     abstract onDestroy(): void;
 
-    get getSiteSampleCache(): SiteSample | null {
-        return this.siteSampleCache;
+    get getInverterDataCache(): Result<InverterData> | null {
+        return this.inverterDataCache;
     }
 
     protected async startPolling() {
         const start = performance.now();
-        const now = new Date();
 
-        this.logger.trace('polling site sample data');
+        this.logger.trace('polling inverter data');
 
-        const siteSampleData = await this.getSiteSampleData();
+        const inverterData = await this.getInverterData();
 
-        if (siteSampleData.success) {
-            const siteSample: SiteSample = {
-                // append current date to the site sample data
-                date: now,
-                ...siteSampleData.value,
-            };
+        this.logger.trace({ inverterData }, 'polled inverter data');
 
-            this.logger.trace({ siteSample }, 'polled site sample data');
+        this.inverterDataCache = inverterData;
 
-            this.siteSampleCache = siteSample;
-
-            this.emit('data', {
-                siteSample,
-            });
-        } else {
-            this.logger.error('Error polling site sample data');
-        }
+        this.emit('data', inverterData);
 
         const end = performance.now();
 
