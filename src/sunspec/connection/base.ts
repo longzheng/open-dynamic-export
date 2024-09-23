@@ -5,7 +5,7 @@ import { logger as pinoLogger } from '../../helpers/logger.js';
 import { registersToUint32 } from '../helpers/converters.js';
 import type { Logger } from 'pino';
 
-const connectionTimeoutMs = 5000;
+const connectionTimeoutMs = 10_000;
 
 export type ModelAddress = {
     start: number;
@@ -88,7 +88,6 @@ export abstract class SunSpecConnection {
                         });
 
                         this.client.setID(this.unitId);
-                        this.client.setTimeout(connectionTimeoutMs);
 
                         this.logger.info(`SunSpec Modbus client connected`);
 
