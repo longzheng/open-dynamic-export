@@ -23,7 +23,7 @@ import {
     sumNumbersNullableArray,
 } from '../../helpers/number.js';
 import { ConnectStatus } from '../models/connectStatus.js';
-import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
+import { DOEControlType } from '../models/doeModesSupportedType.js';
 import { OperationalModeStatus } from '../models/operationModeStatus.js';
 import { type InverterData } from '../../coordinator/helpers/inverterData.js';
 import { DERType } from '../models/derType.js';
@@ -259,6 +259,9 @@ export class DerHelper {
 const derControlTypeModes: DERControlType =
     DERControlType.opModConnect | DERControlType.opModEnergize;
 
+const doeControlTypeModes: DOEControlType =
+    DOEControlType.opModExpLimW | DOEControlType.opModGenLimW;
+
 export function getDerCapabilityResponseFromInverterData(
     data: Pick<InverterData, 'nameplate'>[],
 ): DERCapability {
@@ -282,9 +285,7 @@ export function getDerCapabilityResponseFromInverterData(
         // hard-coded modes
         modesSupported: derControlTypeModes,
         // hard-coded DOE modes
-        doeModesSupported:
-            DOEModesSupportedType.opModExpLimW |
-            DOEModesSupportedType.opModGenLimW,
+        doeModesSupported: doeControlTypeModes,
         type,
         rtgMaxVA: {
             value: rtgMaxVA.base,
@@ -322,6 +323,8 @@ export function getDerSettingsResponseFromInverterData({
         updatedTime: new Date(),
         // hard-coded modes
         modesEnabled: derControlTypeModes,
+        // hard-coded DOE modes
+        doeModesEnabled: doeControlTypeModes,
         // SunSpec inverters don't properly support WGra
         // so we use a software based implementation of ramp rates
         setGradW: rampRateHelper.getDerSettingsSetGradW(),

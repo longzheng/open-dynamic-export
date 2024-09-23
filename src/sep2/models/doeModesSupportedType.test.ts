@@ -1,13 +1,13 @@
 import { it, expect } from 'vitest';
 import { numberToHex } from '../../helpers/number.js';
-import { DOEModesSupportedType } from './doeModesSupportedType.js';
+import { DOEControlType } from './doeModesSupportedType.js';
 
 it('value is expected', () => {
     const value =
-        DOEModesSupportedType.opModExpLimW |
-        DOEModesSupportedType.opModGenLimW |
-        DOEModesSupportedType.opModImpLimW |
-        DOEModesSupportedType.opModLoadLimW;
+        DOEControlType.opModExpLimW |
+        DOEControlType.opModGenLimW |
+        DOEControlType.opModImpLimW |
+        DOEControlType.opModLoadLimW;
 
     const hex = numberToHex(value).padStart(8, '0');
 

@@ -2,7 +2,7 @@ import { it, expect } from 'vitest';
 import { objectToXml } from '../helpers/xml.js';
 import { generateDerCapability } from './derCapability.js';
 import { DERControlType } from './derControlType.js';
-import { DOEModesSupportedType } from './doeModesSupportedType.js';
+import { DOEControlType } from './doeModesSupportedType.js';
 import { DERType } from './derType.js';
 
 it('should generate DERCapability XML', () => {
@@ -13,10 +13,10 @@ it('should generate DERCapability XML', () => {
             DERControlType.opModMaxLimW |
             DERControlType.opModTargetW,
         doeModesSupported:
-            DOEModesSupportedType.opModExpLimW |
-            DOEModesSupportedType.opModGenLimW |
-            DOEModesSupportedType.opModImpLimW |
-            DOEModesSupportedType.opModLoadLimW,
+            DOEControlType.opModExpLimW |
+            DOEControlType.opModGenLimW |
+            DOEControlType.opModImpLimW |
+            DOEControlType.opModLoadLimW,
         type: DERType.VirtualOrMixedDER,
         rtgMaxVA: {
             multiplier: 3,
@@ -94,10 +94,10 @@ it('should generate DERCapability XML without optional fields', () => {
             DERControlType.opModMaxLimW |
             DERControlType.opModTargetW,
         doeModesSupported:
-            DOEModesSupportedType.opModExpLimW |
-            DOEModesSupportedType.opModGenLimW |
-            DOEModesSupportedType.opModImpLimW |
-            DOEModesSupportedType.opModLoadLimW,
+            DOEControlType.opModExpLimW |
+            DOEControlType.opModGenLimW |
+            DOEControlType.opModImpLimW |
+            DOEControlType.opModLoadLimW,
         type: DERType.VirtualOrMixedDER,
         rtgMaxVA: {
             multiplier: 3,

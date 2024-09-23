@@ -3,7 +3,7 @@ import { type ActivePower } from './activePower.js';
 import { type ApparentPower } from './apparentPower.js';
 import type { DERControlType } from './derControlType.js';
 import type { DERType } from './derType.js';
-import type { DOEModesSupportedType } from './doeModesSupportedType.js';
+import type { DOEControlType } from './doeModesSupportedType.js';
 import { xmlns } from '../helpers/namespace.js';
 import { type ReactivePower } from './reactivePower.js';
 import { type VoltageRMS } from './voltageRms.js';
@@ -12,8 +12,8 @@ import type { PowerFactor } from './powerFactor.js';
 export type DERCapability = {
     // Bitmap indicating the DER Controls implemented by the device
     modesSupported: DERControlType;
-    // Bitmap indicating the CSIP-AUS controls implemented
-    doeModesSupported: DOEModesSupportedType;
+    // Bitmap indicating the DOE controls enabled on the device. See DOEControlType for values.
+    doeModesSupported: DOEControlType;
     // Type of DER
     type: DERType;
     // Maximum continuous apparent power output capability of the DER, in voltamperes
