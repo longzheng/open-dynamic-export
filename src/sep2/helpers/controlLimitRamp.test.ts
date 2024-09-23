@@ -18,7 +18,7 @@ describe('ControlLimitRampHelper', () => {
     });
 
     it('should return no value for no target and no total nameplate', () => {
-        helper.updateTarget({ value: undefined, rampTimeSeconds: undefined });
+        helper.updateTarget({ type: 'none' });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(undefined);
@@ -26,13 +26,31 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(undefined);
     });
 
-    it('should return nameplate value for no target with total nameplate', () => {
+    it('should return no value for undefined target and no total nameplate', () => {
+        helper.updateTarget({
+            type: 'active',
+            value: undefined,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(undefined);
+
+        expect(helper.getRampedValue()).toBe(undefined);
+    });
+
+    it('should return nameplate value for active undefined target with total nameplate', () => {
         rampRateHelper.onInverterData([
             {
                 nameplate: { maxW: 10000 },
             },
         ]);
-        helper.updateTarget({ value: undefined, rampTimeSeconds: undefined });
+
+        helper.updateTarget({
+            type: 'active',
+            value: undefined,
+            rampTimeSeconds: undefined,
+        });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(10000);
@@ -40,7 +58,26 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(10000);
     });
 
-    it('should return target value immediately if first time ramping', () => {
+    it('should return nameplate value for default undefined target with total nameplate', () => {
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+
+        helper.updateTarget({
+            type: 'active',
+            value: undefined,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(10000);
+
+        expect(helper.getRampedValue()).toBe(10000);
+    });
+
+    it('should return active target value immediately if first time ramping', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
 
         rampRateHelper.onInverterData([
@@ -48,7 +85,12 @@ describe('ControlLimitRampHelper', () => {
                 nameplate: { maxW: 10000 },
             },
         ]);
-        helper.updateTarget({ value: 5000, rampTimeSeconds: undefined });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(5000);
@@ -56,7 +98,28 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(5000);
     });
 
-    it('should return ramped value with 1% ramp rate', () => {
+    it('should return default target value immediately if first time ramping', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+
+        helper.updateTarget({
+            type: 'default',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(5000);
+
+        expect(helper.getRampedValue()).toBe(5000);
+    });
+
+    it('should return target value immediately if going from active to active', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
         rampRateHelper.onInverterData([
@@ -64,17 +127,58 @@ describe('ControlLimitRampHelper', () => {
                 nameplate: { maxW: 10000 },
             },
         ]);
-        helper.updateTarget({ value: 5000, rampTimeSeconds: undefined });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(5000);
 
-        // new target (new hour)
+        // new active target (new hour)
         vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
 
         expect(helper.getRampedValue()).toBe(5000);
 
-        helper.updateTarget({ value: 1500, rampTimeSeconds: undefined });
+        helper.updateTarget({
+            type: 'active',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(1500);
+    });
+
+    it('should return ramped value with 1% ramp rate if going from active to default', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(5000);
+
+        // new default target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(5000);
+
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
 
         expect(helper.getRampedValue()).toBe(5000);
 
@@ -91,6 +195,122 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(1500);
     });
 
+    it('should return ramped value with 1% ramp rate if going from default to active', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // new active target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // after 1 second
+        vi.setSystemTime(new Date('2021-01-01T01:00:01Z'));
+        expect(helper.getRampedValue()).toBe(1500 + 10000 * (1 / 100) * 1);
+
+        // after 30 seconds
+        vi.setSystemTime(new Date('2021-01-01T01:00:30Z'));
+        expect(helper.getRampedValue()).toBe(1500 + 10000 * (1 / 100) * 30);
+
+        // after 5 minutes
+        vi.setSystemTime(new Date('2021-01-01T01:05:00Z'));
+        expect(helper.getRampedValue()).toBe(5000);
+
+        // new active target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T02:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(5000);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 10000,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(10000);
+    });
+
+    it('should return ramped value with 1% ramp rate if going from default to default', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // new default target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        helper.updateTarget({
+            type: 'default',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // after 1 second
+        vi.setSystemTime(new Date('2021-01-01T01:00:01Z'));
+        expect(helper.getRampedValue()).toBe(1500 + 10000 * (1 / 100) * 1);
+
+        // after 30 seconds
+        vi.setSystemTime(new Date('2021-01-01T01:00:30Z'));
+        expect(helper.getRampedValue()).toBe(1500 + 10000 * (1 / 100) * 30);
+
+        // after 5 minutes
+        vi.setSystemTime(new Date('2021-01-01T01:05:00Z'));
+        expect(helper.getRampedValue()).toBe(5000);
+
+        // new default target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T02:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(5000);
+
+        helper.updateTarget({
+            type: 'default',
+            value: 3000,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(5000);
+
+        // after 1 second
+        vi.setSystemTime(new Date('2021-01-01T02:00:01Z'));
+        expect(helper.getRampedValue()).toBe(5000 - 10000 * (1 / 100) * 1);
+    });
+
     it('should return ramped value with timed ramping', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
 
@@ -99,17 +319,26 @@ describe('ControlLimitRampHelper', () => {
                 nameplate: { maxW: 10000 },
             },
         ]);
-        helper.updateTarget({ value: 5000, rampTimeSeconds: undefined });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(5000);
 
-        // new target (new hour)
+        // new active target (new hour)
         vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
 
         expect(helper.getRampedValue()).toBe(5000);
 
-        helper.updateTarget({ value: 1500, rampTimeSeconds: 5 });
+        helper.updateTarget({
+            type: 'active',
+            value: 1500,
+            rampTimeSeconds: 5,
+        });
 
         expect(helper.getRampedValue()).toBe(5000);
 
@@ -128,9 +357,38 @@ describe('ControlLimitRampHelper', () => {
         // after 10 seconds
         vi.setSystemTime(new Date('2021-01-01T01:00:10Z'));
         expect(helper.getRampedValue()).toBe(1500);
+
+        // new active target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T02:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 3000,
+            rampTimeSeconds: 5,
+        });
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // after 1 second
+        vi.setSystemTime(new Date('2021-01-01T02:00:01Z'));
+        expect(helper.getRampedValue()).toBe(1500 + ((3000 - 1500) / 5) * 1);
+
+        // after 3 seconds
+        vi.setSystemTime(new Date('2021-01-01T02:00:03Z'));
+        expect(helper.getRampedValue()).toBe(1500 + ((3000 - 1500) / 5) * 3);
+
+        // after 5 seconds
+        vi.setSystemTime(new Date('2021-01-01T02:00:05Z'));
+        expect(helper.getRampedValue()).toBe(3000);
+
+        // after 10 seconds
+        vi.setSystemTime(new Date('2021-01-01T02:00:10Z'));
+        expect(helper.getRampedValue()).toBe(3000);
     });
 
-    it('should allow ramping to change while still ramping', () => {
+    it('should ramp from active to default, before reach default, ramp back to active', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
         rampRateHelper.onInverterData([
@@ -138,17 +396,25 @@ describe('ControlLimitRampHelper', () => {
                 nameplate: { maxW: 10000 },
             },
         ]);
-        helper.updateTarget({ value: 5000, rampTimeSeconds: undefined });
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(5000);
 
-        // new target (new hour)
+        // new default target (new hour)
         vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
 
         expect(helper.getRampedValue()).toBe(5000);
 
-        helper.updateTarget({ value: 1500, rampTimeSeconds: undefined });
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
 
         expect(helper.getRampedValue()).toBe(5000);
 
@@ -157,17 +423,103 @@ describe('ControlLimitRampHelper', () => {
         const rampedValue1 = helper.getRampedValue();
         expect(rampedValue1).toBe(5000 - 10000 * (1 / 100) * 30);
 
-        // new target
-        helper.updateTarget({ value: 10000, rampTimeSeconds: undefined });
+        // new active target
+        helper.updateTarget({
+            type: 'active',
+            value: 10000,
+            rampTimeSeconds: undefined,
+        });
         expect(helper.getRampedValue()).toBe(rampedValue1);
 
         // after 30 seconds
         vi.setSystemTime(new Date('2021-01-01T01:01:00Z'));
         const rampedValue2 = helper.getRampedValue();
         expect(rampedValue2).toBe(rampedValue1! + 10000 * (1 / 100) * 30);
+
+        // after 5 minutes
+        vi.setSystemTime(new Date('2021-01-01T01:05:00Z'));
+        const rampedValue3 = helper.getRampedValue();
+        expect(rampedValue3).toBe(10000);
+
+        // new active target
+        helper.updateTarget({
+            type: 'active',
+            value: 20000,
+            rampTimeSeconds: undefined,
+        });
+
+        // immediately new target
+        expect(helper.getRampedValue()).toBe(20000);
     });
 
-    it('should return ramped value with no limit ramp rate', () => {
+    it('should ramp from default to active, before reach active, ramp back to default', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // new active target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // after 30 seconds
+        vi.setSystemTime(new Date('2021-01-01T01:00:30Z'));
+        const rampedValue1 = helper.getRampedValue();
+        expect(rampedValue1).toBe(1500 + 10000 * (1 / 100) * 30);
+
+        // new default target
+        helper.updateTarget({
+            type: 'default',
+            value: 500,
+            rampTimeSeconds: undefined,
+        });
+        expect(helper.getRampedValue()).toBe(rampedValue1);
+
+        // after 30 seconds
+        vi.setSystemTime(new Date('2021-01-01T01:01:00Z'));
+        const rampedValue2 = helper.getRampedValue();
+        expect(rampedValue2).toBe(rampedValue1! - 10000 * (1 / 100) * 30);
+
+        // after 5 minutes
+        vi.setSystemTime(new Date('2021-01-01T01:05:00Z'));
+        const rampedValue3 = helper.getRampedValue();
+        expect(rampedValue3).toBe(500);
+
+        // new active target
+        helper.updateTarget({
+            type: 'active',
+            value: 10000,
+            rampTimeSeconds: undefined,
+        });
+        expect(helper.getRampedValue()).toBe(500);
+
+        // after 30 seconds
+        vi.setSystemTime(new Date('2021-01-01T01:05:30Z'));
+        const rampedValue4 = helper.getRampedValue();
+        expect(rampedValue4).toBe(500 + 10000 * (1 / 100) * 30);
+    });
+
+    it('should return new target value immediately from active to default with no limit ramp rate', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(0);
         rampRateHelper.onInverterData([
@@ -175,19 +527,60 @@ describe('ControlLimitRampHelper', () => {
                 nameplate: { maxW: 10000 },
             },
         ]);
-        helper.updateTarget({ value: 5000, rampTimeSeconds: undefined });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(5000);
 
-        // new target (new hour)
+        // new default target (new hour)
         vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
 
         expect(helper.getRampedValue()).toBe(5000);
 
-        helper.updateTarget({ value: 1500, rampTimeSeconds: undefined });
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
 
         expect(helper.getRampedValue()).toBe(1500);
+    });
+
+    it('should return new target value immediately from default to active with no limit ramp rate', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(0);
+        rampRateHelper.onInverterData([
+            {
+                nameplate: { maxW: 10000 },
+            },
+        ]);
+
+        helper.updateTarget({
+            type: 'default',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // new default target (new hour)
+        vi.setSystemTime(new Date('2021-01-01T01:00:00Z'));
+
+        expect(helper.getRampedValue()).toBe(1500);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 5000,
+            rampTimeSeconds: undefined,
+        });
+
+        expect(helper.getRampedValue()).toBe(5000);
     });
 });
 

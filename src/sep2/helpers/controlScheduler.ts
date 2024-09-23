@@ -20,10 +20,13 @@ import type { FallbackControl } from './fallbackControl.js';
 
 export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 
-type DERControlBaseValueOfType<ControlKey extends ControlType> = {
-    control: DERControlBase[ControlKey];
-    rampTms: DERControlBase['rampTms'];
-};
+type DERControlBaseValueOfType<ControlKey extends ControlType> =
+    | {
+          type: 'active' | 'default';
+          control: DERControlBase[ControlKey];
+          rampTms: DERControlBase['rampTms'];
+      }
+    | { type: 'none'; control: undefined };
 
 export type RandomizedControlSchedule = ControlSchedule & {
     effectiveStartInclusive: Date;
@@ -205,7 +208,9 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         if (this.activeControlSchedule) {
             const controlBase =
                 this.activeControlSchedule.data.control.derControlBase;
+
             return {
+                type: 'active',
                 control: controlBase[this.controlType],
                 rampTms: controlBase.rampTms,
             };
@@ -216,12 +221,13 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 const controlBase =
                     this.fallbackControl.data.defaultControl.derControlBase;
                 return {
+                    type: 'default',
                     control: controlBase[this.controlType],
                     rampTms: controlBase.rampTms,
                 };
             }
             case 'none':
-                return { control: undefined, rampTms: undefined };
+                return { type: 'none', control: undefined };
         }
     }
 

@@ -81,28 +81,52 @@ export class Sep2Limiter implements LimiterType {
         const opModExpLimW =
             this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue();
 
-        this.opModExpLimWRampRateHelper.updateTarget({
-            value: opModExpLimW.control
-                ? numberWithPow10(
-                      opModExpLimW.control.value,
-                      opModExpLimW.control.multiplier,
-                  )
-                : undefined,
-            rampTimeSeconds: opModExpLimW.rampTms,
-        });
+        this.opModExpLimWRampRateHelper.updateTarget(
+            (() => {
+                switch (opModExpLimW.type) {
+                    case 'active':
+                    case 'default': {
+                        return {
+                            type: opModExpLimW.type,
+                            value: opModExpLimW.control
+                                ? numberWithPow10(
+                                      opModExpLimW.control.value,
+                                      opModExpLimW.control.multiplier,
+                                  )
+                                : undefined,
+                            rampTimeSeconds: opModExpLimW.rampTms,
+                        };
+                    }
+                    case 'none':
+                        return { type: 'none' };
+                }
+            })(),
+        );
 
         const opModGenLimW =
             this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue();
 
-        this.opModGenLimWRampRateHelper.updateTarget({
-            value: opModGenLimW.control
-                ? numberWithPow10(
-                      opModGenLimW.control.value,
-                      opModGenLimW.control.multiplier,
-                  )
-                : undefined,
-            rampTimeSeconds: opModGenLimW.rampTms,
-        });
+        this.opModGenLimWRampRateHelper.updateTarget(
+            (() => {
+                switch (opModGenLimW.type) {
+                    case 'active':
+                    case 'default': {
+                        return {
+                            type: opModGenLimW.type,
+                            value: opModGenLimW.control
+                                ? numberWithPow10(
+                                      opModGenLimW.control.value,
+                                      opModGenLimW.control.multiplier,
+                                  )
+                                : undefined,
+                            rampTimeSeconds: opModGenLimW.rampTms,
+                        };
+                    }
+                    case 'none':
+                        return { type: 'none' };
+                }
+            })(),
+        );
 
         const limit: InverterControlLimit = {
             opModExpLimW: this.opModExpLimWRampRateHelper.getRampedValue(),

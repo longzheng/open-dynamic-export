@@ -4,100 +4,151 @@ export class ControlLimitRampHelper {
     private rampRateHelper: RampRateHelper;
     private cachedValue:
         | {
+              type: 'active' | 'default';
               value: number;
               time: Date;
+              isRamping: boolean;
           }
-        | undefined = undefined;
-    private target: {
-        value: number;
-        endDateTime: Date | null;
-    } | null = null;
+        | { type: 'none' } = { type: 'none' };
+    private target:
+        | {
+              type: 'active' | 'default';
+              value: number;
+              endDateTime: Date | null;
+          }
+        | { type: 'none' } = { type: 'none' };
 
     constructor({ rampRateHelper }: { rampRateHelper: RampRateHelper }) {
         this.rampRateHelper = rampRateHelper;
     }
 
-    public updateTarget({
-        value,
-        rampTimeSeconds,
-    }: {
-        value: number | undefined;
-        rampTimeSeconds: number | undefined;
-    }) {
-        if (value === undefined) {
-            // if there is no target value
-            // we want to fallback to the total nameplate watts
-            // this is so that we can smoothly ramp between no limit and a limit
-            // this only applies to export/generation limits so total nameplate watts should be reasonable
-            const totalNameplateWatts =
-                this.rampRateHelper.getTotalNameplateWatts;
+    public updateTarget(
+        target:
+            | {
+                  type: 'active' | 'default';
+                  value: number | undefined;
+                  rampTimeSeconds: number | undefined;
+              }
+            | { type: 'none' },
+    ) {
+        switch (target.type) {
+            case 'none':
+                this.target = { type: 'none' };
+                return;
+            case 'active':
+            case 'default': {
+                if (target.value === undefined) {
+                    const totalNameplateWatts =
+                        this.rampRateHelper.getTotalNameplateWatts;
 
-            this.target = totalNameplateWatts
-                ? { value: totalNameplateWatts, endDateTime: null }
-                : null;
-            return;
+                    this.target = totalNameplateWatts
+                        ? {
+                              type: target.type,
+                              value: totalNameplateWatts,
+                              endDateTime: null,
+                          }
+                        : { type: 'none' };
+                    return;
+                }
+
+                if (
+                    this.target.type !== 'none' &&
+                    target.value === this.target.value
+                ) {
+                    return;
+                }
+
+                this.target = {
+                    type: target.type,
+                    value: target.value,
+                    endDateTime: target.rampTimeSeconds
+                        ? new Date(
+                              new Date().getTime() +
+                                  target.rampTimeSeconds * 1000,
+                          )
+                        : null,
+                };
+            }
         }
-
-        if (value === this.target?.value) {
-            return;
-        }
-
-        this.target = {
-            value,
-            endDateTime: rampTimeSeconds
-                ? new Date(new Date().getTime() + rampTimeSeconds * 1000)
-                : null,
-        };
     }
 
     public getRampedValue(): number | undefined {
         const value = ((): number | undefined => {
-            if (!this.target) {
-                return undefined;
-            }
+            switch (this.target.type) {
+                case 'none':
+                    return undefined;
+                case 'active':
+                case 'default': {
+                    switch (this.cachedValue.type) {
+                        case 'none':
+                            return this.target.value;
+                        case 'active':
+                        case 'default': {
+                            // skip ramping if going from active to active control
+                            // and not already ramping (due to a previous default target)
+                            // and the target does not have a specified end date
+                            if (
+                                this.cachedValue.type === 'active' &&
+                                this.target.type === 'active' &&
+                                this.target.endDateTime === null &&
+                                !this.cachedValue.isRamping
+                            ) {
+                                // No ramping needed, return target value immediately
+                                return this.target.value;
+                            }
 
-            if (this.cachedValue === undefined) {
-                return this.target.value;
-            }
+                            const ramping: Ramping = (() => {
+                                if (this.target.endDateTime) {
+                                    return {
+                                        type: 'time',
+                                        endTime: this.target.endDateTime,
+                                    };
+                                }
 
-            const ramping: Ramping = (() => {
-                if (this.target.endDateTime) {
-                    return {
-                        type: 'time',
-                        endTime: this.target.endDateTime,
-                    };
-                }
+                                const maxChangeWatts =
+                                    this.rampRateHelper.getMaxChangeWatts();
 
-                const maxChangeWatts = this.rampRateHelper.getMaxChangeWatts();
+                                switch (maxChangeWatts.type) {
+                                    case 'limited': {
+                                        return {
+                                            type: 'limit',
+                                            maxChangePerSecond:
+                                                maxChangeWatts.wattsPerSecond,
+                                        };
+                                    }
+                                    case 'noLimit': {
+                                        return { type: 'noLimit' };
+                                    }
+                                }
+                            })();
 
-                switch (maxChangeWatts.type) {
-                    case 'limited': {
-                        return {
-                            type: 'limit',
-                            maxChangePerSecond: maxChangeWatts.wattsPerSecond,
-                        };
+                            // Ramping is needed
+                            return calculateRampedValue({
+                                lastValue: this.cachedValue.value,
+                                lastValueTime: this.cachedValue.time,
+                                toValue: this.target.value,
+                                ramping,
+                            });
+                        }
                     }
-                    case 'noLimit': {
-                        return { type: 'noLimit' };
-                    }
                 }
-            })();
-
-            return calculateRampedValue({
-                lastValue: this.cachedValue.value,
-                lastValueTime: this.cachedValue.time,
-                toValue: this.target.value,
-                ramping,
-            });
+            }
         })();
 
-        this.cachedValue =
-            value !== undefined
-                ? {
-                      value,
-                      time: new Date(),
-                  }
-                : undefined;
+        this.cachedValue = (() => {
+            if (value === undefined || this.target.type === 'none') {
+                return { type: 'none' };
+            }
+
+            const hasReachedTarget = value === this.target.value;
+
+            return {
+                type: this.target.type,
+                value,
+                time: new Date(),
+                isRamping: !hasReachedTarget,
+            };
+        })();
 
         return value;
     }
