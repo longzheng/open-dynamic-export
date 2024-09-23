@@ -20,6 +20,7 @@ import { InvertersPoller } from './helpers/inverterSample.js';
 const logger = pinoLogger.child({ module: 'coordinator' });
 
 export type Coordinator = {
+    invertersPoller: InvertersPoller;
     siteSamplePoller: SiteSamplePollerBase;
     destroy: () => void;
 };
@@ -89,6 +90,7 @@ export function createCoordinator(): Coordinator {
     });
 
     return {
+        invertersPoller,
         siteSamplePoller,
         destroy: () => {
             logger.info('Destroying coordinator');

@@ -22,6 +22,7 @@ export class InvertersPoller extends EventEmitter<{
     private inverterDataPollers: InverterDataPollerBase[];
     private inverterDataCacheMapByIndex: Map<number, Result<InverterData>> =
         new Map();
+    private derSampleCache: DerSample | null = null;
     private logger: Logger;
 
     constructor({ config }: { config: Config }) {
@@ -63,18 +64,24 @@ export class InvertersPoller extends EventEmitter<{
         );
     }
 
-    private onData() {
-        const invertersDataCache = Array.from(
-            this.inverterDataCacheMapByIndex.values(),
-        );
+    public get getInvertersDataCache() {
+        return Array.from(this.inverterDataCacheMapByIndex.values());
+    }
 
-        const successInvertersData = invertersDataCache
+    public get getDerSampleCache() {
+        return this.derSampleCache;
+    }
+
+    private onData() {
+        const successInvertersData = this.getInvertersDataCache
             .filter((data) => data.success)
             .map((data) => data.value);
 
         const derSample = generateDerSample({
             invertersData: successInvertersData,
         });
+
+        this.derSampleCache = derSample;
 
         this.logger.trace({ derSample }, 'generated DER sample');
 

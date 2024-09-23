@@ -1,11 +1,18 @@
 import type { Coordinator } from '../../coordinator/index.js';
 import { createCoordinator } from '../../coordinator/index.js';
-import type { SiteSampleData } from '../../meters/siteSample.js';
-import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
+import type { Result } from '../../helpers/result.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 
-export type CoordinatorResponse = {
-    running: boolean;
-};
+export type CoordinatorResponse =
+    | {
+          running: true;
+          invertersDataCache: Result<InverterData>[] | null;
+          derSample: DerSample | null;
+          siteSample: SiteSample | null;
+      }
+    | {
+          running: false;
+      };
 
 class CoordinatorService {
     private coordinator: Coordinator | null = null;
@@ -15,8 +22,18 @@ class CoordinatorService {
     }
 
     public status(): CoordinatorResponse {
+        if (!this.coordinator) {
+            return {
+                running: false,
+            };
+        }
+
         return {
-            running: this.coordinator !== null,
+            running: true,
+            derSample: this.coordinator.invertersPoller.getDerSampleCache,
+            siteSample: this.coordinator.siteSamplePoller.getSiteSampleCache,
+            invertersDataCache:
+                this.coordinator.invertersPoller.getInvertersDataCache,
         };
     }
 
@@ -36,15 +53,77 @@ class CoordinatorService {
         this.coordinator.destroy();
         this.coordinator = null;
     }
-
-    public siteSample(): // workaround tsoa type issue with zod
-    (SampleBase & SiteSampleData) | null {
-        if (!this.coordinator) {
-            throw new Error("Coordinator isn't running");
-        }
-
-        return this.coordinator.siteSamplePoller.getSiteSampleCache;
-    }
 }
 
 export const coordinatorService = new CoordinatorService();
+
+// workaround tsoa type issue with zod infer types
+type DerSample = {
+    date: Date;
+    realPower:
+        | {
+              type: 'perPhaseNet';
+              phaseA: number;
+              phaseB: number | null;
+              phaseC: number | null;
+              net: number;
+          }
+        | {
+              type: 'noPhase';
+              net: number;
+          };
+    reactivePower:
+        | {
+              type: 'perPhaseNet';
+              phaseA: number;
+              phaseB: number | null;
+              phaseC: number | null;
+              net: number;
+          }
+        | {
+              type: 'noPhase';
+              net: number;
+          };
+    voltage: {
+        type: 'perPhase';
+        phaseA: number;
+        phaseB: number | null;
+        phaseC: number | null;
+    } | null;
+    frequency: number | null;
+};
+
+type SiteSample = {
+    date: Date;
+    realPower:
+        | {
+              type: 'perPhaseNet';
+              phaseA: number;
+              phaseB: number | null;
+              phaseC: number | null;
+              net: number;
+          }
+        | {
+              type: 'noPhase';
+              net: number;
+          };
+    reactivePower:
+        | {
+              type: 'perPhaseNet';
+              phaseA: number;
+              phaseB: number | null;
+              phaseC: number | null;
+              net: number;
+          }
+        | {
+              type: 'noPhase';
+              net: number;
+          };
+    voltage: {
+        type: 'perPhase';
+        phaseA: number;
+        phaseB: number | null;
+        phaseC: number | null;
+    };
+    frequency: number | null;
+};

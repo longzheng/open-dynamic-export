@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Route } from 'tsoa';
+import { Controller, Get, Post, Route, Tags } from 'tsoa';
 import { coordinatorService } from '../services/coordinatorService.js';
 
+@Tags('coordinator')
 @Route('coordinator')
 export class CoordinatorController extends Controller {
     @Post('start')
@@ -16,10 +17,5 @@ export class CoordinatorController extends Controller {
     @Post('stop')
     public stop() {
         return coordinatorService.stop();
-    }
-
-    @Get('siteSample')
-    public siteSample() {
-        return coordinatorService.siteSample();
     }
 }

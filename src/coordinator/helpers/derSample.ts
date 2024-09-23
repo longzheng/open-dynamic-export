@@ -1,7 +1,8 @@
-import type {
-    NoPhaseMeasurement,
-    PerPhaseMeasurement,
-    PerPhaseNetMeasurement,
+import { z } from 'zod';
+import {
+    noPhaseMeasurementSchema,
+    perPhaseMeasurementSchema,
+    perPhaseNetMeasurementSchema,
 } from '../../helpers/measurement.js';
 import {
     averageNumbersArray,
@@ -12,12 +13,20 @@ import type { InverterData } from '../../inverter/inverterData.js';
 import type { SampleBase } from './sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
-export type DerSampleData = {
-    realPower: PerPhaseNetMeasurement | NoPhaseMeasurement;
-    reactivePower: PerPhaseNetMeasurement | NoPhaseMeasurement;
-    voltage: PerPhaseMeasurement | null;
-    frequency: number | null;
-};
+export const derSampleDataSchema = z.object({
+    realPower: z.union([
+        perPhaseNetMeasurementSchema,
+        noPhaseMeasurementSchema,
+    ]),
+    reactivePower: z.union([
+        perPhaseNetMeasurementSchema,
+        noPhaseMeasurementSchema,
+    ]),
+    voltage: perPhaseMeasurementSchema.nullable(),
+    frequency: z.number().nullable(),
+});
+
+export type DerSampleData = z.infer<typeof derSampleDataSchema>;
 
 export type DerSample = SampleBase & DerSampleData;
 
