@@ -13,7 +13,10 @@ import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { SiteSample } from '../../meters/siteSample.js';
 import type { InvertersData } from './inverterSample.js';
 import type { Limiters } from '../../limiters/index.js';
-import { objectEntriesWithType } from '../../helpers/object.js';
+import {
+    objectEntriesWithType,
+    objectFromEntriesWithType,
+} from '../../helpers/object.js';
 import type { LimiterKeys } from '../../helpers/config.js';
 
 export type SupportedControlTypes = Extract<
@@ -127,12 +130,12 @@ export class InverterController {
             return;
         }
 
-        const controlLimitsByLimiter = Object.fromEntries(
+        const controlLimitsByLimiter = objectFromEntriesWithType(
             objectEntriesWithType(this.limiters).map(([key, limiter]) => [
                 key,
                 limiter?.getInverterControlLimit() ?? null,
             ]),
-        ) as Record<LimiterKeys, InverterControlLimit | null>;
+        );
 
         const activeInverterControlLimit = getAggregatedInverterControlLimit(
             Object.values(controlLimitsByLimiter),
