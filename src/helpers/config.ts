@@ -125,6 +125,10 @@ export const configSchema = z.object({
             .object({
                 type: z.literal('sunspec'),
                 ...sunspecModbusSchema,
+                location: z.union([
+                    z.literal('feedin'),
+                    z.literal('consumption'),
+                ]),
             })
             .describe('SunSpec meter configuration'),
         z
