@@ -1,6 +1,5 @@
 import { type InverterData } from '../inverterData.js';
 import { enumHasValue } from '../../helpers/enum.js';
-import { logger } from '../../helpers/logger.js';
 import type { Result } from '../../helpers/result.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
@@ -27,16 +26,21 @@ import {
     getWMaxLimPctFromTargetSolarPowerRatio,
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
+import type { Config } from '../../helpers/config.js';
+import { getSunSpecInvertersConnection } from '../../sunspec/connections.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
     private cachedControlsModel: ControlsModel | null = null;
 
     constructor({
-        inverterConnection,
+        sunspecInverterConfig,
         applyControl,
     }: {
-        inverterConnection: InverterSunSpecConnection;
+        sunspecInverterConfig: Extract<
+            Config['inverters'][number],
+            { type: 'sunspec' }
+        >;
         applyControl: boolean;
     }) {
         super({
@@ -45,7 +49,9 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
             applyControl,
         });
 
-        this.inverterConnection = inverterConnection;
+        this.inverterConnection = getSunSpecInvertersConnection(
+            sunspecInverterConfig,
+        );
 
         void this.startPolling();
     }
@@ -71,7 +77,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                 value: inverterData,
             };
         } catch (error) {
-            logger.error(error, 'Failed to get inverter data');
+            this.logger.error(error, 'Failed to get inverter data');
 
             return {
                 success: false,

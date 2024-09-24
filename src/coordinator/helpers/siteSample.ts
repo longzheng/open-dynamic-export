@@ -15,18 +15,18 @@ export function getSiteSamplePollerInstance({
     switch (config.meter.type) {
         case 'sunspec': {
             return new SunSpecMeterSiteSamplePoller({
-                config: config.meter,
+                sunspecMeterConfig: config.meter,
                 invertersPoller,
             });
         }
         case 'powerwall2': {
             return new Powerwall2SiteSamplePoller({
-                config: config.meter,
+                powerwall2Config: config.meter,
             });
         }
         case 'mqtt': {
             return new MqttSiteSamplePoller({
-                config: config.meter,
+                mqttConfig: config.meter,
             });
         }
     }

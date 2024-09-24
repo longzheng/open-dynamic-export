@@ -20,16 +20,16 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     private derSampleCache: DerSample | null = null;
 
     constructor({
-        config,
+        sunspecMeterConfig,
         invertersPoller,
     }: {
-        config: SunSpecMeterConfig;
+        sunspecMeterConfig: SunSpecMeterConfig;
         invertersPoller: InvertersPoller;
     }) {
         super({ name: 'SunSpecMeterPoller', pollingIntervalMs: 200 });
 
-        this.meterConnection = getSunSpecMeterConnection(config);
-        this.location = config.location;
+        this.meterConnection = getSunSpecMeterConnection(sunspecMeterConfig);
+        this.location = sunspecMeterConfig.location;
 
         invertersPoller.on('data', ({ derSample }) => {
             this.derSampleCache = derSample;
