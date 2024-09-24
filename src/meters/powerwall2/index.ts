@@ -10,9 +10,9 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;
 
     constructor({
-        config,
+        powerwall2Config,
     }: {
-        config: Extract<Config['meter'], { type: 'powerwall2' }>;
+        powerwall2Config: Extract<Config['meter'], { type: 'powerwall2' }>;
     }) {
         super({
             name: 'powerwall2',
@@ -20,8 +20,8 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
         });
 
         this.client = new Powerwall2Client({
-            ip: config.ip,
-            password: config.password,
+            ip: powerwall2Config.ip,
+            password: powerwall2Config.password,
         });
 
         void this.startPolling();

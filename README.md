@@ -54,7 +54,7 @@ Site meter:
 | Tesla Powerwall 2 | `powerwall2`       |                                                                                 | Backup Gateway 2                                                                |
 
 > [!IMPORTANT]
-> The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
+> Site meters installed in the consumption path with batteries are not supported due to the inability to measure battery power. The site meter must be installed in the feedin path.
 
 ## Configuration
 
@@ -80,6 +80,7 @@ To configure the inverter and meter connections, add the following property to `
         "ip": "192.168.1.6", // (string) required: the IP address of the meter
         "port": 502, // (number) required: the SunSpec Modbus TCP port of the meter
         "unitId": 240 // (number) required: the SunSpec unit ID of the meter
+        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption)
     }
     ...
 }

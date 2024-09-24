@@ -12,6 +12,9 @@ import type { FallbackControl } from '../sep2/helpers/fallbackControl.js';
 const influxDB = new InfluxDB({
     url: `http://influxdb:${process.env['INFLUXDB_PORT'] ?? 8086}`,
     token: process.env['INFLUXDB_ADMIN_TOKEN'],
+    writeOptions: {
+        flushInterval: 5_000,
+    },
 });
 
 const influxDbWriteApi = influxDB.getWriteApi(

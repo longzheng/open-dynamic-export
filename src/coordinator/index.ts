@@ -27,7 +27,10 @@ export function createCoordinator(): Coordinator {
 
     const invertersPoller = new InvertersPoller({ config });
 
-    const siteSamplePoller = getSiteSamplePollerInstance(config);
+    const siteSamplePoller = getSiteSamplePollerInstance({
+        config,
+        invertersPoller,
+    });
 
     const rampRateHelper = new RampRateHelper();
 

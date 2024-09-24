@@ -11,22 +11,22 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     private cachedMessage: z.infer<typeof siteSampleDataSchema> | null = null;
 
     constructor({
-        config,
+        mqttConfig,
     }: {
-        config: Extract<Config['meter'], { type: 'mqtt' }>;
+        mqttConfig: Extract<Config['meter'], { type: 'mqtt' }>;
     }) {
         super({
             name: 'mqtt',
             pollingIntervalMs: 200,
         });
 
-        this.client = mqtt.connect(`mqtt://${config.host}`, {
-            username: config.username,
-            password: config.password,
+        this.client = mqtt.connect(`mqtt://${mqttConfig.host}`, {
+            username: mqttConfig.username,
+            password: mqttConfig.password,
         });
 
         this.client.on('connect', () => {
-            this.client.subscribe(config.topic);
+            this.client.subscribe(mqttConfig.topic);
         });
 
         this.client.on('message', (_topic, message) => {

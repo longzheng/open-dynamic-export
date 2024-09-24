@@ -5,18 +5,35 @@ import { assertNonNull } from '../../helpers/null.js';
 import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
 import type { MeterModel } from '../../sunspec/models/meter.js';
 import type { Result } from '../../helpers/result.js';
+import type { InvertersPoller } from '../../coordinator/helpers/inverterSample.js';
+import { getSunSpecMeterConnection } from '../../sunspec/connections.js';
+import type { Config } from '../../helpers/config.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
+
+type SunSpecMeterConfig = Extract<Config['meter'], { type: 'sunspec' }>;
+
+type MeterLocation = SunSpecMeterConfig['location'];
 
 export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     private meterConnection: MeterSunSpecConnection;
+    private location: MeterLocation;
+    private derSampleCache: DerSample | null = null;
 
     constructor({
-        meterConnection,
+        sunspecMeterConfig,
+        invertersPoller,
     }: {
-        meterConnection: MeterSunSpecConnection;
+        sunspecMeterConfig: SunSpecMeterConfig;
+        invertersPoller: InvertersPoller;
     }) {
         super({ name: 'SunSpecMeterPoller', pollingIntervalMs: 200 });
 
-        this.meterConnection = meterConnection;
+        this.meterConnection = getSunSpecMeterConnection(sunspecMeterConfig);
+        this.location = sunspecMeterConfig.location;
+
+        invertersPoller.on('data', ({ derSample }) => {
+            this.derSampleCache = derSample;
+        });
 
         void this.startPolling();
     }
@@ -27,9 +44,21 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
 
             this.logger.trace({ meterModel }, 'received data');
 
-            const siteSample = generateSiteSample({
-                meter: meterModel,
-            });
+            const siteSample = (() => {
+                const sample = generateSiteSample({
+                    meter: meterModel,
+                });
+
+                switch (this.location) {
+                    case 'consumption':
+                        return convertConsumptionMeteringToFeedInMetering({
+                            siteSample: sample,
+                            derSample: this.derSampleCache,
+                        });
+                    case 'feedin':
+                        return sample;
+                }
+            })();
 
             return { success: true, value: siteSample };
         } catch (error) {
@@ -49,11 +78,7 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     }
 }
 
-export function generateSiteSample({
-    meter,
-}: {
-    meter: MeterModel;
-}): SiteSampleData {
+function generateSiteSample({ meter }: { meter: MeterModel }): SiteSampleData {
     const meterMetrics = getMeterMetrics(meter);
 
     return {
@@ -85,5 +110,63 @@ export function generateSiteSample({
             phaseC: meterMetrics.PhVphC,
         },
         frequency: meterMetrics.Hz,
+    };
+}
+
+function convertConsumptionMeteringToFeedInMetering({
+    siteSample,
+    derSample,
+}: {
+    siteSample: SiteSampleData;
+    derSample: DerSample | null;
+}): SiteSampleData {
+    if (!derSample) {
+        throw new Error(
+            'Cannot convert consumption metering to feed-in metering without DER data',
+        );
+    }
+
+    const siteRealPower = convertConsumptionRealPowerToFeedInRealPower({
+        consumptionRealPower: siteSample.realPower,
+        derRealPower: derSample.realPower,
+    });
+
+    return {
+        realPower: siteRealPower,
+        reactivePower: siteSample.reactivePower,
+        voltage: siteSample.voltage,
+        frequency: siteSample.frequency,
+    };
+}
+
+export function convertConsumptionRealPowerToFeedInRealPower({
+    consumptionRealPower,
+    derRealPower,
+}: {
+    consumptionRealPower: SiteSampleData['realPower'];
+    derRealPower: DerSample['realPower'];
+}): SiteSampleData['realPower'] {
+    if (
+        consumptionRealPower.type === 'perPhaseNet' &&
+        derRealPower.type === 'perPhaseNet'
+    ) {
+        return {
+            type: 'perPhaseNet',
+            phaseA: (derRealPower.phaseA + consumptionRealPower.phaseA) * -1,
+            phaseB:
+                ((derRealPower.phaseB ?? 0) +
+                    (consumptionRealPower.phaseB ?? 0)) *
+                -1,
+            phaseC:
+                ((derRealPower.phaseC ?? 0) +
+                    (consumptionRealPower.phaseC ?? 0)) *
+                -1,
+            net: (derRealPower.net + consumptionRealPower.net) * -1,
+        };
+    }
+
+    return {
+        type: 'noPhase',
+        net: (derRealPower.net + consumptionRealPower.net) * -1,
     };
 }

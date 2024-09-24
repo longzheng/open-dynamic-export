@@ -6,7 +6,6 @@ import type { InverterData } from '../../inverter/inverterData.js';
 import type { Result } from '../../helpers/result.js';
 import type { InverterDataPollerBase } from '../../inverter/inverterDataPollerBase.js';
 import type { Config } from '../../helpers/config.js';
-import { getSunSpecInvertersConnection } from '../../sunspec/connections.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import type { InverterConfiguration } from './inverterController.js';
 import type { Logger } from 'pino';
@@ -28,24 +27,23 @@ export class InvertersPoller extends EventEmitter<{
     constructor({ config }: { config: Config }) {
         super();
 
-        this.inverterDataPollers = config.inverters.map((inverter, index) => {
-            switch (inverter.type) {
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                case 'sunspec': {
-                    const inverterConnection =
-                        getSunSpecInvertersConnection(inverter);
+        this.inverterDataPollers = config.inverters.map(
+            (inverterConfig, index) => {
+                switch (inverterConfig.type) {
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    case 'sunspec': {
+                        return new SunSpecInverterDataPoller({
+                            sunspecInverterConfig: inverterConfig,
+                            applyControl: config.inverterControl,
+                        }).on('data', (data) => {
+                            this.inverterDataCacheMapByIndex.set(index, data);
 
-                    return new SunSpecInverterDataPoller({
-                        inverterConnection,
-                        applyControl: config.inverterControl,
-                    }).on('data', (data) => {
-                        this.inverterDataCacheMapByIndex.set(index, data);
-
-                        this.onData();
-                    });
+                            this.onData();
+                        });
+                    }
                 }
-            }
-        });
+            },
+        );
 
         this.logger = pinoLogger.child({ module: 'InvertersPoller' });
     }
