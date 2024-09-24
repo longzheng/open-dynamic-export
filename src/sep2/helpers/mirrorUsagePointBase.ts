@@ -158,6 +158,9 @@ export abstract class MirrorUsagePointHelperBase<
                         return await this.postMirrorMeterReading({
                             mirrorMeterReading: {
                                 mRID: this.getReadingMrid(key),
+                                description:
+                                    mirrorMeterReadingDefinitions[key]
+                                        .description,
                                 lastUpdateTime,
                                 nextUpdateTime,
                                 Reading: {
