@@ -15,6 +15,7 @@ import type { InvertersData } from './inverterSample.js';
 import type { Limiters } from '../../limiters/index.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import type { LimiterKeys } from '../../helpers/config.js';
+import { cappedChange } from '../../helpers/math.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -138,11 +139,53 @@ export class InverterController {
             Object.values(controlLimitsByLimiter),
         );
 
-        const inverterConfiguration = calculateInverterConfiguration({
-            activeInverterControlLimit,
-            invertersData: this.cachedInvertersData,
-            siteSample: this.cachedSiteSample,
-        });
+        const inverterConfiguration = ((): InverterConfiguration => {
+            const configuration = calculateInverterConfiguration({
+                activeInverterControlLimit,
+                invertersData: this.cachedInvertersData,
+                siteSample: this.cachedSiteSample,
+            });
+
+            switch (configuration.type) {
+                case 'disconnect':
+                    return configuration;
+                case 'limit': {
+                    // ramp the target solar power ratio to prevent sudden changes (e.g. 0% > 100% > 0%)
+                    // prevents inverter from potential hardware damage
+                    // also prevents feedback cycle with batteries constantly switching between charge/discharge
+                    const previousTargetSolarPowerRatio = (() => {
+                        if (!this.cachedData) {
+                            return null;
+                        }
+
+                        switch (this.cachedData.inverterConfiguration.type) {
+                            case 'disconnect':
+                                // slowly ramp from 0 if previously disconnected
+                                return 0;
+                            case 'limit':
+                                return this.cachedData.inverterConfiguration
+                                    .targetSolarPowerRatio;
+                        }
+                    })();
+
+                    if (previousTargetSolarPowerRatio === null) {
+                        return configuration;
+                    }
+
+                    const rampedTargetSolarPowerRatio = cappedChange({
+                        previousValue: previousTargetSolarPowerRatio,
+                        targetValue: configuration.targetSolarPowerRatio,
+                        // max 10% change
+                        maxChange: 0.1,
+                    });
+
+                    return {
+                        type: 'limit',
+                        targetSolarPowerRatio: rampedTargetSolarPowerRatio,
+                    };
+                }
+            }
+        })();
 
         this.cachedData = {
             controlLimitsByLimiter,
