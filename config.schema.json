@@ -206,12 +206,20 @@
                 },
                 "unitId": {
                   "$ref": "#/definitions/config/properties/inverters/items/properties/unitId"
+                },
+                "location": {
+                  "type": "string",
+                  "enum": [
+                    "feedin",
+                    "consumption"
+                  ]
                 }
               },
               "required": [
                 "type",
                 "ip",
-                "port"
+                "port",
+                "location"
               ],
               "additionalProperties": false,
               "description": "SunSpec meter configuration"
