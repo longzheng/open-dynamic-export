@@ -7,10 +7,12 @@ import { createCoordinator } from '../../coordinator/index.js';
 import type { Result } from '../../helpers/result.js';
 import type { InverterData } from '../../inverter/inverterData.js';
 
+type InvertersDataCache = Result<InverterData>[];
+
 type CoordinatorResponse =
     | {
           running: true;
-          invertersDataCache: Result<InverterData>[] | null;
+          invertersDataCache: InvertersDataCache | null;
           derSample: DerSample | null;
           siteSample: SiteSample | null;
       }
@@ -140,11 +142,13 @@ type SiteSample = {
     frequency: number | null;
 };
 
+type ControlLimitsByLimiter = Record<
+    'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
+    InverterControlLimit | null
+>;
+
 type InverterControllerData = {
-    controlLimitsByLimiter: Record<
-        'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
-        InverterControlLimit | null
-    >;
+    controlLimitsByLimiter: ControlLimitsByLimiter;
     activeInverterControlLimit: InverterControlLimit;
     inverterConfiguration: InverterConfiguration;
 };
