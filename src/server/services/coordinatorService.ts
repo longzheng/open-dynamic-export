@@ -1,4 +1,5 @@
 import type {
+    ActiveInverterControlLimit,
     InverterConfiguration,
     InverterControlLimit,
 } from '../../coordinator/helpers/inverterController.js';
@@ -149,6 +150,6 @@ type ControlLimitsByLimiter = Record<
 
 type InverterControllerData = {
     controlLimitsByLimiter: ControlLimitsByLimiter;
-    activeInverterControlLimit: InverterControlLimit;
+    activeInverterControlLimit: ActiveInverterControlLimit;
     inverterConfiguration: InverterConfiguration;
 };

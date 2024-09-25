@@ -42,8 +42,9 @@ export class AmberLimiter implements LimiterType {
         // positive price means feed-in costs money
         const feedInCostsMoney = price && price > 0;
 
-        const limit = feedInCostsMoney
+        const limit: InverterControlLimit = feedInCostsMoney
             ? {
+                  source: 'negativeFeedIn',
                   // if feed in price is negative, limit export to 0
                   opModConnect: undefined,
                   opModEnergize: undefined,
@@ -51,6 +52,7 @@ export class AmberLimiter implements LimiterType {
                   opModGenLimW: undefined,
               }
             : {
+                  source: 'negativeFeedIn',
                   // can't find current interval, assume export is fine
                   // if feed in price is positive, export is fine
                   opModConnect: undefined,
@@ -59,7 +61,7 @@ export class AmberLimiter implements LimiterType {
                   opModGenLimW: undefined,
               };
 
-        writeControlLimit({ limit, name: 'amber' });
+        writeControlLimit({ limit });
 
         return limit;
     }
