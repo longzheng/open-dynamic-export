@@ -61,12 +61,21 @@ class CoordinatorService {
         this.coordinator = null;
     }
 
-    public inverterControllerData(): InverterControllerData | null {
+    public inverterControllerData(): InverterControllerData {
         if (!this.coordinator) {
             throw new Error('Coordinator is not running');
         }
 
-        return this.coordinator.inverterController.getCachedData;
+        const data = this.coordinator.inverterController.getCachedData;
+
+        if (!data) {
+            return { cached: false };
+        }
+
+        return {
+            cached: true,
+            ...data,
+        };
     }
 }
 
@@ -148,8 +157,11 @@ type ControlLimitsByLimiter = Record<
     InverterControlLimit | null
 >;
 
-type InverterControllerData = {
-    controlLimitsByLimiter: ControlLimitsByLimiter;
-    activeInverterControlLimit: ActiveInverterControlLimit;
-    inverterConfiguration: InverterConfiguration;
-};
+type InverterControllerData =
+    | {
+          cached: true;
+          controlLimitsByLimiter: ControlLimitsByLimiter;
+          activeInverterControlLimit: ActiveInverterControlLimit;
+          inverterConfiguration: InverterConfiguration;
+      }
+    | { cached: false };
