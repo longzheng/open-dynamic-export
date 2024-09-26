@@ -77,17 +77,6 @@ export function assertPerPhaseNetOrNoPhaseMeasurementArray(
     }
 }
 
-export function getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-    measurement: PerPhaseNetMeasurement | NoPhaseMeasurement,
-) {
-    switch (measurement.type) {
-        case 'noPhase':
-            return measurement.net;
-        case 'perPhaseNet':
-            return measurement.net;
-    }
-}
-
 type PhaseValues = {
     phaseA: number[];
     phaseB: (number | null)[];

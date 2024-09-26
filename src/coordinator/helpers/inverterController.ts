@@ -6,7 +6,6 @@ import {
     roundToDecimals,
     sumNumbersArray,
 } from '../../helpers/number.js';
-import { getTotalFromPerPhaseNetOrNoPhaseMeasurement } from '../../helpers/measurement.js';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
@@ -246,13 +245,8 @@ export function calculateInverterConfiguration({
 
     const disconnect = energize === false || connect === false;
 
-    const siteWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-        siteSample.realPower,
-    );
-
-    const solarWatts = getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-        invertersData.derSample.realPower,
-    );
+    const siteWatts = siteSample.realPower.net;
+    const solarWatts = invertersData.derSample.realPower.net;
 
     const exportLimitWatts =
         activeInverterControlLimit.opModExpLimW?.value ??

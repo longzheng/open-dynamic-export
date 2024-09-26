@@ -10,7 +10,6 @@ import {
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurementsNullable,
     getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements,
-    getTotalFromPerPhaseNetOrNoPhaseMeasurement,
 } from './measurement.js';
 
 describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
@@ -109,47 +108,6 @@ describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
             type: 'noPhase',
             measurements: [],
         } satisfies AssertedPerPhaseNetOrNoPhaseMeasurementArray);
-    });
-});
-
-describe('getTotalFromPerPhaseOrNoPhaseMeasurement', () => {
-    it('should return the value from noPhase measurement', () => {
-        const noPhaseMeasurement: NoPhaseMeasurement = {
-            type: 'noPhase',
-            net: 100,
-        };
-
-        const result =
-            getTotalFromPerPhaseNetOrNoPhaseMeasurement(noPhaseMeasurement);
-        expect(result).toBe(100);
-    });
-
-    it('should return the sum of phaseA, phaseB, and phaseC when all phases are present in perPhase measurement', () => {
-        const perPhaseMeasurement: PerPhaseNetMeasurement = {
-            type: 'perPhaseNet',
-            phaseA: 10,
-            phaseB: 20,
-            phaseC: 30,
-            net: 60,
-        };
-
-        const result =
-            getTotalFromPerPhaseNetOrNoPhaseMeasurement(perPhaseMeasurement);
-        expect(result).toBe(10 + 20 + 30);
-    });
-
-    it('should return the sum of phases with null in perPhase measurement', () => {
-        const perPhaseMeasurement: PerPhaseNetMeasurement = {
-            type: 'perPhaseNet',
-            phaseA: 10,
-            phaseB: 20,
-            phaseC: null,
-            net: 30,
-        };
-
-        const result =
-            getTotalFromPerPhaseNetOrNoPhaseMeasurement(perPhaseMeasurement);
-        expect(result).toBe(10 + 20 + 0);
     });
 });
 
