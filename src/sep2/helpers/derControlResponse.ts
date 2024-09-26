@@ -78,11 +78,15 @@ export class DerControlResponseHelper {
 
         this.logger.debug(
             { derControl, response },
-            'sending DER Control response',
+            'Sending DERControl response',
         );
 
         const xml = objectToXml(response);
 
-        await this.client.post(derControl.replyToHref, xml);
+        try {
+            await this.client.post(derControl.replyToHref, xml);
+        } catch (error) {
+            this.logger.error(error, 'Failed to send DERControl response');
+        }
     }
 }
