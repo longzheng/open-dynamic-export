@@ -98,8 +98,4 @@ export class RampRateHelper {
             }
         }
     }
-
-    get getTotalNameplateWatts() {
-        return this.totalNameplateWatts;
-    }
 }
