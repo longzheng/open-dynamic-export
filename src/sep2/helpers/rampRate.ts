@@ -1,8 +1,7 @@
 import { Decimal } from 'decimal.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
-import type { InverterData } from '../../inverter/inverterData.js';
-import { sumNumbersArray } from '../../helpers/number.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
 
 // The default ramp-rate derived from 16.67% per minute (roughly 0.28% per second)
 // which is the default value for Wgra in AS/NZS 4777.2
@@ -67,12 +66,10 @@ export class RampRateHelper {
         }
     }
 
-    public onInverterData(
-        data: { nameplate: Pick<InverterData['nameplate'], 'maxW'> }[],
-    ) {
-        this.totalNameplateWatts = sumNumbersArray(
-            data.map((d) => d.nameplate.maxW),
-        );
+    public onDerSample(derSample: {
+        nameplate: Pick<DerSample['nameplate'], 'maxW'>;
+    }) {
+        this.totalNameplateWatts = derSample.nameplate.maxW;
     }
 
     public getMaxChangeWatts():

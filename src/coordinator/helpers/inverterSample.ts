@@ -9,14 +9,8 @@ import type { Config } from '../../helpers/config.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import type { InverterConfiguration } from './inverterController.js';
 import type { Logger } from 'pino';
-
-export type InvertersData = {
-    invertersData: InverterData[];
-    derSample: DerSample;
-};
-
 export class InvertersPoller extends EventEmitter<{
-    data: [InvertersData];
+    data: [DerSample];
 }> {
     private inverterDataPollers: InverterDataPollerBase[];
     private inverterDataCacheMapByIndex: Map<number, Result<InverterData>> =
@@ -83,9 +77,6 @@ export class InvertersPoller extends EventEmitter<{
 
         this.logger.trace({ derSample }, 'generated DER sample');
 
-        this.emit('data', {
-            invertersData: successInvertersData,
-            derSample,
-        });
+        this.emit('data', derSample);
     }
 }

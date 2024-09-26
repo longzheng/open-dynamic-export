@@ -11,22 +11,13 @@ import {
 import { objectToXml } from './xml.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
-import { PVConn } from '../../sunspec/models/status.js';
 import type { PollRate } from '../models/pollRate.js';
 import deepEqual from 'fast-deep-equal';
 import type { RampRateHelper } from './rampRate.js';
 import { DERControlType } from '../models/derControlType.js';
-import { enumHasValue } from '../../helpers/enum.js';
-import {
-    convertNumberToBaseAndPow10Exponent,
-    sumNumbersArray,
-    sumNumbersNullableArray,
-} from '../../helpers/number.js';
-import { ConnectStatus } from '../models/connectStatus.js';
+import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
-import { OperationalModeStatus } from '../models/operationModeStatus.js';
-import { type InverterData } from '../../inverter/inverterData.js';
-import { DERType } from '../models/derType.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
 
 type Config = {
     der: DER;
@@ -76,8 +67,8 @@ export class DerHelper {
         }
     }
 
-    public onInverterData(data: InverterData[]) {
-        const derCapability = getDerCapabilityResponseFromInverterData(data);
+    public onDerSample(derSample: DerSample) {
+        const derCapability = getDerCapabilityResponse(derSample);
 
         this.logger.trace(
             {
@@ -96,8 +87,8 @@ export class DerHelper {
             void this.putDerCapability({ derCapability });
         }
 
-        const derSettings = getDerSettingsResponseFromInverterData({
-            data,
+        const derSettings = getDerSettingsResponse({
+            derSample,
             rampRateHelper: this.rampRateHelper,
         });
 
@@ -113,7 +104,7 @@ export class DerHelper {
             void this.putDerSettings({ derSettings });
         }
 
-        const derStatus = getDerStatusResponseFromInverterData(data);
+        const derStatus = getDerStatusResponse(derSample);
 
         this.logger.trace(
             {
@@ -262,23 +253,17 @@ const derControlTypeModes: DERControlType =
 const doeControlTypeModes: DOEControlType =
     DOEControlType.opModExpLimW | DOEControlType.opModGenLimW;
 
-export function getDerCapabilityResponseFromInverterData(
-    data: Pick<InverterData, 'nameplate'>[],
+export function getDerCapabilityResponse(
+    derSample: Pick<DerSample, 'nameplate'>,
 ): DERCapability {
-    // get the highest DERTyp value
-    const type: DERType = Math.max(
-        ...data.map((d) => d.nameplate.type),
-        // fallback to NA if no inverters are connected
-        DERType.NotApplicable,
-    );
     const rtgMaxVA = convertNumberToBaseAndPow10Exponent(
-        sumNumbersArray(data.map((d) => d.nameplate.maxVA)),
+        derSample.nameplate.maxVA,
     );
     const rtgMaxW = convertNumberToBaseAndPow10Exponent(
-        sumNumbersArray(data.map((d) => d.nameplate.maxW)),
+        derSample.nameplate.maxW,
     );
     const rtgMaxVar = convertNumberToBaseAndPow10Exponent(
-        sumNumbersArray(data.map((d) => d.nameplate.maxVar)),
+        derSample.nameplate.maxVar,
     );
 
     return {
@@ -286,7 +271,7 @@ export function getDerCapabilityResponseFromInverterData(
         modesSupported: derControlTypeModes,
         // hard-coded DOE modes
         doeModesSupported: doeControlTypeModes,
-        type,
+        type: derSample.nameplate.type,
         rtgMaxVA: {
             value: rtgMaxVA.base,
             multiplier: rtgMaxVA.pow10,
@@ -302,21 +287,21 @@ export function getDerCapabilityResponseFromInverterData(
     };
 }
 
-export function getDerSettingsResponseFromInverterData({
-    data,
+export function getDerSettingsResponse({
+    derSample,
     rampRateHelper,
 }: {
-    data: InverterData[];
+    derSample: Pick<DerSample, 'settings'>;
     rampRateHelper: RampRateHelper;
 }): DERSettings {
-    const maxVA = sumNumbersNullableArray(data.map((d) => d.settings.maxVA));
-    const setMaxVA = maxVA ? convertNumberToBaseAndPow10Exponent(maxVA) : null;
+    const setMaxVA = derSample.settings.setMaxVA
+        ? convertNumberToBaseAndPow10Exponent(derSample.settings.setMaxVA)
+        : null;
     const setMaxW = convertNumberToBaseAndPow10Exponent(
-        sumNumbersArray(data.map((d) => d.settings.maxW)),
+        derSample.settings.setMaxW,
     );
-    const maxVar = sumNumbersNullableArray(data.map((d) => d.settings.maxVar));
-    const setMaxVar = maxVar
-        ? convertNumberToBaseAndPow10Exponent(maxVar)
+    const setMaxVar = derSample.settings.setMaxVar
+        ? convertNumberToBaseAndPow10Exponent(derSample.settings.setMaxVar)
         : null;
 
     return {
@@ -347,52 +332,20 @@ export function getDerSettingsResponseFromInverterData({
     };
 }
 
-export function getDerStatusResponseFromInverterData(
-    data: Pick<InverterData, 'status'>[],
+export function getDerStatusResponse(
+    derSample: Pick<DerSample, 'status'>,
 ): DERStatus {
     const now = new Date();
-    const operationalModeStatus: OperationalModeStatus = Math.max(
-        ...data.map((d) => d.status.operationalModeStatus),
-        // fallback to Off if no inverters are connected
-        OperationalModeStatus.Off,
-    );
-    const genConnectStatus: ConnectStatus = Math.max(
-        ...data.map((d) => d.status.genConnectStatus),
-        // fallback to 0 if no inverters are connected
-        0,
-    );
 
     return {
         readingTime: now,
         operationalModeStatus: {
             dateTime: now,
-            value: operationalModeStatus,
+            value: derSample.status.operationalModeStatus,
         },
         genConnectStatus: {
             dateTime: now,
-            value: genConnectStatus,
+            value: derSample.status.genConnectStatus,
         },
     };
-}
-
-export function getConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
-    let result: ConnectStatus = 0 as ConnectStatus;
-
-    if (enumHasValue(pvConn, PVConn.CONNECTED)) {
-        result += ConnectStatus.Connected;
-    }
-
-    if (enumHasValue(pvConn, PVConn.AVAILABLE)) {
-        result += ConnectStatus.Available;
-    }
-
-    if (enumHasValue(pvConn, PVConn.OPERATING)) {
-        result += ConnectStatus.Operating;
-    }
-
-    if (enumHasValue(pvConn, PVConn.TEST)) {
-        result += ConnectStatus.Test;
-    }
-
-    return result;
 }

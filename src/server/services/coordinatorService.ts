@@ -115,6 +115,21 @@ type DerSample = {
         phaseC: number | null;
     } | null;
     frequency: number | null;
+    nameplate: {
+        type: number;
+        maxW: number;
+        maxVA: number;
+        maxVar: number;
+    };
+    settings: {
+        setMaxW: number;
+        setMaxVA: number | null;
+        setMaxVar: number | null;
+    };
+    status: {
+        operationalModeStatus: number;
+        genConnectStatus: number;
+    };
 };
 
 type SiteSample = {

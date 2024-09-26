@@ -1,16 +1,11 @@
 import type { ControlType } from '../../sep2/helpers/controlScheduler.js';
 import { type ControlsModel } from '../../sunspec/models/controls.js';
 import { Decimal } from 'decimal.js';
-import {
-    numberWithPow10,
-    roundToDecimals,
-    sumNumbersArray,
-} from '../../helpers/number.js';
+import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { SiteSample } from '../../meters/siteSample.js';
-import type { InvertersData } from './inverterSample.js';
 import type { Limiters } from '../../limiters/index.js';
 import {
     objectEntriesWithType,
@@ -18,6 +13,7 @@ import {
 } from '../../helpers/object.js';
 import type { LimiterKeys } from '../../helpers/config.js';
 import { cappedChange } from '../../helpers/math.js';
+import type { DerSample } from './derSample.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -56,7 +52,7 @@ const defaultValues = {
 } as const satisfies Record<ControlType, unknown>;
 
 export class InverterController {
-    private cachedInvertersData: InvertersData | null = null;
+    private cachedDerSample: DerSample | null = null;
     private cachedSiteSample: SiteSample | null = null;
     private logger: Logger;
     private limiters: Limiters;
@@ -90,9 +86,9 @@ export class InverterController {
         void this.startLoop();
     }
 
-    updateSunSpecInverterData(data: InvertersData) {
-        this.logger.debug('Received inverter data, updating inverter controls');
-        this.cachedInvertersData = data;
+    updateDerSample(derSample: DerSample) {
+        this.logger.debug('Received DER sample, updating inverter controls');
+        this.cachedDerSample = derSample;
     }
 
     updateSiteSample(siteSample: SiteSample) {
@@ -125,7 +121,7 @@ export class InverterController {
     }
 
     private async updateInverterControlValues() {
-        if (!this.cachedInvertersData) {
+        if (!this.cachedDerSample) {
             this.logger.warn(
                 'Inverter data is not cached, cannot update inverter controls yet. Wait for next loop.',
             );
@@ -151,13 +147,13 @@ export class InverterController {
         );
 
         const loadWatts =
-            this.cachedInvertersData.derSample.realPower.net +
+            this.cachedDerSample.realPower.net +
             this.cachedSiteSample.realPower.net;
 
         const inverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit,
-                invertersData: this.cachedInvertersData,
+                derSample: this.cachedDerSample,
                 siteSample: this.cachedSiteSample,
             });
 
@@ -223,11 +219,11 @@ export class InverterController {
 
 export function calculateInverterConfiguration({
     activeInverterControlLimit,
-    invertersData,
+    derSample,
     siteSample,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
-    invertersData: InvertersData;
+    derSample: DerSample;
     siteSample: SiteSample;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
@@ -252,7 +248,7 @@ export function calculateInverterConfiguration({
     const disconnect = energize === false || connect === false;
 
     const siteWatts = siteSample.realPower.net;
-    const solarWatts = invertersData.derSample.realPower.net;
+    const solarWatts = derSample.realPower.net;
 
     const exportLimitWatts =
         activeInverterControlLimit.opModExpLimW?.value ??
@@ -276,7 +272,7 @@ export function calculateInverterConfiguration({
     );
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
-        inverters: invertersData.invertersData,
+        derSample,
         targetSolarWatts,
     });
 
@@ -336,27 +332,20 @@ export function getWMaxLimPctFromTargetSolarPowerRatio({
 }
 
 export function calculateTargetSolarPowerRatio({
-    inverters,
+    derSample,
     targetSolarWatts,
 }: {
-    inverters: {
-        nameplate: Pick<
-            InvertersData['invertersData'][number]['nameplate'],
-            'maxW'
-        >;
-    }[];
+    derSample: {
+        nameplate: Pick<DerSample['nameplate'], 'maxW'>;
+    };
     targetSolarWatts: number;
 }) {
-    const nameplateWattsTotal = sumNumbersArray(
-        inverters.map(({ nameplate }) => nameplate.maxW),
-    );
-
-    if (nameplateWattsTotal === 0) {
+    if (derSample.nameplate.maxW === 0) {
         return 0;
     }
 
     const targetPowerRatio = new Decimal(targetSolarWatts).div(
-        sumNumbersArray(inverters.map(({ nameplate }) => nameplate.maxW)),
+        derSample.nameplate.maxW,
     );
 
     // cap the target power ratio to 1.0

@@ -40,11 +40,9 @@ describe('ControlLimitRampHelper', () => {
     });
 
     it('should return nameplate value for active undefined target with total nameplate', () => {
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -59,11 +57,9 @@ describe('ControlLimitRampHelper', () => {
     });
 
     it('should return nameplate value for default undefined target with total nameplate', () => {
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -80,11 +76,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return active target value immediately if first time ramping', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
 
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -101,11 +95,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return default target value immediately if first time ramping', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
 
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'default',
@@ -122,11 +114,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return target value immediately if going from active to active', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -154,11 +144,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return ramped value with 1% ramp rate if going from active to default', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -198,11 +186,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return ramped value with 1% ramp rate if going from default to active', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
         helper.updateTarget({
             type: 'default',
             value: 1500,
@@ -254,11 +240,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return ramped value with 1% ramp rate if going from default to default', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
         helper.updateTarget({
             type: 'default',
             value: 1500,
@@ -314,11 +298,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return ramped value with timed ramping', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
 
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -391,11 +373,9 @@ describe('ControlLimitRampHelper', () => {
     it('should ramp from active to default, before reach default, ramp back to active', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
         helper.updateTarget({
             type: 'active',
             value: 5000,
@@ -455,11 +435,9 @@ describe('ControlLimitRampHelper', () => {
     it('should ramp from default to active, before reach active, ramp back to default', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(100);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
         helper.updateTarget({
             type: 'default',
             value: 1500,
@@ -522,11 +500,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return new target value immediately from active to default with no limit ramp rate', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(0);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'active',
@@ -554,11 +530,9 @@ describe('ControlLimitRampHelper', () => {
     it('should return new target value immediately from default to active with no limit ramp rate', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
         rampRateHelper.setDefaultDERControlRampRate(0);
-        rampRateHelper.onInverterData([
-            {
-                nameplate: { maxW: 10000 },
-            },
-        ]);
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 10000 },
+        });
 
         helper.updateTarget({
             type: 'default',

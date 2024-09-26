@@ -31,7 +31,7 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
         this.meterConnection = getSunSpecMeterConnection(sunspecMeterConfig);
         this.location = sunspecMeterConfig.location;
 
-        invertersPoller.on('data', ({ derSample }) => {
+        invertersPoller.on('data', (derSample) => {
             this.derSampleCache = derSample;
         });
 
