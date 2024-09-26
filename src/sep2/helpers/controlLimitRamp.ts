@@ -1,3 +1,4 @@
+import { cappedChange } from '../../helpers/math.js';
 import type { RampRateHelper } from './rampRate.js';
 
 export class ControlLimitRampHelper {
@@ -208,22 +209,14 @@ export function calculateRampedValue({
             return lastValue + changeSinceLastValue;
         }
         case 'limit': {
-            const delta = toValue - lastValue;
-            const direction = Math.sign(delta);
+            const maxChange =
+                ramping.maxChangePerSecond * secondsSinceLastValue;
 
-            // If delta is zero, no change is needed
-            if (direction === 0) {
-                return toValue;
-            }
-
-            const limitedChange =
-                direction *
-                Math.min(
-                    Math.abs(delta),
-                    ramping.maxChangePerSecond * secondsSinceLastValue,
-                );
-
-            return lastValue + limitedChange;
+            return cappedChange({
+                previousValue: lastValue,
+                targetValue: toValue,
+                maxChange,
+            });
         }
     }
 }
