@@ -61,6 +61,7 @@ export class InverterController {
     private logger: Logger;
     private limiters: Limiters;
     private cachedData: {
+        loadWatts: number;
         controlLimitsByLimiter: Record<
             LimiterKeys,
             InverterControlLimit | null
@@ -149,6 +150,10 @@ export class InverterController {
             Object.values(controlLimitsByLimiter),
         );
 
+        const loadWatts =
+            this.cachedInvertersData.derSample.realPower.net +
+            this.cachedSiteSample.realPower.net;
+
         const inverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit,
@@ -198,6 +203,7 @@ export class InverterController {
         })();
 
         this.cachedData = {
+            loadWatts,
             controlLimitsByLimiter,
             activeInverterControlLimit,
             inverterConfiguration,

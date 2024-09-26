@@ -160,6 +160,7 @@ type ControlLimitsByLimiter = Record<
 type InverterControllerData =
     | {
           cached: true;
+          loadWatts: number;
           controlLimitsByLimiter: ControlLimitsByLimiter;
           activeInverterControlLimit: ActiveInverterControlLimit;
           inverterConfiguration: InverterConfiguration;
