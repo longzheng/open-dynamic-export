@@ -22,7 +22,10 @@ import type { DerSample } from '../../coordinator/helpers/derSample.js';
 import { CommodityType } from '../models/commodityType.js';
 import { KindType } from '../models/kindType.js';
 import type { SEP2Client } from '../client.js';
-import { objectEntriesWithType } from '../../helpers/object.js';
+import {
+    objectEntriesWithType,
+    objectFromEntriesWithType,
+} from '../../helpers/object.js';
 
 type DerReading = {
     realPower: AvgMaxMin<PerPhaseNetMeasurement | NoPhaseMeasurement>;
@@ -487,7 +490,7 @@ export class MirrorUsagePointDerHelper extends MirrorUsagePointHelperBase<
     constructor({ client }: { client: SEP2Client }) {
         super({ client });
 
-        this.mirrorMeterReadingMrids = Object.fromEntries(
+        this.mirrorMeterReadingMrids = objectFromEntriesWithType(
             objectEntriesWithType(mirrorMeterReadingDefinitions).map(
                 ([key, value]) => [
                     key,

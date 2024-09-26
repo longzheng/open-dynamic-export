@@ -129,6 +129,7 @@ export class Sep2Limiter implements LimiterType {
         );
 
         const limit: InverterControlLimit = {
+            source: 'sep2',
             opModExpLimW: this.opModExpLimWRampRateHelper.getRampedValue(),
             opModGenLimW: this.opModGenLimWRampRateHelper.getRampedValue(),
             opModEnergize:
@@ -139,7 +140,7 @@ export class Sep2Limiter implements LimiterType {
                     .control,
         };
 
-        writeControlLimit({ limit, name: 'sep2' });
+        writeControlLimit({ limit });
 
         return limit;
     }

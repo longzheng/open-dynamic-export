@@ -13,14 +13,15 @@ export class FixedLimiter implements LimiterType {
     }
 
     getInverterControlLimit(): InverterControlLimit {
-        const limit = {
+        const limit: InverterControlLimit = {
+            source: 'fixed',
             opModConnect: this.config.connect,
             opModEnergize: this.config.connect,
             opModExpLimW: this.config.exportLimitWatts,
             opModGenLimW: this.config.generationLimitWatts,
         };
 
-        writeControlLimit({ limit, name: 'fixed' });
+        writeControlLimit({ limit });
 
         return limit;
     }

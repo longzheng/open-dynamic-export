@@ -26,24 +26,26 @@ export class AusgridEA029Limiter implements LimiterType {
 
         const nowHour = now.getHours();
 
-        const limit =
+        const limit: InverterControlLimit =
             // if within charge window, zero export
             nowHour >= chargeWindow.startHourOfDay &&
             nowHour < chargeWindow.endHourOfDay
                 ? {
+                      source: 'twoWayTariff',
                       opModConnect: undefined,
                       opModEnergize: undefined,
                       opModExpLimW: 0,
                       opModGenLimW: undefined,
                   }
                 : {
+                      source: 'twoWayTariff',
                       opModConnect: undefined,
                       opModEnergize: undefined,
                       opModExpLimW: undefined,
                       opModGenLimW: undefined,
                   };
 
-        writeControlLimit({ limit, name: 'ausgridEA029' });
+        writeControlLimit({ limit });
 
         return limit;
     }

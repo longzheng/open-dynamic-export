@@ -1,4 +1,5 @@
 import type {
+    ActiveInverterControlLimit,
     InverterConfiguration,
     InverterControlLimit,
 } from '../../coordinator/helpers/inverterController.js';
@@ -7,10 +8,12 @@ import { createCoordinator } from '../../coordinator/index.js';
 import type { Result } from '../../helpers/result.js';
 import type { InverterData } from '../../inverter/inverterData.js';
 
+type InvertersDataCache = Result<InverterData>[];
+
 type CoordinatorResponse =
     | {
           running: true;
-          invertersDataCache: Result<InverterData>[] | null;
+          invertersDataCache: InvertersDataCache | null;
           derSample: DerSample | null;
           siteSample: SiteSample | null;
       }
@@ -58,12 +61,21 @@ class CoordinatorService {
         this.coordinator = null;
     }
 
-    public inverterControllerData(): InverterControllerData | null {
+    public inverterControllerData(): InverterControllerData {
         if (!this.coordinator) {
             throw new Error('Coordinator is not running');
         }
 
-        return this.coordinator.inverterController.getCachedData;
+        const data = this.coordinator.inverterController.getCachedData;
+
+        if (!data) {
+            return { cached: false };
+        }
+
+        return {
+            cached: true,
+            ...data,
+        };
     }
 }
 
@@ -140,11 +152,16 @@ type SiteSample = {
     frequency: number | null;
 };
 
-type InverterControllerData = {
-    controlLimitsByLimiter: Record<
-        'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
-        InverterControlLimit | null
-    >;
-    activeInverterControlLimit: InverterControlLimit;
-    inverterConfiguration: InverterConfiguration;
-};
+type ControlLimitsByLimiter = Record<
+    'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
+    InverterControlLimit | null
+>;
+
+type InverterControllerData =
+    | {
+          cached: true;
+          controlLimitsByLimiter: ControlLimitsByLimiter;
+          activeInverterControlLimit: ActiveInverterControlLimit;
+          inverterConfiguration: InverterConfiguration;
+      }
+    | { cached: false };

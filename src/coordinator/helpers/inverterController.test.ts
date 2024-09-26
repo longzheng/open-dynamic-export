@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { InverterControlLimit } from './inverterController.js';
 import {
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
-    getAggregatedInverterControlLimit,
+    getActiveInverterControlLimit,
     getWMaxLimPctFromTargetSolarPowerRatio,
 } from './inverterController.js';
 
@@ -172,22 +171,25 @@ describe('getWMaxLimPctFromTargetSolarPowerRatio', () => {
     });
 });
 
-describe('getAggregatedInverterControlLimit', () => {
+describe('getActiveInverterControlLimit', () => {
     it('should return the minimum of all limits', () => {
-        const inverterControlLimit = getAggregatedInverterControlLimit([
+        const inverterControlLimit = getActiveInverterControlLimit([
             {
+                source: 'fixed',
                 opModConnect: undefined,
                 opModEnergize: undefined,
                 opModExpLimW: undefined,
                 opModGenLimW: 20000,
             },
             {
+                source: 'mqtt',
                 opModConnect: false,
                 opModEnergize: true,
                 opModExpLimW: 5000,
                 opModGenLimW: 5000,
             },
             {
+                source: 'sep2',
                 opModConnect: true,
                 opModEnergize: false,
                 opModExpLimW: 2000,
@@ -196,22 +198,36 @@ describe('getAggregatedInverterControlLimit', () => {
         ]);
 
         expect(inverterControlLimit).toEqual({
-            opModConnect: false,
-            opModEnergize: false,
-            opModExpLimW: 2000,
-            opModGenLimW: 5000,
-        } satisfies InverterControlLimit);
+            opModConnect: {
+                source: 'mqtt',
+                value: false,
+            },
+            opModEnergize: {
+                source: 'sep2',
+                value: false,
+            },
+            opModExpLimW: {
+                source: 'sep2',
+                value: 2000,
+            },
+            opModGenLimW: {
+                source: 'mqtt',
+                value: 5000,
+            },
+        } satisfies typeof inverterControlLimit);
     });
 
     it('should return undefined if all limits are undefined', () => {
-        const inverterControlLimit = getAggregatedInverterControlLimit([
+        const inverterControlLimit = getActiveInverterControlLimit([
             {
+                source: 'fixed',
                 opModConnect: undefined,
                 opModEnergize: undefined,
                 opModExpLimW: undefined,
                 opModGenLimW: undefined,
             },
             {
+                source: 'mqtt',
                 opModConnect: undefined,
                 opModEnergize: undefined,
                 opModExpLimW: 1000,
@@ -222,8 +238,11 @@ describe('getAggregatedInverterControlLimit', () => {
         expect(inverterControlLimit).toEqual({
             opModConnect: undefined,
             opModEnergize: undefined,
-            opModExpLimW: 1000,
+            opModExpLimW: {
+                source: 'mqtt',
+                value: 1000,
+            },
             opModGenLimW: undefined,
-        } satisfies InverterControlLimit);
+        } satisfies typeof inverterControlLimit);
     });
 });

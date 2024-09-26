@@ -13,7 +13,10 @@ import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
 import type { SiteSample } from '../../meters/siteSample.js';
 import type { InvertersData } from './inverterSample.js';
 import type { Limiters } from '../../limiters/index.js';
-import { objectEntriesWithType } from '../../helpers/object.js';
+import {
+    objectEntriesWithType,
+    objectFromEntriesWithType,
+} from '../../helpers/object.js';
 import type { LimiterKeys } from '../../helpers/config.js';
 import { cappedChange } from '../../helpers/math.js';
 
@@ -22,7 +25,15 @@ export type SupportedControlTypes = Extract<
     'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
 >;
 
+export type InverterControlTypes =
+    | 'fixed'
+    | 'mqtt'
+    | 'sep2'
+    | 'twoWayTariff'
+    | 'negativeFeedIn';
+
 export type InverterControlLimit = {
+    source: InverterControlTypes;
     opModEnergize: boolean | undefined;
     opModConnect: boolean | undefined;
     opModGenLimW: number | undefined;
@@ -55,7 +66,7 @@ export class InverterController {
             LimiterKeys,
             InverterControlLimit | null
         >;
-        activeInverterControlLimit: InverterControlLimit;
+        activeInverterControlLimit: ActiveInverterControlLimit;
         inverterConfiguration: InverterConfiguration;
     } | null = null;
     private onControl: (
@@ -128,14 +139,14 @@ export class InverterController {
             return;
         }
 
-        const controlLimitsByLimiter = Object.fromEntries(
+        const controlLimitsByLimiter = objectFromEntriesWithType(
             objectEntriesWithType(this.limiters).map(([key, limiter]) => [
                 key,
                 limiter?.getInverterControlLimit() ?? null,
             ]),
-        ) as Record<LimiterKeys, InverterControlLimit | null>;
+        );
 
-        const activeInverterControlLimit = getAggregatedInverterControlLimit(
+        const activeInverterControlLimit = getActiveInverterControlLimit(
             Object.values(controlLimitsByLimiter),
         );
 
@@ -210,7 +221,7 @@ export function calculateInverterConfiguration({
     invertersData,
     siteSample,
 }: {
-    activeInverterControlLimit: InverterControlLimit;
+    activeInverterControlLimit: ActiveInverterControlLimit;
     invertersData: InvertersData;
     siteSample: SiteSample;
 }): InverterConfiguration {
@@ -226,10 +237,12 @@ export function calculateInverterConfiguration({
     );
 
     const energize =
-        activeInverterControlLimit.opModEnergize ?? defaultValues.opModEnergize;
+        activeInverterControlLimit.opModEnergize?.value ??
+        defaultValues.opModEnergize;
 
     const connect =
-        activeInverterControlLimit.opModConnect ?? defaultValues.opModConnect;
+        activeInverterControlLimit.opModConnect?.value ??
+        defaultValues.opModConnect;
 
     const disconnect = energize === false || connect === false;
 
@@ -242,10 +255,12 @@ export function calculateInverterConfiguration({
     );
 
     const exportLimitWatts =
-        activeInverterControlLimit.opModExpLimW ?? defaultValues.opModExpLimW;
+        activeInverterControlLimit.opModExpLimW?.value ??
+        defaultValues.opModExpLimW;
 
     const generationLimitWatts =
-        activeInverterControlLimit.opModGenLimW ?? defaultValues.opModGenLimW;
+        activeInverterControlLimit.opModGenLimW?.value ??
+        defaultValues.opModGenLimW;
 
     const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
@@ -371,13 +386,40 @@ export function calculateTargetSolarWatts({
     return solarTarget.toNumber();
 }
 
-export function getAggregatedInverterControlLimit(
+export type ActiveInverterControlLimit = {
+    opModEnergize:
+        | {
+              value: boolean;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    opModConnect:
+        | {
+              value: boolean;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    opModGenLimW:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    opModExpLimW:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+};
+
+export function getActiveInverterControlLimit(
     controlLimits: (InverterControlLimit | null)[],
-) {
-    let opModEnergize: boolean | undefined = undefined;
-    let opModConnect: boolean | undefined = undefined;
-    let opModGenLimW: number | undefined = undefined;
-    let opModExpLimW: number | undefined = undefined;
+): ActiveInverterControlLimit {
+    let opModEnergize: ActiveInverterControlLimit['opModEnergize'] = undefined;
+    let opModConnect: ActiveInverterControlLimit['opModConnect'] = undefined;
+    let opModGenLimW: ActiveInverterControlLimit['opModGenLimW'] = undefined;
+    let opModExpLimW: ActiveInverterControlLimit['opModExpLimW'] = undefined;
 
     for (const controlLimit of controlLimits) {
         if (!controlLimit) {
@@ -385,47 +427,58 @@ export function getAggregatedInverterControlLimit(
         }
 
         if (controlLimit.opModEnergize !== undefined) {
-            if (opModEnergize === undefined) {
-                opModEnergize = controlLimit.opModEnergize;
-            } else {
-                opModEnergize = opModEnergize && controlLimit.opModEnergize;
+            if (
+                opModEnergize === undefined ||
+                // false overrides true
+                (opModEnergize.value === true &&
+                    controlLimit.opModEnergize === false)
+            ) {
+                opModEnergize = {
+                    source: controlLimit.source,
+                    value: controlLimit.opModEnergize,
+                };
             }
         }
 
         if (controlLimit.opModConnect !== undefined) {
-            if (opModConnect === undefined) {
-                opModConnect = controlLimit.opModConnect;
-            } else {
-                opModConnect = opModConnect && controlLimit.opModConnect;
+            if (
+                opModConnect === undefined ||
+                // false overrides true
+                (opModConnect.value === true &&
+                    controlLimit.opModConnect === false)
+            ) {
+                opModConnect = {
+                    source: controlLimit.source,
+                    value: controlLimit.opModConnect,
+                };
             }
         }
 
         if (controlLimit.opModGenLimW !== undefined) {
             if (
                 opModGenLimW === undefined ||
-                controlLimit.opModGenLimW < opModGenLimW
+                // take the lesser value
+                controlLimit.opModGenLimW < opModGenLimW.value
             ) {
-                opModGenLimW = controlLimit.opModGenLimW;
+                opModGenLimW = {
+                    source: controlLimit.source,
+                    value: controlLimit.opModGenLimW,
+                };
             }
         }
 
         if (controlLimit.opModExpLimW !== undefined) {
             if (
                 opModExpLimW === undefined ||
-                controlLimit.opModExpLimW < opModExpLimW
+                // take the lesser value
+                controlLimit.opModExpLimW < opModExpLimW.value
             ) {
-                opModExpLimW = controlLimit.opModExpLimW;
+                opModExpLimW = {
+                    source: controlLimit.source,
+                    value: controlLimit.opModExpLimW,
+                };
             }
         }
-    }
-
-    // round numeric values
-    if (opModGenLimW !== undefined) {
-        opModGenLimW = Math.round(opModGenLimW);
-    }
-
-    if (opModExpLimW !== undefined) {
-        opModExpLimW = Math.round(opModExpLimW);
     }
 
     return {

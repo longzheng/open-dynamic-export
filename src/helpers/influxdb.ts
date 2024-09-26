@@ -517,14 +517,8 @@ export function writeAmberPrice(number: number | undefined) {
     influxDbWriteApi.writePoint(new Point('amber').floatField('price', number));
 }
 
-export function writeControlLimit({
-    limit,
-    name,
-}: {
-    limit: InverterControlLimit;
-    name: string;
-}) {
-    const point = new Point('controlLimit').tag('name', name);
+export function writeControlLimit({ limit }: { limit: InverterControlLimit }) {
+    const point = new Point('controlLimit').tag('name', limit.source);
 
     if (limit.opModConnect !== undefined) {
         point.booleanField('opModConnect', limit.opModConnect);
