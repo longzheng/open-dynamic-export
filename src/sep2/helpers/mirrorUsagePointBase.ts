@@ -19,6 +19,7 @@ import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { addMilliseconds } from 'date-fns';
 import axiosRetry from 'axios-retry';
+import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 
 export type MirrorMeterReadingDefinitions = Required<
     Pick<MirrorMeterReading, 'description'> & {
@@ -50,6 +51,8 @@ export abstract class MirrorUsagePointHelperBase<
     protected abstract roleFlags: RoleFlagsType;
     protected mirrorMeterReadingPostTimer: NodeJS.Timeout | null = null;
     protected abstract logger: Logger;
+    private mirrorMeterReadingsBuffer: CappedArrayStack<MirrorMeterReading> =
+        new CappedArrayStack({ limit: 1000 });
 
     constructor({ client }: { client: SEP2Client }) {
         this.client = client;
@@ -123,6 +126,22 @@ export abstract class MirrorUsagePointHelperBase<
     }
 
     public async mirrorMeterReadingsPost() {
+        // send any buffered readings
+        if (this.mirrorMeterReadingsBuffer.get().length > 0) {
+            const bufferedReadings = this.mirrorMeterReadingsBuffer.get();
+
+            this.mirrorMeterReadingsBuffer.clear();
+
+            const bufferedResult = await this.sendReadings(bufferedReadings);
+
+            this.logger.debug(
+                {
+                    bufferedResult,
+                },
+                'Sent buffered MirrorMeterReadings',
+            );
+        }
+
         // this is a function because we want to evaluate `this.mirrorUsagePoint?.postRate` every time
         // the mirrorUsagePoint may be updated after we post to it so we want to get the latest postRate
         const getNextUpdateMilliseconds = () =>
@@ -148,47 +167,47 @@ export abstract class MirrorUsagePointHelperBase<
 
             const mirrorMeterReadingDefinitions = this.getReadingDefintions();
 
-            await Promise.all(
-                objectEntriesWithType(mirrorMeterReadings).map(
-                    async ([key, value]) => {
-                        // don't post null reading values
-                        if (value === null) {
-                            return;
-                        }
+            const readings = objectEntriesWithType(mirrorMeterReadings)
+                .map(([key, value]): MirrorMeterReading | null => {
+                    // don't post null reading values
+                    if (value === null) {
+                        return null;
+                    }
 
-                        return await this.postMirrorMeterReading({
-                            mirrorMeterReading: {
-                                mRID: this.getReadingMrid(key),
-                                description:
-                                    mirrorMeterReadingDefinitions[key]
-                                        .description,
-                                lastUpdateTime,
-                                nextUpdateTime,
-                                Reading: {
-                                    // the value must not contain a decimal point
-                                    // shift the base value by the power of 10 multiplier
-                                    value: Math.round(
-                                        numberWithPow10(
-                                            value,
-                                            -mirrorMeterReadingDefinitions[key]
-                                                .ReadingType
-                                                .powerOfTenMultiplier,
-                                        ),
-                                    ),
+                    return {
+                        mRID: this.getReadingMrid(key),
+                        description:
+                            mirrorMeterReadingDefinitions[key].description,
+                        lastUpdateTime,
+                        nextUpdateTime,
+                        Reading: {
+                            // the value must not contain a decimal point
+                            // shift the base value by the power of 10 multiplier
+                            value: Math.round(
+                                numberWithPow10(
+                                    value,
+                                    -mirrorMeterReadingDefinitions[key]
+                                        .ReadingType.powerOfTenMultiplier,
+                                ),
+                            ),
 
-                                    timePeriod: {
-                                        start: sampleTimePeriod.start,
-                                        duration:
-                                            sampleTimePeriod.durationSeconds,
-                                    },
-                                },
+                            timePeriod: {
+                                start: sampleTimePeriod.start,
+                                duration: sampleTimePeriod.durationSeconds,
                             },
-                        });
-                    },
-                ),
-            );
+                        },
+                    };
+                })
+                .filter((reading) => reading !== null);
 
-            this.logger.debug('Sent MirrorMeterReadings');
+            const result = await this.sendReadings(readings);
+
+            this.logger.debug(
+                {
+                    result,
+                },
+                'Sent MirrorMeterReadings',
+            );
         }
 
         this.queueMirrorMeterReadingPost();
@@ -251,6 +270,37 @@ export abstract class MirrorUsagePointHelperBase<
         }
 
         return parseMirrorUsagePointXml(await this.client.get(locationHeader));
+    }
+
+    private async sendReadings(readings: MirrorMeterReading[]): Promise<{
+        successCount: number;
+        failCount: number;
+    }> {
+        let successCount = 0;
+        let failCount = 0;
+
+        await Promise.all(
+            readings.map(async (reading) => {
+                try {
+                    await this.postMirrorMeterReading({
+                        mirrorMeterReading: reading,
+                    });
+                    successCount++;
+                } catch (error) {
+                    this.logger.debug(
+                        error,
+                        'Failed to post MirrorMeterReading',
+                    );
+                    failCount++;
+                    this.mirrorMeterReadingsBuffer.push(reading);
+                }
+            }),
+        );
+
+        return {
+            successCount,
+            failCount,
+        };
     }
 
     private async postMirrorMeterReading({

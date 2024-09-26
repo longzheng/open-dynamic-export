@@ -18,4 +18,8 @@ export class CappedArrayStack<T> {
     public get() {
         return this.array;
     }
+
+    public clear() {
+        this.array = [];
+    }
 }
