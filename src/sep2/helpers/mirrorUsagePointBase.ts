@@ -18,6 +18,7 @@ import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { addMilliseconds } from 'date-fns';
+import axiosRetry from 'axios-retry';
 
 export type MirrorMeterReadingDefinitions = Required<
     Pick<MirrorMeterReading, 'description'> & {
@@ -267,6 +268,18 @@ export abstract class MirrorUsagePointHelperBase<
         const response = await this.client.post(
             this.mirrorUsagePoint.href,
             xml,
+            {
+                'axios-retry': {
+                    // by default axios-retry will not retry POST errors
+                    // we know these calls are idempotent so we can retry them
+                    retryCondition: (error) => {
+                        return (
+                            axiosRetry.isNetworkError(error) ||
+                            axiosRetry.isRetryableError(error)
+                        );
+                    },
+                },
+            },
         );
 
         return response;

@@ -1,4 +1,4 @@
-import type { AxiosInstance, AxiosResponse } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
@@ -83,15 +83,23 @@ export class SEP2Client {
         return await parseStringPromise(response.data);
     }
 
-    async post(link: string, data: unknown): Promise<AxiosResponse> {
+    async post<T>(
+        link: string,
+        data: T,
+        options?: AxiosRequestConfig<T>,
+    ): Promise<AxiosResponse> {
         const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.post<string>(url, data);
+        const response = await this.axiosInstance.post(url, data, options);
         return response;
     }
 
-    async put(link: string, data: unknown): Promise<AxiosResponse> {
+    async put<T>(
+        link: string,
+        data: T,
+        options?: AxiosRequestConfig<T>,
+    ): Promise<AxiosResponse> {
         const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.put<string>(url, data);
+        const response = await this.axiosInstance.put(url, data, options);
 
         return response;
     }
