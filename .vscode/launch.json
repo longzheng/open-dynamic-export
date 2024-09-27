@@ -20,7 +20,7 @@
             "port": 9229,
             "continueOnAttach": true,
             "remoteRoot": "/app",
-            "preLaunchTask": "docker-compose debug up",
+            "preLaunchTask": "docker-compose debug",
             "skipFiles": [
                 // Node.js internal core modules
                 "<node_internals>/**",

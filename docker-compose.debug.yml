@@ -4,4 +4,4 @@ services:
       NODE_ENV: development
     ports:
       - 9229:9229
-    command: ["npm", "run", "start:debug"]
+    command: ["node","--inspect=0.0.0.0:9229","dist/src/app.js"]
