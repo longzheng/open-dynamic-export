@@ -44,6 +44,8 @@ export function sunSpecModelFactory<
 
             await modbusConnection.connect();
 
+            logger.trace({ address }, 'Reading registers');
+
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
                     address.start,
