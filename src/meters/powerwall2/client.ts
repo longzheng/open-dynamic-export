@@ -28,6 +28,7 @@ export class Powerwall2Client {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),
+            timeout: 10_000,
         });
 
         void this.getToken();
