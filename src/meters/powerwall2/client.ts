@@ -119,6 +119,7 @@ export class Powerwall2Client {
                     error.response.status < 500
                 ) {
                     // refresh token and retry request
+                    this.token = { type: 'none' };
                     await this.getToken();
 
                     return this.get(url, params);
