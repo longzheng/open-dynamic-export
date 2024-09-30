@@ -71,6 +71,10 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
     }
 
+    getControlSchedules() {
+        return this.controlSchedules;
+    }
+
     updateFallbackControl(fallbackControl: FallbackControl) {
         this.fallbackControl = fallbackControl;
     }

@@ -69,6 +69,10 @@ export class Sep2Limiter implements LimiterType {
         });
     }
 
+    getSchedulerByControlType() {
+        return this.schedulerByControlType;
+    }
+
     updateSep2ControlsData(data: DerControlsHelperChangedData) {
         for (const scheduler of Object.values(this.schedulerByControlType)) {
             scheduler.updateControlsData(data);

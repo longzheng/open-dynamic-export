@@ -4,7 +4,10 @@ import { Decimal } from 'decimal.js';
 import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import { writeInverterControllerPoints } from '../../helpers/influxdb.js';
+import {
+    writeActiveControlLimit,
+    writeInverterControllerPoints,
+} from '../../helpers/influxdb.js';
 import type { SiteSample } from '../../meters/siteSample.js';
 import type { Limiters } from '../../limiters/index.js';
 import {
@@ -145,6 +148,8 @@ export class InverterController {
         const activeInverterControlLimit = getActiveInverterControlLimit(
             Object.values(controlLimitsByLimiter),
         );
+
+        writeActiveControlLimit({ limit: activeInverterControlLimit });
 
         const loadWatts =
             this.cachedDerSample.realPower.net +

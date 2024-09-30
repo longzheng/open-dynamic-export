@@ -11,6 +11,7 @@ import { getSep2Instance } from '../sep2/index.js';
 import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
 import type { SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
 import { InvertersPoller } from './helpers/inverterSample.js';
+import type { Limiters } from '../limiters/index.js';
 import { getLimiters } from '../limiters/index.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
@@ -19,6 +20,7 @@ export type Coordinator = {
     inverterController: InverterController;
     invertersPoller: InvertersPoller;
     siteSamplePoller: SiteSamplePollerBase;
+    limiters: Limiters;
     destroy: () => void;
 };
 
@@ -73,6 +75,7 @@ export function createCoordinator(): Coordinator {
         inverterController,
         invertersPoller,
         siteSamplePoller,
+        limiters,
         destroy: () => {
             logger.info('Destroying coordinator');
 

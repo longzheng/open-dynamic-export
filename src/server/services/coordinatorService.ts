@@ -77,6 +77,14 @@ class CoordinatorService {
             ...data,
         };
     }
+
+    public getLimiters() {
+        if (!this.coordinator) {
+            throw new Error('Coordinator is not running');
+        }
+
+        return this.coordinator.limiters;
+    }
 }
 
 export const coordinatorService = new CoordinatorService();
