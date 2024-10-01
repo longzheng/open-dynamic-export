@@ -111,6 +111,8 @@ export class InverterController {
             const end = performance.now();
             const duration = end - start;
 
+            this.logger.trace({ duration }, 'run time');
+
             // update the inverter at most every 1 second
             const delay = Math.max(1000 - duration, 0);
 
