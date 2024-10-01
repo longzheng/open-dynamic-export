@@ -4,6 +4,7 @@
 
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
+  - certified by SA Power Networks (1/10/2024)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - two-way tariffs (e.g.time based) export limitation
 - negative feed-in (e.g. Amber) export limitation
@@ -222,7 +223,7 @@ z.object({
 
 ## CSIP-AUS client
 
-The project implements a CSIP-AUS compatible client that interacts with the utility server (SEP2 server). The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
+The project implements a CSIP-AUS compatible client that interacts with the utility server (CSIP-AUS/SEP2 server). The initial implementation focuses on the [SA Power Networks requirements](https://www.talkingpower.com.au/71619/widgets/376925/documents/239205) and [Energy Queensland requirements](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
 ```mermaid
 sequenceDiagram
