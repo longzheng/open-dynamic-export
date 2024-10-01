@@ -16,10 +16,12 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
 
     constructor({
         name,
+        inverterIndex,
         pollingIntervalMs,
         applyControl,
     }: {
         name: string;
+        inverterIndex: number;
         // how frequently at most to poll the data
         pollingIntervalMs: number;
         applyControl: boolean;
@@ -30,6 +32,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
         this.logger = pinoLogger.child({
             module: 'InverterDataPollerBase',
             inverterPollerName: name,
+            inverterIndex,
         });
         this.applyControl = applyControl;
     }

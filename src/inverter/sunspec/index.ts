@@ -35,18 +35,21 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
     constructor({
         sunspecInverterConfig,
+        inverterIndex,
         applyControl,
     }: {
         sunspecInverterConfig: Extract<
             Config['inverters'][number],
             { type: 'sunspec' }
         >;
+        inverterIndex: number;
         applyControl: boolean;
     }) {
         super({
             name: 'SunSpecInverterDataPoller',
             pollingIntervalMs: 200,
             applyControl,
+            inverterIndex,
         });
 
         this.inverterConnection = getSunSpecInvertersConnection(
