@@ -61,6 +61,8 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
     override async getInverterData(): Promise<Result<InverterData>> {
         try {
+            const start = performance.now();
+
             const models = {
                 inverter: await this.inverterConnection.getInverterModel(),
                 nameplate: await this.inverterConnection.getNameplateModel(),
@@ -69,7 +71,10 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                 controls: await this.inverterConnection.getControlsModel(),
             };
 
-            this.logger.trace({ models }, 'received model data');
+            const end = performance.now();
+            const duration = end - start;
+
+            this.logger.trace({ duration, models }, 'Got inverter data');
 
             this.cachedControlsModel = models.controls;
 

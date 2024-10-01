@@ -40,11 +40,9 @@ export function sunSpecModelFactory<
                 module: `sunspec-model-${config.name}`,
             });
 
-            logger.trace({ address }, 'Reading model');
+            const start = performance.now();
 
             await modbusConnection.connect();
-
-            logger.trace({ address }, 'Reading registers');
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
@@ -52,7 +50,13 @@ export function sunSpecModelFactory<
                     address.length,
                 );
 
-            logger.trace({ registers: registers.data }, 'Read registers');
+            const end = performance.now();
+            const duration = end - start;
+
+            logger.trace(
+                { duration, registers: registers.data },
+                'Read registers',
+            );
 
             return convertReadRegisters({
                 registers: registers.data,
@@ -64,7 +68,7 @@ export function sunSpecModelFactory<
                 module: `sunspec-model-${config.name}`,
             });
 
-            logger.trace({ address, values }, 'Writing model');
+            const start = performance.now();
 
             await modbusConnection.connect();
 
@@ -74,14 +78,15 @@ export function sunSpecModelFactory<
                 length: address.length,
             });
 
-            logger.trace({ registerValues }, 'Converted write registers');
-
             await modbusConnection.client.writeRegisters(
                 address.start,
                 registerValues,
             );
 
-            logger.trace('Wrote registers');
+            const end = performance.now();
+            const duration = end - start;
+
+            logger.trace({ duration, registerValues }, 'Wrote registers');
         },
     };
 }
