@@ -81,34 +81,7 @@ export function sunSpecModelFactory<
                 registerValues,
             );
 
-            logger.trace('Wrote registers, validating written registers');
-
-            const registers =
-                await modbusConnection.client.readHoldingRegisters(
-                    address.start,
-                    address.length,
-                );
-
-            // confirm the registers were written correctly
-            const writtenValues = convertReadRegisters({
-                registers: registers.data,
-                mapping: config.mapping,
-            });
-
-            objectEntriesWithType(values).forEach(([key, value]) => {
-                if (writtenValues[key] !== value) {
-                    logger.error(
-                        {
-                            key: key.toString(),
-                            value,
-                            read: writtenValues[key],
-                        },
-                        `Failed to write value for key`,
-                    );
-                }
-            });
-
-            logger.trace('Validated written registers');
+            logger.trace('Wrote registers');
         },
     };
 }
