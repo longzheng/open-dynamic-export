@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/9a1ba915-410d-4349-a2ff-4d226aea0a88" width="500" alt="Logo" />
+<img src="https://github.com/user-attachments/assets/9a1ba915-410d-4349-a2ff-4d226aea0a88" width="250" alt="Logo" />
 
 ## About
 
@@ -8,6 +8,10 @@ This project aims to implement dynamic export control/solar curtailment of inver
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - two-way tariffs (e.g.time based) export limitation
 - negative feed-in (e.g. Amber) export limitation
+
+![frame_generic_dark](https://github.com/user-attachments/assets/cd8e1bca-14e5-46ce-a845-917eb7744ec4)
+> [!NOTE]
+> The dashboard UI is not part of this open-source reprository and will be available as a licensed product along with a hardware package.
 
 ```mermaid
 flowchart LR
