@@ -9,11 +9,7 @@ import {
 describe('calculateTargetSolarPowerRatio', () => {
     it('should calculate target ratio', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            derSample: {
-                nameplate: {
-                    maxW: 10000,
-                },
-            },
+            nameplateMaxW: 10000,
             targetSolarWatts: 5000,
         });
 
@@ -22,11 +18,7 @@ describe('calculateTargetSolarPowerRatio', () => {
 
     it('should cap target power ratio above 1.0 to 1.0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            derSample: {
-                nameplate: {
-                    maxW: 10000,
-                },
-            },
+            nameplateMaxW: 10000,
             targetSolarWatts: 15000,
         });
 
@@ -35,11 +27,7 @@ describe('calculateTargetSolarPowerRatio', () => {
 
     it('should not return target power ratio lower than 0.0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            derSample: {
-                nameplate: {
-                    maxW: 10000,
-                },
-            },
+            nameplateMaxW: 10000,
             targetSolarWatts: 0,
         });
 
@@ -49,11 +37,7 @@ describe('calculateTargetSolarPowerRatio', () => {
     it('avoid floating point errors', () => {
         // these values don't make sense practically but is designed to test floating point errors
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            derSample: {
-                nameplate: {
-                    maxW: 3,
-                },
-            },
+            nameplateMaxW: 3,
             targetSolarWatts: 0.27,
         });
 
@@ -62,11 +46,7 @@ describe('calculateTargetSolarPowerRatio', () => {
 
     it('should handle nameplate as 0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            derSample: {
-                nameplate: {
-                    maxW: 0,
-                },
-            },
+            nameplateMaxW: 0,
             targetSolarWatts: 0,
         });
 
@@ -75,7 +55,7 @@ describe('calculateTargetSolarPowerRatio', () => {
 
     it('should handle no inverters', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            derSample: { nameplate: { maxW: 0 } },
+            nameplateMaxW: 0,
             targetSolarWatts: 0,
         });
 
