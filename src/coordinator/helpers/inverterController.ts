@@ -86,14 +86,12 @@ export class InverterController {
     }
 
     updateDerSample(derSample: DerSample) {
-        this.logger.debug('Received DER sample, updating inverter controls');
         this.cachedDerSample = derSample;
 
         this.updateInverterControlValues();
     }
 
     updateSiteSample(siteSample: SiteSample) {
-        this.logger.debug('Received site sample, updating inverter controls');
         this.cachedSiteSample = siteSample;
 
         this.updateInverterControlValues();
