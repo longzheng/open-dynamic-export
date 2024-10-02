@@ -113,6 +113,16 @@ export class InverterController {
                 );
             } else {
                 await this.onControl(this.cachedData.inverterConfiguration);
+
+                this.logger.info(
+                    {
+                        activeInverterControlLimit:
+                            this.cachedData.activeInverterControlLimit,
+                        inverterConfiguration:
+                            this.cachedData.inverterConfiguration,
+                    },
+                    'Set inverter control values',
+                );
             }
         } catch (error) {
             this.logger.error(error, 'Failed to set inverter control values');
@@ -134,14 +144,14 @@ export class InverterController {
     private updateInverterControlValues() {
         if (!this.cachedDerSample) {
             this.logger.warn(
-                'Inverter data is not cached, cannot update inverter controls yet. Wait for next loop.',
+                'Inverter data is not cached, cannot update inverter controller data yet.',
             );
             return;
         }
 
         if (!this.cachedSiteSample) {
             this.logger.warn(
-                'Site monitoring data is not cached, cannot update inverter controls yet. Wait for next loop.',
+                'Site monitoring data is not cached, cannot update inverter controller data yet.',
             );
             return;
         }
@@ -216,12 +226,11 @@ export class InverterController {
             inverterConfiguration,
         };
 
-        this.logger.info(
+        this.logger.debug(
             {
-                activeInverterControlLimit,
-                inverterConfiguration,
+                ...this.cachedData,
             },
-            'Updating inverter control values',
+            'Updated inverter controller data',
         );
     }
 }
