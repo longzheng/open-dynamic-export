@@ -314,7 +314,7 @@ export function calculateInverterConfiguration({
             exportLimitTargetSolarWatts,
             generationLimitWatts,
             targetSolarWatts,
-            targetSolarPowerRatio,
+            targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
         },
         'calculated values',
     );
