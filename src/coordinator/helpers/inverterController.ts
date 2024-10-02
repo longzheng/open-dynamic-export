@@ -104,20 +104,22 @@ export class InverterController {
     private async controlLoop() {
         const start = performance.now();
 
+        // make a copy of this value as it might change during the control loop
+        const cachedData = this.cachedData ? { ...this.cachedData } : null;
+
         try {
-            if (!this.cachedData) {
+            if (!cachedData) {
                 this.logger.warn(
                     'Inverter data is not cached, cannot set inverter controls yet. Wait for next loop.',
                 );
             } else {
-                await this.onControl(this.cachedData.inverterConfiguration);
+                await this.onControl(cachedData.inverterConfiguration);
 
                 this.logger.info(
                     {
                         activeInverterControlLimit:
-                            this.cachedData.activeInverterControlLimit,
-                        inverterConfiguration:
-                            this.cachedData.inverterConfiguration,
+                            cachedData.activeInverterControlLimit,
+                        inverterConfiguration: cachedData.inverterConfiguration,
                     },
                     'Set inverter control values',
                 );
@@ -128,7 +130,7 @@ export class InverterController {
             const end = performance.now();
             const duration = end - start;
 
-            this.logger.trace({ duration }, 'Set inverter control values');
+            this.logger.trace({ duration }, 'Inverter control loop duration');
 
             // update the inverter at most every 1 second
             const delay = Math.max(1000 - duration, 0);
