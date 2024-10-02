@@ -83,46 +83,56 @@ export class InverterController {
         this.limiters = limiters;
         this.onControl = onControl;
 
-        void this.startLoop();
+        void this.controlLoop();
     }
 
     updateDerSample(derSample: DerSample) {
         this.logger.debug('Received DER sample, updating inverter controls');
         this.cachedDerSample = derSample;
+
+        this.updateInverterControlValues();
     }
 
     updateSiteSample(siteSample: SiteSample) {
         this.logger.debug('Received site sample, updating inverter controls');
         this.cachedSiteSample = siteSample;
+
+        this.updateInverterControlValues();
     }
 
     public get getCachedData() {
         return this.cachedData;
     }
 
-    private async startLoop() {
+    private async controlLoop() {
         const start = performance.now();
 
         try {
-            await this.updateInverterControlValues();
+            if (!this.cachedData) {
+                this.logger.warn(
+                    'Inverter data is not cached, cannot set inverter controls yet. Wait for next loop.',
+                );
+            } else {
+                await this.onControl(this.cachedData.inverterConfiguration);
+            }
         } catch (error) {
-            this.logger.error(error, 'Failed to push inverter control values');
+            this.logger.error(error, 'Failed to set inverter control values');
         } finally {
             const end = performance.now();
             const duration = end - start;
 
-            this.logger.trace({ duration }, 'Updated inverter control values');
+            this.logger.trace({ duration }, 'Set inverter control values');
 
             // update the inverter at most every 1 second
             const delay = Math.max(1000 - duration, 0);
 
             setTimeout(() => {
-                void this.startLoop();
+                void this.controlLoop();
             }, delay);
         }
     }
 
-    private async updateInverterControlValues() {
+    private updateInverterControlValues() {
         if (!this.cachedDerSample) {
             this.logger.warn(
                 'Inverter data is not cached, cannot update inverter controls yet. Wait for next loop.',
@@ -214,8 +224,6 @@ export class InverterController {
             },
             'Updating inverter control values',
         );
-
-        await this.onControl(inverterConfiguration);
     }
 }
 
