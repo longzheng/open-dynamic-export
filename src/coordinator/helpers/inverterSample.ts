@@ -76,7 +76,10 @@ export class InvertersPoller extends EventEmitter<{
 
         this.derSampleCache = derSample;
 
-        this.logger.trace({ derSample }, 'generated DER sample');
+        this.logger.trace(
+            { derSample, successInvertersCount: successInvertersData.length },
+            'generated DER sample',
+        );
 
         this.emit('data', derSample);
     }
