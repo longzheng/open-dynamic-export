@@ -16,6 +16,7 @@ type CoordinatorResponse =
           invertersDataCache: InvertersDataCache | null;
           derSample: DerSample | null;
           siteSample: SiteSample | null;
+          inverterControllerData: InverterControllerData | null;
       }
     | {
           running: false;
@@ -41,6 +42,8 @@ class CoordinatorService {
             siteSample: this.coordinator.siteSamplePoller.getSiteSampleCache,
             invertersDataCache:
                 this.coordinator.invertersPoller.getInvertersDataCache,
+            inverterControllerData:
+                this.coordinator.inverterController.getCachedData,
         };
     }
 
@@ -59,23 +62,6 @@ class CoordinatorService {
 
         this.coordinator.destroy();
         this.coordinator = null;
-    }
-
-    public inverterControllerData(): InverterControllerData {
-        if (!this.coordinator) {
-            throw new Error('Coordinator is not running');
-        }
-
-        const data = this.coordinator.inverterController.getCachedData;
-
-        if (!data) {
-            return { cached: false };
-        }
-
-        return {
-            cached: true,
-            ...data,
-        };
     }
 }
 
@@ -172,12 +158,9 @@ type ControlLimitsByLimiter = Record<
     InverterControlLimit | null
 >;
 
-type InverterControllerData =
-    | {
-          cached: true;
-          loadWatts: number;
-          controlLimitsByLimiter: ControlLimitsByLimiter;
-          activeInverterControlLimit: ActiveInverterControlLimit;
-          inverterConfiguration: InverterConfiguration;
-      }
-    | { cached: false };
+type InverterControllerData = {
+    loadWatts: number;
+    controlLimitsByLimiter: ControlLimitsByLimiter;
+    activeInverterControlLimit: ActiveInverterControlLimit;
+    inverterConfiguration: InverterConfiguration;
+} | null;

@@ -51,20 +51,19 @@ const defaultValues = {
     opModConnect: true,
 } as const satisfies Record<ControlType, unknown>;
 
+type InverterControllerData = {
+    loadWatts: number;
+    controlLimitsByLimiter: Record<LimiterKeys, InverterControlLimit | null>;
+    activeInverterControlLimit: ActiveInverterControlLimit;
+    inverterConfiguration: InverterConfiguration;
+};
+
 export class InverterController {
     private cachedDerSample: DerSample | null = null;
     private cachedSiteSample: SiteSample | null = null;
     private logger: Logger;
     private limiters: Limiters;
-    private cachedData: {
-        loadWatts: number;
-        controlLimitsByLimiter: Record<
-            LimiterKeys,
-            InverterControlLimit | null
-        >;
-        activeInverterControlLimit: ActiveInverterControlLimit;
-        inverterConfiguration: InverterConfiguration;
-    } | null = null;
+    private cachedData: InverterControllerData | null = null;
     private onControl: (
         inverterConfiguration: InverterConfiguration,
     ) => Promise<void>;
