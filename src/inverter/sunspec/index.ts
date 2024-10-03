@@ -31,6 +31,7 @@ import {
 } from '../../coordinator/helpers/inverterController.js';
 import type { Config } from '../../helpers/config.js';
 import { getSunSpecInvertersConnection } from '../../sunspec/connections.js';
+import { withRetry } from '../../helpers/withRetry.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
@@ -64,29 +65,41 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
     override async getInverterData(): Promise<Result<InverterData>> {
         try {
-            const start = performance.now();
+            return await withRetry(
+                async () => {
+                    const start = performance.now();
 
-            const models = {
-                inverter: await this.inverterConnection.getInverterModel(),
-                nameplate: await this.inverterConnection.getNameplateModel(),
-                settings: await this.inverterConnection.getSettingsModel(),
-                status: await this.inverterConnection.getStatusModel(),
-                controls: await this.inverterConnection.getControlsModel(),
-            };
+                    const models = {
+                        inverter:
+                            await this.inverterConnection.getInverterModel(),
+                        nameplate:
+                            await this.inverterConnection.getNameplateModel(),
+                        settings:
+                            await this.inverterConnection.getSettingsModel(),
+                        status: await this.inverterConnection.getStatusModel(),
+                        controls:
+                            await this.inverterConnection.getControlsModel(),
+                    };
 
-            const end = performance.now();
-            const duration = end - start;
+                    const end = performance.now();
+                    const duration = end - start;
 
-            this.logger.trace({ duration, models }, 'Got inverter data');
+                    this.logger.trace(
+                        { duration, models },
+                        'Got inverter data',
+                    );
 
-            this.cachedControlsModel = models.controls;
+                    this.cachedControlsModel = models.controls;
 
-            const inverterData = generateInverterData(models);
+                    const inverterData = generateInverterData(models);
 
-            return {
-                success: true,
-                value: inverterData,
-            };
+                    return {
+                        success: true,
+                        value: inverterData,
+                    };
+                },
+                { attempts: 3, functionName: 'get inverter data' },
+            );
         } catch (error) {
             this.logger.error(error, 'Failed to get inverter data');
 
