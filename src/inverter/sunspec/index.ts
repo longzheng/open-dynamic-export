@@ -98,7 +98,11 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                         value: inverterData,
                     };
                 },
-                { attempts: 3, functionName: 'get inverter data' },
+                {
+                    attempts: 3,
+                    delayMilliseconds: 100,
+                    functionName: 'get inverter data',
+                },
             );
         } catch (error) {
             this.logger.error(error, 'Failed to get inverter data');

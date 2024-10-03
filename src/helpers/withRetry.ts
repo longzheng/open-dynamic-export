@@ -6,11 +6,11 @@ export async function withRetry<T>(
     {
         attempts,
         functionName,
-        delay,
+        delayMilliseconds,
     }: {
         attempts: number;
         functionName: string;
-        delay?: number;
+        delayMilliseconds?: number;
     },
 ): Promise<T> {
     for (let attempt = 1; attempt <= attempts; attempt++) {
@@ -24,8 +24,8 @@ export async function withRetry<T>(
                 `${functionName} withRetry attempt ${attempt} of ${attempts} failed`,
             );
 
-            if (attempt < attempts && delay) {
-                await setTimeout(delay);
+            if (attempt < attempts && delayMilliseconds) {
+                await setTimeout(delayMilliseconds);
             } else if (attempt === attempts) {
                 // If this was the last attempt, rethrow the error
                 throw error;
