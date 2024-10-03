@@ -16,6 +16,7 @@ import { cappedChange } from '../../helpers/math.js';
 import type { DerSample } from './derSample.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
+import { differenceInSeconds } from 'date-fns';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -53,19 +54,27 @@ const defaultValues = {
     opModConnect: true,
 } as const satisfies Record<ControlType, unknown>;
 
-type InverterControllerData = {
-    loadWatts: number;
-    controlLimitsByLimiter: Record<LimiterKeys, InverterControlLimit | null>;
-    activeInverterControlLimit: ActiveInverterControlLimit;
-    inverterConfiguration: InverterConfiguration;
-};
+// instantaneous DER and site readings are unrealiable since they are sampled at different intervals
+// due to the nature of control influencing the measurements which create a feedback loop
+// we don't want to rely on the latest readings to make decisions since it will lead to oscillating control values
+// we take a time weighted average of the last few seconds to smooth out the control values
+const lastSecondsToSample = 5;
 
 export class InverterController {
-    private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 10 });
-    private cachedSiteSample = new CappedArrayStack<SiteSample>({ limit: 10 });
+    private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 100 });
+    private cachedSiteSample = new CappedArrayStack<SiteSample>({ limit: 100 });
     private logger: Logger;
     private limiters: Limiters;
-    private cachedData: InverterControllerData | null = null;
+    private loadWattsCache: number | null = null;
+    private controlLimitsCache: {
+        controlLimitsByLimiter: Record<
+            LimiterKeys,
+            InverterControlLimit | null
+        >;
+        activeInverterControlLimit: ActiveInverterControlLimit;
+    } | null = null;
+    private lastAppliedInverterConfiguration: InverterConfiguration | null =
+        null;
     private onControl: (
         inverterConfiguration: InverterConfiguration,
     ) => Promise<void>;
@@ -84,70 +93,50 @@ export class InverterController {
         this.limiters = limiters;
         this.onControl = onControl;
 
-        void this.controlLoop();
+        this.updateControlLimitsLoop();
+        void this.applyControlLoop();
     }
 
     updateDerSample(derSample: DerSample) {
         this.cachedDerSample.push(derSample);
+
+        this.updateLoadWatts();
     }
 
     updateSiteSample(siteSample: SiteSample) {
         this.cachedSiteSample.push(siteSample);
 
-        this.updateInverterControlValues();
+        this.updateLoadWatts();
     }
 
-    public get getCachedData() {
-        return this.cachedData;
+    public get getLoadWatts() {
+        return this.loadWattsCache;
     }
 
-    private async controlLoop() {
-        const start = performance.now();
-
-        // make a copy of this value as it might change during the control loop
-        const cachedData = this.cachedData ? { ...this.cachedData } : null;
-
-        try {
-            if (!cachedData) {
-                this.logger.warn(
-                    'Inverter data is not cached, cannot set inverter controls yet. Wait for next loop.',
-                );
-            } else {
-                await this.onControl(cachedData.inverterConfiguration);
-
-                this.logger.info(
-                    {
-                        activeInverterControlLimit:
-                            cachedData.activeInverterControlLimit,
-                        inverterConfiguration: cachedData.inverterConfiguration,
-                    },
-                    'Set inverter control values',
-                );
-            }
-        } catch (error) {
-            this.logger.error(error, 'Failed to set inverter control values');
-        } finally {
-            const end = performance.now();
-            const duration = end - start;
-
-            this.logger.trace({ duration }, 'Inverter control loop duration');
-
-            // update the inverter at most every 1 second
-            const delay = Math.max(1000 - duration, 0);
-
-            setTimeout(() => {
-                void this.controlLoop();
-            }, delay);
-        }
+    public get getControlLimits() {
+        return this.controlLimitsCache;
     }
 
-    private updateInverterControlValues() {
-        const derSamples = this.cachedDerSample.get();
-        const siteSamples = this.cachedSiteSample.get();
+    public get getLastAppliedInverterConfiguration() {
+        return this.lastAppliedInverterConfiguration;
+    }
 
-        if (!derSamples.length || !siteSamples.length) {
+    private updateLoadWatts() {
+        const lastSolarWatts = this.cachedDerSample.get().at(-1)?.realPower.net;
+        const lastSiteWatts = this.cachedSiteSample.get().at(-1)?.realPower.net;
+
+        if (lastSolarWatts === undefined || lastSiteWatts === undefined) {
+            this.loadWattsCache = null;
             return;
         }
+
+        const loadWatts = lastSolarWatts + lastSiteWatts;
+
+        this.loadWattsCache = loadWatts;
+    }
+
+    private updateControlLimitsLoop() {
+        const start = performance.now();
 
         const controlLimitsByLimiter = objectFromEntriesWithType(
             objectEntriesWithType(this.limiters).map(([key, limiter]) => [
@@ -160,30 +149,118 @@ export class InverterController {
             Object.values(controlLimitsByLimiter),
         );
 
+        this.controlLimitsCache = {
+            controlLimitsByLimiter,
+            activeInverterControlLimit,
+        };
+
+        const end = performance.now();
+        const duration = end - start;
+
+        this.logger.trace(
+            { duration, ...this.controlLimitsCache },
+            'control limits loop updated',
+        );
+
+        // update at most every 1 second
+        const delay = Math.max(1000 - duration, 0);
+
+        setTimeout(() => {
+            void this.updateControlLimitsLoop();
+        }, delay);
+    }
+
+    private async applyControlLoop() {
+        const start = performance.now();
+
+        const inverterConfiguration = this.getInverterConfiguration();
+
+        try {
+            if (!inverterConfiguration) {
+                this.logger.warn('Inverter configuration is not calculated');
+            } else {
+                await this.onControl(inverterConfiguration);
+
+                this.logger.info(
+                    {
+                        activeInverterControlLimit:
+                            this.controlLimitsCache?.activeInverterControlLimit,
+                        inverterConfiguration,
+                    },
+                    'Set inverter control values',
+                );
+
+                this.lastAppliedInverterConfiguration = inverterConfiguration;
+            }
+        } catch (error) {
+            this.logger.error(error, 'Failed to set inverter control values');
+        } finally {
+            const end = performance.now();
+            const duration = end - start;
+
+            this.logger.trace({ duration }, 'Inverter control loop duration');
+
+            // control the inverter at most every 1 second
+            const delay = Math.max(1000 - duration, 0);
+
+            setTimeout(() => {
+                void this.applyControlLoop();
+            }, delay);
+        }
+    }
+
+    private getInverterConfiguration(): InverterConfiguration | null {
+        if (!this.controlLimitsCache) {
+            this.logger.warn('Control limits not available');
+            return null;
+        }
+
+        const now = new Date();
+
+        const recentDerSamples = this.cachedDerSample
+            .get()
+            .filter(
+                (sample) =>
+                    differenceInSeconds(now, sample.date) <=
+                    lastSecondsToSample,
+            );
+
+        const recentSiteSamples = this.cachedSiteSample
+            .get()
+            .filter(
+                (sample) =>
+                    differenceInSeconds(now, sample.date) <=
+                    lastSecondsToSample,
+            );
+
+        if (!recentDerSamples.length || !recentSiteSamples.length) {
+            this.logger.warn('No recent DER or site samples');
+            return null;
+        }
+
         const averagedSolarWatts = timeWeightedAverage(
-            derSamples.map((s) => ({
+            recentDerSamples.map((s) => ({
                 timestamp: s.date,
                 value: s.realPower.net,
             })),
         );
         const averagedSiteWatts = timeWeightedAverage(
-            siteSamples.map((s) => ({
+            recentSiteSamples.map((s) => ({
                 timestamp: s.date,
                 value: s.realPower.net,
             })),
         );
         const averagedNameplateMaxW = timeWeightedAverage(
-            derSamples.map((s) => ({
+            recentDerSamples.map((s) => ({
                 timestamp: s.date,
                 value: s.nameplate.maxW,
             })),
         );
 
-        const loadWatts = averagedSolarWatts + averagedSiteWatts;
-
         const inverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
-                activeInverterControlLimit,
+                activeInverterControlLimit:
+                    this.controlLimitsCache.activeInverterControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
                 solarWatts: averagedSolarWatts,
@@ -197,16 +274,16 @@ export class InverterController {
                     // prevents inverter from potential hardware damage
                     // also prevents feedback cycle with batteries constantly switching between charge/discharge
                     const previousTargetSolarPowerRatio = (() => {
-                        if (!this.cachedData) {
+                        if (!this.lastAppliedInverterConfiguration) {
                             return null;
                         }
 
-                        switch (this.cachedData.inverterConfiguration.type) {
+                        switch (this.lastAppliedInverterConfiguration.type) {
                             case 'disconnect':
                                 // slowly ramp from 0 if previously disconnected
                                 return 0;
                             case 'limit':
-                                return this.cachedData.inverterConfiguration
+                                return this.lastAppliedInverterConfiguration
                                     .targetSolarPowerRatio;
                         }
                     })();
@@ -230,19 +307,7 @@ export class InverterController {
             }
         })();
 
-        this.cachedData = {
-            loadWatts,
-            controlLimitsByLimiter,
-            activeInverterControlLimit,
-            inverterConfiguration,
-        };
-
-        this.logger.debug(
-            {
-                ...this.cachedData,
-            },
-            'Updated inverter controller data',
-        );
+        return inverterConfiguration;
     }
 }
 

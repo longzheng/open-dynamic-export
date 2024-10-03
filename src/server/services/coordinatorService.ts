@@ -16,7 +16,12 @@ type CoordinatorResponse =
           invertersDataCache: InvertersDataCache | null;
           derSample: DerSample | null;
           siteSample: SiteSample | null;
-          inverterControllerData: InverterControllerData | null;
+          loadWatts: number | null;
+          controlLimits: {
+              controlLimitsByLimiter: ControlLimitsByLimiter;
+              activeInverterControlLimit: ActiveInverterControlLimit;
+          } | null;
+          inverterConfiguration: InverterConfiguration | null;
       }
     | {
           running: false;
@@ -42,8 +47,11 @@ class CoordinatorService {
             siteSample: this.coordinator.siteSamplePoller.getSiteSampleCache,
             invertersDataCache:
                 this.coordinator.invertersPoller.getInvertersDataCache,
-            inverterControllerData:
-                this.coordinator.inverterController.getCachedData,
+            loadWatts: this.coordinator.inverterController.getLoadWatts,
+            controlLimits: this.coordinator.inverterController.getControlLimits,
+            inverterConfiguration:
+                this.coordinator.inverterController
+                    .getLastAppliedInverterConfiguration,
         };
     }
 
@@ -157,10 +165,3 @@ type ControlLimitsByLimiter = Record<
     'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
     InverterControlLimit | null
 >;
-
-type InverterControllerData = {
-    loadWatts: number;
-    controlLimitsByLimiter: ControlLimitsByLimiter;
-    activeInverterControlLimit: ActiveInverterControlLimit;
-    inverterConfiguration: InverterConfiguration;
-} | null;
