@@ -16,7 +16,10 @@ import {
     type ControlsModel,
     type ControlsModelWrite,
 } from '../../sunspec/models/controls.js';
-import type { InverterModel } from '../../sunspec/models/inverter.js';
+import {
+    InverterState,
+    type InverterModel,
+} from '../../sunspec/models/inverter.js';
 import type { NameplateModel } from '../../sunspec/models/nameplate.js';
 import type { SettingsModel } from '../../sunspec/models/settings.js';
 import type { StatusModel } from '../../sunspec/models/status.js';
@@ -142,6 +145,18 @@ export function generateInverterData({
     const inverterMetrics = getInverterMetrics(inverter);
     const nameplateMetrics = getNameplateMetrics(nameplate);
     const settingsMetrics = getSettingsMetrics(settings);
+
+    // observed some Fronius inverters randomly spit out 0 values even though the inverter is operating normally
+    // may be related to the constant polling of SunSpec Modbus?
+    // Ignore this state and hope the next poll will return valid data
+    if (
+        inverterMetrics.W === 0 &&
+        inverterMetrics.Hz === 0 &&
+        inverterMetrics.PhVphA === 0 &&
+        inverter.St === InverterState.FAULT
+    ) {
+        throw new Error('Inverter returned 0 metrics and is in fault state');
+    }
 
     return {
         date: new Date(),
