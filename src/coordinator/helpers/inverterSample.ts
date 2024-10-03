@@ -55,6 +55,9 @@ export class InvertersPoller extends EventEmitter<{
                 return poller.onControl(configuration);
             }),
         );
+
+        // reset the data cache to align all inverters data after they've been controlled
+        this.inverterDataCacheMapByIndex.clear();
     }
 
     public get getInvertersDataCache() {
@@ -66,6 +69,24 @@ export class InvertersPoller extends EventEmitter<{
     }
 
     private onData() {
+        // we expect to have results (regardless of success or failure) for all inverters before processing the data
+        if (
+            this.getInvertersDataCache.length !==
+            this.inverterDataPollers.length
+        ) {
+            this.logger.debug(
+                {
+                    invertersDataCount: this.getInvertersDataCache.length,
+                    invertersCount: this.inverterDataPollers.length,
+                },
+                'waiting for all inverters data',
+            );
+
+            return;
+        }
+
+        // discard non-success inverters data
+        // if we can't get data, assume the inverter is offline/inaccessible and is not contributing to the site
         const successInvertersData = this.getInvertersDataCache
             .filter((data) => data.success)
             .map((data) => data.value);
