@@ -161,14 +161,17 @@ export function generateInverterData({
 
     // observed some Fronius inverters randomly spit out 0 values even though the inverter is operating normally
     // may be related to the constant polling of SunSpec Modbus?
-    // Ignore this state and hope the next poll will return valid data
+    // ignore this state and hope the next poll will return valid data
     if (
         inverterMetrics.W === 0 &&
         inverterMetrics.Hz === 0 &&
         inverterMetrics.PhVphA === 0 &&
-        inverter.St === InverterState.FAULT
+        inverter.St === InverterState.FAULT &&
+        // normal polling shouldn't return 0 for these values
+        inverter.W_SF === 0 &&
+        inverter.WH === 0
     ) {
-        throw new Error('Inverter returned 0 metrics and is in fault state');
+        throw new Error('Inverter returned faulty metrics');
     }
 
     return {
