@@ -79,7 +79,9 @@ To configure the inverter and meter connections, add the following property to `
             "unitId": 1 // (number) required: the Modbus unit ID of the inverter
         }
     ],
-    "inverterControl": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
+    "inverterControl": {
+        "enabled": true // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
+    },
     "meter": {
         "type": "sunspec", // (string) required: the type of meter
         "ip": "192.168.1.6", // (string) required: the IP address of the meter
@@ -285,12 +287,6 @@ The initial plan is to implement a direct gateway client that interacts directly
   - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
   - [x] Software-based limit ramping (`setGradW` or `rampTms`)
 - [x] Metrics logging in InfluxDB
-
-Future
-- [ ] CSIP-AUS self-service certificate generation
-- [ ] CSIP-AUS cloud aggregator proxy mode
-- [ ] Web UI with real-time metrics and historical metrics
-- [ ] Device package (plug and play solution)
 
 ## CSIP-AUS Private key and CSR
 

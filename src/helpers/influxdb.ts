@@ -538,3 +538,13 @@ export function writeControlLimit({ limit }: { limit: InverterControlLimit }) {
 
     writeApi.writePoint(point);
 }
+
+export function writeLoadWatts(loadWatts: number) {
+    writeApi.writePoint(
+        new Point('sample')
+            .timestamp(new Date())
+            .tag('type', 'load')
+            .tag('phase', 'net')
+            .floatField('realPower', loadWatts),
+    );
+}

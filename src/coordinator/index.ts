@@ -45,6 +45,7 @@ export function createCoordinator(): Coordinator {
     });
 
     const inverterController = new InverterController({
+        config,
         limiters,
         onControl: (InverterController) =>
             invertersPoller.onControl(InverterController),
