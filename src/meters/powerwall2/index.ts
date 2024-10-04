@@ -74,7 +74,7 @@ export function generateSiteSample({
         date: new Date(),
         realPower: {
             type: 'perPhaseNet',
-            phaseA: firstMeter.Cached_readings.real_power_a,
+            phaseA: firstMeter.Cached_readings.real_power_a ?? 0,
             phaseB: firstMeter.Cached_readings.real_power_b ?? null,
             phaseC: firstMeter.Cached_readings.real_power_c ?? null,
             net: firstMeter.Cached_readings.instant_power,
