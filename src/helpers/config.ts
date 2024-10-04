@@ -129,7 +129,8 @@ export const configSchema = z.object({
 A shorter time will increase responsiveness to load changes but may introduce oscillations.
 A longer time will smooth out load changes but may result in overshoot.`,
             )
-            .optional(),
+            .optional()
+            .default(5),
     }),
     meter: z.union([
         z

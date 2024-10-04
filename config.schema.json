@@ -195,7 +195,14 @@
             "sampleSeconds": {
               "type": "number",
               "minimum": 0,
-              "description": "How many seconds of inverter and site data to sample to make control decisions.\nA shorter time will increase responsiveness to load changes but may introduce oscillations.\nA longer time will smooth out load changes but may result in overshoot."
+              "description": "How many seconds of inverter and site data to sample to make control decisions.\nA shorter time will increase responsiveness to load changes but may introduce oscillations.\nA longer time will smooth out load changes but may result in overshoot.",
+              "default": 5
+            },
+            "controlFrequencyMinimumSeconds": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The number of seconds between control commands",
+              "default": 1
             }
           },
           "required": [

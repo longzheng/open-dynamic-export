@@ -93,7 +93,7 @@ export class InverterController {
             inverterConfiguration: InverterConfiguration,
         ) => Promise<void>;
     }) {
-        this.secondsToSample = config.inverterControl.sampleSeconds ?? 5;
+        this.secondsToSample = config.inverterControl.sampleSeconds;
         this.limiters = limiters;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.onControl = onControl;
