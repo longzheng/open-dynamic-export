@@ -28,7 +28,7 @@ export class InvertersPoller extends EventEmitter<{
                     case 'sunspec': {
                         return new SunSpecInverterDataPoller({
                             sunspecInverterConfig: inverterConfig,
-                            applyControl: config.inverterControl,
+                            applyControl: config.inverterControl.enabled,
                             inverterIndex: index,
                         }).on('data', (data) => {
                             this.inverterDataCacheMapByIndex.set(index, data);
