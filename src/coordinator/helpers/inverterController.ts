@@ -11,7 +11,7 @@ import {
     objectEntriesWithType,
     objectFromEntriesWithType,
 } from '../../helpers/object.js';
-import type { LimiterKeys } from '../../helpers/config.js';
+import type { Config, LimiterKeys } from '../../helpers/config.js';
 import { cappedChange } from '../../helpers/math.js';
 import type { DerSample } from './derSample.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
@@ -54,12 +54,6 @@ const defaultValues = {
     opModConnect: true,
 } as const satisfies Record<ControlType, unknown>;
 
-// instantaneous DER and site readings are unrealiable since they are sampled at different intervals
-// due to the nature of control influencing the measurements which create a feedback loop
-// we don't want to rely on the latest readings to make decisions since it will lead to oscillating control values
-// we take a time weighted average of the last few seconds to smooth out the control values
-const lastSecondsToSample = 5;
-
 export class InverterController {
     private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 100 });
     private cachedSiteSample = new CappedArrayStack<SiteSample>({ limit: 100 });
@@ -79,18 +73,26 @@ export class InverterController {
         inverterConfiguration: InverterConfiguration,
     ) => Promise<void>;
 
+    // instantaneous DER and site readings are unrealiable since they are sampled at different intervals
+    // due to the nature of control influencing the measurements which create a feedback loop
+    // we don't want to rely on the latest readings to make decisions since it will lead to oscillating control values
+    // we take a time weighted average of the last few seconds to smooth out the control values
+    private secondsToSample: number;
+
     constructor({
+        config,
         limiters,
         onControl,
     }: {
+        config: Config;
         limiters: Limiters;
         onControl: (
             inverterConfiguration: InverterConfiguration,
         ) => Promise<void>;
     }) {
-        this.logger = pinoLogger.child({ module: 'InverterController' });
-
+        this.secondsToSample = config.inverterControl.sampleSeconds ?? 5;
         this.limiters = limiters;
+        this.logger = pinoLogger.child({ module: 'InverterController' });
         this.onControl = onControl;
 
         this.updateControlLimitsLoop();
@@ -222,7 +224,7 @@ export class InverterController {
             .filter(
                 (sample) =>
                     differenceInSeconds(now, sample.date) <=
-                    lastSecondsToSample,
+                    this.secondsToSample,
             );
 
         const recentSiteSamples = this.cachedSiteSample
@@ -230,7 +232,7 @@ export class InverterController {
             .filter(
                 (sample) =>
                     differenceInSeconds(now, sample.date) <=
-                    lastSecondsToSample,
+                    this.secondsToSample,
             );
 
         if (!recentDerSamples.length || !recentSiteSamples.length) {

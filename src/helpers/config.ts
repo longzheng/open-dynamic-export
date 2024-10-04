@@ -119,7 +119,18 @@ export const configSchema = z.object({
                 .describe('SunSpec inverter configuration'),
         )
         .describe('Inverter configuration'),
-    inverterControl: z.boolean().describe('Whether to control the inverters'),
+    inverterControl: z.object({
+        enabled: z.boolean().describe('Whether to control the inverters'),
+        sampleSeconds: z
+            .number()
+            .min(0)
+            .describe(
+                `How many seconds of inverter and site data to sample to make control decisions.
+A shorter time will increase responsiveness to load changes but may introduce oscillations.
+A longer time will smooth out load changes but may result in overshoot.`,
+            )
+            .optional(),
+    }),
     meter: z.union([
         z
             .object({
