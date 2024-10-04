@@ -81,6 +81,7 @@ export class InverterController {
     // we don't want to rely on the latest readings to make decisions since it will lead to oscillating control values
     // we take a time weighted average of the last few seconds to smooth out the control values
     private secondsToSample: number;
+    private controlFrequencyMinimumSeconds: number;
 
     constructor({
         config,
@@ -94,6 +95,8 @@ export class InverterController {
         ) => Promise<void>;
     }) {
         this.secondsToSample = config.inverterControl.sampleSeconds;
+        this.controlFrequencyMinimumSeconds =
+            config.inverterControl.controlFrequencyMinimumSeconds;
         this.limiters = limiters;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.onControl = onControl;
@@ -207,8 +210,10 @@ export class InverterController {
 
             this.logger.trace({ duration }, 'Inverter control loop duration');
 
-            // control the inverter at most every 1 second
-            const delay = Math.max(1000 - duration, 0);
+            const delay = Math.max(
+                this.controlFrequencyMinimumSeconds * 1000 - duration,
+                0,
+            );
 
             setTimeout(() => {
                 void this.applyControlLoop();
