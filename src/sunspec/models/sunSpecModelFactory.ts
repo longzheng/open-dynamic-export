@@ -40,11 +40,9 @@ export function sunSpecModelFactory<
                 module: `sunspec-model-${config.name}`,
             });
 
-            logger.trace({ address }, 'Reading model');
+            const start = performance.now();
 
             await modbusConnection.connect();
-
-            logger.trace({ address }, 'Reading registers');
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
@@ -52,7 +50,13 @@ export function sunSpecModelFactory<
                     address.length,
                 );
 
-            logger.trace({ registers: registers.data }, 'Read registers');
+            const end = performance.now();
+            const duration = end - start;
+
+            logger.trace(
+                { duration, registers: registers.data },
+                'Read registers',
+            );
 
             return convertReadRegisters({
                 registers: registers.data,
@@ -64,7 +68,7 @@ export function sunSpecModelFactory<
                 module: `sunspec-model-${config.name}`,
             });
 
-            logger.trace({ address, values }, 'Writing model');
+            const start = performance.now();
 
             await modbusConnection.connect();
 
@@ -74,41 +78,15 @@ export function sunSpecModelFactory<
                 length: address.length,
             });
 
-            logger.trace({ registerValues }, 'Converted write registers');
-
             await modbusConnection.client.writeRegisters(
                 address.start,
                 registerValues,
             );
 
-            logger.trace('Wrote registers, validating written registers');
+            const end = performance.now();
+            const duration = end - start;
 
-            const registers =
-                await modbusConnection.client.readHoldingRegisters(
-                    address.start,
-                    address.length,
-                );
-
-            // confirm the registers were written correctly
-            const writtenValues = convertReadRegisters({
-                registers: registers.data,
-                mapping: config.mapping,
-            });
-
-            objectEntriesWithType(values).forEach(([key, value]) => {
-                if (writtenValues[key] !== value) {
-                    logger.error(
-                        {
-                            key: key.toString(),
-                            value,
-                            read: writtenValues[key],
-                        },
-                        `Failed to write value for key`,
-                    );
-                }
-            });
-
-            logger.trace('Validated written registers');
+            logger.trace({ duration, registerValues }, 'Wrote registers');
         },
     };
 }

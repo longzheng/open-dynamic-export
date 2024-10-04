@@ -115,7 +115,7 @@ export const metersSiteSchema = z.array(
             v_l2n: z.number().optional(),
             v_l3n: z.number().optional(),
             last_phase_power_communication_time: z.string(),
-            real_power_a: z.number(),
+            real_power_a: z.number().optional(),
             real_power_b: z.number().optional(),
             real_power_c: z.number().optional(),
             reactive_power_a: z.number(),

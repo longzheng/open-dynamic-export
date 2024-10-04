@@ -1,5 +1,5 @@
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import type { SiteSampleData } from '../siteSample.js';
+import type { SiteSample } from '../siteSample.js';
 import { Powerwall2Client } from './client.js';
 import type { z } from 'zod';
 import type { metersSiteSchema } from './api.js';
@@ -27,11 +27,19 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSampleData(): Promise<Result<SiteSampleData>> {
+    override async getSiteSample(): Promise<Result<SiteSample>> {
         try {
+            const start = performance.now();
+
             const metersSiteData = await this.client.getMetersSite();
 
-            this.logger.trace({ metersSiteData }, 'received data');
+            const end = performance.now();
+            const duration = end - start;
+
+            this.logger.trace(
+                { duration, metersSiteData },
+                'polled Powerwall meter site data',
+            );
 
             const siteSample = generateSiteSample({
                 meter: metersSiteData,
@@ -55,7 +63,7 @@ export function generateSiteSample({
     meter,
 }: {
     meter: z.infer<typeof metersSiteSchema>;
-}): SiteSampleData {
+}): SiteSample {
     const firstMeter = meter[0];
 
     if (!firstMeter) {
@@ -63,9 +71,10 @@ export function generateSiteSample({
     }
 
     return {
+        date: new Date(),
         realPower: {
             type: 'perPhaseNet',
-            phaseA: firstMeter.Cached_readings.real_power_a,
+            phaseA: firstMeter.Cached_readings.real_power_a ?? 0,
             phaseB: firstMeter.Cached_readings.real_power_b ?? null,
             phaseC: firstMeter.Cached_readings.real_power_c ?? null,
             net: firstMeter.Cached_readings.instant_power,

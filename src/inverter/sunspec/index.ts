@@ -16,7 +16,10 @@ import {
     type ControlsModel,
     type ControlsModelWrite,
 } from '../../sunspec/models/controls.js';
-import type { InverterModel } from '../../sunspec/models/inverter.js';
+import {
+    InverterState,
+    type InverterModel,
+} from '../../sunspec/models/inverter.js';
 import type { NameplateModel } from '../../sunspec/models/nameplate.js';
 import type { SettingsModel } from '../../sunspec/models/settings.js';
 import type { StatusModel } from '../../sunspec/models/status.js';
@@ -28,6 +31,7 @@ import {
 } from '../../coordinator/helpers/inverterController.js';
 import type { Config } from '../../helpers/config.js';
 import { getSunSpecInvertersConnection } from '../../sunspec/connections.js';
+import { withRetry } from '../../helpers/withRetry.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
@@ -35,18 +39,21 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
     constructor({
         sunspecInverterConfig,
+        inverterIndex,
         applyControl,
     }: {
         sunspecInverterConfig: Extract<
             Config['inverters'][number],
             { type: 'sunspec' }
         >;
+        inverterIndex: number;
         applyControl: boolean;
     }) {
         super({
             name: 'SunSpecInverterDataPoller',
             pollingIntervalMs: 200,
             applyControl,
+            inverterIndex,
         });
 
         this.inverterConnection = getSunSpecInvertersConnection(
@@ -58,24 +65,45 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
     override async getInverterData(): Promise<Result<InverterData>> {
         try {
-            const models = {
-                inverter: await this.inverterConnection.getInverterModel(),
-                nameplate: await this.inverterConnection.getNameplateModel(),
-                settings: await this.inverterConnection.getSettingsModel(),
-                status: await this.inverterConnection.getStatusModel(),
-                controls: await this.inverterConnection.getControlsModel(),
-            };
+            return await withRetry(
+                async () => {
+                    const start = performance.now();
 
-            this.logger.trace({ models }, 'received model data');
+                    const models = {
+                        inverter:
+                            await this.inverterConnection.getInverterModel(),
+                        nameplate:
+                            await this.inverterConnection.getNameplateModel(),
+                        settings:
+                            await this.inverterConnection.getSettingsModel(),
+                        status: await this.inverterConnection.getStatusModel(),
+                        controls:
+                            await this.inverterConnection.getControlsModel(),
+                    };
 
-            this.cachedControlsModel = models.controls;
+                    const end = performance.now();
+                    const duration = end - start;
 
-            const inverterData = generateInverterData(models);
+                    this.logger.trace(
+                        { duration, models },
+                        'Got inverter data',
+                    );
 
-            return {
-                success: true,
-                value: inverterData,
-            };
+                    this.cachedControlsModel = models.controls;
+
+                    const inverterData = generateInverterData(models);
+
+                    return {
+                        success: true,
+                        value: inverterData,
+                    };
+                },
+                {
+                    attempts: 3,
+                    delayMilliseconds: 100,
+                    functionName: 'get inverter data',
+                },
+            );
         } catch (error) {
             this.logger.error(error, 'Failed to get inverter data');
 
@@ -134,6 +162,21 @@ export function generateInverterData({
     const inverterMetrics = getInverterMetrics(inverter);
     const nameplateMetrics = getNameplateMetrics(nameplate);
     const settingsMetrics = getSettingsMetrics(settings);
+
+    // observed some Fronius inverters randomly spit out 0 values even though the inverter is operating normally
+    // may be related to the constant polling of SunSpec Modbus?
+    // ignore this state and hope the next poll will return valid data
+    if (
+        inverterMetrics.W === 0 &&
+        inverterMetrics.Hz === 0 &&
+        inverterMetrics.PhVphA === 0 &&
+        inverter.St === InverterState.FAULT &&
+        // normal polling shouldn't return 0 for these values
+        inverter.W_SF === 0 &&
+        inverter.WH === 0
+    ) {
+        throw new Error('Inverter returned faulty metrics');
+    }
 
     return {
         date: new Date(),
@@ -231,6 +274,11 @@ export function generateControlsModelWriteFromInverterConfiguration({
                     targetSolarPowerRatio: 0,
                     controlsModel,
                 }),
+                // revert WMaxLimtPct in 60 seconds
+                // this is a safety measure in case the SunSpec connection is lost
+                // we want to revert the inverter to the default which is assumed to be safe
+                // we assume we will write another config witin 60 seconds to reset this timeout
+                WMaxLimPct_RvrtTms: 60,
                 VArPct_Ena: VArPct_Ena.DISABLED,
                 OutPFSet_Ena: OutPFSet_Ena.DISABLED,
             };
@@ -238,6 +286,11 @@ export function generateControlsModelWriteFromInverterConfiguration({
             return {
                 ...controlsModel,
                 Conn: Conn.CONNECT,
+                // revert Conn in 60 seconds
+                // this is a safety measure in case the SunSpec connection is lost
+                // we want to revert the inverter to the default which is assumed to be safe
+                // we assume we will write another config witin 60 seconds to reset this timeout
+                Conn_RvrtTms: 60,
                 WMaxLim_Ena: WMaxLim_Ena.ENABLED,
                 WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
                     targetSolarPowerRatio:
