@@ -55,9 +55,6 @@ export class InvertersPoller extends EventEmitter<{
                 return poller.onControl(configuration);
             }),
         );
-
-        // reset the data cache to align all inverters data after they've been controlled
-        this.inverterDataCacheMapByIndex.clear();
     }
 
     public get getInvertersDataCache() {
