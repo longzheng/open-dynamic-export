@@ -22,6 +22,7 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
         this.client = new Powerwall2Client({
             ip: powerwall2Config.ip,
             password: powerwall2Config.password,
+            timeoutSeconds: powerwall2Config.timeoutSeconds,
         });
 
         void this.startPolling();

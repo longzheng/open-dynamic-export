@@ -161,6 +161,11 @@ A longer time will smooth out load changes but may result in overshoot.`,
                     .describe(
                         'The customer password of the Powerwall 2 gateway. By default, this is the last 5 characters of the password sticker inside the gateway.',
                     ),
+                timeoutSeconds: z
+                    .number()
+                    .optional()
+                    .describe('Request timeout in seconds')
+                    .default(2),
             })
             .describe('Powerwall 2 meter configuration'),
         z
