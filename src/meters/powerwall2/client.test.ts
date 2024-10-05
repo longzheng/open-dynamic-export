@@ -50,6 +50,7 @@ describe('Powerwall2Client', () => {
         power2Client = new Powerwall2Client({
             ip: mockIp,
             password: 'testpassword',
+            timeoutSeconds: 5,
         });
     });
 
