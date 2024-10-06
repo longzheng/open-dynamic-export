@@ -119,7 +119,25 @@ export const configSchema = z.object({
                 .describe('SunSpec inverter configuration'),
         )
         .describe('Inverter configuration'),
-    inverterControl: z.boolean().describe('Whether to control the inverters'),
+    inverterControl: z.object({
+        enabled: z.boolean().describe('Whether to control the inverters'),
+        sampleSeconds: z
+            .number()
+            .min(0)
+            .describe(
+                `How many seconds of inverter and site data to sample to make control decisions.
+A shorter time will increase responsiveness to load changes but may introduce oscillations.
+A longer time will smooth out load changes but may result in overshoot.`,
+            )
+            .optional()
+            .default(5),
+        controlFrequencyMinimumSeconds: z
+            .number()
+            .min(0)
+            .describe(`The number of seconds between control commands`)
+            .optional()
+            .default(1),
+    }),
     meter: z.union([
         z
             .object({
@@ -143,6 +161,11 @@ export const configSchema = z.object({
                     .describe(
                         'The customer password of the Powerwall 2 gateway. By default, this is the last 5 characters of the password sticker inside the gateway.',
                     ),
+                timeoutSeconds: z
+                    .number()
+                    .optional()
+                    .describe('Request timeout in seconds')
+                    .default(2),
             })
             .describe('Powerwall 2 meter configuration'),
         z

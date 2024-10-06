@@ -21,7 +21,10 @@ app.get('/', (_req, res) => {
     res.redirect('/docs');
 });
 
-app.get('/docs/swagger.json', (_req, res) => res.json(swaggerJson));
+app.get('/docs/swagger.json', (_req, res) => {
+    res.json(swaggerJson);
+});
+
 app.get(
     '/docs',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

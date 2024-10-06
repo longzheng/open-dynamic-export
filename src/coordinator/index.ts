@@ -45,23 +45,21 @@ export function createCoordinator(): Coordinator {
     });
 
     const inverterController = new InverterController({
+        config,
         limiters,
         onControl: (InverterController) =>
             invertersPoller.onControl(InverterController),
     });
 
-    invertersPoller.on('data', ({ invertersData, derSample }) => {
+    invertersPoller.on('data', (derSample) => {
         writeDerSamplePoints(derSample);
 
-        rampRateHelper.onInverterData(invertersData);
+        rampRateHelper.onDerSample(derSample);
 
-        sep2Instance?.derHelper.onInverterData(invertersData);
+        sep2Instance?.derHelper.onDerSample(derSample);
         sep2Instance?.mirrorUsagePointListHelper.addDerSample(derSample);
 
-        inverterController.updateSunSpecInverterData({
-            invertersData,
-            derSample,
-        });
+        inverterController.updateDerSample(derSample);
     });
 
     siteSamplePoller.on('data', ({ siteSample }) => {

@@ -1,5 +1,5 @@
 import type { MeterSunSpecConnection } from '../../sunspec/connection/meter.js';
-import type { SiteSampleData } from '../siteSample.js';
+import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { assertNonNull } from '../../helpers/null.js';
 import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
@@ -31,18 +31,26 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
         this.meterConnection = getSunSpecMeterConnection(sunspecMeterConfig);
         this.location = sunspecMeterConfig.location;
 
-        invertersPoller.on('data', ({ derSample }) => {
+        invertersPoller.on('data', (derSample) => {
             this.derSampleCache = derSample;
         });
 
         void this.startPolling();
     }
 
-    override async getSiteSampleData(): Promise<Result<SiteSampleData>> {
+    override async getSiteSample(): Promise<Result<SiteSample>> {
         try {
+            const start = performance.now();
+
             const meterModel = await this.meterConnection.getMeterModel();
 
-            this.logger.trace({ meterModel }, 'received data');
+            const end = performance.now();
+            const duration = end - start;
+
+            this.logger.trace(
+                { duration, meterModel },
+                'polled SunSpec meter data',
+            );
 
             const siteSample = (() => {
                 const sample = generateSiteSample({
@@ -78,10 +86,11 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     }
 }
 
-function generateSiteSample({ meter }: { meter: MeterModel }): SiteSampleData {
+function generateSiteSample({ meter }: { meter: MeterModel }): SiteSample {
     const meterMetrics = getMeterMetrics(meter);
 
     return {
+        date: new Date(),
         realPower: meterMetrics.WphA
             ? {
                   type: 'perPhaseNet',
@@ -117,9 +126,9 @@ function convertConsumptionMeteringToFeedInMetering({
     siteSample,
     derSample,
 }: {
-    siteSample: SiteSampleData;
+    siteSample: SiteSample;
     derSample: DerSample | null;
-}): SiteSampleData {
+}): SiteSample {
     if (!derSample) {
         throw new Error(
             'Cannot convert consumption metering to feed-in metering without DER data',
@@ -132,10 +141,8 @@ function convertConsumptionMeteringToFeedInMetering({
     });
 
     return {
+        ...siteSample,
         realPower: siteRealPower,
-        reactivePower: siteSample.reactivePower,
-        voltage: siteSample.voltage,
-        frequency: siteSample.frequency,
     };
 }
 
@@ -143,9 +150,9 @@ export function convertConsumptionRealPowerToFeedInRealPower({
     consumptionRealPower,
     derRealPower,
 }: {
-    consumptionRealPower: SiteSampleData['realPower'];
+    consumptionRealPower: SiteSample['realPower'];
     derRealPower: DerSample['realPower'];
-}): SiteSampleData['realPower'] {
+}): SiteSample['realPower'] {
     if (
         consumptionRealPower.type === 'perPhaseNet' &&
         derRealPower.type === 'perPhaseNet'

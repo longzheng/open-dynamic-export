@@ -51,10 +51,7 @@ describe('getMaxChangeWatts', () => {
     });
 
     it('should return limit for default ramp rate with nameplate', () => {
-        helper.onInverterData([
-            { nameplate: { maxW: 5000 } },
-            { nameplate: { maxW: 5000 } },
-        ]);
+        helper.onDerSample({ nameplate: { maxW: 10000 } });
 
         const result = helper.getMaxChangeWatts();
 
@@ -75,10 +72,8 @@ describe('getMaxChangeWatts', () => {
     });
 
     it('should return limited for 1% ramp rate with nameplate', () => {
-        helper.onInverterData([
-            { nameplate: { maxW: 5000 } },
-            { nameplate: { maxW: 5000 } },
-        ]);
+        helper.onDerSample({ nameplate: { maxW: 10000 } });
+
         helper.setDefaultDERControlRampRate(100);
 
         const result = helper.getMaxChangeWatts();

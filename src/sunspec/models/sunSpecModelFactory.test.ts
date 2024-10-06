@@ -140,14 +140,6 @@ describe('sunSpecModelFactory', () => {
             .spyOn(inverterSunSpecConnection.client, 'writeRegisters')
             .mockResolvedValue({ address: 40000, length: 6 });
 
-        // after write
-        const readHoldingRegistersMock = vi
-            .spyOn(inverterSunSpecConnection.client, 'readHoldingRegisters')
-            .mockResolvedValue({
-                data: [0x0001, 0x00003, 0xff80, 0x6865, 0x6c6c, 0x6f00],
-                buffer: Buffer.from([]), // buffer value is not used
-            });
-
         const values = {
             Hello: 3,
             World: -128,
@@ -166,42 +158,5 @@ describe('sunSpecModelFactory', () => {
             40000,
             [0, 3, 0xff80, 0, 0, 0],
         );
-        expect(readHoldingRegistersMock).toHaveBeenCalledOnce();
-        expect(readHoldingRegistersMock).toHaveBeenCalledWith(40000, 6);
-    });
-
-    it('sunSpecModelFactory.write returns even if data is not updated', async () => {
-        const writeRegistersMock = vi
-            .spyOn(inverterSunSpecConnection.client, 'writeRegisters')
-            .mockResolvedValue({ address: 40000, length: 6 });
-
-        // after write
-        const readHoldingRegistersMock = vi
-            .spyOn(inverterSunSpecConnection.client, 'readHoldingRegisters')
-            .mockResolvedValue({
-                data: [0x0001, 0x000011, 0xff80, 0x6865, 0x6c6c, 0x6f00],
-                buffer: Buffer.from([]), // buffer value is not used
-            });
-
-        const values = {
-            Hello: 3,
-            World: -128,
-        } satisfies ModelWrite;
-
-        await expect(
-            model.write({
-                values,
-                modbusConnection: inverterSunSpecConnection,
-                address: { start: 40000, length: 6 },
-            }),
-        ).resolves.toBeUndefined();
-
-        expect(writeRegistersMock).toHaveBeenCalledOnce();
-        expect(writeRegistersMock).toHaveBeenCalledWith(
-            40000,
-            [0, 3, 0xff80, 0, 0, 0],
-        );
-        expect(readHoldingRegistersMock).toHaveBeenCalledOnce();
-        expect(readHoldingRegistersMock).toHaveBeenCalledWith(40000, 6);
     });
 });

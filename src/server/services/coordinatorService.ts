@@ -16,6 +16,12 @@ type CoordinatorResponse =
           invertersDataCache: InvertersDataCache | null;
           derSample: DerSample | null;
           siteSample: SiteSample | null;
+          loadWatts: number | null;
+          controlLimits: {
+              controlLimitsByLimiter: ControlLimitsByLimiter;
+              activeInverterControlLimit: ActiveInverterControlLimit;
+          } | null;
+          inverterConfiguration: InverterConfiguration | null;
       }
     | {
           running: false;
@@ -41,6 +47,11 @@ class CoordinatorService {
             siteSample: this.coordinator.siteSamplePoller.getSiteSampleCache,
             invertersDataCache:
                 this.coordinator.invertersPoller.getInvertersDataCache,
+            loadWatts: this.coordinator.inverterController.getLoadWatts,
+            controlLimits: this.coordinator.inverterController.getControlLimits,
+            inverterConfiguration:
+                this.coordinator.inverterController
+                    .getLastAppliedInverterConfiguration,
         };
     }
 
@@ -59,23 +70,6 @@ class CoordinatorService {
 
         this.coordinator.destroy();
         this.coordinator = null;
-    }
-
-    public inverterControllerData(): InverterControllerData {
-        if (!this.coordinator) {
-            throw new Error('Coordinator is not running');
-        }
-
-        const data = this.coordinator.inverterController.getCachedData;
-
-        if (!data) {
-            return { cached: false };
-        }
-
-        return {
-            cached: true,
-            ...data,
-        };
     }
 }
 
@@ -115,6 +109,21 @@ type DerSample = {
         phaseC: number | null;
     } | null;
     frequency: number | null;
+    nameplate: {
+        type: number;
+        maxW: number;
+        maxVA: number;
+        maxVar: number;
+    };
+    settings: {
+        setMaxW: number;
+        setMaxVA: number | null;
+        setMaxVar: number | null;
+    };
+    status: {
+        operationalModeStatus: number;
+        genConnectStatus: number;
+    };
 };
 
 type SiteSample = {
@@ -156,13 +165,3 @@ type ControlLimitsByLimiter = Record<
     'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
     InverterControlLimit | null
 >;
-
-type InverterControllerData =
-    | {
-          cached: true;
-          loadWatts: number;
-          controlLimitsByLimiter: ControlLimitsByLimiter;
-          activeInverterControlLimit: ActiveInverterControlLimit;
-          inverterConfiguration: InverterConfiguration;
-      }
-    | { cached: false };

@@ -18,7 +18,15 @@ export class Powerwall2Client {
         | { type: 'fetching'; promise: Promise<string> }
         | { type: 'cached'; token: string } = { type: 'none' };
 
-    constructor({ ip, password }: { ip: string; password: string }) {
+    constructor({
+        ip,
+        password,
+        timeoutSeconds,
+    }: {
+        ip: string;
+        password: string;
+        timeoutSeconds: number;
+    }) {
         this.password = password;
 
         this.logger = pinoLogger.child({ module: 'Powerwall2' });
@@ -28,6 +36,7 @@ export class Powerwall2Client {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),
+            timeout: timeoutSeconds * 1000,
         });
 
         void this.getToken();
@@ -118,6 +127,7 @@ export class Powerwall2Client {
                     error.response.status < 500
                 ) {
                     // refresh token and retry request
+                    this.token = { type: 'none' };
                     await this.getToken();
 
                     return this.get(url, params);

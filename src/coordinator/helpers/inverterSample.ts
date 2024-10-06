@@ -9,14 +9,8 @@ import type { Config } from '../../helpers/config.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import type { InverterConfiguration } from './inverterController.js';
 import type { Logger } from 'pino';
-
-export type InvertersData = {
-    invertersData: InverterData[];
-    derSample: DerSample;
-};
-
 export class InvertersPoller extends EventEmitter<{
-    data: [InvertersData];
+    data: [DerSample];
 }> {
     private inverterDataPollers: InverterDataPollerBase[];
     private inverterDataCacheMapByIndex: Map<number, Result<InverterData>> =
@@ -34,7 +28,8 @@ export class InvertersPoller extends EventEmitter<{
                     case 'sunspec': {
                         return new SunSpecInverterDataPoller({
                             sunspecInverterConfig: inverterConfig,
-                            applyControl: config.inverterControl,
+                            applyControl: config.inverterControl.enabled,
+                            inverterIndex: index,
                         }).on('data', (data) => {
                             this.inverterDataCacheMapByIndex.set(index, data);
 
@@ -71,6 +66,24 @@ export class InvertersPoller extends EventEmitter<{
     }
 
     private onData() {
+        // we expect to have results (regardless of success or failure) for all inverters before processing the data
+        if (
+            this.getInvertersDataCache.length !==
+            this.inverterDataPollers.length
+        ) {
+            this.logger.debug(
+                {
+                    invertersDataCount: this.getInvertersDataCache.length,
+                    invertersCount: this.inverterDataPollers.length,
+                },
+                'waiting for all inverters data',
+            );
+
+            return;
+        }
+
+        // discard non-success inverters data
+        // if we can't get data, assume the inverter is offline/inaccessible and is not contributing to the site
         const successInvertersData = this.getInvertersDataCache
             .filter((data) => data.success)
             .map((data) => data.value);
@@ -81,11 +94,11 @@ export class InvertersPoller extends EventEmitter<{
 
         this.derSampleCache = derSample;
 
-        this.logger.trace({ derSample }, 'generated DER sample');
+        this.logger.trace(
+            { derSample, successInvertersCount: successInvertersData.length },
+            'generated DER sample',
+        );
 
-        this.emit('data', {
-            invertersData: successInvertersData,
-            derSample,
-        });
+        this.emit('data', derSample);
     }
 }

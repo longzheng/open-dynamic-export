@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateDerSample } from './derSample.js';
 import type { InverterData } from '../../inverter/inverterData.js';
+import { DERTyp } from '../../sunspec/models/nameplate.js';
+import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
+import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 
 describe('generateDerSample', () => {
     beforeEach(() => {
@@ -17,8 +20,9 @@ describe('generateDerSample', () => {
         const now = new Date('2023-01-01T10:05:00Z');
         vi.setSystemTime(now);
 
-        const invertersData: Pick<InverterData, 'inverter'>[] = [
+        const invertersData: InverterData[] = [
             {
+                date: now,
                 inverter: {
                     realPower: 6990,
                     reactivePower: -25,
@@ -26,6 +30,25 @@ describe('generateDerSample', () => {
                     voltagePhaseB: 227.7,
                     voltagePhaseC: 229,
                     frequency: 49.99,
+                },
+                nameplate: {
+                    type: DERTyp.PV,
+                    maxW: 7000,
+                    maxVA: 7000,
+                    maxVar: 7000,
+                },
+                settings: {
+                    maxW: 7000,
+                    maxVA: 7000,
+                    maxVar: 7000,
+                },
+                status: {
+                    operationalModeStatus:
+                        OperationalModeStatus.OperationalMode,
+                    genConnectStatus:
+                        ConnectStatus.Available |
+                        ConnectStatus.Connected |
+                        ConnectStatus.Operating,
                 },
             },
         ];
@@ -49,15 +72,34 @@ describe('generateDerSample', () => {
                 phaseC: 229.0,
             },
             frequency: 49.99,
-        });
+            nameplate: {
+                maxVA: 7000,
+                maxVar: 7000,
+                maxW: 7000,
+                type: 4,
+            },
+            settings: {
+                setMaxVA: 7000,
+                setMaxVar: 7000,
+                setMaxW: 7000,
+            },
+            status: {
+                operationalModeStatus: OperationalModeStatus.OperationalMode,
+                genConnectStatus:
+                    ConnectStatus.Available |
+                    ConnectStatus.Connected |
+                    ConnectStatus.Operating,
+            },
+        } satisfies typeof result);
     });
 
     it('should return a DerSample for a multiple inverters', () => {
         const now = new Date('2023-01-01T10:05:00Z');
         vi.setSystemTime(now);
 
-        const invertersData: Pick<InverterData, 'inverter'>[] = [
+        const invertersData: InverterData[] = [
             {
+                date: now,
                 inverter: {
                     realPower: 6990,
                     reactivePower: -25,
@@ -66,8 +108,28 @@ describe('generateDerSample', () => {
                     voltagePhaseC: 229,
                     frequency: 49.99,
                 },
+                nameplate: {
+                    type: DERTyp.PV,
+                    maxW: 7000,
+                    maxVA: 7000,
+                    maxVar: 7000,
+                },
+                settings: {
+                    maxW: 7000,
+                    maxVA: 7000,
+                    maxVar: 7000,
+                },
+                status: {
+                    operationalModeStatus:
+                        OperationalModeStatus.OperationalMode,
+                    genConnectStatus:
+                        ConnectStatus.Available |
+                        ConnectStatus.Connected |
+                        ConnectStatus.Operating,
+                },
             },
             {
+                date: now,
                 inverter: {
                     realPower: 6990,
                     reactivePower: -25,
@@ -75,6 +137,21 @@ describe('generateDerSample', () => {
                     voltagePhaseB: null,
                     voltagePhaseC: null,
                     frequency: 50,
+                },
+                nameplate: {
+                    type: DERTyp.PV,
+                    maxW: 7000,
+                    maxVA: 7000,
+                    maxVar: 7000,
+                },
+                settings: {
+                    maxW: 7000,
+                    maxVA: 7000,
+                    maxVar: 7000,
+                },
+                status: {
+                    operationalModeStatus: OperationalModeStatus.Off,
+                    genConnectStatus: ConnectStatus.Connected,
                 },
             },
         ];
@@ -98,6 +175,24 @@ describe('generateDerSample', () => {
                 phaseC: 229,
             },
             frequency: 49.995,
-        });
+            nameplate: {
+                maxVA: 14000,
+                maxVar: 14000,
+                maxW: 14000,
+                type: 4,
+            },
+            settings: {
+                setMaxVA: 14000,
+                setMaxVar: 14000,
+                setMaxW: 14000,
+            },
+            status: {
+                operationalModeStatus: OperationalModeStatus.OperationalMode,
+                genConnectStatus:
+                    ConnectStatus.Available |
+                    ConnectStatus.Connected |
+                    ConnectStatus.Operating,
+            },
+        } satisfies typeof result);
     });
 });

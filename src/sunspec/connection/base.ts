@@ -84,10 +84,14 @@ export abstract class SunSpecConnection {
 
                         await this.client.connectTCP(this.ip, {
                             port: this.port,
+                            // timeout for connection
                             timeout: connectionTimeoutMs,
                         });
 
                         this.client.setID(this.unitId);
+
+                        // timeout for requests
+                        this.client.setTimeout(connectionTimeoutMs);
 
                         this.logger.info(`SunSpec Modbus client connected`);
 
