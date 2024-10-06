@@ -18,7 +18,7 @@ export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
     const mirrorUsagePointArray = assertArray(
         xml['MirrorUsagePointList']['MirrorUsagePoint'],
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     const mirrorUsagePoints = mirrorUsagePointArray.map((mirrorUsagePoint) =>
         parseMirrorUsagePointXmlObject(mirrorUsagePoint),

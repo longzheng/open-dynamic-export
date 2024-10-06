@@ -47,14 +47,19 @@ describe('sumNumbersArray', () => {
 });
 
 describe('sumNumbersNullableArray', () => {
-    it('should return null if any number is null', () => {
+    it('should return if any number is null', () => {
         const result = sumNumbersNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(4);
     });
 
     it('should avoid floating point errors', () => {
         const result = sumNumbersNullableArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.6);
+    });
+
+    it('should return null if all null array', () => {
+        const result = sumNumbersNullableArray([null, null]);
+        expect(result).toBe(null);
     });
 });
 
@@ -68,41 +73,61 @@ describe('averageNumbersArray', () => {
         const result = averageNumbersArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.2);
     });
+
+    it('should return 0 if emtpy array', () => {
+        const result = averageNumbersArray([]);
+        expect(result).toBe(0);
+    });
 });
 
 describe('averageNumbersNullableArray', () => {
-    it('should return null if any number is null', () => {
+    it('should return if any number is null', () => {
         const result = averageNumbersNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(2);
     });
 
     it('should avoid floating point errors', () => {
         const result = averageNumbersNullableArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.2);
     });
+
+    it('should return null if all null array', () => {
+        const result = averageNumbersNullableArray([null, null]);
+        expect(result).toBe(null);
+    });
 });
 
 describe('mathMinNullbleArray', () => {
-    it('should return null if any number is null', () => {
+    it('should return if any number is null', () => {
         const result = mathMinNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(1);
     });
 
     it('should return minimum value if all numbers are not null', () => {
         const result = mathMinNullableArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.1);
     });
+
+    it('should return null if all null array', () => {
+        const result = mathMinNullableArray([null, null]);
+        expect(result).toBe(null);
+    });
 });
 
 describe('mathMaxNullableArray', () => {
-    it('should return null if any number is null', () => {
+    it('should return if any number is null', () => {
         const result = mathMaxNullableArray([1, null, 3]);
-        expect(result).toBe(null);
+        expect(result).toBe(3);
     });
 
     it('should return maximum value if all numbers are not null', () => {
         const result = mathMaxNullableArray([0.1, 0.2, 0.3]);
         expect(result).toBe(0.3);
+    });
+
+    it('should return null if all null array', () => {
+        const result = mathMaxNullableArray([null, null]);
+        expect(result).toBe(null);
     });
 });
 
@@ -140,6 +165,18 @@ describe('convertNumberToBaseAndPow10Exponent', () => {
 
     it('should convert number 0.0', () => {
         const result = convertNumberToBaseAndPow10Exponent(0.0);
+        expect(result).toEqual({ base: 0, pow10: 0 });
+    });
+
+    it('should convert NaN', () => {
+        const result = convertNumberToBaseAndPow10Exponent(Number.NaN);
+        expect(result).toEqual({ base: 0, pow10: 0 });
+    });
+
+    it('should convert Infinity', () => {
+        const result = convertNumberToBaseAndPow10Exponent(
+            Number.POSITIVE_INFINITY,
+        );
         expect(result).toEqual({ base: 0, pow10: 0 });
     });
 });

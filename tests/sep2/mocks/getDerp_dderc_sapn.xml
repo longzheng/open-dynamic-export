@@ -1,0 +1,15 @@
+<DefaultDERControl xsi:schemaLocation="urn:ieee:std:2030.5:ns sep.xsd"
+    xmlns="urn:ieee:std:2030.5:ns"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:csipaus = "https://csipaus.org/ns" href="/edev/2dbac664c4e406e56169858ee224ca415849bc43/derp/1/dderc/15" subscribable="1">
+    <mRID>03e42dbac664c4e066e77a5d00054666</mRID>
+    <description>88402262345a48358d8c46542e2a201b</description>
+    <version>0</version>
+    <DERControlBase>
+        <csipaus:opModExpLimW>
+            <multiplier>0</multiplier>
+            <value>1500</value>
+        </csipaus:opModExpLimW>
+    </DERControlBase>
+    <setGradW>27</setGradW>
+</DefaultDERControl>

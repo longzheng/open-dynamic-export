@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import { SapnRELE2WLimiter } from './index.js';
 
 describe('AusgridEA029Limiter', () => {
@@ -24,11 +23,12 @@ describe('AusgridEA029Limiter', () => {
         const result = sapnRELE2WLimiter.getInverterControlLimit();
 
         expect(result).toEqual({
+            source: 'twoWayTariff',
             opModConnect: undefined,
             opModEnergize: undefined,
             opModExpLimW: 0,
             opModGenLimW: undefined,
-        } satisfies InverterControlLimit);
+        } satisfies typeof result);
     });
 
     it('should return no control limit outside of charge window', () => {
@@ -38,11 +38,12 @@ describe('AusgridEA029Limiter', () => {
         const result = sapnRELE2WLimiter.getInverterControlLimit();
 
         expect(result).toEqual({
+            source: 'twoWayTariff',
             opModConnect: undefined,
             opModEnergize: undefined,
             opModExpLimW: undefined,
             opModGenLimW: undefined,
-        });
+        } satisfies typeof result);
     });
 
     it('should throw exception when timezone is not NSW', () => {

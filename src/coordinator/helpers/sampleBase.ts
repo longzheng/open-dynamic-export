@@ -2,14 +2,28 @@ export type SampleBase = {
     date: Date;
 };
 
-export function getSamplesIntervalSeconds<T extends SampleBase>(samples: T[]) {
-    // assume samples are in order from oldest to newest
-    if (samples.length < 2) {
-        return 0;
+export type SampleTimePeriod = {
+    start: Date;
+    end: Date;
+    durationSeconds: number;
+};
+
+export function getSampleTimePeriod<T extends SampleBase>(
+    samples: T[],
+): SampleTimePeriod {
+    if (samples.length === 0) {
+        throw new Error('No samples to calculate time period');
     }
 
-    const oldest = samples.at(0)!.date;
-    const newest = samples.at(-1)!.date;
+    const start = samples.at(0)!.date;
+    const end = samples.at(-1)!.date;
+    const durationSeconds = Math.round(
+        (end.getTime() - start.getTime()) / 1000,
+    );
 
-    return Math.round((newest.getTime() - oldest.getTime()) / 1000);
+    return {
+        start,
+        end,
+        durationSeconds,
+    };
 }

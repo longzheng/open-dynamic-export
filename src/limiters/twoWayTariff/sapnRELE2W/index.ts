@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../../limiter.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { logger as pinoLogger } from '../../../helpers/logger.js';
 
@@ -25,24 +25,26 @@ export class SapnRELE2WLimiter implements LimiterType {
 
         const nowHour = now.getHours();
 
-        const limit =
+        const limit: InverterControlLimit =
             // if within charge window, zero export
             nowHour >= chargeWindow.startHourOfDay &&
             nowHour < chargeWindow.endHourOfDay
                 ? {
+                      source: 'twoWayTariff',
                       opModConnect: undefined,
                       opModEnergize: undefined,
                       opModExpLimW: 0,
                       opModGenLimW: undefined,
                   }
                 : {
+                      source: 'twoWayTariff',
                       opModConnect: undefined,
                       opModEnergize: undefined,
                       opModExpLimW: undefined,
                       opModGenLimW: undefined,
                   };
 
-        writeControlLimit({ limit, name: 'sapnRELE2W' });
+        writeControlLimit({ limit });
 
         return limit;
     }
@@ -56,6 +58,7 @@ const chargeWindow: Window = {
 
 // In the summer peak of November to March, 5pm – 9pm, customers are encouraged to export into the distribution network to access a credit.
 // TODO: reduce load or export battery during reward window
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const rewardWindow: {
     months: number[];
     hourOfDay: Window;

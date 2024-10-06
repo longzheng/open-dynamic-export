@@ -1,5 +1,5 @@
 import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../limiter.js';
 import type { Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 
@@ -13,14 +13,15 @@ export class FixedLimiter implements LimiterType {
     }
 
     getInverterControlLimit(): InverterControlLimit {
-        const limit = {
+        const limit: InverterControlLimit = {
+            source: 'fixed',
             opModConnect: this.config.connect,
             opModEnergize: this.config.connect,
             opModExpLimW: this.config.exportLimitWatts,
             opModGenLimW: this.config.generationLimitWatts,
         };
 
-        writeControlLimit({ limit, name: 'fixed' });
+        writeControlLimit({ limit });
 
         return limit;
     }

@@ -5,7 +5,6 @@ import { ResponseStatus } from '../models/derControlResponse.js';
 import type { DERControlBase } from '../models/derControlBase.js';
 import type {
     DerControlsHelperChangedData,
-    FallbackControl,
     MergedControlsData,
 } from './derControls.js';
 import { DerControlResponseHelper } from './derControlResponse.js';
@@ -13,16 +12,21 @@ import {
     getDerControlEndDate,
     sortByProgramPrimacyAndEventCreationTime,
 } from './derControl.js';
-import { CurrentStatus } from '../models/eventStatus.js';
 import { randomInt } from 'crypto';
 import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
+import type { DERControl } from '../models/derControl.js';
+import type { FallbackControl } from './fallbackControl.js';
 
-export type ControlType = keyof DERControlBase;
+export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 
 type DERControlBaseValueOfType<ControlKey extends ControlType> =
-    DERControlBase[ControlKey];
+    | {
+          type: 'active' | 'default';
+          control: DERControlBase[ControlKey];
+          rampTms: DERControlBase['rampTms'];
+      }
+    | { type: 'none'; control: undefined };
 
 export type RandomizedControlSchedule = ControlSchedule & {
     effectiveStartInclusive: Date;
@@ -42,7 +46,6 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     private client: SEP2Client;
     private derControlResponseHelper: DerControlResponseHelper;
     private logger: Logger;
-    private rampRateHelper: RampRateHelper;
     private controlType: ControlKey;
     private fallbackControl: FallbackControl = {
         type: 'none',
@@ -53,14 +56,11 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     constructor({
         client,
         controlType,
-        rampRateHelper,
     }: {
         client: SEP2Client;
         controlType: ControlKey;
-        rampRateHelper: RampRateHelper;
     }) {
         this.client = client;
-        this.rampRateHelper = rampRateHelper;
         this.controlType = controlType;
         this.derControlResponseHelper = new DerControlResponseHelper({
             client,
@@ -71,22 +71,40 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
     }
 
-    updateControlsData(data: DerControlsHelperChangedData) {
-        this.fallbackControl = data.fallbackControl;
+    updateFallbackControl(fallbackControl: FallbackControl) {
+        this.fallbackControl = fallbackControl;
+    }
 
-        const activeOrScheduledControls = data.controls.filter(
-            ({ control }) =>
-                control.eventStatus.currentStatus === CurrentStatus.Active ||
-                control.eventStatus.currentStatus === CurrentStatus.Scheduled,
-        );
+    updateControlsData({
+        activeOrScheduledControls,
+        fallbackControl,
+    }: DerControlsHelperChangedData) {
+        this.updateFallbackControl(fallbackControl);
 
         const controlsOfType = filterControlsOfType({
-            controls: activeOrScheduledControls,
+            activeOrScheduledControls,
             type: this.controlType,
         });
 
         const generatedControlSchedules = generateControlsSchedule({
-            activeOrScheduledControls: controlsOfType,
+            activeOrScheduledControlsOfType: controlsOfType,
+            onSupersededControl: ({
+                supersededControl,
+                supersedingControl,
+            }) => {
+                this.logger.debug(
+                    {
+                        supersededControl,
+                        supersedingControl,
+                    },
+                    'Control schedule superseded',
+                );
+
+                void this.derControlResponseHelper.respondDerControl({
+                    derControl: supersededControl,
+                    status: ResponseStatus.EventSuperseded,
+                });
+            },
         });
 
         this.controlSchedules = applyRandomizationToControlSchedule({
@@ -108,62 +126,47 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
             this.activeControlSchedule?.data.control.mRID !==
             newActiveControlSchedule?.data.control.mRID
         ) {
-            this.handleActiveControlScheduleChange(newActiveControlSchedule);
+            void this.handleActiveControlScheduleChange(
+                newActiveControlSchedule,
+            );
         }
 
         return this.getCurrentControlBaseValue();
     }
 
-    private handleActiveControlScheduleChange(
+    private async handleActiveControlScheduleChange(
         newActiveControlSchedule: RandomizedControlSchedule | null,
     ) {
+        const now = new Date();
+
         // if the schedule should be changed
         if (this.activeControlSchedule) {
             const activeControlScheduleEnd =
                 this.activeControlSchedule.effectiveEndExclusive;
             const activeControlScheduleEndedSuccessfully =
-                activeControlScheduleEnd < new Date();
+                activeControlScheduleEnd <= now;
 
             if (activeControlScheduleEndedSuccessfully) {
                 this.logger.info(
-                    { activeControlSchedule: this.activeControlSchedule },
+                    {
+                        activeControlSchedule: this.activeControlSchedule,
+                        now,
+                    },
                     'Active control schedule completed',
                 );
 
-                // send event completed response
-                void this.derControlResponseHelper.respondDerControl({
+                await this.derControlResponseHelper.respondDerControl({
                     derControl: this.activeControlSchedule.data.control,
                     status: ResponseStatus.EventCompleted,
                 });
             } else {
                 this.logger.warn(
-                    { activeControlSchedule: this.activeControlSchedule },
+                    {
+                        activeControlSchedule: this.activeControlSchedule,
+                        now,
+                    },
                     'Active control schedule aborted before end time',
                 );
-
-                // we don't need to worry about cancelled or superseded events here because they are handled by the DerControlsHelper
-                // we only need to worry about aborted by another program
-                if (
-                    newActiveControlSchedule &&
-                    this.activeControlSchedule.data.program.mRID !==
-                        newActiveControlSchedule.data.program.mRID
-                ) {
-                    this.logger.warn(
-                        {
-                            activeControlScheduleProgramMrid:
-                                this.activeControlSchedule.data.program.mRID,
-                            newActiveControlScheduleProgramMrid:
-                                newActiveControlSchedule.data.program.mRID,
-                        },
-                        'Active control schedule aborted by another program',
-                    );
-
-                    // send event aborted by another program response
-                    void this.derControlResponseHelper.respondDerControl({
-                        derControl: this.activeControlSchedule.data.control,
-                        status: ResponseStatus.EventAbortedProgram,
-                    });
-                }
             }
 
             // remove the active control schedule from the schedule list
@@ -176,29 +179,17 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
 
         if (newActiveControlSchedule) {
             this.logger.info(
-                { newActiveControlSchedule },
+                { newActiveControlSchedule, now },
                 'Active control schedule started',
             );
 
-            // send event started response
-            void this.derControlResponseHelper.respondDerControl({
+            await this.derControlResponseHelper.respondDerControl({
                 derControl: newActiveControlSchedule.data.control,
                 status: ResponseStatus.EventStarted,
             });
-
-            // if the control has a ramp time, start the ramp
-            // note: this may not be the best place to start the ramp because different controlTypes of the same control
-            // will start the ramp multiple times with different randomization
-            // however this is the simplest way to implement it and it shouldn't have a significant negative effect
-            if (newActiveControlSchedule.data.control.derControlBase.rampTms) {
-                this.rampRateHelper.startControlRampTms(
-                    newActiveControlSchedule.data.control.derControlBase
-                        .rampTms,
-                );
-            }
         } else {
             this.logger.info(
-                { defaultControl: this.fallbackControl },
+                { defaultControl: this.fallbackControl, now },
                 'Default control started',
             );
         }
@@ -207,9 +198,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         this.activeControlSchedule = newActiveControlSchedule;
     }
 
-    private getCurrentControlBaseValue():
-        | DERControlBaseValueOfType<ControlKey>
-        | undefined {
+    private getCurrentControlBaseValue(): DERControlBaseValueOfType<ControlKey> {
         writeControlSchedulerPoints({
             activeControlSchedule: this.activeControlSchedule,
             controlType: this.controlType,
@@ -217,18 +206,28 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
 
         if (this.activeControlSchedule) {
-            return this.activeControlSchedule.data.control.derControlBase[
-                this.controlType
-            ];
+            const controlBase =
+                this.activeControlSchedule.data.control.derControlBase;
+
+            return {
+                type: 'active',
+                control: controlBase[this.controlType],
+                rampTms: controlBase.rampTms,
+            };
         }
 
         switch (this.fallbackControl.type) {
-            case 'default':
-                return this.fallbackControl.data.defaultControl.derControlBase[
-                    this.controlType
-                ];
+            case 'default': {
+                const controlBase =
+                    this.fallbackControl.data.defaultControl.derControlBase;
+                return {
+                    type: 'default',
+                    control: controlBase[this.controlType],
+                    rampTms: controlBase.rampTms,
+                };
+            }
             case 'none':
-                return undefined;
+                return { type: 'none', control: undefined };
         }
     }
 
@@ -255,8 +254,14 @@ export function filterControlsOfType<
     T extends {
         control: Pick<MergedControlsData['control'], 'derControlBase'>;
     },
->({ controls, type }: { controls: T[]; type: ControlType }) {
-    return controls.filter(
+>({
+    activeOrScheduledControls,
+    type,
+}: {
+    activeOrScheduledControls: T[];
+    type: ControlType;
+}) {
+    return activeOrScheduledControls.filter(
         ({ control }) =>
             Object.keys(control.derControlBase).includes(type) &&
             control.derControlBase[type] !== undefined,
@@ -264,18 +269,24 @@ export function filterControlsOfType<
 }
 
 export function generateControlsSchedule({
-    activeOrScheduledControls,
+    activeOrScheduledControlsOfType,
+    onSupersededControl,
 }: {
     // assume only active or scheduled controls
-    activeOrScheduledControls: MergedControlsData[];
+    activeOrScheduledControlsOfType: MergedControlsData[];
+    onSupersededControl?: (controls: {
+        supersededControl: DERControl;
+        supersedingControl: DERControl;
+    }) => void;
 }): ControlSchedule[] {
     const sortedDatetimes = getSortedUniqueDatetimesFromControls(
-        activeOrScheduledControls,
+        activeOrScheduledControlsOfType,
     );
     const chunkedControlsScheduleByPriority =
         buildChunkedControlsScheduleByPriority({
-            activeOrScheduledControls,
+            activeOrScheduledControls: activeOrScheduledControlsOfType,
             sortedDatetimes,
+            onSupersededControl,
         });
 
     const joinedControlsSchedules = joinChunkedControlSchedules({
@@ -312,9 +323,14 @@ export function getSortedUniqueDatetimesFromControls<
 function buildChunkedControlsScheduleByPriority({
     activeOrScheduledControls,
     sortedDatetimes,
+    onSupersededControl,
 }: {
     activeOrScheduledControls: MergedControlsData[];
     sortedDatetimes: Date[];
+    onSupersededControl?: (controls: {
+        supersededControl: DERControl;
+        supersedingControl: DERControl;
+    }) => void;
 }) {
     const controlsSchedules: ControlSchedule[] = [];
 
@@ -334,20 +350,34 @@ function buildChunkedControlsScheduleByPriority({
             continue;
         }
 
-        // get the top control by priority
-        const sortedControls = controlsAtTime
-            .sort(sortByProgramPrimacyAndEventCreationTime)
-            .at(0)!;
+        // sort controls by priority
+        const sortedControls = controlsAtTime.sort(
+            sortByProgramPrimacyAndEventCreationTime,
+        );
+
+        // get the top priority control
+        const firstControl = sortedControls.at(0)!;
+
+        if (sortedControls.length > 1) {
+            // for the superseded events we need to respond to
+            const supersededControls = sortedControls.slice(1);
+
+            for (const supersededControl of supersededControls) {
+                void onSupersededControl?.({
+                    supersededControl: supersededControl.control,
+                    supersedingControl: firstControl.control,
+                });
+            }
+        }
 
         // add to schedule until the next datetime event
         controlsSchedules.push({
-            data: sortedControls,
+            data: firstControl,
             startInclusive: datetimeEvent,
             endExclusive:
-                nextdateTimeEvent ??
-                getDerControlEndDate(sortedControls.control),
-            randomizeStart: sortedControls.control.randomizeStart,
-            randomizeDuration: sortedControls.control.randomizeDuration,
+                nextdateTimeEvent ?? getDerControlEndDate(firstControl.control),
+            randomizeStart: firstControl.control.randomizeStart,
+            randomizeDuration: firstControl.control.randomizeDuration,
         });
     }
 

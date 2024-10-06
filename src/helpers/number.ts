@@ -38,46 +38,70 @@ export function sumNumbersArray(numbers: number[]) {
         .toNumber();
 }
 
-export function sumNumbersNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
+export function sumNumbersNullableArray(
+    numbers: (number | null)[],
+): number | null {
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
         return null;
     }
 
-    return sumNumbersArray(numbers as number[]);
+    return sumNumbersArray(nonNullableNumbers);
 }
 
 export function averageNumbersArray(numbers: number[]) {
+    if (numbers.length === 0) {
+        return 0;
+    }
+
     return new Decimal(sumNumbersArray(numbers)).div(numbers.length).toNumber();
 }
 
-export function averageNumbersNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
+export function averageNumbersNullableArray(
+    numbers: (number | null)[],
+): number | null {
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
         return null;
     }
 
-    return averageNumbersArray(numbers as number[]);
+    return averageNumbersArray(nonNullableNumbers);
 }
 
-export function mathMinNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
+export function mathMinNullableArray(
+    numbers: (number | null)[],
+): number | null {
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
         return null;
     }
 
-    return Math.min(...(numbers as number[]));
+    return Math.min(...nonNullableNumbers);
 }
 
-export function mathMaxNullableArray(numbers: (number | null)[]) {
-    if (numbers.some((number) => number === null)) {
+export function mathMaxNullableArray(
+    numbers: (number | null)[],
+): number | null {
+    const nonNullableNumbers = numbers.filter((number) => number !== null);
+
+    if (nonNullableNumbers.length === 0) {
         return null;
     }
 
-    return Math.max(...(numbers as number[]));
+    return Math.max(...nonNullableNumbers);
 }
 
 export function convertNumberToBaseAndPow10Exponent(number: number): {
     base: number;
     pow10: number;
 } {
+    if (Number.isNaN(number) || !Number.isFinite(number)) {
+        return { base: 0, pow10: 0 };
+    }
+
     let decimal = new Decimal(number);
 
     // Special case for 0

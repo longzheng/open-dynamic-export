@@ -12,11 +12,11 @@ export type DERList = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerListXml(xml: any): DERList {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const list = parseListXmlObject(xml['DERList']);
     const pollRate = parsePollRateXmlObject(xml['DERList']);
     const derArray = assertArray(xml['DERList']['DER']);
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     const ders = derArray.map((derXmlObject) =>
         parseDerXmlObject(derXmlObject),

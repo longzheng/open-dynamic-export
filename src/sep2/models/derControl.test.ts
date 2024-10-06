@@ -9,7 +9,6 @@ it('should parse DER Control XML', async () => {
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlXmlObject =
@@ -65,7 +64,6 @@ it('should parse DER Control XML with randomization', async () => {
     </DERControlBase>
 </DERControl>`,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlXmlObject =

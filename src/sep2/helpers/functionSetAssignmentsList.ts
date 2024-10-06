@@ -58,6 +58,10 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
                                 functionSetAssignments.mRID,
                             );
 
+                        if (!functionSetAssignments.derProgramListLink) {
+                            return;
+                        }
+
                         // update
                         if (existingFunctionSetAssignments) {
                             existingFunctionSetAssignments.functionSetAssignments =

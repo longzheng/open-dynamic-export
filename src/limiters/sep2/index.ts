@@ -3,25 +3,27 @@ import type {
     InverterControlLimit,
     SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController.js';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
+import type { RampRateHelper } from '../../sep2/helpers/rampRate.js';
 import type { SEP2Client } from '../../sep2/client.js';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
-import EventEmitter from 'events';
-import type { LimiterType } from '../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../limiter.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
+import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
+import {
+    cacheFallbackControl,
+    getCachedFallbackControl,
+    type FallbackControl,
+} from '../../sep2/helpers/fallbackControl.js';
 
-export class Sep2Limiter
-    extends EventEmitter<{
-        changed: [];
-    }>
-    implements LimiterType
-{
+export class Sep2Limiter implements LimiterType {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
     };
+    private opModExpLimWRampRateHelper: ControlLimitRampHelper;
+    private opModGenLimWRampRateHelper: ControlLimitRampHelper;
     private logger: Logger;
 
     constructor({
@@ -31,32 +33,40 @@ export class Sep2Limiter
         client: SEP2Client;
         rampRateHelper: RampRateHelper;
     }) {
-        super();
-
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.schedulerByControlType = {
             opModExpLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModExpLimW',
-                rampRateHelper,
             }),
             opModEnergize: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModEnergize',
-                rampRateHelper,
             }),
             opModConnect: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModConnect',
-                rampRateHelper,
             }),
             opModGenLimW: new ControlSchedulerHelper({
                 client,
                 controlType: 'opModGenLimW',
-                rampRateHelper,
             }),
         };
+
+        const cachedFallbackControl = getCachedFallbackControl();
+
+        if (cachedFallbackControl) {
+            this.updateFallbackControl(cachedFallbackControl);
+        }
+
+        this.opModExpLimWRampRateHelper = new ControlLimitRampHelper({
+            rampRateHelper,
+        });
+
+        this.opModGenLimWRampRateHelper = new ControlLimitRampHelper({
+            rampRateHelper,
+        });
     }
 
     updateSep2ControlsData(data: DerControlsHelperChangedData) {
@@ -64,30 +74,80 @@ export class Sep2Limiter
             scheduler.updateControlsData(data);
         }
 
-        this.emit('changed');
+        cacheFallbackControl(data.fallbackControl);
     }
 
     getInverterControlLimit(): InverterControlLimit {
         const opModExpLimW =
             this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue();
+
+        this.opModExpLimWRampRateHelper.updateTarget(
+            (() => {
+                switch (opModExpLimW.type) {
+                    case 'active':
+                    case 'default': {
+                        return {
+                            type: opModExpLimW.type,
+                            value: opModExpLimW.control
+                                ? numberWithPow10(
+                                      opModExpLimW.control.value,
+                                      opModExpLimW.control.multiplier,
+                                  )
+                                : undefined,
+                            rampTimeSeconds: opModExpLimW.rampTms,
+                        };
+                    }
+                    case 'none':
+                        return { type: 'none' };
+                }
+            })(),
+        );
+
         const opModGenLimW =
             this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue();
 
-        const limit = {
-            opModExpLimW: opModExpLimW
-                ? numberWithPow10(opModExpLimW.value, opModExpLimW.multiplier)
-                : undefined,
-            opModGenLimW: opModGenLimW
-                ? numberWithPow10(opModGenLimW.value, opModGenLimW.multiplier)
-                : undefined,
+        this.opModGenLimWRampRateHelper.updateTarget(
+            (() => {
+                switch (opModGenLimW.type) {
+                    case 'active':
+                    case 'default': {
+                        return {
+                            type: opModGenLimW.type,
+                            value: opModGenLimW.control
+                                ? numberWithPow10(
+                                      opModGenLimW.control.value,
+                                      opModGenLimW.control.multiplier,
+                                  )
+                                : undefined,
+                            rampTimeSeconds: opModGenLimW.rampTms,
+                        };
+                    }
+                    case 'none':
+                        return { type: 'none' };
+                }
+            })(),
+        );
+
+        const limit: InverterControlLimit = {
+            source: 'sep2',
+            opModExpLimW: this.opModExpLimWRampRateHelper.getRampedValue(),
+            opModGenLimW: this.opModGenLimWRampRateHelper.getRampedValue(),
             opModEnergize:
-                this.schedulerByControlType.opModEnergize.getActiveScheduleDerControlBaseValue(),
+                this.schedulerByControlType.opModEnergize.getActiveScheduleDerControlBaseValue()
+                    .control,
             opModConnect:
-                this.schedulerByControlType.opModConnect.getActiveScheduleDerControlBaseValue(),
+                this.schedulerByControlType.opModConnect.getActiveScheduleDerControlBaseValue()
+                    .control,
         };
 
-        writeControlLimit({ limit, name: 'sep2' });
+        writeControlLimit({ limit });
 
         return limit;
+    }
+
+    private updateFallbackControl(fallbackControl: FallbackControl) {
+        for (const scheduler of Object.values(this.schedulerByControlType)) {
+            scheduler.updateFallbackControl(fallbackControl);
+        }
     }
 }

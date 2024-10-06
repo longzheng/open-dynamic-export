@@ -57,11 +57,12 @@ describe('AmberLimiter', () => {
         const result = amberControlLimit.getInverterControlLimit();
 
         expect(result).toEqual({
+            source: 'negativeFeedIn',
             opModConnect: undefined,
             opModEnergize: undefined,
             opModExpLimW: 0,
             opModGenLimW: undefined,
-        });
+        } satisfies typeof result);
     });
 
     it('should return no control limit when feed-in earns money', async () => {
@@ -73,10 +74,11 @@ describe('AmberLimiter', () => {
         const result = amberControlLimit.getInverterControlLimit();
 
         expect(result).toEqual({
+            source: 'negativeFeedIn',
             opModConnect: undefined,
             opModEnergize: undefined,
             opModExpLimW: undefined,
             opModGenLimW: undefined,
-        });
+        } satisfies typeof result);
     });
 });

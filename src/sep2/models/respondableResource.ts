@@ -12,7 +12,7 @@ export function parseRespondableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): RespondableResource {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const resource = parseResourceXmlObject(xmlObject);
     const replyToHref = xmlObject['$']['replyTo']
         ? assertString(xmlObject['$']['replyTo'])
@@ -20,7 +20,7 @@ export function parseRespondableResourceXmlObject(
     const responseRequired = stringHexToEnumType<ResponseRequiredType>(
         assertString(xmlObject['$']['responseRequired']),
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...resource,

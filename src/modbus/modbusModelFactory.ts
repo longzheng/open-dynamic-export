@@ -3,6 +3,7 @@ import type {
     ModelAddress,
     SunSpecConnection,
 } from '../sunspec/connection/base.js';
+import { writeLatency } from '../helpers/influxdb.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +46,7 @@ export function modbusModelFactory<
                 type: 'read',
             });
 
-            logger.trace({ address }, 'Reading model');
+            const start = performance.now();
 
             await modbusConnection.connect();
 
@@ -55,7 +56,24 @@ export function modbusModelFactory<
                     address.length,
                 );
 
-            logger.trace({ registers: registers.data }, 'Read registers');
+            const end = performance.now();
+            const duration = end - start;
+
+            writeLatency({
+                field: 'sunSpecModelFactory',
+                duration,
+                tags: {
+                    operation: 'read',
+                    model: config.name,
+                    addressStart: address.start.toString(),
+                    addressLength: address.length.toString(),
+                },
+            });
+
+            logger.trace(
+                { duration, registers: registers.data },
+                'Read registers',
+            );
 
             return convertReadRegisters({
                 registers: registers.data,
@@ -69,7 +87,7 @@ export function modbusModelFactory<
                 type: 'write',
             });
 
-            logger.trace({ address, values }, 'Writing model');
+            const start = performance.now();
 
             await modbusConnection.connect();
 
@@ -79,41 +97,26 @@ export function modbusModelFactory<
                 length: address.length,
             });
 
-            logger.trace({ registerValues }, 'Converted write registers');
-
             await modbusConnection.client.writeRegisters(
                 address.start,
                 registerValues,
             );
 
-            logger.trace('Wrote registers, validating written registers');
+            const end = performance.now();
+            const duration = end - start;
 
-            const registers =
-                await modbusConnection.client.readHoldingRegisters(
-                    address.start,
-                    address.length,
-                );
-
-            // confirm the registers were written correctly
-            const writtenValues = convertReadRegisters({
-                registers: registers.data,
-                mapping: config.mapping,
+            writeLatency({
+                field: 'sunSpecModelFactory',
+                duration,
+                tags: {
+                    operation: 'write',
+                    model: config.name,
+                    addressStart: address.start.toString(),
+                    addressLength: address.length.toString(),
+                },
             });
 
-            objectEntriesWithType(values).forEach(([key, value]) => {
-                if (writtenValues[key] !== value) {
-                    logger.error(
-                        {
-                            key: key.toString(),
-                            value,
-                            read: writtenValues[key],
-                        },
-                        `Failed to write value for key`,
-                    );
-                }
-            });
-
-            logger.trace('Validated written registers');
+            logger.trace({ duration, registerValues }, 'Wrote registers');
         },
     };
 }

@@ -1,11 +1,7 @@
 import { assertNonNull } from '../../helpers/null.js';
 import {
-    averageNumbersArray,
-    averageNumbersNullableArray,
     numberNullableWithPow10,
     numberWithPow10,
-    sumNumbersArray,
-    sumNumbersNullableArray,
 } from '../../helpers/number.js';
 import type { InverterModel } from '../models/inverter.js';
 import { getSitePhasesFromInverter } from './sitePhases.js';
@@ -21,7 +17,7 @@ export function getInverterMetrics(inverter: InverterModel) {
         PPVphAB: numberNullableWithPow10(inverter.PPVphAB, inverter.V_SF),
         PPVphBC: numberNullableWithPow10(inverter.PPVphBC, inverter.V_SF),
         PPVphCA: numberNullableWithPow10(inverter.PPVphCA, inverter.V_SF),
-        PhVphA: numberNullableWithPow10(inverter.PhVphA, inverter.V_SF),
+        PhVphA: numberWithPow10(inverter.PhVphA, inverter.V_SF),
         PhVphB: numberNullableWithPow10(inverter.PhVphB, inverter.V_SF),
         PhVphC: numberNullableWithPow10(inverter.PhVphC, inverter.V_SF),
         W: numberWithPow10(inverter.W, inverter.W_SF),
@@ -124,170 +120,6 @@ export function getInverterMetrics(inverter: InverterModel) {
                 DCA: scaledValues.DCA,
                 DCV: scaledValues.DCV,
                 DCW: scaledValues.DCW,
-            };
-        }
-    }
-}
-
-export function getAggregatedInverterMetrics(
-    inverters: InverterModel[],
-): ReturnType<typeof getInverterMetrics> {
-    const metrics = inverters.map(getInverterMetrics);
-
-    const firstInverter = metrics.at(0);
-    if (!firstInverter) {
-        throw new Error('At least one inverter must be provided');
-    }
-
-    const phases = firstInverter.phases;
-
-    if (metrics.some((metric) => metric.phases !== phases)) {
-        throw new Error('Different phases detected across inverters');
-    }
-
-    switch (phases) {
-        case 'singlePhase': {
-            return {
-                phases,
-                A: sumNumbersArray(metrics.map((metric) => metric.A)),
-                AphA: sumNumbersArray(metrics.map((metric) => metric.AphA)),
-                AphB: null,
-                AphC: null,
-                PPVphAB: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PPVphAB),
-                ),
-                PPVphBC: null,
-                PPVphCA: null,
-                PhVphA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PhVphA),
-                ),
-                PhVphB: null,
-                PhVphC: null,
-                W: sumNumbersArray(metrics.map((metric) => metric.W)),
-                Hz: averageNumbersArray(metrics.map((metric) => metric.Hz)),
-                VA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.VA),
-                ),
-                VAr: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.VAr),
-                ),
-                PF: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PF),
-                ),
-                WH: sumNumbersArray(metrics.map((metric) => metric.WH)),
-                DCA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCA),
-                ),
-                DCV: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCV),
-                ),
-                DCW: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCW),
-                ),
-            };
-        }
-        case 'splitPhase': {
-            return {
-                phases,
-                A: sumNumbersArray(metrics.map((metric) => metric.A)),
-                AphA: sumNumbersArray(metrics.map((metric) => metric.AphA)),
-                AphB: assertNonNull(
-                    sumNumbersNullableArray(
-                        metrics.map((metric) => metric.AphB),
-                    ),
-                ),
-                AphC: null,
-                PPVphAB: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PPVphAB),
-                ),
-                PPVphBC: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PPVphBC),
-                ),
-                PPVphCA: null,
-                PhVphA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PhVphA),
-                ),
-                PhVphB: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PhVphB),
-                ),
-                PhVphC: null,
-                W: sumNumbersArray(metrics.map((metric) => metric.W)),
-                Hz: averageNumbersArray(metrics.map((metric) => metric.Hz)),
-                VA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.VA),
-                ),
-                VAr: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.VAr),
-                ),
-                PF: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PF),
-                ),
-                WH: sumNumbersArray(metrics.map((metric) => metric.WH)),
-                DCA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCA),
-                ),
-                DCV: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCV),
-                ),
-                DCW: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCW),
-                ),
-            };
-        }
-        case 'threePhase': {
-            return {
-                phases,
-                A: sumNumbersArray(metrics.map((metric) => metric.A)),
-                AphA: sumNumbersArray(metrics.map((metric) => metric.AphA)),
-                AphB: assertNonNull(
-                    sumNumbersNullableArray(
-                        metrics.map((metric) => metric.AphB),
-                    ),
-                ),
-                AphC: assertNonNull(
-                    sumNumbersNullableArray(
-                        metrics.map((metric) => metric.AphC),
-                    ),
-                ),
-                PPVphAB: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PPVphAB),
-                ),
-                PPVphBC: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PPVphBC),
-                ),
-                PPVphCA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PPVphCA),
-                ),
-                PhVphA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PhVphA),
-                ),
-                PhVphB: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PhVphB),
-                ),
-                PhVphC: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PhVphC),
-                ),
-                W: sumNumbersArray(metrics.map((metric) => metric.W)),
-                Hz: averageNumbersArray(metrics.map((metric) => metric.Hz)),
-                VA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.VA),
-                ),
-                VAr: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.VAr),
-                ),
-                PF: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.PF),
-                ),
-                WH: sumNumbersArray(metrics.map((metric) => metric.WH)),
-                DCA: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCA),
-                ),
-                DCV: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCV),
-                ),
-                DCW: averageNumbersNullableArray(
-                    metrics.map((metric) => metric.DCW),
-                ),
             };
         }
     }

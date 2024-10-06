@@ -1,31 +1,31 @@
 import mqtt from 'mqtt';
 import type { Config } from '../../helpers/config.js';
-import type { z } from 'zod';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import type { SiteSampleData } from '../siteSample.js';
+import type { SiteSample } from '../siteSample.js';
 import { siteSampleDataSchema } from '../siteSample.js';
+import type { Result } from '../../helpers/result.js';
 
 export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     private client: mqtt.MqttClient;
-    private cachedMessage: z.infer<typeof siteSampleDataSchema> | null = null;
+    private cachedMessage: SiteSample | null = null;
 
     constructor({
-        config,
+        mqttConfig,
     }: {
-        config: Extract<Config['meter'], { type: 'mqtt' }>;
+        mqttConfig: Extract<Config['meter'], { type: 'mqtt' }>;
     }) {
         super({
-            meterName: 'mqtt',
+            name: 'mqtt',
             pollingIntervalMs: 200,
         });
 
-        this.client = mqtt.connect(`mqtt://${config.host}`, {
-            username: config.username,
-            password: config.password,
+        this.client = mqtt.connect(`mqtt://${mqttConfig.host}`, {
+            username: mqttConfig.username,
+            password: mqttConfig.password,
         });
 
         this.client.on('connect', () => {
-            this.client.subscribe(config.topic);
+            this.client.subscribe(mqttConfig.topic);
         });
 
         this.client.on('message', (_topic, message) => {
@@ -38,14 +38,25 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
                 return;
             }
 
-            this.cachedMessage = result.data;
+            this.cachedMessage = { date: new Date(), ...result.data };
         });
 
         void this.startPolling();
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
-    override async getSiteSampleData(): Promise<SiteSampleData | null> {
-        return this.cachedMessage;
+    override async getSiteSample(): Promise<Result<SiteSample>> {
+        if (!this.cachedMessage) {
+            return {
+                success: false,
+                error: new Error('No site sample data on MQTT'),
+            };
+        }
+
+        return { success: true, value: this.cachedMessage };
+    }
+
+    override onDestroy() {
+        this.client.end();
     }
 }

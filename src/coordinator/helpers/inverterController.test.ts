@@ -1,38 +1,25 @@
 import { describe, expect, it } from 'vitest';
-import type { InverterControlLimit } from './inverterController.js';
 import {
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
-    getAggregatedInverterControlLimit,
+    getActiveInverterControlLimit,
     getWMaxLimPctFromTargetSolarPowerRatio,
 } from './inverterController.js';
 
 describe('calculateTargetSolarPowerRatio', () => {
-    it('should calculate higher target ratio', () => {
+    it('should calculate target ratio', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 5000,
-            currentPowerRatio: 0.4,
-            targetSolarWatts: 10000,
+            nameplateMaxW: 10000,
+            targetSolarWatts: 5000,
         });
 
-        expect(targetPowerRatio).toBe(0.8);
-    });
-
-    it('should calculate lower target ratio', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 5000,
-            currentPowerRatio: 0.4,
-            targetSolarWatts: 4000,
-        });
-
-        expect(targetPowerRatio).toBe(0.32);
+        expect(targetPowerRatio).toBe(0.5);
     });
 
     it('should cap target power ratio above 1.0 to 1.0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 5000,
-            currentPowerRatio: 0.5,
-            targetSolarWatts: 20000,
+            nameplateMaxW: 10000,
+            targetSolarWatts: 15000,
         });
 
         expect(targetPowerRatio).toBe(1);
@@ -40,38 +27,7 @@ describe('calculateTargetSolarPowerRatio', () => {
 
     it('should not return target power ratio lower than 0.0', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 10,
-            currentPowerRatio: 0,
-            targetSolarWatts: 0,
-        });
-
-        expect(targetPowerRatio).toBe(0);
-    });
-
-    it('should return a hard-coded power ratio of 0.01 if current power ratio is 0 and target is greater', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 70.52,
-            currentPowerRatio: 0,
-            targetSolarWatts: 9000,
-        });
-
-        expect(targetPowerRatio).toBe(0.01);
-    });
-
-    it('should return a hard-coded power ratio of 0.01 if current power ratio is NaN and target is greater', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 70.52,
-            currentPowerRatio: Number.NaN,
-            targetSolarWatts: 9000,
-        });
-
-        expect(targetPowerRatio).toBe(0.01);
-    });
-
-    it('should return a hard-coded power ratio of 0 if current power ratio is 0 and target is lower', () => {
-        const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 70.52,
-            currentPowerRatio: 0,
+            nameplateMaxW: 10000,
             targetSolarWatts: 0,
         });
 
@@ -81,12 +37,29 @@ describe('calculateTargetSolarPowerRatio', () => {
     it('avoid floating point errors', () => {
         // these values don't make sense practically but is designed to test floating point errors
         const targetPowerRatio = calculateTargetSolarPowerRatio({
-            currentSolarWatts: 3,
-            currentPowerRatio: 1,
+            nameplateMaxW: 3,
             targetSolarWatts: 0.27,
         });
 
         expect(targetPowerRatio).toBe(0.09);
+    });
+
+    it('should handle nameplate as 0', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            nameplateMaxW: 0,
+            targetSolarWatts: 0,
+        });
+
+        expect(targetPowerRatio).toBe(0);
+    });
+
+    it('should handle no inverters', () => {
+        const targetPowerRatio = calculateTargetSolarPowerRatio({
+            nameplateMaxW: 0,
+            targetSolarWatts: 0,
+        });
+
+        expect(targetPowerRatio).toBe(0);
     });
 });
 
@@ -168,22 +141,25 @@ describe('getWMaxLimPctFromTargetSolarPowerRatio', () => {
     });
 });
 
-describe('getAggregatedInverterControlLimit', () => {
+describe('getActiveInverterControlLimit', () => {
     it('should return the minimum of all limits', () => {
-        const inverterControlLimit = getAggregatedInverterControlLimit([
+        const inverterControlLimit = getActiveInverterControlLimit([
             {
+                source: 'fixed',
                 opModConnect: undefined,
                 opModEnergize: undefined,
                 opModExpLimW: undefined,
                 opModGenLimW: 20000,
             },
             {
+                source: 'mqtt',
                 opModConnect: false,
                 opModEnergize: true,
                 opModExpLimW: 5000,
                 opModGenLimW: 5000,
             },
             {
+                source: 'sep2',
                 opModConnect: true,
                 opModEnergize: false,
                 opModExpLimW: 2000,
@@ -192,22 +168,36 @@ describe('getAggregatedInverterControlLimit', () => {
         ]);
 
         expect(inverterControlLimit).toEqual({
-            opModConnect: false,
-            opModEnergize: false,
-            opModExpLimW: 2000,
-            opModGenLimW: 5000,
-        } satisfies InverterControlLimit);
+            opModConnect: {
+                source: 'mqtt',
+                value: false,
+            },
+            opModEnergize: {
+                source: 'sep2',
+                value: false,
+            },
+            opModExpLimW: {
+                source: 'sep2',
+                value: 2000,
+            },
+            opModGenLimW: {
+                source: 'mqtt',
+                value: 5000,
+            },
+        } satisfies typeof inverterControlLimit);
     });
 
     it('should return undefined if all limits are undefined', () => {
-        const inverterControlLimit = getAggregatedInverterControlLimit([
+        const inverterControlLimit = getActiveInverterControlLimit([
             {
+                source: 'fixed',
                 opModConnect: undefined,
                 opModEnergize: undefined,
                 opModExpLimW: undefined,
                 opModGenLimW: undefined,
             },
             {
+                source: 'mqtt',
                 opModConnect: undefined,
                 opModEnergize: undefined,
                 opModExpLimW: 1000,
@@ -218,8 +208,11 @@ describe('getAggregatedInverterControlLimit', () => {
         expect(inverterControlLimit).toEqual({
             opModConnect: undefined,
             opModEnergize: undefined,
-            opModExpLimW: 1000,
+            opModExpLimW: {
+                source: 'mqtt',
+                value: 1000,
+            },
             opModGenLimW: undefined,
-        } satisfies InverterControlLimit);
+        } satisfies typeof inverterControlLimit);
     });
 });

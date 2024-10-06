@@ -42,5 +42,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Run the application as a non-root user.
 USER node
 
+EXPOSE 3000
+
 # Run the application.
 CMD ["npm", "start"]

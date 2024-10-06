@@ -21,20 +21,20 @@ export type DERProgram = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
     const defaultDerControlLink = xmlObject['DefaultDERControlLink']
         ? parseLinkXmlObject(xmlObject['DefaultDERControlLink'][0])
         : undefined;
-    const derControlListLink = parseListLinkXmlObject(
-        xmlObject['DERControlListLink'][0],
-    );
-    const derCurveListLink = parseListLinkXmlObject(
-        xmlObject['DERCurveListLink'][0],
-    );
+    const derControlListLink = xmlObject['DERControlListLink']
+        ? parseListLinkXmlObject(xmlObject['DERControlListLink'][0])
+        : undefined;
+    const derCurveListLink = xmlObject['DERCurveListLink']
+        ? parseListLinkXmlObject(xmlObject['DERCurveListLink'][0])
+        : undefined;
     const primacy = safeParseIntString(assertString(xmlObject['primacy'][0]));
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

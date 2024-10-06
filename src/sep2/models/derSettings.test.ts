@@ -2,6 +2,7 @@ import { it, expect } from 'vitest';
 import { objectToXml } from '../helpers/xml.js';
 import { DERControlType } from './derControlType.js';
 import { generateDerSettingsResponse } from './derSettings.js';
+import { DOEControlType } from './doeModesSupportedType.js';
 
 it('should generate DERSettings XML', () => {
     const response = generateDerSettingsResponse({
@@ -11,6 +12,11 @@ it('should generate DERSettings XML', () => {
             DERControlType.opModFixedW |
             DERControlType.opModMaxLimW |
             DERControlType.opModTargetW,
+        doeModesEnabled:
+            DOEControlType.opModExpLimW |
+            DOEControlType.opModGenLimW |
+            DOEControlType.opModImpLimW |
+            DOEControlType.opModLoadLimW,
         setGradW: 1,
         setMaxVA: {
             multiplier: 3,
@@ -29,9 +35,10 @@ it('should generate DERSettings XML', () => {
     const xml = objectToXml(response);
 
     expect(xml).toBe(`<?xml version="1.0"?>
-<DERSettings xmlns="urn:ieee:std:2030.5:ns">
+<DERSettings xmlns="urn:ieee:std:2030.5:ns" xmlns:csipaus="https://csipaus.org/ns">
     <updatedTime>1682475029</updatedTime>
     <modesEnabled>00500088</modesEnabled>
+    <csipaus:doeModesEnabled>0000000F</csipaus:doeModesEnabled>
     <setGradW>1</setGradW>
     <setMaxW>
         <multiplier>3</multiplier>

@@ -10,51 +10,166 @@ import {
 } from '../helpers/converters.js';
 import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Status
+ *
+ * Inverter Controls Extended Measurements and Status
+ */
 export type StatusModel = {
-    // Model identifier
+    /**
+     * Model ID
+     *
+     * Model identifier
+     */
     ID: 122;
-    // Model length
+
+    /**
+     * Model Length
+     *
+     * Model length
+     */
     L: number;
-    // PV inverter present/available status. Enumerated value.
+
+    /**
+     * PVConn
+     *
+     * PV inverter present/available status. Enumerated value.
+     */
     PVConn: PVConn;
-    // Storage inverter present/available status. Enumerated value.
+
+    /**
+     * StorConn
+     *
+     * Storage inverter present/available status. Enumerated value.
+     */
     StorConn: StorConn;
-    // ECP connection status: disconnected=0 connected=1.
+
+    /**
+     * ECPConn
+     *
+     * ECP connection status: disconnected=0 connected=1.
+     */
     ECPConn: ECPConn;
-    // AC lifetime active (real) energy output.
+
+    /**
+     * ActWh
+     *
+     * AC lifetime active (real) energy output.
+     */
     ActWh: bigint;
-    // AC lifetime apparent energy output.
+
+    /**
+     * ActVAh
+     *
+     * AC lifetime apparent energy output.
+     */
     ActVAh: bigint;
-    // AC lifetime reactive energy output in quadrant 1.
+
+    /**
+     * ActVArhQ1
+     *
+     * AC lifetime reactive energy output in quadrant 1.
+     */
     ActVArhQ1: bigint;
-    // AC lifetime reactive energy output in quadrant 2.
+
+    /**
+     * ActVArhQ2
+     *
+     * AC lifetime reactive energy output in quadrant 2.
+     */
     ActVArhQ2: bigint;
-    // AC lifetime negative energy output in quadrant 3.
+
+    /**
+     * ActVArhQ3
+     *
+     * AC lifetime negative energy output in quadrant 3.
+     */
     ActVArhQ3: bigint;
-    // AC lifetime reactive energy output in quadrant 4.
+
+    /**
+     * ActVArhQ4
+     *
+     * AC lifetime reactive energy output in quadrant 4.
+     */
     ActVArhQ4: bigint;
-    // Amount of VARs available without impacting watts output.
+
+    /**
+     * VArAval
+     *
+     * Amount of VARs available without impacting watts output.
+     */
     VArAval: number | null;
-    // Scale factor for available VARs.
+
+    /**
+     * VArAval_SF
+     *
+     * Scale factor for available VARs.
+     */
     VArAval_SF: number | null;
-    // Amount of Watts available.
+
+    /**
+     * WAval
+     *
+     * Amount of Watts available.
+     */
     WAval: number | null;
-    // Scale factor for available Watts.
+
+    /**
+     * WAval_SF
+     *
+     * Scale factor for available Watts.
+     */
     WAval_SF: number | null;
-    // Bit Mask indicating setpoint limit(s) reached.
+
+    /**
+     * StSetLimMsk
+     *
+     * Bit Mask indicating setpoint limit(s) reached.
+     */
     StSetLimMsk: StSetLimMsk | null;
-    // Bit Mask indicating which inverter controls are currently active.
+
+    /**
+     * StActCtl
+     *
+     * Bit Mask indicating which inverter controls are currently active.
+     */
     StActCtl: StActCtl | null;
-    // Source of time synchronization.
+
+    /**
+     * TmSrc
+     *
+     * Source of time synchronization.
+     */
     TmSrc: string | null;
-    // Seconds since 01-01-2000 00:00 UTC
+
+    /**
+     * Tms
+     *
+     * Seconds since 01-01-2000 00:00 UTC.
+     */
     Tms: number | null;
-    // Bit Mask indicating active ride-through status.
+
+    /**
+     * RtSt
+     *
+     * Bit Mask indicating active ride-through status.
+     */
     RtSt: RtSt | null;
-    // Isolation resistance.
+
+    /**
+     * Ris
+     *
+     * Isolation resistance.
+     */
     Ris: number | null;
-    // Scale factor for isolation resistance.
+
+    /**
+     * Ris_SF
+     *
+     * Scale factor for isolation resistance.
+     */
     Ris_SF: number | null;
 };
 
@@ -174,6 +289,11 @@ export const statusModel = modbusModelFactory<StatusModel>({
     },
 });
 
+/**
+ * PVConn Enumeration
+ *
+ * Bitmask values representing PV inverter present/available status.
+ */
 export enum PVConn {
     CONNECTED = 1 << 0,
     AVAILABLE = 1 << 1,
@@ -181,6 +301,11 @@ export enum PVConn {
     TEST = 1 << 3,
 }
 
+/**
+ * StorConn Enumeration
+ *
+ * Bitmask values representing Storage inverter present/available status.
+ */
 export enum StorConn {
     CONNECTED = 1 << 0,
     AVAILABLE = 1 << 1,
@@ -188,10 +313,21 @@ export enum StorConn {
     TEST = 1 << 3,
 }
 
+/**
+ * ECPConn Enumeration
+ *
+ * Enumerated values representing ECP connection status.
+ */
 export enum ECPConn {
+    DISCONNECTED = 0,
     CONNECTED = 1 << 0,
 }
 
+/**
+ * StSetLimMsk Enumeration
+ *
+ * Bitmask values indicating setpoint limits reached.
+ */
 export enum StSetLimMsk {
     WMax = 1 << 0,
     VAMax = 1 << 1,
@@ -206,6 +342,11 @@ export enum StSetLimMsk {
     PFMinQ4 = 1 << 10,
 }
 
+/**
+ * StActCtl Enumeration
+ *
+ * Bitmask values indicating which inverter controls are currently active.
+ */
 export enum StActCtl {
     FixedW = 1 << 0,
     FixedVAR = 1 << 1,
@@ -223,6 +364,11 @@ export enum StActCtl {
     HFRT = 1 << 14,
 }
 
+/**
+ * RtSt Enumeration
+ *
+ * Bitmask values indicating active ride-through status.
+ */
 export enum RtSt {
     LVRT_ACTIVE = 1 << 0,
     HVRT_ACTIVE = 1 << 1,

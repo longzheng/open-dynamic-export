@@ -31,7 +31,7 @@ export type PerPhaseNetMeasurement = z.infer<
 
 export const noPhaseMeasurementSchema = z.object({
     type: z.literal('noPhase'),
-    value: z.number(),
+    net: z.number(),
 });
 
 export type NoPhaseMeasurement = z.infer<typeof noPhaseMeasurementSchema>;
@@ -74,17 +74,6 @@ export function assertPerPhaseNetOrNoPhaseMeasurementArray(
                 measurements: measurements.filter((m) => m.type === 'noPhase'),
             };
         }
-    }
-}
-
-export function getTotalFromPerPhaseNetOrNoPhaseMeasurement(
-    measurement: PerPhaseNetMeasurement | NoPhaseMeasurement,
-) {
-    switch (measurement.type) {
-        case 'noPhase':
-            return measurement.value;
-        case 'perPhaseNet':
-            return measurement.net;
     }
 }
 
@@ -202,20 +191,20 @@ export function getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(
 ): AvgMaxMin<PerPhaseNetMeasurement | NoPhaseMeasurement> {
     switch (array.type) {
         case 'noPhase': {
-            const values = array.measurements.map((m) => m.value);
+            const values = array.measurements.map((m) => m.net);
 
             return {
                 average: {
                     type: 'noPhase',
-                    value: averageNumbersArray(values),
+                    net: averageNumbersArray(values),
                 },
                 maximum: {
                     type: 'noPhase',
-                    value: Math.max(...values),
+                    net: Math.max(...values),
                 },
                 minimum: {
                     type: 'noPhase',
-                    value: Math.min(...values),
+                    net: Math.min(...values),
                 },
             };
         }

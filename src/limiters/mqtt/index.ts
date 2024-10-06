@@ -1,6 +1,6 @@
 import mqtt from 'mqtt';
 import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../limiter.js';
 import type { Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { z } from 'zod';
@@ -41,14 +41,15 @@ export class MqttLimiter implements LimiterType {
     }
 
     getInverterControlLimit(): InverterControlLimit {
-        const limit = {
+        const limit: InverterControlLimit = {
+            source: 'mqtt',
             opModConnect: this.cachedMessage?.opModConnect,
             opModEnergize: this.cachedMessage?.opModEnergize,
             opModExpLimW: this.cachedMessage?.opModExpLimW,
             opModGenLimW: this.cachedMessage?.opModGenLimW,
         };
 
-        writeControlLimit({ limit, name: 'mqtt' });
+        writeControlLimit({ limit });
 
         return limit;
     }

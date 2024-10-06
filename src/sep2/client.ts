@@ -1,5 +1,5 @@
-import type { AxiosInstance, AxiosResponse } from 'axios';
-import axios, { AxiosError } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
 import {
@@ -10,19 +10,19 @@ import {
 import type { Config } from '../helpers/config.js';
 import type { RoleFlagsType } from './models/roleFlagsType.js';
 import { numberToHex } from '../helpers/number.js';
-import { randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
 import axiosRetry from 'axios-retry';
 
 const USER_AGENT = 'open-dynamic-export';
 
 export class SEP2Client {
-    private host: string;
-    private dcapUri: string;
-    private pen: string;
-    public lfdi: string;
-    public sfdi: string;
-    private axiosInstance: AxiosInstance;
+    private readonly host: string;
+    private readonly dcapUri: string;
+    public readonly pen: string;
+    public readonly lfdi: string;
+    public readonly sfdi: string;
+    private readonly axiosInstance: AxiosInstance;
 
     constructor({
         sep2Config,
@@ -74,82 +74,34 @@ export class SEP2Client {
         this.axiosInstance = axiosClient;
     }
 
-    async get(
-        link: string,
-        params?: Record<string, string>,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): Promise<any> {
-        try {
-            const url = `${this.host}${link}`;
-            const response = await this.axiosInstance.get<string>(url, {
-                params,
-            });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await parseStringPromise(response.data);
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                throw new Error(
-                    `SEP2Client GET error
-message: ${error.message}
-url: ${error.config?.url}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
-            }
+    async get(link: string, params?: Record<string, string>): Promise<unknown> {
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.get<string>(url, {
+            params,
+        });
 
-            throw error;
-        }
+        return await parseStringPromise(response.data);
     }
 
-    async post(
+    async post<T>(
         link: string,
-        data: unknown,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data: T,
+        options?: AxiosRequestConfig<T>,
     ): Promise<AxiosResponse> {
-        try {
-            const url = `${this.host}${link}`;
-            const response = await this.axiosInstance.post<string>(url, data);
-            return response;
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                throw new Error(
-                    `SEP2Client POST error
-message: ${error.message}
-url: ${error.config?.url}
-request data: ${JSON.stringify(data, null, 2)}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
-            }
-
-            throw error;
-        }
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.post(url, data, options);
+        return response;
     }
 
-    async put(
+    async put<T>(
         link: string,
-        data: unknown,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data: T,
+        options?: AxiosRequestConfig<T>,
     ): Promise<AxiosResponse> {
-        try {
-            const url = `${this.host}${link}`;
-            const response = await this.axiosInstance.put<string>(url, data);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return response;
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                throw new Error(
-                    `SEP2Client PUT error
-message: ${error.message}
-url: ${error.config?.url}
-request data: ${JSON.stringify(data, null, 2)}
-response status: ${error.response?.status}
-response data: ${JSON.stringify(error.response?.data, null, 2)}`,
-                );
-            }
+        const url = `${this.host}${link}`;
+        const response = await this.axiosInstance.put(url, data, options);
 
-            throw error;
-        }
+        return response;
     }
 
     public discover() {
@@ -167,8 +119,15 @@ response data: ${JSON.stringify(error.response?.data, null, 2)}`,
 
     // From the SEP2 Client Handbook
     // The mRID of each MeterReading needs to be unique for that EndDevice
-    generateMeterReadingMrid() {
-        return `${randomUUID().replace(/-/g, '').substring(0, 24)}${this.pen}`;
+    // hash the description to generate a consistent mRID for the "type" of MeterReadingMrid
+    generateMeterReadingMrid({
+        description,
+        roleFlags,
+    }: {
+        description: string;
+        roleFlags: RoleFlagsType;
+    }) {
+        return `${createHash('sha256').update(description).digest('hex').substring(0, 22).toUpperCase()}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
     }
 }
 

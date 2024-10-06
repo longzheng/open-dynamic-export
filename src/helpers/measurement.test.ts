@@ -10,7 +10,6 @@ import {
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurementsNullable,
     getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements,
-    getTotalFromPerPhaseNetOrNoPhaseMeasurement,
 } from './measurement.js';
 
 describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
@@ -43,8 +42,8 @@ describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
 
     it('should return noPhase when only noPhase measurements are present', () => {
         const noPhaseMeasurements: NoPhaseMeasurement[] = [
-            { type: 'noPhase', value: 100 },
-            { type: 'noPhase', value: 200 },
+            { type: 'noPhase', net: 100 },
+            { type: 'noPhase', net: 200 },
         ];
 
         const result =
@@ -67,7 +66,7 @@ describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
                 phaseC: 30,
                 net: 60,
             },
-            { type: 'noPhase', value: 100 },
+            { type: 'noPhase', net: 100 },
             {
                 type: 'perPhaseNet',
                 phaseA: 40,
@@ -112,65 +111,24 @@ describe('assertPerPhaseOrNoPhaseMeasurementArray', () => {
     });
 });
 
-describe('getTotalFromPerPhaseOrNoPhaseMeasurement', () => {
-    it('should return the value from noPhase measurement', () => {
-        const noPhaseMeasurement: NoPhaseMeasurement = {
-            type: 'noPhase',
-            value: 100,
-        };
-
-        const result =
-            getTotalFromPerPhaseNetOrNoPhaseMeasurement(noPhaseMeasurement);
-        expect(result).toBe(100);
-    });
-
-    it('should return the sum of phaseA, phaseB, and phaseC when all phases are present in perPhase measurement', () => {
-        const perPhaseMeasurement: PerPhaseNetMeasurement = {
-            type: 'perPhaseNet',
-            phaseA: 10,
-            phaseB: 20,
-            phaseC: 30,
-            net: 60,
-        };
-
-        const result =
-            getTotalFromPerPhaseNetOrNoPhaseMeasurement(perPhaseMeasurement);
-        expect(result).toBe(10 + 20 + 30);
-    });
-
-    it('should return the sum of phases with null in perPhase measurement', () => {
-        const perPhaseMeasurement: PerPhaseNetMeasurement = {
-            type: 'perPhaseNet',
-            phaseA: 10,
-            phaseB: 20,
-            phaseC: null,
-            net: 30,
-        };
-
-        const result =
-            getTotalFromPerPhaseNetOrNoPhaseMeasurement(perPhaseMeasurement);
-        expect(result).toBe(10 + 20 + 0);
-    });
-});
-
 describe('getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements', () => {
     it('should return correct average, maximum, and minimum for noPhase measurements', () => {
         const noPhaseMeasurements: AssertedPerPhaseNetOrNoPhaseMeasurementArray =
             {
                 type: 'noPhase',
                 measurements: [
-                    { type: 'noPhase', value: 100 },
-                    { type: 'noPhase', value: 200 },
-                    { type: 'noPhase', value: 300 },
+                    { type: 'noPhase', net: 100 },
+                    { type: 'noPhase', net: 200 },
+                    { type: 'noPhase', net: 300 },
                 ],
             };
 
         const result =
             getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements(noPhaseMeasurements);
         expect(result).toEqual({
-            average: { type: 'noPhase', value: 200 }, // (100 + 200 + 300) / 3 = 200
-            maximum: { type: 'noPhase', value: 300 },
-            minimum: { type: 'noPhase', value: 100 },
+            average: { type: 'noPhase', net: 200 }, // (100 + 200 + 300) / 3 = 200
+            maximum: { type: 'noPhase', net: 300 },
+            minimum: { type: 'noPhase', net: 100 },
         });
     });
 
@@ -271,22 +229,22 @@ describe('getAvgMaxMinOfPerPhaseOrNoPhaseMeasurements', () => {
             average: {
                 type: 'perPhaseNet',
                 phaseA: 40, // (10 + 40 + 70) / 3 = 40
-                phaseB: null,
-                phaseC: null,
+                phaseB: 50,
+                phaseC: 45,
                 net: (60 + 100 + 150) / 3, // (60 + 100 + 150) / 3 = 103.33333333333333
             },
             maximum: {
                 type: 'perPhaseNet',
                 phaseA: 70,
-                phaseB: null,
-                phaseC: null,
+                phaseB: 80,
+                phaseC: 60,
                 net: 150,
             },
             minimum: {
                 type: 'perPhaseNet',
                 phaseA: 10,
-                phaseB: null,
-                phaseC: null,
+                phaseB: 20,
+                phaseC: 30,
                 net: 60,
             },
         } satisfies ReturnType<

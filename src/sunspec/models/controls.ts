@@ -13,59 +13,194 @@ import {
 } from '../helpers/converters.js';
 import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Controls
+ *
+ * Immediate Inverter Controls
+ */
 export type ControlsModel = {
-    // Model identifier
+    /**
+     * Model ID
+     *
+     * Model identifier.
+     */
     ID: 123;
-    // Model length
+
+    /**
+     * Model Length
+     *
+     * Model length.
+     */
     L: number;
-    // Time window for connect/disconnect
+
+    /**
+     * Conn_WinTms
+     *
+     * Time window for connect/disconnect.
+     */
     Conn_WinTms: number | null;
-    // Timeout period for connect/disconnect
+
+    /**
+     * Conn_RvrtTms
+     *
+     * Timeout period for connect/disconnect.
+     */
     Conn_RvrtTms: number | null;
-    // Enumerated valued. Connection control
+
+    /**
+     * Conn
+     *
+     * Enumerated valued. Connection control.
+     */
     Conn: Conn;
-    // Set power output to specified level
+
+    /**
+     * WMaxLimPct
+     *
+     * Set power output to specified level.
+     */
     WMaxLimPct: number;
-    // Time window for power limit change
+
+    /**
+     * WMaxLimPct_WinTms
+     *
+     * Time window for power limit change.
+     */
     WMaxLimPct_WinTms: number | null;
-    // Timeout period for power limit
+
+    /**
+     * WMaxLimPct_RvrtTms
+     *
+     * Timeout period for power limit.
+     */
     WMaxLimPct_RvrtTms: number | null;
-    // Ramp time for moving from current setpoint to new setpoint
+
+    /**
+     * WMaxLimPct_RmpTms
+     *
+     * Ramp time for moving from current setpoint to new setpoint.
+     */
     WMaxLimPct_RmpTms: number | null;
-    // Enumerated valued. Throttle enable/disable control
+
+    /**
+     * WMaxLim_Ena
+     *
+     * Enumerated valued. Throttle enable/disable control.
+     */
     WMaxLim_Ena: WMaxLim_Ena;
-    // Set power factor to specific value - cosine of angle
+
+    /**
+     * OutPFSet
+     *
+     * Set power factor to specific value - cosine of angle.
+     */
     OutPFSet: number;
-    // Time window for power factor change
+
+    /**
+     * OutPFSet_WinTms
+     *
+     * Time window for power factor change.
+     */
     OutPFSet_WinTms: number | null;
-    // Timeout period for power factor
+
+    /**
+     * OutPFSet_RvrtTms
+     *
+     * Timeout period for power factor.
+     */
     OutPFSet_RvrtTms: number | null;
-    // Ramp time for moving from current setpoint to new setpoint
+
+    /**
+     * OutPFSet_RmpTms
+     *
+     * Ramp time for moving from current setpoint to new setpoint.
+     */
     OutPFSet_RmpTms: number | null;
-    // Enumerated valued. Fixed power factor enable/disable control
+
+    /**
+     * OutPFSet_Ena
+     *
+     * Enumerated valued. Fixed power factor enable/disable control.
+     */
     OutPFSet_Ena: OutPFSet_Ena;
-    // Reactive power in percent of WMax
+
+    /**
+     * VArWMaxPct
+     *
+     * Reactive power in percent of WMax.
+     */
     VArWMaxPct: number | null;
-    // Reactive power in percent of VArMax
+
+    /**
+     * VArMaxPct
+     *
+     * Reactive power in percent of VArMax.
+     */
     VArMaxPct: number | null;
-    // Reactive power in percent of VArAval
+
+    /**
+     * VArAvalPct
+     *
+     * Reactive power in percent of VArAval.
+     */
     VArAvalPct: number | null;
-    // Time window for VAR limit change
+
+    /**
+     * VArPct_WinTms
+     *
+     * Time window for VAR limit change.
+     */
     VArPct_WinTms: number | null;
-    // Timeout period for VAR limit
+
+    /**
+     * VArPct_RvrtTms
+     *
+     * Timeout period for VAR limit.
+     */
     VArPct_RvrtTms: number | null;
-    // Ramp time for moving from current setpoint to new setpoint
+
+    /**
+     * VArPct_RmpTms
+     *
+     * Ramp time for moving from current setpoint to new setpoint.
+     */
     VArPct_RmpTms: number | null;
-    // Enumerated value. VAR percent limit mode
+
+    /**
+     * VArPct_Mod
+     *
+     * Enumerated value. VAR percent limit mode.
+     */
     VArPct_Mod: VArPct_Mod | null;
-    // Enumerated valued. Percent limit VAr enable/disable control
+
+    /**
+     * VArPct_Ena
+     *
+     * Enumerated valued. Percent limit VAr enable/disable control.
+     */
     VArPct_Ena: VArPct_Ena;
-    // Scale factor for power output percent
+
+    /**
+     * WMaxLimPct_SF
+     *
+     * Scale factor for power output percent.
+     */
     WMaxLimPct_SF: number;
-    // Scale factor for power factor
+
+    /**
+     * OutPFSet_SF
+     *
+     * Scale factor for power factor.
+     */
     OutPFSet_SF: number;
-    // Scale factor for reactive power percent
+
+    /**
+     * VArPct_SF
+     *
+     * Scale factor for reactive power percent.
+     */
     VArPct_SF: number | null;
 };
 
@@ -254,21 +389,41 @@ export const controlsModel = modbusModelFactory<
     },
 });
 
+/**
+ * Conn Enumeration
+ *
+ * Enumerated values representing Connection control.
+ */
 export enum Conn {
     DISCONNECT = 0,
     CONNECT = 1,
 }
 
+/**
+ * WMaxLim_Ena Enumeration
+ *
+ * Enumerated values representing Throttle enable/disable control.
+ */
 export enum WMaxLim_Ena {
     DISABLED = 0,
     ENABLED = 1,
 }
 
+/**
+ * OutPFSet_Ena Enumeration
+ *
+ * Enumerated values representing Fixed power factor enable/disable control.
+ */
 export enum OutPFSet_Ena {
     DISABLED = 0,
     ENABLED = 1,
 }
 
+/**
+ * VArPct_Mod Enumeration
+ *
+ * Enumerated values representing VAR percent limit mode.
+ */
 export enum VArPct_Mod {
     NONE = 0,
     WMax = 1,
@@ -276,6 +431,11 @@ export enum VArPct_Mod {
     VArAval = 3,
 }
 
+/**
+ * VArPct_Ena Enumeration
+ *
+ * Enumerated values representing Percent limit VAr enable/disable control.
+ */
 export enum VArPct_Ena {
     DISABLED = 0,
     ENABLED = 1,

@@ -1,8 +1,7 @@
-import type { RampRateHelper } from '../coordinator/helpers/rampRate.js';
+import type { RampRateHelper } from './helpers/rampRate.js';
 import type { Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
 import { logger } from '../helpers/logger.js';
-import type { InverterSunSpecConnection } from '../sunspec/connection/inverter.js';
 import { SEP2Client } from './client.js';
 import { Sep2Limiter } from '../limiters/sep2/index.js';
 import { DerHelper } from './helpers/der.js';
@@ -22,20 +21,25 @@ import { objectToXml } from './helpers/xml.js';
 import { generateConnectionPointResponse } from './models/connectionPoint.js';
 import { RegistrationHelper } from './helpers/registration.js';
 
-export function getSep2Limiter({
+export type Sep2Instance = {
+    sep2Client: SEP2Client;
+    derHelper: DerHelper;
+    mirrorUsagePointListHelper: MirrorUsagePointListHelper;
+    limiter: Sep2Limiter;
+};
+
+export function getSep2Instance({
     config,
-    invertersConnections,
     rampRateHelper,
 }: {
     config: Config;
-    invertersConnections: InverterSunSpecConnection[];
     rampRateHelper: RampRateHelper;
-}) {
+}): Sep2Instance | null {
     if (!config.limiters.sep2) {
         return null;
     }
 
-    const sep2Certificate = getSep2Certificate(config);
+    const sep2Certificate = getSep2Certificate();
 
     const sep2Client = new SEP2Client({
         sep2Config: config.limiters.sep2,
@@ -62,7 +66,6 @@ export function getSep2Limiter({
 
     const derHelper = new DerHelper({
         client: sep2Client,
-        invertersConnections,
         rampRateHelper,
     });
 
@@ -75,7 +78,7 @@ export function getSep2Limiter({
         client: sep2Client,
     });
 
-    const sep2Limiter = new Sep2Limiter({
+    const limiter = new Sep2Limiter({
         client: sep2Client,
         rampRateHelper,
     });
@@ -85,7 +88,7 @@ export function getSep2Limiter({
     }).on('data', (data) => {
         logger.debug(data, 'DER controls data changed');
 
-        sep2Limiter.updateSep2ControlsData(data);
+        limiter.updateSep2ControlsData(data);
 
         rampRateHelper.setDefaultDERControlRampRate(
             data.fallbackControl.type === 'default'
@@ -120,8 +123,6 @@ export function getSep2Limiter({
                 await putConnectionPointId({
                     connectionPointHref: endDevice.connectionPointLink.href,
                 });
-
-                await endDeviceListHelper.refresh();
             }
 
             if (endDevice.registrationLink) {
@@ -157,7 +158,7 @@ export function getSep2Limiter({
                 'Received SEP2 function set assignments list',
             );
 
-            derControlsHelper.updateFsaData(functionSetAssignmentsList);
+            void derControlsHelper.updateFsaData(functionSetAssignmentsList);
         },
     );
 
@@ -256,6 +257,6 @@ export function getSep2Limiter({
         sep2Client,
         derHelper,
         mirrorUsagePointListHelper,
-        sep2Limiter,
+        limiter,
     };
 }

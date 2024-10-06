@@ -9,62 +9,201 @@ import {
 } from '../helpers/converters.js';
 import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
-// https://sunspec.org/wp-content/uploads/2021/12/SunSpec_Information_Model_Reference_20211209.xlsx
+// generated from SunSpec_Information_Model_Reference_20240701.xlsx
+
+/**
+ * Nameplate
+ *
+ * Inverter Controls Nameplate Ratings
+ */
 export type NameplateModel = {
-    // Model identifier
-    // Well-known value. Uniquely identifies this as a sunspec model nameplate
+    /**
+     * Model ID
+     *
+     * Model identifier
+     */
     ID: 120;
-    // Model length
+
+    /**
+     * Model Length
+     *
+     * Model length
+     */
     L: number;
-    // Type of DER device. Default value is 4 to indicate PV device.
+
+    /**
+     * Type of DER device
+     *
+     * Type of DER device. Default value is 4 to indicate PV device.
+     */
     DERTyp: DERTyp;
-    // Continuous power output capability of the inverter.
+
+    /**
+     * WRtg
+     *
+     * Continuous power output capability of the inverter.
+     */
     WRtg: number;
-    // Scale factor
+
+    /**
+     * WRtg_SF
+     *
+     * Scale factor
+     */
     WRtg_SF: number;
-    // Continuous Volt-Ampere capability of the inverter.
+
+    /**
+     * VARtg
+     *
+     * Continuous Volt-Ampere capability of the inverter.
+     */
     VARtg: number;
-    // Scale factor
+
+    /**
+     * VARtg_SF
+     *
+     * Scale factor
+     */
     VARtg_SF: number;
-    // Continuous VAR capability of the inverter in quadrant 1.
+
+    /**
+     * VArRtgQ1
+     *
+     * Continuous VAR capability of the inverter in quadrant 1.
+     */
     VArRtgQ1: number;
-    // Continuous VAR capability of the inverter in quadrant 2.
+
+    /**
+     * VArRtgQ2
+     *
+     * Continuous VAR capability of the inverter in quadrant 2.
+     */
     VArRtgQ2: number | null;
-    // Continuous VAR capability of the inverter in quadrant 3.
+
+    /**
+     * VArRtgQ3
+     *
+     * Continuous VAR capability of the inverter in quadrant 3.
+     */
     VArRtgQ3: number | null;
-    // Continuous VAR capability of the inverter in quadrant 4.
+
+    /**
+     * VArRtgQ4
+     *
+     * Continuous VAR capability of the inverter in quadrant 4.
+     */
     VArRtgQ4: number;
-    // Scale factor
+
+    /**
+     * VArRtg_SF
+     *
+     * Scale factor
+     */
     VArRtg_SF: number;
-    // Maximum RMS AC current level capability of the inverter.
+
+    /**
+     * ARtg
+     *
+     * Maximum RMS AC current level capability of the inverter.
+     */
     ARtg: number;
-    // Scale factor
+
+    /**
+     * ARtg_SF
+     *
+     * Scale factor
+     */
     ARtg_SF: number;
-    // Minimum power factor capability of the inverter in quadrant 1.
+
+    /**
+     * PFRtgQ1
+     *
+     * Minimum power factor capability of the inverter in quadrant 1.
+     */
     PFRtgQ1: number;
-    // Minimum power factor capability of the inverter in quadrant 2.
+
+    /**
+     * PFRtgQ2
+     *
+     * Minimum power factor capability of the inverter in quadrant 2.
+     */
     PFRtgQ2: number | null;
-    // Minimum power factor capability of the inverter in quadrant 3.
+
+    /**
+     * PFRtgQ3
+     *
+     * Minimum power factor capability of the inverter in quadrant 3.
+     */
     PFRtgQ3: number | null;
-    // Minimum power factor capability of the inverter in quadrant 4.
+
+    /**
+     * PFRtgQ4
+     *
+     * Minimum power factor capability of the inverter in quadrant 4.
+     */
     PFRtgQ4: number;
-    // Scale factor
+
+    /**
+     * PFRtg_SF
+     *
+     * Scale factor
+     */
     PFRtg_SF: number;
-    // Nominal energy rating of storage device.
+
+    /**
+     * WHRtg
+     *
+     * Nominal energy rating of storage device.
+     */
     WHRtg: number | null;
-    // Scale factor
+
+    /**
+     * WHRtg_SF
+     *
+     * Scale factor
+     */
     WHRtg_SF: number | null;
-    // The usable capacity of the battery.  Maximum charge minus minimum charge from a technology capability perspective (Amp-hour capacity rating).
+
+    /**
+     * AhrRtg
+     *
+     * The usable capacity of the battery. Maximum charge minus minimum charge from a technology capability perspective (Amp-hour capacity rating).
+     */
     AhrRtg: number | null;
-    // Scale factor
+
+    /**
+     * AhrRtg_SF
+     *
+     * Scale factor
+     */
     AhrRtg_SF: number | null;
-    // Maximum rate of energy transfer into the storage device.
+
+    /**
+     * MaxChaRte
+     *
+     * Maximum rate of energy transfer into the storage device.
+     */
     MaxChaRte: number | null;
-    // Scale factor
+
+    /**
+     * MaxChaRte_SF
+     *
+     * Scale factor
+     */
     MaxChaRte_SF: number | null;
-    // Maximum rate of energy transfer out of the storage device.
+
+    /**
+     * MaxDisChaRte
+     *
+     * Maximum rate of energy transfer out of the storage device.
+     */
     MaxDisChaRte: number | null;
-    // Scale factor
+
+    /**
+     * MaxDisChaRte_SF
+     *
+     * Scale factor
+     */
     MaxDisChaRte_SF: number | null;
 };
 
@@ -209,6 +348,11 @@ export const nameplateModel = modbusModelFactory<NameplateModel>({
     },
 });
 
+/**
+ * Type of DER device Enumeration
+ *
+ * Enumerated values representing the type of DER device.
+ */
 export enum DERTyp {
     PV = 4,
     PV_STOR = 82,

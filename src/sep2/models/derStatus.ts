@@ -2,19 +2,7 @@ import type { ConnectStatus } from './connectStatus.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
 import { numberToHex } from '../../helpers/number.js';
-
-/// DER OperationalModeStatus value:
-/// 0 - Not applicable / Unknown
-/// 1 - Off
-/// 2 - Operational mode
-/// 3 - Test mode
-/// All other values reserved.
-export enum OperationalModeStatus {
-    NotApplicable = 0,
-    Off = 1,
-    OperationalMode = 2,
-    TestMode = 3,
-}
+import type { OperationalModeStatus } from './operationModeStatus.js';
 
 export type DERStatus = {
     readingTime: Date;

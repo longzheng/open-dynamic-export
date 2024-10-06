@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../../../coordinator/helpers/limiter.js';
+import type { LimiterType } from '../../limiter.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { logger as pinoLogger } from '../../../helpers/logger.js';
 
@@ -26,24 +26,26 @@ export class AusgridEA029Limiter implements LimiterType {
 
         const nowHour = now.getHours();
 
-        const limit =
+        const limit: InverterControlLimit =
             // if within charge window, zero export
             nowHour >= chargeWindow.startHourOfDay &&
             nowHour < chargeWindow.endHourOfDay
                 ? {
+                      source: 'twoWayTariff',
                       opModConnect: undefined,
                       opModEnergize: undefined,
                       opModExpLimW: 0,
                       opModGenLimW: undefined,
                   }
                 : {
+                      source: 'twoWayTariff',
                       opModConnect: undefined,
                       opModEnergize: undefined,
                       opModExpLimW: undefined,
                       opModGenLimW: undefined,
                   };
 
-        writeControlLimit({ limit, name: 'ausgridEA029' });
+        writeControlLimit({ limit });
 
         return limit;
     }
@@ -57,6 +59,7 @@ const chargeWindow: Window = {
 
 // Customers receive a payment or credit of 2.3 cents/kWh for the electricity exported during the peak demand period (4pm to 9pm).
 // TODO: reduce load or export battery during reward window
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const rewardWindow: Window = {
     startHourOfDay: 16,
     endHourOfDay: 22,

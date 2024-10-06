@@ -6,7 +6,6 @@ import { parseMirrorUsagePointListXml } from './mirrorUsagePointList.js';
 it('should parse end device list XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getMup.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 
     const mirrorUsagePointList = parseMirrorUsagePointListXml(xml);
 

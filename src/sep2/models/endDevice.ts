@@ -44,9 +44,9 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     const lFDI = endDeviceObject['lFDI']
         ? assertString(endDeviceObject['lFDI'][0])
         : undefined;
-    const logEventListLink = parseListLinkXmlObject(
-        endDeviceObject['LogEventListLink'][0],
-    );
+    const logEventListLink = endDeviceObject['LogEventListLink']
+        ? parseListLinkXmlObject(endDeviceObject['LogEventListLink'][0])
+        : undefined;
     const sFDI = assertString(endDeviceObject['sFDI'][0]);
     const changedTime = stringIntToDate(
         assertString(endDeviceObject['changedTime'][0]),

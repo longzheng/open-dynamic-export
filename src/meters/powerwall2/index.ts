@@ -1,49 +1,70 @@
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import type { SiteSampleData } from '../siteSample.js';
+import type { SiteSample } from '../siteSample.js';
 import { Powerwall2Client } from './client.js';
 import type { z } from 'zod';
 import type { metersSiteSchema } from './api.js';
 import type { Config } from '../../helpers/config.js';
+import type { Result } from '../../helpers/result.js';
 
 export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;
 
     constructor({
-        config,
+        powerwall2Config,
     }: {
-        config: Extract<Config['meter'], { type: 'powerwall2' }>;
+        powerwall2Config: Extract<Config['meter'], { type: 'powerwall2' }>;
     }) {
         super({
-            meterName: 'powerwall2',
+            name: 'powerwall2',
             pollingIntervalMs: 200,
         });
 
         this.client = new Powerwall2Client({
-            ip: config.ip,
-            password: config.password,
+            ip: powerwall2Config.ip,
+            password: powerwall2Config.password,
+            timeoutSeconds: powerwall2Config.timeoutSeconds,
         });
 
         void this.startPolling();
     }
 
-    override async getSiteSampleData(): Promise<SiteSampleData | null> {
-        const metersSiteData = await this.client.getMetersSite();
+    override async getSiteSample(): Promise<Result<SiteSample>> {
+        try {
+            const start = performance.now();
 
-        this.logger.trace({ metersSiteData }, 'received data');
+            const metersSiteData = await this.client.getMetersSite();
 
-        const siteSample = generateSiteSample({
-            meter: metersSiteData,
-        });
+            const end = performance.now();
+            const duration = end - start;
 
-        return siteSample;
+            this.logger.trace(
+                { duration, metersSiteData },
+                'polled Powerwall meter site data',
+            );
+
+            const siteSample = generateSiteSample({
+                meter: metersSiteData,
+            });
+
+            return { success: true, value: siteSample };
+        } catch (error) {
+            return {
+                success: false,
+                error: new Error(
+                    `Error loading Powerwall2 data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                ),
+            };
+        }
     }
+
+    override onDestroy() {}
 }
 
 export function generateSiteSample({
     meter,
 }: {
     meter: z.infer<typeof metersSiteSchema>;
-}): SiteSampleData {
+}): SiteSample {
     const firstMeter = meter[0];
 
     if (!firstMeter) {
@@ -51,9 +72,10 @@ export function generateSiteSample({
     }
 
     return {
+        date: new Date(),
         realPower: {
             type: 'perPhaseNet',
-            phaseA: firstMeter.Cached_readings.real_power_a,
+            phaseA: firstMeter.Cached_readings.real_power_a ?? 0,
             phaseB: firstMeter.Cached_readings.real_power_b ?? null,
             phaseC: firstMeter.Cached_readings.real_power_c ?? null,
             net: firstMeter.Cached_readings.instant_power,

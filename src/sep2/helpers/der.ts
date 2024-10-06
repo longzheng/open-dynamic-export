@@ -6,28 +6,18 @@ import type { DERSettings } from '../models/derSettings.js';
 import { generateDerSettingsResponse } from '../models/derSettings.js';
 import {
     generateDerStatusResponse,
-    OperationalModeStatus,
     type DERStatus,
 } from '../models/derStatus.js';
 import { objectToXml } from './xml.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
-import { DERTyp, type NameplateModel } from '../../sunspec/models/nameplate.js';
-import type { SettingsModel } from '../../sunspec/models/settings.js';
-import { PVConn, type StatusModel } from '../../sunspec/models/status.js';
 import type { PollRate } from '../models/pollRate.js';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import deepEqual from 'fast-deep-equal';
-import type { RampRateHelper } from '../../coordinator/helpers/rampRate.js';
+import type { RampRateHelper } from './rampRate.js';
 import { DERControlType } from '../models/derControlType.js';
-import { enumHasValue } from '../../helpers/enum.js';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
-import { getAggregatedNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
-import { getAggregatedSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
-import { getAggregatedStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
-import { ConnectStatus } from '../models/connectStatus.js';
-import { DOEModesSupportedType } from '../models/doeModesSupportedType.js';
-import { DERType } from '../models/derType.js';
+import { DOEControlType } from '../models/doeModesSupportedType.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
 
 type Config = {
     der: DER;
@@ -44,21 +34,17 @@ export class DerHelper {
     private lastSentDerCapability: DERCapability | null = null;
     private lastSentDerSettings: DERSettings | null = null;
     private lastSentDerStatus: DERStatus | null = null;
-    private invertersConnections: InverterSunSpecConnection[];
     private pollTimer: NodeJS.Timeout | null = null;
     private rampRateHelper: RampRateHelper;
 
     constructor({
         client,
-        invertersConnections,
         rampRateHelper,
     }: {
         client: SEP2Client;
-        invertersConnections: InverterSunSpecConnection[];
         rampRateHelper: RampRateHelper;
     }) {
         this.client = client;
-        this.invertersConnections = invertersConnections;
         this.rampRateHelper = rampRateHelper;
 
         this.logger = pinoLogger.child({ module: 'DerHelper' });
@@ -69,20 +55,20 @@ export class DerHelper {
         this.config = config;
 
         if (!this.pollTimer) {
-            void this.poll();
+            this.pollTimer = setTimeout(
+                () => {
+                    void this.poll();
+                },
+                this.config.pollRate
+                    ? this.config.pollRate * 1000
+                    : // fallback to default poll rate for EndDeviceList
+                      defaultPollPushRates.endDeviceListPoll * 1000,
+            );
         }
     }
 
-    public onInverterData(
-        data: {
-            nameplate: NameplateModel;
-            settings: SettingsModel;
-            status: StatusModel;
-        }[],
-    ) {
-        const derCapability = getDerCapabilityResponseFromSunSpecArray(
-            data.map((data) => data.nameplate),
-        );
+    public onDerSample(derSample: DerSample) {
+        const derCapability = getDerCapabilityResponse(derSample);
 
         this.logger.trace(
             {
@@ -99,12 +85,10 @@ export class DerHelper {
             )
         ) {
             void this.putDerCapability({ derCapability });
-
-            this.lastSentDerCapability = derCapability;
         }
 
-        const derSettings = getDerSettingsResponseFromSunSpecArray({
-            settingsModels: data.map((data) => data.settings),
+        const derSettings = getDerSettingsResponse({
+            derSample,
             rampRateHelper: this.rampRateHelper,
         });
 
@@ -118,13 +102,9 @@ export class DerHelper {
 
         if (!this.isDerSettingsEqual(derSettings, this.lastSentDerSettings)) {
             void this.putDerSettings({ derSettings });
-
-            this.lastSentDerSettings = derSettings;
         }
 
-        const derStatus = getDerStatusResponseFromSunSpecArray(
-            data.map((data) => data.status),
-        );
+        const derStatus = getDerStatusResponse(derSample);
 
         this.logger.trace(
             {
@@ -136,38 +116,16 @@ export class DerHelper {
 
         if (!this.isDerStatusEqual(derStatus, this.lastSentDerStatus)) {
             void this.putDerStatus({ derStatus });
-
-            this.lastSentDerStatus = derStatus;
         }
     }
 
     private async poll() {
-        this.pollTimer = setTimeout(
-            () => {
-                void this.poll();
-            },
-            this.config?.pollRate
-                ? this.config.pollRate * 1000
-                : // fallback to default poll rate for EndDeviceList
-                  defaultPollPushRates.endDeviceListPoll * 1000,
-        );
-
         try {
-            const inverterData = await Promise.all(
-                this.invertersConnections.map(async (inverter) => {
-                    return {
-                        status: await inverter.getStatusModel(),
-                    };
-                }),
-            );
+            if (!this.lastSentDerStatus) {
+                throw new Error('DER status has not been cached');
+            }
 
-            const derStatus = getDerStatusResponseFromSunSpecArray(
-                inverterData.map((data) => data.status),
-            );
-
-            void this.putDerStatus({ derStatus });
-
-            this.lastSentDerStatus = derStatus;
+            await this.putDerStatus({ derStatus: this.lastSentDerStatus });
         } catch (error) {
             this.logger.error(
                 error,
@@ -193,7 +151,13 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         try {
+            if (!this.config.der.derCapabilityLink) {
+                return;
+            }
+
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
+
+            this.lastSentDerCapability = derCapability;
         } catch (error) {
             this.logger.error(error, 'Error updating DER capability');
         }
@@ -216,7 +180,13 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         try {
+            if (!this.config.der.derSettingsLink) {
+                return;
+            }
+
             await this.client.put(this.config.der.derSettingsLink.href, xml);
+
+            this.lastSentDerSettings = derSettings;
         } catch (error) {
             this.logger.error(error, 'Error updating DER settings');
         }
@@ -235,7 +205,13 @@ export class DerHelper {
         const xml = objectToXml(response);
 
         try {
+            if (!this.config.der.derStatusLink) {
+                return;
+            }
+
             await this.client.put(this.config.der.derStatusLink.href, xml);
+
+            this.lastSentDerStatus = derStatus;
         } catch (error) {
             this.logger.error(error, 'Error updating DER capability');
         }
@@ -274,29 +250,28 @@ export class DerHelper {
 const derControlTypeModes: DERControlType =
     DERControlType.opModConnect | DERControlType.opModEnergize;
 
-export function getDerCapabilityResponseFromSunSpecArray(
-    nameplateModels: NameplateModel[],
+const doeControlTypeModes: DOEControlType =
+    DOEControlType.opModExpLimW | DOEControlType.opModGenLimW;
+
+export function getDerCapabilityResponse(
+    derSample: Pick<DerSample, 'nameplate'>,
 ): DERCapability {
-    const metrics = getAggregatedNameplateMetrics(nameplateModels);
-    const rtgMaxVA = convertNumberToBaseAndPow10Exponent(metrics.VARtg);
-    const rtgMaxW = convertNumberToBaseAndPow10Exponent(metrics.WRtg);
-    const rtgMaxVar = convertNumberToBaseAndPow10Exponent(metrics.VArRtgQ1);
+    const rtgMaxVA = convertNumberToBaseAndPow10Exponent(
+        derSample.nameplate.maxVA,
+    );
+    const rtgMaxW = convertNumberToBaseAndPow10Exponent(
+        derSample.nameplate.maxW,
+    );
+    const rtgMaxVar = convertNumberToBaseAndPow10Exponent(
+        derSample.nameplate.maxVar,
+    );
 
     return {
         // hard-coded modes
         modesSupported: derControlTypeModes,
         // hard-coded DOE modes
-        doeModesSupported:
-            DOEModesSupportedType.opModExpLimW |
-            DOEModesSupportedType.opModGenLimW,
-        type: (() => {
-            switch (metrics.DERTyp) {
-                case DERTyp.PV:
-                    return DERType.PhotovoltaicSystem;
-                case DERTyp.PV_STOR:
-                    return DERType.CombinedPVAndStorage;
-            }
-        })(),
+        doeModesSupported: doeControlTypeModes,
+        type: derSample.nameplate.type,
         rtgMaxVA: {
             value: rtgMaxVA.base,
             multiplier: rtgMaxVA.pow10,
@@ -309,33 +284,32 @@ export function getDerCapabilityResponseFromSunSpecArray(
             value: rtgMaxW.base,
             multiplier: rtgMaxW.pow10,
         },
-        // there's no way to get the nominal voltage from the SunSpec nameplate model
-        // VNom is available from the DER Capacity 702 model but it's not widely available
-        // https://sunspec.org/wp-content/uploads/2021/02/SunSpec-DER-Information-Model-Specification-V1-0-02-01-2021.pdf
-        rtgVNom: undefined,
     };
 }
 
-export function getDerSettingsResponseFromSunSpecArray({
-    settingsModels,
+export function getDerSettingsResponse({
+    derSample,
     rampRateHelper,
 }: {
-    settingsModels: SettingsModel[];
+    derSample: Pick<DerSample, 'settings'>;
     rampRateHelper: RampRateHelper;
 }): DERSettings {
-    const metrics = getAggregatedSettingsMetrics(settingsModels);
-    const setMaxVA = metrics.VAMax
-        ? convertNumberToBaseAndPow10Exponent(metrics.VAMax)
+    const setMaxVA = derSample.settings.setMaxVA
+        ? convertNumberToBaseAndPow10Exponent(derSample.settings.setMaxVA)
         : null;
-    const setMaxW = convertNumberToBaseAndPow10Exponent(metrics.WMax);
-    const setMaxVar = metrics.VArMaxQ1
-        ? convertNumberToBaseAndPow10Exponent(metrics.VArMaxQ1)
+    const setMaxW = convertNumberToBaseAndPow10Exponent(
+        derSample.settings.setMaxW,
+    );
+    const setMaxVar = derSample.settings.setMaxVar
+        ? convertNumberToBaseAndPow10Exponent(derSample.settings.setMaxVar)
         : null;
 
     return {
         updatedTime: new Date(),
         // hard-coded modes
         modesEnabled: derControlTypeModes,
+        // hard-coded DOE modes
+        doeModesEnabled: doeControlTypeModes,
         // SunSpec inverters don't properly support WGra
         // so we use a software based implementation of ramp rates
         setGradW: rampRateHelper.getDerSettingsSetGradW(),
@@ -358,52 +332,20 @@ export function getDerSettingsResponseFromSunSpecArray({
     };
 }
 
-export function getDerStatusResponseFromSunSpecArray(
-    statusModels: StatusModel[],
+export function getDerStatusResponse(
+    derSample: Pick<DerSample, 'status'>,
 ): DERStatus {
-    const metrics = getAggregatedStatusMetrics(statusModels);
     const now = new Date();
-    const operationalModeStatus: OperationalModeStatus = enumHasValue(
-        metrics.PVConn,
-        PVConn.CONNECTED,
-    )
-        ? OperationalModeStatus.OperationalMode
-        : OperationalModeStatus.Off;
-    const genConnectStatus: ConnectStatus = getConnectStatusFromPVConn(
-        metrics.PVConn,
-    );
 
     return {
         readingTime: now,
         operationalModeStatus: {
             dateTime: now,
-            value: operationalModeStatus,
+            value: derSample.status.operationalModeStatus,
         },
         genConnectStatus: {
             dateTime: now,
-            value: genConnectStatus,
+            value: derSample.status.genConnectStatus,
         },
     };
-}
-
-export function getConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
-    let result: ConnectStatus = 0 as ConnectStatus;
-
-    if (enumHasValue(pvConn, PVConn.CONNECTED)) {
-        result += ConnectStatus.Connected;
-    }
-
-    if (enumHasValue(pvConn, PVConn.AVAILABLE)) {
-        result += ConnectStatus.Available;
-    }
-
-    if (enumHasValue(pvConn, PVConn.OPERATING)) {
-        result += ConnectStatus.Operating;
-    }
-
-    if (enumHasValue(pvConn, PVConn.TEST)) {
-        result += ConnectStatus.Test;
-    }
-
-    return result;
 }

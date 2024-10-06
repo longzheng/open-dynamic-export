@@ -11,6 +11,7 @@ import EventEmitter from 'events';
 import { CurrentStatus } from '../models/eventStatus.js';
 import { DerControlResponseHelper } from './derControlResponse.js';
 import { getDerControlEndDate, sortByProgramPrimacy } from './derControl.js';
+import type { FallbackControl } from './fallbackControl.js';
 
 export type MergedControlsData = {
     fsa: FunctionSetAssignments;
@@ -24,17 +25,8 @@ export type MergedDefaultControlsData = {
     defaultControl: DefaultDERControl;
 };
 
-export type FallbackControl =
-    | {
-          type: 'default';
-          data: MergedDefaultControlsData;
-      }
-    | {
-          type: 'none';
-      };
-
 export type DerControlsHelperChangedData = {
-    controls: MergedControlsData[];
+    activeOrScheduledControls: MergedControlsData[];
     fallbackControl: FallbackControl;
 };
 
@@ -54,7 +46,9 @@ export class DerControlsHelper extends EventEmitter<{
         });
     }
 
-    updateFsaData(fsaData: FunctionSetAssignmentsListData) {
+    async updateFsaData(fsaData: FunctionSetAssignmentsListData) {
+        const now = new Date();
+
         // assumptions
         // - events are considered immutable besides the status
         //      from the IEEE 2030.5-2018 spec page 90
@@ -72,28 +66,31 @@ export class DerControlsHelper extends EventEmitter<{
             // sort all controls across all programs and FSAs
             .sort(sortMergedControlsDataByStartTimeAscending);
 
-        // get existing controls mRIDs to figure out what controls are new
-        // we need to know what is new to send "event received" responses
-        const existingControlsMapByMrid = new Map(
-            this.cachedControlsData.map((control) => [
-                control.control.mRID,
-                control,
-            ]),
+        // to handle missing/delete controls which are not considered cancelled
+        const activeOrScheduledControls = this.cachedControlsData.filter(
+            (controlData) =>
+                // get existing controls that have not ended
+                getDerControlEndDate(controlData.control) > now &&
+                // get existing controls that are not in the new controls
+                !newControlsData.some(
+                    (newControl) =>
+                        newControl.control.mRID === controlData.control.mRID &&
+                        newControl.program.mRID === controlData.program.mRID &&
+                        newControl.fsa.mRID === controlData.fsa.mRID,
+                ),
         );
 
         for (const controlData of newControlsData) {
+            // always send event received responses for new events
+            await this.derControlResponseHelper.respondDerControl({
+                derControl: controlData.control,
+                status: ResponseStatus.EventReceived,
+            });
+
             // When a client receives an Event with the Specified End Time in the past (Specified End Time <
             // Current Time), this Event SHALL be ignored. Note that the Duration Randomization is not used in
             // this calculation.
-            if (getDerControlEndDate(controlData.control) < new Date()) {
-                // For function sets with direct control, if the Event responseRequired indicates, clients SHALL
-                // POST a Response to the replyTo URI with a Status of “Rejected - Event was received after it
-                // had expired”.
-                void this.derControlResponseHelper.respondDerControl({
-                    derControl: controlData.control,
-                    status: ResponseStatus.EventExpired,
-                });
-
+            if (getDerControlEndDate(controlData.control) < now) {
                 continue;
             }
 
@@ -101,79 +98,38 @@ export class DerControlsHelper extends EventEmitter<{
             // note: this does not handle overlapping events because that is specific to a control type (e.g. OpModExpLim)
             // needs to be handled by ControlScheduler
             switch (controlData.control.eventStatus.currentStatus) {
-                case CurrentStatus.Scheduled:
-                case CurrentStatus.Active: {
-                    if (
-                        // if we've not seen this event before
-                        !existingControlsMapByMrid.has(controlData.control.mRID)
-                    ) {
-                        void this.derControlResponseHelper.respondDerControl({
-                            derControl: controlData.control,
-                            status: ResponseStatus.EventReceived,
-                        });
-                    }
-                    break;
-                }
                 // Client devices SHALL be aware of Cancelled with Randomization events,
                 // determine if the Cancelled event applies to them, and cancel the event immediately, using the larger of
                 // (absolute value of randomizeStart) and (absolute value of randomizeDuration) as the end randomization, in
                 // seconds. This Status.type SHALL NOT be used with “regular” Events, only with specializations of RandomizableEvent.
                 case CurrentStatus.Cancelled:
                 case CurrentStatus.CancelledWithRandomization: {
-                    const existingControlWithMrid =
-                        existingControlsMapByMrid.get(controlData.control.mRID);
+                    await this.derControlResponseHelper.respondDerControl({
+                        derControl: controlData.control,
+                        status: ResponseStatus.EventCancelled,
+                    });
 
-                    if (
-                        // if we've not seen this event before
-                        !existingControlWithMrid ||
-                        // or if we have, but the event status has changed
-                        existingControlWithMrid.control.eventStatus
-                            .currentStatus !==
-                            controlData.control.eventStatus.currentStatus
-                    ) {
-                        // respond to
-                        void this.derControlResponseHelper.respondDerControl({
-                            derControl: controlData.control,
-                            status: ResponseStatus.EventCancelled,
-                        });
-                    }
-
-                    break;
+                    continue;
                 }
-                // Client devices encountering a Superseded event SHALL terminate execution of the event immediately and
-                // commence execution of the new event immediately, unless the current time is within the start
-                // randomization window of the superseded event, in which case the client SHALL obey the start
-                // randomization of the new event. This Status.type SHALL NOT be used with TextMessage, since multiple
-                // text messages can be active.
-                case CurrentStatus.Superseded: {
-                    const existingControlWithMrid =
-                        existingControlsMapByMrid.get(controlData.control.mRID);
 
-                    if (
-                        // if we've not seen this event before
-                        !existingControlWithMrid ||
-                        // or if we have, but the event status has changed
-                        existingControlWithMrid.control.eventStatus
-                            .currentStatus !==
-                            controlData.control.eventStatus.currentStatus
-                    ) {
-                        // respond to
-                        void this.derControlResponseHelper.respondDerControl({
-                            derControl: controlData.control,
-                            status: ResponseStatus.EventSuperseded,
-                        });
-                    }
+                // control response handled by ControlScheduler logic
+                case CurrentStatus.Scheduled:
+                case CurrentStatus.Active:
+                case CurrentStatus.Superseded: {
                     break;
                 }
             }
+
+            // add control to active controls
+            activeOrScheduledControls.push(controlData);
         }
 
         this.emit('data', {
-            controls: newControlsData,
+            activeOrScheduledControls,
             fallbackControl: defaultControl,
         });
 
-        this.cachedControlsData = newControlsData;
+        this.cachedControlsData = activeOrScheduledControls;
     }
 }
 

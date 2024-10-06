@@ -1,12 +1,17 @@
-<img src="https://github.com/user-attachments/assets/9a1ba915-410d-4349-a2ff-4d226aea0a88" width="500" alt="Logo" />
+<img src="https://github.com/user-attachments/assets/9a1ba915-410d-4349-a2ff-4d226aea0a88" width="250" alt="Logo" />
 
 ## About
 
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
+  - certified by SA Power Networks (1/10/2024)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - two-way tariffs (e.g.time based) export limitation
 - negative feed-in (e.g. Amber) export limitation
+
+![frame_generic_dark](https://github.com/user-attachments/assets/cd8e1bca-14e5-46ce-a845-917eb7744ec4)
+> [!NOTE]
+> The dashboard UI is not part of this open-source reprository and will be available as a licensed product along with a hardware package.
 
 ```mermaid
 flowchart LR
@@ -54,7 +59,7 @@ Site meter:
 | Tesla Powerwall 2 | `powerwall2`       |                                                                                 | Backup Gateway 2                                                                |
 
 > [!IMPORTANT]
-> The application assumes the smart meter is configured as a feed-in or export/import meter installed at the grid connection to accurately measure the site export/import. Smart meters installed as consumption metering is not supported due to ambiguity if there are other loads or batteries that are not counted towards the site export/import.
+> Site meters installed in the consumption path with batteries are not supported due to the inability to measure battery power. The site meter must be installed in the feedin path.
 
 ## Configuration
 
@@ -74,12 +79,15 @@ To configure the inverter and meter connections, add the following property to `
             "unitId": 1 // (number) required: the Modbus unit ID of the inverter
         }
     ],
-    "inverterControl": true, // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
+    "inverterControl": {
+        "enabled": true // (true/false) optional: whether the inverters should be controlled based on limits, turn off to simulate
+    },
     "meter": {
         "type": "sunspec", // (string) required: the type of meter
         "ip": "192.168.1.6", // (string) required: the IP address of the meter
         "port": 502, // (number) required: the SunSpec Modbus TCP port of the meter
         "unitId": 240 // (number) required: the SunSpec unit ID of the meter
+        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption)
     }
     ...
 }
@@ -221,7 +229,7 @@ z.object({
 
 ## CSIP-AUS client
 
-The project implements a CSIP-AUS compatible client that interacts with the utility server (SEP2 server). The initial implementation focuses on the Energy Queensland requirements as outlined in the [SEP2 Client Handbook published by Energy Queensland](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
+The project implements a CSIP-AUS compatible client that interacts with the utility server (CSIP-AUS/SEP2 server). The initial implementation focuses on the [SA Power Networks requirements](https://www.talkingpower.com.au/71619/widgets/376925/documents/239205) and [Energy Queensland requirements](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
 ```mermaid
 sequenceDiagram
@@ -277,14 +285,8 @@ The initial plan is to implement a direct gateway client that interacts directly
   - [x] DER status/capability/settings reporting
   - [x] DER control scheduling and default DER control fallback
   - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
-- [x] Software-based `setGradW` ramping
+  - [x] Software-based limit ramping (`setGradW` or `rampTms`)
 - [x] Metrics logging in InfluxDB
-
-Future
-- [ ] CSIP-AUS self-service certificate generation
-- [ ] CSIP-AUS cloud aggregator proxy mode
-- [ ] Web UI with real-time metrics and historical metrics
-- [ ] Device package (plug and play solution)
 
 ## CSIP-AUS Private key and CSR
 
@@ -312,8 +314,8 @@ npm run cert:device-generate
 
 To view the device certificate LFDI
 
-```bash
-npm run cert:device-lfdi
+```
+http://localhost:3000/csipAus/id
 ```
 
 The manufacturer certificate is signed manually by the utility. The certificate key and certificate signing request can be generated with

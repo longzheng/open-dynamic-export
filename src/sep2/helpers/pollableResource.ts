@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import type { PollRate } from '../models/pollRate.js';
 import type { SEP2Client } from '../client.js';
+import { logger } from '../../helpers/logger.js';
 
 export abstract class PollableResource<
     ResponseType extends { pollRate: PollRate },
@@ -44,11 +45,21 @@ export abstract class PollableResource<
             clearTimeout(this.pollTimerId);
         }
 
-        const response = await this.get({ client: this.client, url: this.url });
+        const response = await (async () => {
+            try {
+                return await this.get({ client: this.client, url: this.url });
+            } catch (error) {
+                logger.error(error, 'Failed to poll resource');
 
-        this.emit('data', response);
+                return null;
+            }
+        })();
 
-        const pollRate = response.pollRate || this.defaultPollRateSeconds;
+        if (response) {
+            this.emit('data', response);
+        }
+
+        const pollRate = response?.pollRate || this.defaultPollRateSeconds;
 
         // schedule next poll
         this.pollTimerId = setTimeout(() => {
