@@ -32,10 +32,12 @@ import {
 import type { Config } from '../../helpers/config.js';
 import { getSunSpecInvertersConnection } from '../../sunspec/connections.js';
 import { withRetry } from '../../helpers/withRetry.js';
+import { writeLatency } from '../../helpers/influxdb.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
     private cachedControlsModel: ControlsModel | null = null;
+    private sunSpecInverterIndex: number;
 
     constructor({
         sunspecInverterConfig,
@@ -59,6 +61,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
         this.inverterConnection = getSunSpecInvertersConnection(
             sunspecInverterConfig,
         );
+        this.sunSpecInverterIndex = inverterIndex;
 
         void this.startPolling();
     }
@@ -69,16 +72,72 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                 async () => {
                     const start = performance.now();
 
+                    const inverterModel =
+                        await this.inverterConnection.getInverterModel();
+
+                    writeLatency({
+                        field: 'sunSpecInverterDataPoller',
+                        duration: performance.now() - start,
+                        tags: {
+                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            model: 'inverter',
+                        },
+                    });
+
+                    const nameplateModel =
+                        await this.inverterConnection.getNameplateModel();
+
+                    writeLatency({
+                        field: 'sunSpecInverterDataPoller',
+                        duration: performance.now() - start,
+                        tags: {
+                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            model: 'nameplate',
+                        },
+                    });
+
+                    const settingsModel =
+                        await this.inverterConnection.getSettingsModel();
+
+                    writeLatency({
+                        field: 'sunSpecInverterDataPoller',
+                        duration: performance.now() - start,
+                        tags: {
+                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            model: 'settings',
+                        },
+                    });
+
+                    const statusModel =
+                        await this.inverterConnection.getStatusModel();
+
+                    writeLatency({
+                        field: 'sunSpecInverterDataPoller',
+                        duration: performance.now() - start,
+                        tags: {
+                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            model: 'status',
+                        },
+                    });
+
+                    const controlsModel =
+                        await this.inverterConnection.getControlsModel();
+
+                    writeLatency({
+                        field: 'sunSpecInverterDataPoller',
+                        duration: performance.now() - start,
+                        tags: {
+                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            model: 'controls',
+                        },
+                    });
+
                     const models = {
-                        inverter:
-                            await this.inverterConnection.getInverterModel(),
-                        nameplate:
-                            await this.inverterConnection.getNameplateModel(),
-                        settings:
-                            await this.inverterConnection.getSettingsModel(),
-                        status: await this.inverterConnection.getStatusModel(),
-                        controls:
-                            await this.inverterConnection.getControlsModel(),
+                        inverter: inverterModel,
+                        nameplate: nameplateModel,
+                        settings: settingsModel,
+                        status: statusModel,
+                        controls: controlsModel,
                     };
 
                     const end = performance.now();

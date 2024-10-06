@@ -4,6 +4,7 @@ import EventEmitter from 'node:events';
 import type { Result } from '../helpers/result.js';
 import type { InverterData } from './inverterData.js';
 import type { InverterConfiguration } from '../coordinator/helpers/inverterController.js';
+import { writeLatency } from '../helpers/influxdb.js';
 
 export abstract class InverterDataPollerBase extends EventEmitter<{
     data: [Result<InverterData>];
@@ -13,6 +14,8 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
     private pollingTimer: NodeJS.Timeout | null = null;
     private inverterDataCache: Result<InverterData> | null = null;
     protected applyControl: boolean;
+    private inverterIndex: number;
+    private inverterPollerName: string;
 
     constructor({
         name,
@@ -35,6 +38,8 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
             inverterIndex,
         });
         this.applyControl = applyControl;
+        this.inverterIndex = inverterIndex;
+        this.inverterPollerName = name;
     }
 
     public destroy() {
@@ -68,6 +73,15 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
         const duration = end - start;
 
         this.logger.trace({ duration, inverterData }, 'polled inverter data');
+
+        writeLatency({
+            field: 'inverterDataPoller',
+            duration,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                inverterPollerName: this.inverterPollerName,
+            },
+        });
 
         // this loop must meet sampling requirements and dynamic export requirements
         // Energex SEP2 Client Handbook specifies "As per the standard, samples should be taken every 200ms (10 cycles). If not capable of sampling this frequently, 1 second samples may be sufficient."

@@ -1,3 +1,4 @@
+import { writeLatency } from '../../helpers/influxdb.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import type { ModelAddress, SunSpecConnection } from '../connection/base.js';
 
@@ -53,6 +54,17 @@ export function sunSpecModelFactory<
             const end = performance.now();
             const duration = end - start;
 
+            writeLatency({
+                field: 'sunSpecModelFactory',
+                duration,
+                tags: {
+                    operation: 'read',
+                    model: config.name,
+                    addressStart: address.start.toString(),
+                    addressLength: address.length.toString(),
+                },
+            });
+
             logger.trace(
                 { duration, registers: registers.data },
                 'Read registers',
@@ -85,6 +97,17 @@ export function sunSpecModelFactory<
 
             const end = performance.now();
             const duration = end - start;
+
+            writeLatency({
+                field: 'sunSpecModelFactory',
+                duration,
+                tags: {
+                    operation: 'write',
+                    model: config.name,
+                    addressStart: address.start.toString(),
+                    addressLength: address.length.toString(),
+                },
+            });
 
             logger.trace({ duration, registerValues }, 'Wrote registers');
         },
