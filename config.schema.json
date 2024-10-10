@@ -260,6 +260,11 @@
                 "password": {
                   "type": "string",
                   "description": "The customer password of the Powerwall 2 gateway. By default, this is the last 5 characters of the password sticker inside the gateway."
+                },
+                "timeoutSeconds": {
+                  "type": "number",
+                  "description": "Request timeout in seconds",
+                  "default": 2
                 }
               },
               "required": [

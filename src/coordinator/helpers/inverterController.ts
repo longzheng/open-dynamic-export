@@ -7,6 +7,7 @@ import { logger as pinoLogger } from '../../helpers/logger.js';
 import {
     writeActiveControlLimit,
     writeInverterControllerPoints,
+    writeLatency,
     writeLoadWatts,
 } from '../../helpers/influxdb.js';
 import type { SiteSample } from '../../meters/siteSample.js';
@@ -175,6 +176,8 @@ export class InverterController {
             'control limits loop updated',
         );
 
+        writeLatency({ field: 'controlLimitsLoop', duration });
+
         // update at most every 1 second
         const delay = Math.max(1000 - duration, 0);
 
@@ -212,6 +215,8 @@ export class InverterController {
             const duration = end - start;
 
             this.logger.trace({ duration }, 'Inverter control loop duration');
+
+            writeLatency({ field: 'applyControlLoop', duration });
 
             const delay = Math.max(
                 this.controlFrequencyMinimumSeconds * 1000 - duration,

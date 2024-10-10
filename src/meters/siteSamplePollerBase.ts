@@ -3,6 +3,7 @@ import { logger as pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
 import type { SiteSample } from './siteSample.js';
 import type { Result } from '../helpers/result.js';
+import { writeLatency } from '../helpers/influxdb.js';
 
 export abstract class SiteSamplePollerBase extends EventEmitter<{
     data: [
@@ -15,6 +16,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
     private pollingIntervalMs;
     private pollingTimer: NodeJS.Timeout | null = null;
     private siteSampleCache: SiteSample | null = null;
+    private meterPollerName: string;
 
     constructor({
         name,
@@ -31,6 +33,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
             module: 'SiteSamplePollerBase',
             meterPollerName: name,
         });
+        this.meterPollerName = name;
     }
 
     public destroy() {
@@ -56,6 +59,14 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
 
         const end = performance.now();
         const duration = end - start;
+
+        writeLatency({
+            field: 'siteSamplePoller',
+            duration,
+            tags: {
+                meterPollerName: this.meterPollerName,
+            },
+        });
 
         if (siteSample.success) {
             this.siteSampleCache = siteSample.value;

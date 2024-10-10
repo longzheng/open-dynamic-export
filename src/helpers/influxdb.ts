@@ -11,6 +11,7 @@ import type {
     InverterControlLimit,
 } from '../coordinator/helpers/inverterController.js';
 import type { FallbackControl } from '../sep2/helpers/fallbackControl.js';
+import { objectEntriesWithType } from './object.js';
 
 const influxDB = new InfluxDB({
     url: `http://influxdb:${process.env['INFLUXDB_PORT'] ?? 8086}`,
@@ -679,4 +680,26 @@ export function writeLoadWatts(loadWatts: number) {
             .tag('phase', 'net')
             .floatField('realPower', loadWatts),
     );
+}
+
+export function writeLatency({
+    field,
+    duration,
+    tags,
+}: {
+    field: string;
+    duration: number;
+    tags?: Record<string, string>;
+}) {
+    const point = new Point('latency')
+        .timestamp(new Date())
+        .floatField(field, duration);
+
+    if (tags) {
+        for (const [name, value] of objectEntriesWithType(tags)) {
+            point.tag(name, value);
+        }
+    }
+
+    writeApi.writePoint(point);
 }
