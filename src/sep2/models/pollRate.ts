@@ -1,8 +1,12 @@
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
+import { z } from 'zod';
 
-// in seconds
-export type PollRate = number | null;
+export const pollRateSchema = z
+    .union([z.number(), z.null()])
+    .describe('In seconds');
+
+export type PollRate = z.infer<typeof pollRateSchema>;
 
 export function parsePollRateXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

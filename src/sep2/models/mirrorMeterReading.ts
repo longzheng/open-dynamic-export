@@ -1,35 +1,44 @@
 import { numberToHex } from '../../helpers/number.js';
-import type { CommodityType } from './commodityType.js';
-import type { DataQualifierType } from './dataQualifierType.js';
+import { commodityTypeSchema } from './commodityType.js';
+import { dataQualifierTypeSchema } from './dataQualifierType.js';
 import { dateToStringSeconds } from '../helpers/date.js';
-import type { FlowDirectionType } from './flowDirectionType.js';
-import type { KindType } from './kindType.js';
+import { flowDirectionTypeSchema } from './flowDirectionType.js';
+import { kindTypeSchema } from './kindType.js';
 import { xmlns } from '../helpers/namespace.js';
-import { PhaseCode } from './phaseCode.js';
-import type { QualityFlags } from './qualityFlags.js';
-import type { UomType } from './uomType.js';
-import type { IdentifiedObject } from './identifiedObject.js';
-import type { DateTimeInterval } from './dateTimeInterval.js';
+import { PhaseCode, phaseCodeSchema } from './phaseCode.js';
+import { qualityFlagsSchema } from './qualityFlags.js';
+import { uomTypeSchema } from './uomType.js';
+import { identifiedObjectSchema } from './identifiedObject.js';
+import { dateTimeIntervalSchema } from './dateTimeInterval.js';
+import { z } from 'zod';
 
-export type MirrorMeterReading = {
-    lastUpdateTime?: Date;
-    nextUpdateTime?: Date;
-    Reading?: {
-        timePeriod?: DateTimeInterval;
-        qualityFlags?: QualityFlags;
-        value: number;
-    };
-    ReadingType?: {
-        commodity: CommodityType;
-        kind: KindType;
-        dataQualifier: DataQualifierType;
-        flowDirection: FlowDirectionType;
-        phase: PhaseCode;
-        powerOfTenMultiplier: number;
-        intervalLength?: number;
-        uom: UomType;
-    };
-} & IdentifiedObject;
+export const mirrorMeterReadingSchema = z
+    .object({
+        lastUpdateTime: z.date().optional(),
+        nextUpdateTime: z.date().optional(),
+        Reading: z
+            .object({
+                timePeriod: dateTimeIntervalSchema.optional(),
+                qualityFlags: qualityFlagsSchema.optional(),
+                value: z.number(),
+            })
+            .optional(),
+        ReadingType: z
+            .object({
+                commodity: commodityTypeSchema,
+                kind: kindTypeSchema,
+                dataQualifier: dataQualifierTypeSchema,
+                flowDirection: flowDirectionTypeSchema,
+                phase: phaseCodeSchema,
+                powerOfTenMultiplier: z.number(),
+                intervalLength: z.number().optional(),
+                uom: uomTypeSchema,
+            })
+            .optional(),
+    })
+    .merge(identifiedObjectSchema);
+
+export type MirrorMeterReading = z.infer<typeof mirrorMeterReadingSchema>;
 
 export function generateMirrorMeterReadingResponse(
     mirrorMeterReading: MirrorMeterReading,

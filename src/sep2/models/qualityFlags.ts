@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // List of codes indicating the quality of the reading, using specification:
 // Bit 0 - valid: data that has gone through all required validation checks and either passed them all or has been verified
 // Bit 1 - manually edited: Replaced or approved by a human
@@ -15,3 +17,5 @@ export enum QualityFlags {
     Derived = 1 << 5,
     Projected = 1 << 6,
 }
+
+export const qualityFlagsSchema = z.nativeEnum(QualityFlags);

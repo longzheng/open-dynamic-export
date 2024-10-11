@@ -1,13 +1,18 @@
+import { z } from 'zod';
 import { assertArray } from '../helpers/assert.js';
-import { parseDERControlXmlObject, type DERControl } from './derControl.js';
+import { derControlSchema, parseDERControlXmlObject } from './derControl.js';
 import {
     parseSubscribableListXmlObject,
-    type SubscribableList,
+    subscribableListSchema,
 } from './subscribableList.js';
 
-export type DERControlList = {
-    derControls: DERControl[];
-} & SubscribableList;
+export const derControlListSchema = z
+    .object({
+        derControls: derControlSchema.array(),
+    })
+    .merge(subscribableListSchema);
+
+export type DERControlList = z.infer<typeof derControlListSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerControlListXml(xml: any): DERControlList {

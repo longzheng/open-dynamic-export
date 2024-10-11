@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /// DER OperationalModeStatus value:
 /// 0 - Not applicable / Unknown
 /// 1 - Off
@@ -10,3 +12,5 @@ export enum OperationalModeStatus {
     OperationalMode = 2,
     TestMode = 3,
 }
+
+export const operationalModeStatusSchema = z.nativeEnum(OperationalModeStatus);

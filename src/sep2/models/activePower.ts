@@ -1,12 +1,17 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 
-// The active (real) power P (in W) is the product of root-mean-square (RMS) voltage, RMS current, and cos(theta) where theta is the phase angle of current relative to voltage. It is the primary measure of the rate of flow of energy.
-export type ActivePower = {
-    value: number;
-    // power of ten multiplier
-    multiplier: number;
-};
+export const activePowerSchema = z
+    .object({
+        value: z.number(),
+        multiplier: z.number().describe('power of ten multiplier'),
+    })
+    .describe(
+        'The active (real) power P (in W) is the product of root-mean-square (RMS) voltage, RMS current, and cos(theta) where theta is the phase angle of current relative to voltage. It is the primary measure of the rate of flow of energy.',
+    );
+
+export type ActivePower = z.infer<typeof activePowerSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseActivePowerXmlObject(xmlObject: any): ActivePower {

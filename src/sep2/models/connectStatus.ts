@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // DER ConnectStatus value (bitmap):
 // 0 - Connected
 // 1 - Available
@@ -12,3 +14,5 @@ export enum ConnectStatus {
     Test = 1 << 3,
     Fault = 1 << 4,
 }
+
+export const connectStatusSchema = z.nativeEnum(ConnectStatus);

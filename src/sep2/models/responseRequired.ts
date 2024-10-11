@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 0 - End device shall indicate that message was received
 // 1 - End device shall indicate specific response.
 // 2 - End user / customer response is required.
@@ -6,3 +8,5 @@ export enum ResponseRequiredType {
     SpecificResponse = 1 << 1,
     EndUserResponse = 1 << 2,
 }
+
+export const responseRequiredTypeSchema = z.nativeEnum(ResponseRequiredType);

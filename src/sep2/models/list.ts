@@ -1,11 +1,16 @@
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
-import { parseResourceXmlObject, type Resource } from './resource.js';
+import { parseResourceXmlObject, resourceSchema } from './resource.js';
+import { z } from 'zod';
 
-export type List = {
-    all: number;
-    results: number;
-} & Resource;
+export const listSchema = z
+    .object({
+        all: z.number(),
+        results: z.number(),
+    })
+    .merge(resourceSchema);
+
+export type List = z.infer<typeof listSchema>;
 
 export function parseListXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // DER Management Envelope Extensions
 // Support for Dynamic Operating Envelopes communicated through the protocol is enabled by the
 // Australian Smart Inverter Profile extensions. This set of extensions shall be supported by conforming
@@ -27,3 +29,5 @@ export enum DOEControlType {
     // device (or aggregation of devices, excluding uncontrolled devices) such as an EV charge station.
     opModLoadLimW = 1 << 3,
 }
+
+export const doeControlTypeSchema = z.nativeEnum(DOEControlType);

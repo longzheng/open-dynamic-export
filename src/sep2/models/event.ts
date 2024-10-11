@@ -1,30 +1,35 @@
+import { z } from 'zod';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
 import {
+    dateTimeIntervalSchema,
     parseDateTimeIntervalXmlObject,
-    type DateTimeInterval,
 } from './dateTimeInterval.js';
-import { parseEventStatusXmlObject, type EventStatus } from './eventStatus.js';
+import { eventStatusSchema, parseEventStatusXmlObject } from './eventStatus.js';
 import {
+    identifiedObjectSchema,
     parseIdentifiedObjectXmlObject,
-    type IdentifiedObject,
 } from './identifiedObject.js';
 import {
     parseRespondableResourceXmlObject,
-    type RespondableResource,
+    respondableResourceSchema,
 } from './respondableResource.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export type Event = {
-    creationTime: Date;
-    interval: DateTimeInterval;
-    eventStatus: EventStatus;
-} & RespondableResource &
-    SubscribableResource &
-    IdentifiedObject;
+export const eventSchema = z
+    .object({
+        creationTime: z.date(),
+        interval: dateTimeIntervalSchema,
+        eventStatus: eventStatusSchema,
+    })
+    .merge(respondableResourceSchema)
+    .merge(subscribableResourceSchema)
+    .merge(identifiedObjectSchema);
+
+export type Event = z.infer<typeof eventSchema>;
 
 export function parseEventXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

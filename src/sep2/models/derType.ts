@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 0 - Not applicable / Unknown
 // 1 - Virtual or mixed DER
 // 2 - Reciprocating engine
@@ -23,3 +25,5 @@ export enum DERType {
     EVSE = 82,
     CombinedPVAndStorage = 83,
 }
+
+export const derTypeSchema = z.nativeEnum(DERType);

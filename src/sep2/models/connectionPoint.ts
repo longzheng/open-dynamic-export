@@ -1,9 +1,12 @@
 import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
+import { z } from 'zod';
 
-export type ConnectionPoint = {
-    connectionPointId: string | undefined;
-};
+export const connectionPointSchema = z.object({
+    connectionPointId: z.string().optional(),
+});
+
+export type ConnectionPoint = z.infer<typeof connectionPointSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseConnectionPointXml(xml: any): ConnectionPoint {

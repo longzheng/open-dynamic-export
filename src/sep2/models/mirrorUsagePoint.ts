@@ -3,19 +3,24 @@ import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
 import {
     generateMirrorMeterReadingObject,
-    type MirrorMeterReading,
+    mirrorMeterReadingSchema,
 } from './mirrorMeterReading.js';
-import { parsePostRateXmlObject, type PostRate } from './postRate.js';
+import { parsePostRateXmlObject, postRateSchema } from './postRate.js';
 import {
     parseUsagePointBaseXmlObject,
-    type UsagePointBase,
+    usagePointBaseSchema,
 } from './usagePointBase.js';
+import { z } from 'zod';
 
-export type MirrorUsagePoint = {
-    postRate?: PostRate;
-    deviceLFDI: string;
-    mirrorMeterReading?: MirrorMeterReading[];
-} & UsagePointBase;
+export const mirrorUsagePointSchema = z
+    .object({
+        postRate: postRateSchema.optional(),
+        deviceLFDI: z.string(),
+        mirrorMeterReading: mirrorMeterReadingSchema.array().optional(),
+    })
+    .merge(usagePointBaseSchema);
+
+export type MirrorUsagePoint = z.infer<typeof mirrorUsagePointSchema>;
 
 export function parseMirrorUsagePointXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

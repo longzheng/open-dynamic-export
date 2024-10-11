@@ -1,7 +1,6 @@
 import type { Logger } from 'pino';
 import type { SEP2Client } from '../client.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import { ResponseStatus } from '../models/derControlResponse.js';
 import type { DERControlBase } from '../models/derControlBase.js';
 import type {
     DerControlsHelperChangedData,
@@ -17,6 +16,7 @@ import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
 import type { DERControl } from '../models/derControl.js';
 import type { FallbackControl } from './fallbackControl.js';
+import { ResponseStatus } from '../models/responseStatus.js';
 
 export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 

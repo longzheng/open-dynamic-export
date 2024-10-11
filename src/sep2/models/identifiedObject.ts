@@ -1,12 +1,17 @@
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
-import { parseResourceXmlObject, type Resource } from './resource.js';
+import { parseResourceXmlObject, resourceSchema } from './resource.js';
+import { z } from 'zod';
 
-export type IdentifiedObject = {
-    description?: string;
-    mRID: string;
-    version?: number;
-} & Resource;
+export const identifiedObjectSchema = z
+    .object({
+        description: z.string().optional(),
+        mRID: z.string(),
+        version: z.number().optional(),
+    })
+    .merge(resourceSchema);
+
+export type IdentifiedObject = z.infer<typeof identifiedObjectSchema>;
 
 export function parseIdentifiedObjectXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

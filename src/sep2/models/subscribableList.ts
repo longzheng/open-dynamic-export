@@ -1,10 +1,15 @@
-import { parseListXmlObject, type List } from './list.js';
+import { listSchema, parseListXmlObject } from './list.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
+import type { z } from 'zod';
 
-export type SubscribableList = List & SubscribableResource;
+export const subscribableListSchema = listSchema.merge(
+    subscribableResourceSchema,
+);
+
+export type SubscribableList = z.infer<typeof subscribableListSchema>;
 
 export function parseSubscribableListXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

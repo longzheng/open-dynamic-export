@@ -1,9 +1,15 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
-import { parseLinkXmlObject, type Link } from './link.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
 
-export type ListLink = { all?: number } & Link;
+export const listLinkSchema = z
+    .object({
+        all: z.number().optional(),
+    })
+    .merge(linkSchema);
 
+export type ListLink = z.infer<typeof listLinkSchema>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseListLinkXmlObject(xmlObject: any): ListLink {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */

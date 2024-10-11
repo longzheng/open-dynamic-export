@@ -1,14 +1,17 @@
+import { z } from 'zod';
 import { assertArray } from '../helpers/assert.js';
-import type { DER } from './der.js';
-import { parseDerXmlObject } from './der.js';
-import { parseListXmlObject, type List } from './list.js';
-import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
+import { derSchema, parseDerXmlObject } from './der.js';
+import { listSchema, parseListXmlObject } from './list.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 
-export type DERList = {
-    pollRate: PollRate;
-    // link to the end device
-    ders: DER[];
-} & List;
+export const derListSchema = z
+    .object({
+        pollRate: pollRateSchema,
+        ders: derSchema.array().describe('Link to the end device'),
+    })
+    .merge(listSchema);
+
+export type DERList = z.infer<typeof derListSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerListXml(xml: any): DERList {
