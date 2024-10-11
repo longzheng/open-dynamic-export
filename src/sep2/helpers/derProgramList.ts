@@ -7,19 +7,24 @@ import {
     type DERProgramList,
 } from '../models/derProgramList.js';
 import { getListAll } from './pagination.js';
-import type { DERProgram } from '../models/derProgram.js';
+import { derProgramSchema } from '../models/derProgram.js';
 import {
+    defaultDERControlSchema,
     parseDefaultDERControlXml,
-    type DefaultDERControl,
 } from '../models/defaultDerControl.js';
 import { parseDerControlListXml } from '../models/derControlList.js';
-import type { DERControl } from '../models/derControl.js';
+import { derControlSchema } from '../models/derControl.js';
+import { z } from 'zod';
 
-export type DerProgramListData = {
-    program: DERProgram;
-    defaultDerControl: DefaultDERControl | undefined;
-    derControls: DERControl[] | undefined;
-}[];
+export const derProgramListDataSchema = z.array(
+    z.object({
+        program: derProgramSchema,
+        defaultDerControl: defaultDERControlSchema.optional(),
+        derControls: derControlSchema.array().optional(),
+    }),
+);
+
+export type DerProgramListData = z.infer<typeof derProgramListDataSchema>;
 
 export class DerProgramListHelper extends EventEmitter<{
     data: [DerProgramListData];

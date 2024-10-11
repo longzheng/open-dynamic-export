@@ -8,13 +8,32 @@ import {
 } from '../models/functionSetAssignmentsList.js';
 import { getListAll } from './pagination.js';
 import type { DerProgramListData } from './derProgramList.js';
-import { DerProgramListHelper } from './derProgramList.js';
-import type { FunctionSetAssignments } from '../models/functionSetAssignments.js';
+import {
+    derProgramListDataSchema,
+    DerProgramListHelper,
+} from './derProgramList.js';
+import {
+    functionSetAssignmentsSchema,
+    type FunctionSetAssignments,
+} from '../models/functionSetAssignments.js';
+import { z } from 'zod';
+import { createFileCache } from '../../helpers/fileCache.js';
 
-export type FunctionSetAssignmentsListData = {
-    functionSetAssignments: FunctionSetAssignments;
-    derProgramList: DerProgramListData | null;
-}[];
+export const functionSetAssignmentsListDataSchema = z.array(
+    z.object({
+        functionSetAssignments: functionSetAssignmentsSchema,
+        derProgramList: derProgramListDataSchema.nullable(),
+    }),
+);
+
+export type FunctionSetAssignmentsListData = z.infer<
+    typeof functionSetAssignmentsListDataSchema
+>;
+
+const functionSetAssignmentsListCache = createFileCache({
+    filename: 'functionSetAssignmentsList',
+    schema: functionSetAssignmentsListDataSchema,
+});
 
 export class FunctionSetAssignmentsListHelper extends EventEmitter<{
     data: [FunctionSetAssignmentsListData];
@@ -36,6 +55,12 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
         super();
 
         this.client = client;
+
+        const cachedData = functionSetAssignmentsListCache.get();
+
+        if (cachedData) {
+            this.emit('data', cachedData);
+        }
     }
 
     updateHref({ href }: { href: string }) {
@@ -104,7 +129,7 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
                                         fsa.derProgramList = data;
 
                                         // emit data if DerProgramList is polled
-                                        this.emitData();
+                                        this.cacheAndEmitData();
                                     }),
                                 derProgramList: null,
                             },
@@ -138,7 +163,7 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
                     }
 
                     // emit data if FunctionSetAssignmentsList is polled
-                    this.emitData();
+                    this.cacheAndEmitData();
                 });
         }
 
@@ -149,16 +174,17 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
         this.functionSetAssignmentsListPollableResource?.destroy();
     }
 
-    private emitData() {
-        this.emit(
-            'data',
-            [...this.dataByFunctionSetAssignmentsMrid.values()].map(
-                ({ functionSetAssignments, derProgramList }) => ({
-                    functionSetAssignments,
-                    derProgramList,
-                }),
-            ),
+    private cacheAndEmitData() {
+        const data = [...this.dataByFunctionSetAssignmentsMrid.values()].map(
+            ({ functionSetAssignments, derProgramList }) => ({
+                functionSetAssignments,
+                derProgramList,
+            }),
         );
+
+        functionSetAssignmentsListCache.set(data);
+
+        this.emit('data', data);
     }
 }
 

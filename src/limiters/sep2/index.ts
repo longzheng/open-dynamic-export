@@ -12,11 +12,6 @@ import type { LimiterType } from '../limiter.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
-import {
-    cacheFallbackControl,
-    getCachedFallbackControl,
-    type FallbackControl,
-} from '../../sep2/helpers/fallbackControl.js';
 
 export class Sep2Limiter implements LimiterType {
     private schedulerByControlType: {
@@ -54,12 +49,6 @@ export class Sep2Limiter implements LimiterType {
             }),
         };
 
-        const cachedFallbackControl = getCachedFallbackControl();
-
-        if (cachedFallbackControl) {
-            this.updateFallbackControl(cachedFallbackControl);
-        }
-
         this.opModExpLimWRampRateHelper = new ControlLimitRampHelper({
             rampRateHelper,
         });
@@ -77,8 +66,6 @@ export class Sep2Limiter implements LimiterType {
         for (const scheduler of Object.values(this.schedulerByControlType)) {
             scheduler.updateControlsData(data);
         }
-
-        cacheFallbackControl(data.fallbackControl);
     }
 
     getInverterControlLimit(): InverterControlLimit {
@@ -147,11 +134,5 @@ export class Sep2Limiter implements LimiterType {
         writeControlLimit({ limit });
 
         return limit;
-    }
-
-    private updateFallbackControl(fallbackControl: FallbackControl) {
-        for (const scheduler of Object.values(this.schedulerByControlType)) {
-            scheduler.updateFallbackControl(fallbackControl);
-        }
     }
 }
