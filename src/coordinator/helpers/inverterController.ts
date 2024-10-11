@@ -5,6 +5,7 @@ import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
 import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import {
+    writeActiveControlLimit,
     writeInverterControllerPoints,
     writeLatency,
     writeLoadWatts,
@@ -159,6 +160,8 @@ export class InverterController {
         const activeInverterControlLimit = getActiveInverterControlLimit(
             Object.values(controlLimitsByLimiter),
         );
+
+        writeActiveControlLimit({ limit: activeInverterControlLimit });
 
         this.controlLimitsCache = {
             controlLimitsByLimiter,
