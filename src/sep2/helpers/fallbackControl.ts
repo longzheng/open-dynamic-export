@@ -2,44 +2,13 @@ import { z } from 'zod';
 import { env } from '../../helpers/env.js';
 import { writeFile } from 'fs/promises';
 import { readFileSync } from 'fs';
+import { defaultDERControlSchema } from '../models/defaultDerControl.js';
 
-// derived from DefaultDERControl
 export const fallbackControlSchema = z.union([
     z.object({
         type: z.literal('default'),
         data: z.object({
-            defaultControl: z.object({
-                derControlBase: z.object({
-                    opModImpLimW: z
-                        .object({
-                            value: z.number(),
-                            multiplier: z.number(),
-                        })
-                        .optional(),
-                    opModExpLimW: z
-                        .object({
-                            value: z.number(),
-                            multiplier: z.number(),
-                        })
-                        .optional(),
-                    opModGenLimW: z
-                        .object({
-                            value: z.number(),
-                            multiplier: z.number(),
-                        })
-                        .optional(),
-                    opModLoadLimW: z
-                        .object({
-                            value: z.number(),
-                            multiplier: z.number(),
-                        })
-                        .optional(),
-                    opModEnergize: z.boolean().optional(),
-                    opModConnect: z.boolean().optional(),
-                    rampTms: z.number().optional(),
-                }),
-                setGradW: z.number().optional(),
-            }),
+            defaultControl: defaultDERControlSchema,
         }),
     }),
     z.object({
