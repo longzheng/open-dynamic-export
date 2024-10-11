@@ -19,7 +19,7 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
             pollingIntervalMs: 200,
         });
 
-        this.client = mqtt.connect(`mqtt://${mqttConfig.host}`, {
+        this.client = mqtt.connect(mqttConfig.host, {
             username: mqttConfig.username,
             password: mqttConfig.password,
         });
