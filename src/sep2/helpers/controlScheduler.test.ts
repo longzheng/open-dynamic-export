@@ -15,6 +15,7 @@ import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { randomInt } from 'crypto';
+import { ResponseRequiredType } from '../models/responseRequired.js';
 
 vi.mock('crypto', async () => {
     const actual = await import('crypto');
@@ -169,9 +170,7 @@ describe('generateControlsSchedule', () => {
 
         expect(result.length).toStrictEqual(1);
 
-        expect(result[0]?.data.control.mRID).toStrictEqual(
-            controlA.control.mRID,
-        );
+        expect(result[0]?.mRID).toStrictEqual(controlA.control.mRID);
         expect(result[0]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
@@ -250,9 +249,7 @@ describe('generateControlsSchedule', () => {
 
         expect(result.length).toStrictEqual(3);
 
-        expect(result[0]?.data.control.mRID).toStrictEqual(
-            controlA.control.mRID,
-        );
+        expect(result[0]?.mRID).toStrictEqual(controlA.control.mRID);
         expect(result[0]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
@@ -260,9 +257,7 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:10Z'),
         );
 
-        expect(result[1]?.data.control.mRID).toStrictEqual(
-            controlB.control.mRID,
-        );
+        expect(result[1]?.mRID).toStrictEqual(controlB.control.mRID);
         expect(result[1]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:10Z'),
         );
@@ -270,9 +265,7 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:15Z'),
         );
 
-        expect(result[2]?.data.control.mRID).toStrictEqual(
-            controlC.control.mRID,
-        );
+        expect(result[2]?.mRID).toStrictEqual(controlC.control.mRID);
         expect(result[2]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:20Z'),
         );
@@ -377,9 +370,7 @@ describe('generateControlsSchedule', () => {
 
         expect(result.length).toStrictEqual(5);
 
-        expect(result[0]?.data.control.mRID).toStrictEqual(
-            controlA.control.mRID,
-        );
+        expect(result[0]?.mRID).toStrictEqual(controlA.control.mRID);
         expect(result[0]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:00Z'),
         );
@@ -387,9 +378,7 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:02Z'),
         );
 
-        expect(result[1]?.data.control.mRID).toStrictEqual(
-            controlB.control.mRID,
-        );
+        expect(result[1]?.mRID).toStrictEqual(controlB.control.mRID);
         expect(result[1]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:02Z'),
         );
@@ -397,9 +386,7 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:03Z'),
         );
 
-        expect(result[2]?.data.control.mRID).toStrictEqual(
-            controlC.control.mRID,
-        );
+        expect(result[2]?.mRID).toStrictEqual(controlC.control.mRID);
         expect(result[2]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:03Z'),
         );
@@ -407,9 +394,7 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:06Z'),
         );
 
-        expect(result[3]?.data.control.mRID).toStrictEqual(
-            controlD.control.mRID,
-        );
+        expect(result[3]?.mRID).toStrictEqual(controlD.control.mRID);
         expect(result[3]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
@@ -417,9 +402,7 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:07Z'),
         );
 
-        expect(result[4]?.data.control.mRID).toStrictEqual(
-            controlA.control.mRID,
-        );
+        expect(result[4]?.mRID).toStrictEqual(controlA.control.mRID);
         expect(result[4]?.startInclusive).toStrictEqual(
             new Date('2024-01-01T00:00:07Z'),
         );
@@ -516,18 +499,10 @@ describe('getUniqueDatetimesFromControls', () => {
 describe('applyRandomizationToControlSchedule', () => {
     it('should randomize control schedules', () => {
         const controlA: ControlSchedule = {
-            data: {
-                fsa: generateMockFunctionSetAssignments({}),
-                program: generateMockDERProgram({}),
-                control: generateMockDERControl({
-                    interval: {
-                        start: new Date('2024-01-01T00:00:00Z'),
-                        duration: 10,
-                    },
-                    randomizeStart: 2,
-                    randomizeDuration: 5,
-                }),
-            },
+            mRID: 'controlA',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
             startInclusive: new Date('2024-01-01T00:00:00Z'),
             endExclusive: new Date('2024-01-01T00:00:10Z'),
             randomizeStart: 2,
@@ -535,18 +510,10 @@ describe('applyRandomizationToControlSchedule', () => {
         };
 
         const controlB: ControlSchedule = {
-            data: {
-                fsa: generateMockFunctionSetAssignments({}),
-                program: generateMockDERProgram({}),
-                control: generateMockDERControl({
-                    interval: {
-                        start: new Date('2024-01-01T00:00:10Z'),
-                        duration: 10,
-                    },
-                    randomizeStart: 2,
-                    randomizeDuration: 5,
-                }),
-            },
+            mRID: 'controlB',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
             startInclusive: new Date('2024-01-01T00:00:10Z'),
             endExclusive: new Date('2024-01-01T00:00:20Z'),
             randomizeStart: 2,
@@ -554,18 +521,10 @@ describe('applyRandomizationToControlSchedule', () => {
         };
 
         const controlC: ControlSchedule = {
-            data: {
-                fsa: generateMockFunctionSetAssignments({}),
-                program: generateMockDERProgram({}),
-                control: generateMockDERControl({
-                    interval: {
-                        start: new Date('2024-01-01T00:00:20Z'),
-                        duration: 10,
-                    },
-                    randomizeStart: 0,
-                    randomizeDuration: 0,
-                }),
-            },
+            mRID: 'controlC',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
             startInclusive: new Date('2024-01-01T00:00:20Z'),
             endExclusive: new Date('2024-01-01T00:00:30Z'),
             randomizeStart: 0,
@@ -618,18 +577,10 @@ describe('applyRandomizationToControlSchedule', () => {
             .mockImplementationOnce(() => -5);
 
         const controlA: ControlSchedule = {
-            data: {
-                fsa: generateMockFunctionSetAssignments({}),
-                program: generateMockDERProgram({}),
-                control: generateMockDERControl({
-                    interval: {
-                        start: new Date('2024-01-01T00:00:00Z'),
-                        duration: 10,
-                    },
-                    randomizeStart: 0,
-                    randomizeDuration: 5,
-                }),
-            },
+            mRID: 'controlA',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
             startInclusive: new Date('2024-01-01T00:00:00Z'),
             endExclusive: new Date('2024-01-01T00:00:10Z'),
             randomizeStart: 0,
@@ -637,18 +588,10 @@ describe('applyRandomizationToControlSchedule', () => {
         };
 
         const controlB: ControlSchedule = {
-            data: {
-                fsa: generateMockFunctionSetAssignments({}),
-                program: generateMockDERProgram({}),
-                control: generateMockDERControl({
-                    interval: {
-                        start: new Date('2024-01-01T00:00:13Z'),
-                        duration: 10,
-                    },
-                    randomizeStart: -5,
-                    randomizeDuration: 0,
-                }),
-            },
+            mRID: 'controlB',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
             startInclusive: new Date('2024-01-01T00:00:10Z'),
             endExclusive: new Date('2024-01-01T00:00:20Z'),
             randomizeStart: -5,

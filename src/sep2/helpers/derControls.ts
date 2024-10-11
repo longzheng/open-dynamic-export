@@ -83,7 +83,9 @@ export class DerControlsHelper extends EventEmitter<{
         for (const controlData of newControlsData) {
             // always send event received responses for new events
             await this.derControlResponseHelper.respondDerControl({
-                derControl: controlData.control,
+                mRID: controlData.control.mRID,
+                replyToHref: controlData.control.replyToHref,
+                responseRequired: controlData.control.responseRequired,
                 status: ResponseStatus.EventReceived,
             });
 
@@ -105,7 +107,9 @@ export class DerControlsHelper extends EventEmitter<{
                 case CurrentStatus.Cancelled:
                 case CurrentStatus.CancelledWithRandomization: {
                     await this.derControlResponseHelper.respondDerControl({
-                        derControl: controlData.control,
+                        mRID: controlData.control.mRID,
+                        replyToHref: controlData.control.replyToHref,
+                        responseRequired: controlData.control.responseRequired,
                         status: ResponseStatus.EventCancelled,
                     });
 

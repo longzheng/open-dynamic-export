@@ -345,9 +345,7 @@ export function writeControlSchedulerPoints({
         switch (controlType) {
             case 'opModConnect': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModConnect'
-                    ];
+                    activeControlSchedule.derControlBase['opModConnect'];
 
                 if (value === undefined) {
                     return null;
@@ -357,9 +355,7 @@ export function writeControlSchedulerPoints({
             }
             case 'opModEnergize': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModEnergize'
-                    ];
+                    activeControlSchedule.derControlBase['opModEnergize'];
 
                 if (value === undefined) {
                     return null;
@@ -369,9 +365,7 @@ export function writeControlSchedulerPoints({
             }
             case 'opModExpLimW': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModExpLimW'
-                    ];
+                    activeControlSchedule.derControlBase['opModExpLimW'];
 
                 if (value === undefined) {
                     return null;
@@ -384,9 +378,7 @@ export function writeControlSchedulerPoints({
             }
             case 'opModGenLimW': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModGenLimW'
-                    ];
+                    activeControlSchedule.derControlBase['opModGenLimW'];
 
                 if (value === undefined) {
                     return null;
