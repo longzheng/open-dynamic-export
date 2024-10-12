@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
 
 // DER ConnectStatus value (bitmap):
 // 0 - Connected
@@ -15,4 +15,4 @@ export enum ConnectStatus {
     Fault = 1 << 4,
 }
 
-export const connectStatusSchema = z.nativeEnum(ConnectStatus);
+export const connectStatusSchema = zodBitwiseEnumSchema(ConnectStatus);

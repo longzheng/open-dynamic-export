@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
 
 // 0 - End device shall indicate that message was received
 // 1 - End device shall indicate specific response.
@@ -9,4 +9,5 @@ export enum ResponseRequiredType {
     EndUserResponse = 1 << 2,
 }
 
-export const responseRequiredTypeSchema = z.nativeEnum(ResponseRequiredType);
+export const responseRequiredTypeSchema =
+    zodBitwiseEnumSchema(ResponseRequiredType);

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
 
 // DER Management Envelope Extensions
 // Support for Dynamic Operating Envelopes communicated through the protocol is enabled by the
@@ -30,4 +30,4 @@ export enum DOEControlType {
     opModLoadLimW = 1 << 3,
 }
 
-export const doeControlTypeSchema = z.nativeEnum(DOEControlType);
+export const doeControlTypeSchema = zodBitwiseEnumSchema(DOEControlType);

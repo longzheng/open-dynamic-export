@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
 
 // Control modes supported by the DER. Bit positions SHALL be defined as follows:
 // 0 - Charge mode
@@ -59,4 +59,4 @@ export enum DERControlType {
     opModWattVar = 1 << 26,
 }
 
-export const derControlTypeSchema = z.nativeEnum(DERControlType);
+export const derControlTypeSchema = zodBitwiseEnumSchema(DERControlType);
