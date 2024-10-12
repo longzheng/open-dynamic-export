@@ -1,16 +1,20 @@
 import { assertArray } from '../helpers/assert.js';
-import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
-import type { DERProgram } from './derProgram.js';
-import { parseDERProgramXmlObject } from './derProgram.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
+import { derProgramSchema, parseDERProgramXmlObject } from './derProgram.js';
 import {
     parseSubscribableListXmlObject,
-    type SubscribableList,
+    subscribableListSchema,
 } from './subscribableList.js';
+import { z } from 'zod';
 
-export type DERProgramList = {
-    pollRate: PollRate;
-    derPrograms: DERProgram[];
-} & SubscribableList;
+export const derProgramListSchema = z
+    .object({
+        pollRate: pollRateSchema,
+        derPrograms: derProgramSchema.array(),
+    })
+    .merge(subscribableListSchema);
+
+export type DERProgramList = z.infer<typeof derProgramListSchema>;
 
 export function parseDerProgramListXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

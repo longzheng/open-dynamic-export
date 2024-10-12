@@ -1,8 +1,15 @@
 import { assertString } from '../helpers/assert.js';
 import { stringToBoolean } from '../helpers/boolean.js';
-import { parseResourceXmlObject, type Resource } from './resource.js';
+import { parseResourceXmlObject, resourceSchema } from './resource.js';
+import { z } from 'zod';
 
-export type SubscribableResource = { subscribable: boolean } & Resource;
+export const subscribableResourceSchema = z
+    .object({
+        subscribable: z.boolean(),
+    })
+    .merge(resourceSchema);
+
+export type SubscribableResource = z.infer<typeof subscribableResourceSchema>;
 
 export function parseSubscribableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

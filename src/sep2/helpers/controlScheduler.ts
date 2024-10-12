@@ -1,7 +1,6 @@
 import type { Logger } from 'pino';
 import type { SEP2Client } from '../client.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import { ResponseStatus } from '../models/derControlResponse.js';
 import type { DERControlBase } from '../models/derControlBase.js';
 import type {
     DerControlsHelperChangedData,
@@ -17,6 +16,8 @@ import { addSeconds, isEqual, max } from 'date-fns';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
 import type { DERControl } from '../models/derControl.js';
 import type { FallbackControl } from './fallbackControl.js';
+import { ResponseStatus } from '../models/responseStatus.js';
+import type { ResponseRequiredType } from '../models/responseRequired.js';
 
 export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 
@@ -39,7 +40,10 @@ export type ControlSchedule = {
     endExclusive: Date;
     randomizeStart: number | undefined;
     randomizeDuration: number | undefined;
-    data: MergedControlsData;
+    mRID: string;
+    derControlBase: DERControlBase;
+    responseRequired: ResponseRequiredType;
+    replyToHref: string | undefined;
 };
 
 export class ControlSchedulerHelper<ControlKey extends ControlType> {
@@ -105,7 +109,9 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 );
 
                 void this.derControlResponseHelper.respondDerControl({
-                    derControl: supersededControl,
+                    mRID: supersededControl.mRID,
+                    replyToHref: supersededControl.replyToHref,
+                    responseRequired: supersededControl.responseRequired,
                     status: ResponseStatus.EventSuperseded,
                 });
             },
@@ -127,8 +133,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         const newActiveControlSchedule = this.findActiveControlScheduleForNow();
 
         if (
-            this.activeControlSchedule?.data.control.mRID !==
-            newActiveControlSchedule?.data.control.mRID
+            this.activeControlSchedule?.mRID !== newActiveControlSchedule?.mRID
         ) {
             void this.handleActiveControlScheduleChange(
                 newActiveControlSchedule,
@@ -160,7 +165,10 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 );
 
                 await this.derControlResponseHelper.respondDerControl({
-                    derControl: this.activeControlSchedule.data.control,
+                    mRID: this.activeControlSchedule.mRID,
+                    replyToHref: this.activeControlSchedule.replyToHref,
+                    responseRequired:
+                        this.activeControlSchedule.responseRequired,
                     status: ResponseStatus.EventCompleted,
                 });
             } else {
@@ -176,8 +184,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
             // remove the active control schedule from the schedule list
             this.controlSchedules = this.controlSchedules.filter(
                 (schedule) =>
-                    schedule.data.control.mRID !==
-                    this.activeControlSchedule?.data.control.mRID,
+                    schedule.mRID !== this.activeControlSchedule?.mRID,
             );
         }
 
@@ -188,7 +195,9 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
             );
 
             await this.derControlResponseHelper.respondDerControl({
-                derControl: newActiveControlSchedule.data.control,
+                mRID: newActiveControlSchedule.mRID,
+                replyToHref: newActiveControlSchedule.replyToHref,
+                responseRequired: newActiveControlSchedule.responseRequired,
                 status: ResponseStatus.EventStarted,
             });
         } else {
@@ -210,8 +219,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         });
 
         if (this.activeControlSchedule) {
-            const controlBase =
-                this.activeControlSchedule.data.control.derControlBase;
+            const controlBase = this.activeControlSchedule.derControlBase;
 
             return {
                 type: 'active',
@@ -376,7 +384,10 @@ function buildChunkedControlsScheduleByPriority({
 
         // add to schedule until the next datetime event
         controlsSchedules.push({
-            data: firstControl,
+            mRID: firstControl.control.mRID,
+            replyToHref: firstControl.control.replyToHref,
+            responseRequired: firstControl.control.responseRequired,
+            derControlBase: firstControl.control.derControlBase,
             startInclusive: datetimeEvent,
             endExclusive:
                 nextdateTimeEvent ?? getDerControlEndDate(firstControl.control),
@@ -405,7 +416,7 @@ function joinChunkedControlSchedules({
             continue;
         }
 
-        if (lastSchedule.data.control.mRID === schedule.data.control.mRID) {
+        if (lastSchedule.mRID === schedule.mRID) {
             // same control
             // update the end date with the current end date
             lastSchedule.endExclusive = schedule.endExclusive;
@@ -437,8 +448,7 @@ export function applyRandomizationToControlSchedule({
         // assume it already has randomization applied so we'll keep both the start/duration randomization
         if (
             activeControlSchedule &&
-            schedule.data.control.mRID ===
-                activeControlSchedule.data.control.mRID
+            schedule.mRID === activeControlSchedule.mRID
         ) {
             randomizedControlSchedules.push(activeControlSchedule);
             continue;

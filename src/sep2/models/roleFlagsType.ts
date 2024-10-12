@@ -1,3 +1,5 @@
+import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
+
 // Bit 0 - isMirror - SHALL be set if the server is not the measurement device
 // Bit 1 - isPremisesAggregationPoint - SHALL be set if the UsagePoint is the point of delivery for a premises
 // Bit 2 - isPEV - SHALL be set if the usage applies to an electric vehicle
@@ -16,3 +18,5 @@ export enum RoleFlagsType {
     isSubmeter = 1 << 6,
     // Reserved bits 7 to 15
 }
+
+export const roleFlagsTypeSchema = zodBitwiseEnumSchema(RoleFlagsType);

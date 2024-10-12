@@ -1,16 +1,20 @@
+import { z } from 'zod';
 import { assertArray } from '../helpers/assert.js';
-import { parseEndDeviceObject, type EndDevice } from './endDevice.js';
-import type { PollRate } from './pollRate.js';
-import { parsePollRateXmlObject } from './pollRate.js';
+import { endDeviceSchema, parseEndDeviceObject } from './endDevice.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import {
     parseSubscribableListXmlObject,
-    type SubscribableList,
+    subscribableListSchema,
 } from './subscribableList.js';
 
-export type EndDeviceList = {
-    pollRate: PollRate;
-    endDevices: EndDevice[];
-} & SubscribableList;
+export const endDeviceListSchema = z
+    .object({
+        pollRate: pollRateSchema,
+        endDevices: endDeviceSchema.array(),
+    })
+    .merge(subscribableListSchema);
+
+export type EndDeviceList = z.infer<typeof endDeviceListSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceListXml(xml: any): EndDeviceList {

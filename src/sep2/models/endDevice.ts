@@ -1,26 +1,31 @@
+import { z } from 'zod';
 import { assertString } from '../helpers/assert.js';
 import { booleanToString, stringToBoolean } from '../helpers/boolean.js';
 import { dateToStringSeconds, stringIntToDate } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
-import { parseLinkXmlObject, type Link } from './link.js';
-import { parseListLinkXmlObject, type ListLink } from './listLink.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
+import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export type EndDevice = {
-    lFDI?: string;
-    sFDI: string;
-    changedTime: Date;
-    enabled: boolean;
-    derListLink: ListLink | undefined;
-    logEventListLink: ListLink | undefined;
-    registrationLink: Link | undefined;
-    functionSetAssignmentsListLink: ListLink | undefined;
-    subscriptionListLink: ListLink | undefined;
-    connectionPointLink: Link | undefined;
-} & SubscribableResource;
+export const endDeviceSchema = z
+    .object({
+        lFDI: z.string().optional(),
+        sFDI: z.string(),
+        changedTime: z.coerce.date(),
+        enabled: z.boolean(),
+        derListLink: listLinkSchema.optional(),
+        logEventListLink: listLinkSchema.optional(),
+        registrationLink: linkSchema.optional(),
+        functionSetAssignmentsListLink: listLinkSchema.optional(),
+        subscriptionListLink: listLinkSchema.optional(),
+        connectionPointLink: linkSchema.optional(),
+    })
+    .merge(subscribableResourceSchema);
+
+export type EndDevice = z.infer<typeof endDeviceSchema>;
 
 export type EndDeviceResponse = Pick<
     EndDevice,

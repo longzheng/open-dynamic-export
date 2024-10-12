@@ -1,26 +1,39 @@
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import {
+    derControlBaseSchema,
     parseDERControlBaseXmlObject,
-    type DERControlBase,
 } from './derControlBase.js';
 import {
+    identifiedObjectSchema,
     parseIdentifiedObjectXmlObject,
-    type IdentifiedObject,
 } from './identifiedObject.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
+import { z } from 'zod';
 
-export type DefaultDERControl = {
-    derControlBase: DERControlBase;
-    // Set default rate of change (ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a default ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setGradW).
-    setGradW: number | undefined;
-    // Set soft-start rate of change (soft-start ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setSoftGradW).
-    setSoftGradW: number | undefined;
-} & IdentifiedObject &
-    SubscribableResource;
+export const defaultDERControlSchema = z
+    .object({
+        derControlBase: derControlBaseSchema,
+        setGradW: z
+            .number()
+            .optional()
+            .describe(
+                'Set default rate of change (ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a default ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setGradW).',
+            ),
+        setSoftGradW: z
+            .number()
+            .optional()
+            .describe(
+                'Set soft-start rate of change (soft-start ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setSoftGradW).',
+            ),
+    })
+    .merge(identifiedObjectSchema)
+    .merge(subscribableResourceSchema);
+
+export type DefaultDERControl = z.infer<typeof defaultDERControlSchema>;
 
 export function parseDefaultDERControlXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

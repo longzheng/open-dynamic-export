@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 0 = Not Applicable (default, if not specified)
 // 2 = Average
 // 8 = Maximum
@@ -15,3 +17,5 @@ export enum DataQualifierType {
     PopulationStandardDeviation = '29',
     SampleStandardDeviation = '30',
 }
+
+export const dataQualifierTypeSchema = z.nativeEnum(DataQualifierType);

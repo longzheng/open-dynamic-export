@@ -1,13 +1,12 @@
 import type { Logger } from 'pino';
 import type { SEP2Client } from '../client.js';
-import type { DERControl } from '../models/derControl.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import { ResponseStatus } from '../models/derControlResponse.js';
 import { generateDerControlResponse } from '../models/derControlResponse.js';
 import { objectToXml } from './xml.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import deepEqual from 'fast-deep-equal';
+import { ResponseStatus } from '../models/responseStatus.js';
 
 type HistoryKey = {
     mRID: string;
@@ -30,33 +29,36 @@ export class DerControlResponseHelper {
     }
 
     public async respondDerControl({
-        derControl,
+        responseRequired,
+        replyToHref,
+        mRID,
         status,
     }: {
-        derControl: DERControl;
+        responseRequired: ResponseRequiredType;
+        replyToHref: string | undefined;
+        mRID: string;
         status: ResponseStatus;
     }) {
         // if the DERControl does not require any response, we do not respond
-        if (derControl.responseRequired === (0 as ResponseRequiredType)) {
+        if (responseRequired === (0 as ResponseRequiredType)) {
             return;
         }
 
         // if the DERControl only wants message received events
         // and we're sending anything other than EventReceived, we do not respond
         if (
-            derControl.responseRequired ===
-                ResponseRequiredType.MessageReceived &&
+            responseRequired === ResponseRequiredType.MessageReceived &&
             status !== ResponseStatus.EventReceived
         ) {
             return;
         }
 
         // if the DERControl does not have a reply to URL
-        if (!derControl.replyToHref) {
+        if (!replyToHref) {
             return;
         }
 
-        const historyKey: HistoryKey = { mRID: derControl.mRID, status };
+        const historyKey: HistoryKey = { mRID, status };
 
         // if we've already sent the same response, don't send it again
         if (
@@ -73,18 +75,18 @@ export class DerControlResponseHelper {
             createdDateTime: new Date(),
             endDeviceLFDI: this.client.lfdi,
             status,
-            subject: derControl.mRID,
+            subject: mRID,
         });
 
         this.logger.debug(
-            { derControl, response },
+            { controlMRID: mRID, responseRequired, replyToHref, response },
             'Sending DERControl response',
         );
 
         const xml = objectToXml(response);
 
         try {
-            await this.client.post(derControl.replyToHref, xml);
+            await this.client.post(replyToHref, xml);
         } catch (error) {
             this.logger.error(error, 'Failed to send DERControl response');
         }

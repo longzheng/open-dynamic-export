@@ -1,33 +1,25 @@
-import { safeParseStringToEnumType } from '../../helpers/enum.js';
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
-import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
-import { parseResourceXmlObject, type Resource } from './resource.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
+import { parseResourceXmlObject, resourceSchema } from './resource.js';
+import { timeQualitySchema } from './timeQuality.js';
 
-// 3 = Time obtained from external authoritative source such as NTP
-// 4 = Time obtained from level 3 source
-// 5 = Time manually set or obtained from level 4 source
-// 6 = Time obtained from level 5 source
-// 7 = Time intentionally uncoordinated
-export enum TimeQuality {
-    External = '3',
-    Level3 = '4',
-    Level4 = '5',
-    Level5 = '6',
-    Uncoordinated = '7',
-}
+export const timeSchema = z
+    .object({
+        pollRate: pollRateSchema,
+        currentTime: z.coerce.date(),
+        dstEndTime: z.coerce.date(),
+        dstOffset: z.number(),
+        dstStartTime: z.coerce.date(),
+        localTime: z.coerce.date().optional(),
+        quality: timeQualitySchema,
+        tzOffset: z.number(),
+    })
+    .merge(resourceSchema);
 
-export type Time = {
-    pollRate: PollRate;
-    currentTime: Date;
-    dstEndTime: Date;
-    dstOffset: number;
-    dstStartTime: Date;
-    localTime?: Date;
-    quality: TimeQuality;
-    tzOffset: number;
-} & Resource;
+export type Time = z.infer<typeof timeSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseTimeXml(xml: any): Time {
@@ -49,9 +41,8 @@ export function parseTimeXml(xml: any): Time {
     const localTime = xml['Time']['localTime']
         ? stringIntToDate(assertString(xml['Time']['localTime'][0]))
         : undefined;
-    const quality = safeParseStringToEnumType(
+    const quality = timeQualitySchema.parse(
         assertString(xml['Time']['quality'][0]),
-        TimeQuality,
     );
     const tzOffset = safeParseIntString(
         assertString(xml['Time']['tzOffset'][0]),

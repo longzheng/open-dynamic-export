@@ -1,12 +1,20 @@
 import { stringHexToEnumType } from '../../helpers/enum.js';
 import { assertString } from '../helpers/assert.js';
-import { parseResourceXmlObject, type Resource } from './resource.js';
-import { type ResponseRequiredType } from './responseRequired.js';
+import { parseResourceXmlObject, resourceSchema } from './resource.js';
+import {
+    responseRequiredTypeSchema,
+    type ResponseRequiredType,
+} from './responseRequired.js';
+import { z } from 'zod';
 
-export type RespondableResource = {
-    replyToHref?: string;
-    responseRequired: ResponseRequiredType;
-} & Resource;
+export const respondableResourceSchema = z
+    .object({
+        replyToHref: z.string().optional(),
+        responseRequired: responseRequiredTypeSchema,
+    })
+    .merge(resourceSchema);
+
+export type RespondableResource = z.infer<typeof respondableResourceSchema>;
 
 export function parseRespondableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

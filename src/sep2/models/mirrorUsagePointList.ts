@@ -1,14 +1,20 @@
+import { z } from 'zod';
 import { assertArray } from '../helpers/assert.js';
-import { parseListXmlObject, type List } from './list.js';
-import type { MirrorUsagePoint } from './mirrorUsagePoint.js';
-import { parseMirrorUsagePointXmlObject } from './mirrorUsagePoint.js';
-import type { PollRate } from './pollRate.js';
-import { parsePollRateXmlObject } from './pollRate.js';
+import { listSchema, parseListXmlObject } from './list.js';
+import {
+    mirrorUsagePointSchema,
+    parseMirrorUsagePointXmlObject,
+} from './mirrorUsagePoint.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 
-export type MirrorUsagePointList = {
-    pollRate: PollRate;
-    mirrorUsagePoints: MirrorUsagePoint[];
-} & List;
+export const mirrorUsagePointListSchema = z
+    .object({
+        pollRate: pollRateSchema,
+        mirrorUsagePoints: mirrorUsagePointSchema.array(),
+    })
+    .merge(listSchema);
+
+export type MirrorUsagePointList = z.infer<typeof mirrorUsagePointListSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {

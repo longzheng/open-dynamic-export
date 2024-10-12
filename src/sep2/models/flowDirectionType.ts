@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 0 = Not Applicable (default, if not specified)
 // 1 = Forward (delivered to customer)
 // 19 = Reverse (received from customer)
@@ -7,3 +9,5 @@ export enum FlowDirectionType {
     Forward = '1',
     Reverse = '19',
 }
+
+export const flowDirectionTypeSchema = z.nativeEnum(FlowDirectionType);

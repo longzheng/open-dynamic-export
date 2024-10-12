@@ -1,3 +1,4 @@
+import { z } from 'zod';
 // 0 = Not Applicable (default, if not specified)
 // 1 = Electricity secondary metered value (a premises meter is typically on the low voltage, or secondary, side of a service transformer)
 // 2 = Electricity primary metered value (measured on the high voltage, or primary, side of the service transformer)
@@ -9,6 +10,7 @@
 // 11 = WasteWater
 // 12 = HeatingFluid
 // 13 = CoolingFluid
+
 // All other values reserved.
 export enum CommodityType {
     NotApplicable = '0',
@@ -23,3 +25,5 @@ export enum CommodityType {
     HeatingFluid = '12',
     CoolingFluid = '13',
 }
+
+export const commodityTypeSchema = z.nativeEnum(CommodityType);

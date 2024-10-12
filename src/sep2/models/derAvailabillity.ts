@@ -1,10 +1,12 @@
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
+import { z } from 'zod';
 
-export type DERAvailability = {
-    readingTime: Date;
-    // TODO: partially implemented
-};
+export const derAvailabilitySchema = z.object({
+    readingTime: z.coerce.date(),
+});
+
+export type DERAvailability = z.infer<typeof derAvailabilitySchema>;
 
 export function generateDerAvailabilityResponse({
     readingTime,

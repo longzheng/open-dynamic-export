@@ -1,23 +1,28 @@
 import { assertString } from '../helpers/assert.js';
-import { parseLinkXmlObject, type Link } from './link.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
 import { safeParseIntString } from '../../helpers/number.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
 import {
+    identifiedObjectSchema,
     parseIdentifiedObjectXmlObject,
-    type IdentifiedObject,
 } from './identifiedObject.js';
-import { parseListLinkXmlObject, type ListLink } from './listLink.js';
+import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
+import { z } from 'zod';
 
-export type DERProgram = {
-    defaultDerControlLink: Link | undefined;
-    derControlListLink: ListLink | undefined;
-    derCurveListLink: ListLink | undefined;
-    primacy: number;
-} & SubscribableResource &
-    IdentifiedObject;
+export const derProgramSchema = z
+    .object({
+        defaultDerControlLink: linkSchema.optional(),
+        derControlListLink: listLinkSchema.optional(),
+        derCurveListLink: listLinkSchema.optional(),
+        primacy: z.number(),
+    })
+    .merge(subscribableResourceSchema)
+    .merge(identifiedObjectSchema);
+
+export type DERProgram = z.infer<typeof derProgramSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERProgramXmlObject(xmlObject: any): DERProgram {

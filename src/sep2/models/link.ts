@@ -1,8 +1,11 @@
 import { assertString } from '../helpers/assert.js';
+import { z } from 'zod';
 
-export type Link = {
-    href: string;
-};
+export const linkSchema = z.object({
+    href: z.string(),
+});
+
+export type Link = z.infer<typeof linkSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseLinkXmlObject(xmlObject: any): Link {

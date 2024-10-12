@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 0 = Not Applicable (default, if not specified)
 // 3 = Currency
 // 8 = Demand
@@ -11,3 +13,5 @@ export enum KindType {
     Energy = '12',
     Power = '37',
 }
+
+export const kindTypeSchema = z.nativeEnum(KindType);

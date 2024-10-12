@@ -6,12 +6,12 @@ import {
     DerControlsHelper,
     sortMergedControlsDataByStartTimeAscending,
 } from './derControls.js';
-import { CurrentStatus } from '../models/eventStatus.js';
 import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { CurrentStatus } from '../models/currentStatus.js';
 
 const sep2Client = new SEP2Client({
     sep2Config: {

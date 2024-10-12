@@ -1,15 +1,20 @@
-import { parseLinkXmlObject, type Link } from './link.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
+import { z } from 'zod';
 
-export type DER = {
-    derAvailabilityLink: Link | undefined;
-    derCapabilityLink: Link | undefined;
-    derSettingsLink: Link | undefined;
-    derStatusLink: Link | undefined;
-} & SubscribableResource;
+export const derSchema = z
+    .object({
+        derAvailabilityLink: linkSchema.optional(),
+        derCapabilityLink: linkSchema.optional(),
+        derSettingsLink: linkSchema.optional(),
+        derStatusLink: linkSchema.optional(),
+    })
+    .merge(subscribableResourceSchema);
+
+export type DER = z.infer<typeof derSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerXmlObject(xmlObject: any): DER {

@@ -1,19 +1,25 @@
+import { z } from 'zod';
 import { assertArray } from '../helpers/assert.js';
 import {
+    functionSetAssignmentsSchema,
     parseFunctionSetAssignmentsXmlObject,
-    type FunctionSetAssignments,
 } from './functionSetAssignments.js';
-import type { PollRate } from './pollRate.js';
-import { parsePollRateXmlObject } from './pollRate.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import {
     parseSubscribableListXmlObject,
-    type SubscribableList,
+    subscribableListSchema,
 } from './subscribableList.js';
 
-export type FunctionSetAssignmentsList = {
-    pollRate: PollRate;
-    functionSetAssignments: FunctionSetAssignments[];
-} & SubscribableList;
+export const functionSetAssignmentsListSchema = z
+    .object({
+        pollRate: pollRateSchema,
+        functionSetAssignments: functionSetAssignmentsSchema.array(),
+    })
+    .merge(subscribableListSchema);
+
+export type FunctionSetAssignmentsList = z.infer<
+    typeof functionSetAssignmentsListSchema
+>;
 
 export function parseFunctionSetAssignmentsListXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

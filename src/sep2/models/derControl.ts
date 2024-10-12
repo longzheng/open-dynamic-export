@@ -1,15 +1,20 @@
 import {
+    derControlBaseSchema,
     parseDERControlBaseXmlObject,
-    type DERControlBase,
 } from './derControlBase.js';
 import {
     parseRandomizableEventXmlObject,
-    type RandomizableEvent,
+    randomizableEventSchema,
 } from './randomizableEvent.js';
+import { z } from 'zod';
 
-export type DERControl = {
-    derControlBase: DERControlBase;
-} & RandomizableEvent;
+export const derControlSchema = z
+    .object({
+        derControlBase: derControlBaseSchema,
+    })
+    .merge(randomizableEventSchema);
+
+export type DERControl = z.infer<typeof derControlSchema>;
 
 export function parseDERControlXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

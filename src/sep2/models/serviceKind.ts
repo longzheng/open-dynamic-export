@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // Service kind
 // 0 - electricity
 // 1 - gas
@@ -16,3 +18,5 @@ export enum ServiceKind {
     Heat = '5',
     Cooling = '6',
 }
+
+export const serviceKindSchema = z.nativeEnum(ServiceKind);

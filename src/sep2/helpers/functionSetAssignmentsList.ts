@@ -8,13 +8,34 @@ import {
 } from '../models/functionSetAssignmentsList.js';
 import { getListAll } from './pagination.js';
 import type { DerProgramListData } from './derProgramList.js';
-import { DerProgramListHelper } from './derProgramList.js';
-import type { FunctionSetAssignments } from '../models/functionSetAssignments.js';
+import {
+    derProgramListDataSchema,
+    DerProgramListHelper,
+} from './derProgramList.js';
+import {
+    functionSetAssignmentsSchema,
+    type FunctionSetAssignments,
+} from '../models/functionSetAssignments.js';
+import { z } from 'zod';
+import { createFileCache } from '../../helpers/fileCache.js';
+import type { Logger } from 'pino';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 
-export type FunctionSetAssignmentsListData = {
-    functionSetAssignments: FunctionSetAssignments;
-    derProgramList: DerProgramListData | null;
-}[];
+export const functionSetAssignmentsListDataSchema = z.array(
+    z.object({
+        functionSetAssignments: functionSetAssignmentsSchema,
+        derProgramList: derProgramListDataSchema.nullable(),
+    }),
+);
+
+export type FunctionSetAssignmentsListData = z.infer<
+    typeof functionSetAssignmentsListDataSchema
+>;
+
+const functionSetAssignmentsListCache = createFileCache({
+    filename: 'functionSetAssignmentsList',
+    schema: functionSetAssignmentsListDataSchema,
+});
 
 export class FunctionSetAssignmentsListHelper extends EventEmitter<{
     data: [FunctionSetAssignmentsListData];
@@ -31,11 +52,34 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
             derProgramList: DerProgramListData | null;
         }
     >();
+    private logger: Logger;
 
     constructor({ client }: { client: SEP2Client }) {
         super();
 
         this.client = client;
+
+        const logger = pinoLogger.child({
+            module: 'FunctionSetAssignmentsListHelper',
+        });
+
+        this.logger = logger;
+
+        void (async () => {
+            const cachedData = await functionSetAssignmentsListCache.get();
+
+            if (cachedData) {
+                logger.debug(
+                    { cachedData },
+                    'Loaded cached function set assignments list data',
+                );
+
+                // delay emitting data until listener is attached
+                setTimeout(() => {
+                    this.emit('data', cachedData);
+                }, 0);
+            }
+        })();
     }
 
     updateHref({ href }: { href: string }) {
@@ -104,7 +148,7 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
                                         fsa.derProgramList = data;
 
                                         // emit data if DerProgramList is polled
-                                        this.emitData();
+                                        this.cacheAndEmitData();
                                     }),
                                 derProgramList: null,
                             },
@@ -138,7 +182,7 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
                     }
 
                     // emit data if FunctionSetAssignmentsList is polled
-                    this.emitData();
+                    this.cacheAndEmitData();
                 });
         }
 
@@ -149,16 +193,17 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
         this.functionSetAssignmentsListPollableResource?.destroy();
     }
 
-    private emitData() {
-        this.emit(
-            'data',
-            [...this.dataByFunctionSetAssignmentsMrid.values()].map(
-                ({ functionSetAssignments, derProgramList }) => ({
-                    functionSetAssignments,
-                    derProgramList,
-                }),
-            ),
+    private cacheAndEmitData() {
+        const data = [...this.dataByFunctionSetAssignmentsMrid.values()].map(
+            ({ functionSetAssignments, derProgramList }) => ({
+                functionSetAssignments,
+                derProgramList,
+            }),
         );
+
+        void functionSetAssignmentsListCache.set(data);
+
+        this.emit('data', data);
     }
 }
 
