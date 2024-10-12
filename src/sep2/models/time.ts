@@ -9,11 +9,11 @@ import { timeQualitySchema } from './timeQuality.js';
 export const timeSchema = z
     .object({
         pollRate: pollRateSchema,
-        currentTime: z.date(),
-        dstEndTime: z.date(),
+        currentTime: z.coerce.date(),
+        dstEndTime: z.coerce.date(),
         dstOffset: z.number(),
-        dstStartTime: z.date(),
-        localTime: z.date().optional(),
+        dstStartTime: z.coerce.date(),
+        localTime: z.coerce.date().optional(),
         quality: timeQualitySchema,
         tzOffset: z.number(),
     })

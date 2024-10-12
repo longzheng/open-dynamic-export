@@ -14,8 +14,8 @@ import { z } from 'zod';
 
 export const mirrorMeterReadingSchema = z
     .object({
-        lastUpdateTime: z.date().optional(),
-        nextUpdateTime: z.date().optional(),
+        lastUpdateTime: z.coerce.date().optional(),
+        nextUpdateTime: z.coerce.date().optional(),
         Reading: z
             .object({
                 timePeriod: dateTimeIntervalSchema.optional(),

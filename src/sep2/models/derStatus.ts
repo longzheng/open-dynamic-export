@@ -6,13 +6,13 @@ import { operationalModeStatusSchema } from './operationModeStatus.js';
 import { z } from 'zod';
 
 export const derStatusSchema = z.object({
-    readingTime: z.date(),
+    readingTime: z.coerce.date(),
     operationalModeStatus: z.object({
-        dateTime: z.date(),
+        dateTime: z.coerce.date(),
         value: operationalModeStatusSchema,
     }),
     genConnectStatus: z.object({
-        dateTime: z.date(),
+        dateTime: z.coerce.date(),
         value: connectStatusSchema,
     }),
 });

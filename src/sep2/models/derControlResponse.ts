@@ -4,7 +4,7 @@ import { responseStatusSchema } from './responseStatus.js';
 import { z } from 'zod';
 
 export const derControlResponseSchema = z.object({
-    createdDateTime: z.date(),
+    createdDateTime: z.coerce.date(),
     endDeviceLFDI: z.string(),
     status: responseStatusSchema,
     subject: z

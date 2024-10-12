@@ -14,7 +14,7 @@ export const endDeviceSchema = z
     .object({
         lFDI: z.string().optional(),
         sFDI: z.string(),
-        changedTime: z.date(),
+        changedTime: z.coerce.date(),
         enabled: z.boolean(),
         derListLink: listLinkSchema.optional(),
         logEventListLink: listLinkSchema.optional(),

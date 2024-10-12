@@ -5,7 +5,9 @@ import { z } from 'zod';
 
 export const dateTimeIntervalSchema = z.object({
     duration: z.number().describe('Duration of the interval, in seconds.'),
-    start: z.date().describe('Date and time of the start of the interval.'),
+    start: z.coerce
+        .date()
+        .describe('Date and time of the start of the interval.'),
 });
 
 export type DateTimeInterval = z.infer<typeof dateTimeIntervalSchema>;

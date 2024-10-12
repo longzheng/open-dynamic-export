@@ -3,7 +3,7 @@ import { xmlns } from '../helpers/namespace.js';
 import { z } from 'zod';
 
 export const derAvailabilitySchema = z.object({
-    readingTime: z.date(),
+    readingTime: z.coerce.date(),
 });
 
 export type DERAvailability = z.infer<typeof derAvailabilitySchema>;

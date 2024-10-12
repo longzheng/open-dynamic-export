@@ -6,9 +6,9 @@ import { z } from 'zod';
 
 export const eventStatusSchema = z.object({
     currentStatus: currentStatusSchema,
-    dateTime: z.date(),
+    dateTime: z.coerce.date(),
     potentiallySuperseded: z.boolean(),
-    potentiallySupersededTime: z.date().optional(),
+    potentiallySupersededTime: z.coerce.date().optional(),
     reason: z.string().optional(),
 });
 

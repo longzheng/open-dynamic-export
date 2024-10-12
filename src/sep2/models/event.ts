@@ -21,7 +21,7 @@ import {
 
 export const eventSchema = z
     .object({
-        creationTime: z.date(),
+        creationTime: z.coerce.date(),
         interval: dateTimeIntervalSchema,
         eventStatus: eventStatusSchema,
     })

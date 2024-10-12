@@ -9,7 +9,7 @@ import { doeControlTypeSchema } from './doeModesSupportedType.js';
 import { z } from 'zod';
 
 export const derSettingsSchema = z.object({
-    updatedTime: z.date(),
+    updatedTime: z.coerce.date(),
     modesEnabled: derControlTypeSchema,
     doeModesEnabled: doeControlTypeSchema.describe(
         'Bitmap indicating the DOE controls implemented by the device. See DOEControlType for values.',

@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 export const registrationSchema = z
     .object({
-        dateTimeRegistered: z.date(),
+        dateTimeRegistered: z.coerce.date(),
         pIN: z.number(),
         pollRate: pollRateSchema,
     })
