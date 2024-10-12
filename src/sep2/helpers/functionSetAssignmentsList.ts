@@ -18,6 +18,8 @@ import {
 } from '../models/functionSetAssignments.js';
 import { z } from 'zod';
 import { createFileCache } from '../../helpers/fileCache.js';
+import type { Logger } from 'pino';
+import { logger as pinoLogger } from '../../helpers/logger.js';
 
 export const functionSetAssignmentsListDataSchema = z.array(
     z.object({
@@ -50,17 +52,34 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
             derProgramList: DerProgramListData | null;
         }
     >();
+    private logger: Logger;
 
     constructor({ client }: { client: SEP2Client }) {
         super();
 
         this.client = client;
 
-        const cachedData = functionSetAssignmentsListCache.get();
+        const logger = pinoLogger.child({
+            module: 'FunctionSetAssignmentsListHelper',
+        });
 
-        if (cachedData) {
-            this.emit('data', cachedData);
-        }
+        this.logger = logger;
+
+        void (async () => {
+            const cachedData = await functionSetAssignmentsListCache.get();
+
+            if (cachedData) {
+                logger.debug(
+                    { cachedData },
+                    'Loaded cached function set assignments list data',
+                );
+
+                // delay emitting data until listener is attached
+                setTimeout(() => {
+                    this.emit('data', cachedData);
+                }, 0);
+            }
+        })();
     }
 
     updateHref({ href }: { href: string }) {
@@ -182,7 +201,7 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
             }),
         );
 
-        functionSetAssignmentsListCache.set(data);
+        void functionSetAssignmentsListCache.set(data);
 
         this.emit('data', data);
     }
