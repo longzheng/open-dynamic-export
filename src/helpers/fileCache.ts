@@ -1,5 +1,4 @@
-import { writeFile } from 'fs/promises';
-import { readFileSync } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
 import type { ZodSchema } from 'zod';
 import { env } from './env.js';
 import { logger } from './logger.js';
@@ -13,10 +12,10 @@ export function createFileCache<T>({
 }) {
     const cachePath = `${env.CONFIG_DIR}/cache_${filename}.json`;
 
-    function get(): T | null {
-        const cachedFile = (() => {
+    async function get(): Promise<T | null> {
+        const cachedFile = await (async () => {
             try {
-                return readFileSync(cachePath, 'utf8');
+                return await readFile(cachePath, 'utf8');
             } catch {
                 return null;
             }
@@ -39,8 +38,8 @@ export function createFileCache<T>({
         return result.data;
     }
 
-    function set(data: T): void {
-        void writeFile(cachePath, JSON.stringify(data));
+    async function set(data: T): Promise<void> {
+        await writeFile(cachePath, JSON.stringify(data));
     }
 
     return { get, set };
