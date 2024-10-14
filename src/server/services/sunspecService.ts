@@ -14,7 +14,6 @@ export async function getSunSpecData() {
     const config = getConfig();
 
     const invertersConnections = config.inverters
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         .filter((inverter) => inverter.type === 'sunspec')
         .map((inverter) => getSunSpecInvertersConnection(inverter));
 

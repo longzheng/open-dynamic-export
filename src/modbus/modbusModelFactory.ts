@@ -1,9 +1,7 @@
 import { objectEntriesWithType } from '../helpers/object.js';
-import type {
-    ModelAddress,
-    SunSpecConnection,
-} from '../sunspec/connection/base.js';
+import type { ModelAddress } from '../sunspec/connection/base.js';
 import { writeLatency } from '../helpers/influxdb.js';
+import type { ModbusConnection } from './connection/base.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,11 +27,11 @@ export function modbusModelFactory<
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
-        modbusConnection: SunSpecConnection;
+        modbusConnection: ModbusConnection;
         address: ModelAddress;
     }): Promise<Model>;
     write(params: {
-        modbusConnection: SunSpecConnection;
+        modbusConnection: ModbusConnection;
         address: ModelAddress;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;

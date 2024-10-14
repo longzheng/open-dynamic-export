@@ -24,7 +24,6 @@ export class InvertersPoller extends EventEmitter<{
         this.inverterDataPollers = config.inverters.map(
             (inverterConfig, index) => {
                 switch (inverterConfig.type) {
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                     case 'sunspec': {
                         return new SunSpecInverterDataPoller({
                             sunspecInverterConfig: inverterConfig,
@@ -35,6 +34,9 @@ export class InvertersPoller extends EventEmitter<{
 
                             this.onData();
                         });
+                    }
+                    case 'sma': {
+                        throw new Error('Not implemented');
                     }
                 }
             },

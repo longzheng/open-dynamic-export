@@ -2,22 +2,22 @@ import { z } from 'zod';
 import { readFileSync } from 'fs';
 import { env } from './env.js';
 
-const sunspecModbusSchema = {
+const modbusSchema = {
     ip: z
         .string()
         .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
-        .describe('The IP address of the SunSpec device'),
+        .describe('The IP address of the Modbus device'),
     port: z
         .number()
         .min(1)
         .max(65535)
-        .describe('The port of the SunSpec device'),
+        .describe('The port of the Modbus device'),
     unitId: z
         .number()
         .min(1)
         .max(255)
         .default(1)
-        .describe('The unit/slave ID of the SunSpec device. Defaults to 1.'),
+        .describe('The unit/slave ID of the Modbus device. Defaults to 1.'),
 };
 
 export const configSchema = z.object({
@@ -115,12 +115,21 @@ export const configSchema = z.object({
         .describe('Limiters configuration'),
     inverters: z
         .array(
-            z
-                .object({
-                    type: z.literal('sunspec'),
-                    ...sunspecModbusSchema,
-                })
-                .describe('SunSpec inverter configuration'),
+            z.union([
+                z
+                    .object({
+                        type: z.literal('sunspec'),
+                        ...modbusSchema,
+                    })
+                    .describe('SunSpec inverter configuration'),
+                z
+                    .object({
+                        type: z.literal('sma'),
+                        model: z.literal('core1'),
+                        ...modbusSchema,
+                    })
+                    .describe('SMA inverter configuration'),
+            ]),
         )
         .describe('Inverter configuration'),
     inverterControl: z.object({
@@ -146,13 +155,20 @@ A longer time will smooth out load changes but may result in overshoot.`,
         z
             .object({
                 type: z.literal('sunspec'),
-                ...sunspecModbusSchema,
+                ...modbusSchema,
                 location: z.union([
                     z.literal('feedin'),
                     z.literal('consumption'),
                 ]),
             })
             .describe('SunSpec meter configuration'),
+        z
+            .object({
+                type: z.literal('sma'),
+                model: z.literal('core1'),
+                ...modbusSchema,
+            })
+            .describe('SMA meter configuration'),
         z
             .object({
                 type: z.literal('powerwall2'),

@@ -1,11 +1,12 @@
-import { modbusModelFactory } from '../../../modbus/modbusModelFactory.js';
+import { modbusModelFactory } from '../modbusModelFactory.js';
 import {
-    registersToUint16,
+    registersToInt32,
+    registersToInt32Nullable,
     registersToUint32,
     registersToUint32Nullable,
-} from '../../../sunspec/helpers/converters.js';
+} from '../../sunspec/helpers/converters.js';
 
-export type SmaMeteringModel = {
+export type SmaCore1Meter1 = {
     // Grid power phase L1
     PhV_phsA: number;
     // Grid power phase L2
@@ -31,7 +32,10 @@ export type SmaMeteringModel = {
     // Reactive power grid feeding phase L3
     VAr_phsC: number | null;
     // Reactive power grid feeding
-    TotVAr: number;
+    TotVar: number;
+};
+
+export type SmaCore1Meter2 = {
     // Displacement power factor
     TotPF: number;
     // Grid current phase L1
@@ -56,27 +60,25 @@ export type SmaMeteringModel = {
     PhV_phsB2C: number | null;
     // Apparent power
     TotVA: number;
-    // EEI displacement power factor
-    TotPFEEI: number;
 };
 
-export const meterModel = modbusModelFactory<SmaMeteringModel>({
-    name: 'smaMetering',
+export const smaCore1MeterModel1 = modbusModelFactory<SmaCore1Meter1>({
+    name: 'smaCore1MeterModel1',
     mapping: {
         PhV_phsA: {
             start: 0,
             end: 2,
-            readConverter: registersToUint32,
+            readConverter: (value) => registersToUint32(value, -2),
         },
         PhV_phsB: {
             start: 2,
             end: 4,
-            readConverter: registersToUint32Nullable,
+            readConverter: (value) => registersToUint32Nullable(value, -2),
         },
         PhV_phsC: {
             start: 4,
             end: 6,
-            readConverter: registersToUint32Nullable,
+            readConverter: (value) => registersToUint32Nullable(value, -2),
         },
         W_phsA: {
             start: 6,
@@ -111,17 +113,88 @@ export const meterModel = modbusModelFactory<SmaMeteringModel>({
         VAr_phsA: {
             start: 18,
             end: 20,
-            readConverter: registersToUint32,
+            readConverter: registersToInt32,
         },
         VAr_phsB: {
             start: 20,
             end: 22,
-            readConverter: registersToUint32Nullable,
+            readConverter: registersToInt32Nullable,
         },
         VAr_phsC: {
             start: 22,
             end: 24,
-            readConverter: registersToUint32Nullable,
+            readConverter: registersToInt32Nullable,
+        },
+        TotVar: {
+            start: 24,
+            end: 26,
+            readConverter: registersToInt32,
+        },
+    },
+});
+
+export const smaCore1MeterModel2 = modbusModelFactory<SmaCore1Meter2>({
+    name: 'smaCore1MeterModel2',
+    mapping: {
+        TotPF: {
+            start: 0,
+            end: 2,
+            readConverter: (value) => registersToUint32(value, -2),
+        },
+        A_phsA: {
+            start: 2,
+            end: 4,
+            readConverter: (value) => registersToInt32(value, -3),
+        },
+        A_phsB: {
+            start: 4,
+            end: 6,
+            readConverter: (value) => registersToInt32Nullable(value, -3),
+        },
+        A_phsC: {
+            start: 6,
+            end: 8,
+            readConverter: (value) => registersToInt32Nullable(value, -3),
+        },
+        VA_phsA: {
+            start: 8,
+            end: 10,
+            readConverter: registersToInt32,
+        },
+        VA_phsB: {
+            start: 10,
+            end: 12,
+            readConverter: registersToInt32Nullable,
+        },
+        VA_phsC: {
+            start: 12,
+            end: 14,
+            readConverter: registersToInt32Nullable,
+        },
+        Hz: {
+            start: 14,
+            end: 16,
+            readConverter: (value) => registersToUint32(value, -2),
+        },
+        PhV_phsC2A: {
+            start: 16,
+            end: 18,
+            readConverter: (value) => registersToUint32Nullable(value, -2),
+        },
+        PhV_phsA2B: {
+            start: 18,
+            end: 20,
+            readConverter: (value) => registersToUint32Nullable(value, -2),
+        },
+        PhV_phsB2C: {
+            start: 20,
+            end: 22,
+            readConverter: (value) => registersToUint32Nullable(value, -2),
+        },
+        TotVA: {
+            start: 22,
+            end: 24,
+            readConverter: registersToInt32,
         },
     },
 });
