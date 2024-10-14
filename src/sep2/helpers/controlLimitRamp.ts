@@ -39,16 +39,7 @@ export class ControlLimitRampHelper {
             case 'active':
             case 'default': {
                 if (target.value === undefined) {
-                    const totalNameplateWatts =
-                        this.rampRateHelper.getTotalNameplateWatts;
-
-                    this.target = totalNameplateWatts
-                        ? {
-                              type: target.type,
-                              value: totalNameplateWatts,
-                              endDateTime: null,
-                          }
-                        : { type: 'none' };
+                    this.target = { type: 'none' };
                     return;
                 }
 

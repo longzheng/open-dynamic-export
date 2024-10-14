@@ -7,10 +7,10 @@ export class CappedArrayStack<T> {
         this.array = [];
     }
 
-    public push(item: T) {
-        this.array.push(item);
+    public push(...items: T[]) {
+        this.array.push(...items);
 
-        if (this.array.length > this.limit) {
+        while (this.array.length > this.limit) {
             this.array.shift();
         }
     }

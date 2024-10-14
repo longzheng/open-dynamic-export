@@ -1,14 +1,19 @@
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
-import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
-import { parseResourceXmlObject, type Resource } from './resource.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
+import { parseResourceXmlObject, resourceSchema } from './resource.js';
+import { z } from 'zod';
 
-export type Registration = {
-    dateTimeRegistered: Date;
-    pIN: number;
-    pollRate: PollRate;
-} & Resource;
+export const registrationSchema = z
+    .object({
+        dateTimeRegistered: z.coerce.date(),
+        pIN: z.number(),
+        pollRate: pollRateSchema,
+    })
+    .merge(resourceSchema);
+
+export type Registration = z.infer<typeof registrationSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseRegistrationXml(xml: any): Registration {

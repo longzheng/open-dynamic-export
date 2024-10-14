@@ -1,15 +1,16 @@
-import type { Link } from './link.js';
-import { parseLinkXmlObject } from './link.js';
-import type { ListLink } from './listLink.js';
-import { parseListLinkXmlObject } from './listLink.js';
-import { parsePollRateXmlObject, type PollRate } from './pollRate.js';
+import { z } from 'zod';
+import { linkSchema, parseLinkXmlObject } from './link.js';
+import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
+import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 
-export type DeviceCapability = {
-    pollRate: PollRate;
-    timeLink: Link;
-    endDeviceListLink: ListLink;
-    mirrorUsagePointListLink: ListLink;
-};
+export const deviceCapabilitySchema = z.object({
+    pollRate: pollRateSchema,
+    timeLink: linkSchema,
+    endDeviceListLink: listLinkSchema,
+    mirrorUsagePointListLink: listLinkSchema,
+});
+
+export type DeviceCapability = z.infer<typeof deviceCapabilitySchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDeviceCapabilityXml(xml: any): DeviceCapability {

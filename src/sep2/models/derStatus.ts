@@ -1,21 +1,23 @@
-import type { ConnectStatus } from './connectStatus.js';
+import { connectStatusSchema } from './connectStatus.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
 import { numberToHex } from '../../helpers/number.js';
-import type { OperationalModeStatus } from './operationModeStatus.js';
+import { operationalModeStatusSchema } from './operationModeStatus.js';
+import { z } from 'zod';
 
-export type DERStatus = {
-    readingTime: Date;
-    operationalModeStatus: {
-        dateTime: Date;
-        value: OperationalModeStatus;
-    };
-    genConnectStatus: {
-        dateTime: Date;
-        value: ConnectStatus;
-    };
-    // TODO: partially implemented
-};
+export const derStatusSchema = z.object({
+    readingTime: z.coerce.date(),
+    operationalModeStatus: z.object({
+        dateTime: z.coerce.date(),
+        value: operationalModeStatusSchema,
+    }),
+    genConnectStatus: z.object({
+        dateTime: z.coerce.date(),
+        value: connectStatusSchema,
+    }),
+});
+
+export type DERStatus = z.infer<typeof derStatusSchema>;
 
 export function generateDerStatusResponse({
     readingTime,

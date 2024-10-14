@@ -17,7 +17,7 @@ export class MqttLimiter implements LimiterType {
     constructor({ config }: { config: MqttLimiterConfig }) {
         this.logger = pinoLogger.child({ module: 'MqttLimiter' });
 
-        this.client = mqtt.connect(`mqtt://${config.host}`, {
+        this.client = mqtt.connect(config.host, {
             username: config.username,
             password: config.password,
         });

@@ -17,7 +17,7 @@ describe('ControlLimitRampHelper', () => {
         helper = new ControlLimitRampHelper({ rampRateHelper });
     });
 
-    it('should return no value for no target and no total nameplate', () => {
+    it('should return no value for no target', () => {
         helper.updateTarget({ type: 'none' });
 
         // cache initial value
@@ -26,7 +26,7 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(undefined);
     });
 
-    it('should return no value for undefined target and no total nameplate', () => {
+    it('should return no value for undefined target', () => {
         helper.updateTarget({
             type: 'active',
             value: undefined,
@@ -39,7 +39,7 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(undefined);
     });
 
-    it('should return nameplate value for active undefined target with total nameplate', () => {
+    it('should return no value for undefined target with total nameplate', () => {
         rampRateHelper.onDerSample({
             nameplate: { maxW: 10000 },
         });
@@ -51,26 +51,9 @@ describe('ControlLimitRampHelper', () => {
         });
 
         // cache initial value
-        expect(helper.getRampedValue()).toBe(10000);
+        expect(helper.getRampedValue()).toBe(undefined);
 
-        expect(helper.getRampedValue()).toBe(10000);
-    });
-
-    it('should return nameplate value for default undefined target with total nameplate', () => {
-        rampRateHelper.onDerSample({
-            nameplate: { maxW: 10000 },
-        });
-
-        helper.updateTarget({
-            type: 'active',
-            value: undefined,
-            rampTimeSeconds: undefined,
-        });
-
-        // cache initial value
-        expect(helper.getRampedValue()).toBe(10000);
-
-        expect(helper.getRampedValue()).toBe(10000);
+        expect(helper.getRampedValue()).toBe(undefined);
     });
 
     it('should return active target value immediately if first time ramping', () => {

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // 0 = Not Applicable (default, if not specified)
 // 32 = Phase C (and S2)
 // 33 = Phase CN (and S2N)
@@ -23,3 +25,5 @@ export enum PhaseCode {
     PhaseAB = '132',
     PhaseABC = '224',
 }
+
+export const phaseCodeSchema = z.nativeEnum(PhaseCode);

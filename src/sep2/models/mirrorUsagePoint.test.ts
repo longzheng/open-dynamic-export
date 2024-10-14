@@ -8,7 +8,6 @@ import {
 import { RoleFlagsType } from './roleFlagsType.js';
 import { ServiceKind } from './serviceKind.js';
 import { objectToXml } from '../helpers/xml.js';
-import { UsagePointBaseStatus } from './usagePointBase.js';
 import { QualityFlags } from './qualityFlags.js';
 import { CommodityType } from './commodityType.js';
 import { KindType } from './kindType.js';
@@ -16,6 +15,7 @@ import { DataQualifierType } from './dataQualifierType.js';
 import { FlowDirectionType } from './flowDirectionType.js';
 import { PhaseCode } from './phaseCode.js';
 import { UomType } from './uomType.js';
+import { UsagePointBaseStatus } from './usagePointBaseStatus.js';
 
 it('should parse end device DER with XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

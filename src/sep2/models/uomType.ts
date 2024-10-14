@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // The following values are recommended values sourced from the unit of measure enumeration in IEC 61968-9 [61968]. Other values from the unit of measure enumeration in IEC 61968-9 [61968] MAY be used.
 // 0 = Not Applicable (default, if not specified)
 // 5 = A (Current in Amperes (RMS))
@@ -65,3 +67,5 @@ export enum UomType {
     PAAbsolute = '155',
     Therm = '169',
 }
+
+export const uomTypeSchema = z.nativeEnum(UomType);

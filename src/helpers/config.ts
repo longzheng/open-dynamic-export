@@ -92,7 +92,11 @@ export const configSchema = z.object({
                 .describe('If defined, limit by two-way tariff'),
             mqtt: z
                 .object({
-                    host: z.string().describe('The host of the MQTT broker'),
+                    host: z
+                        .string()
+                        .describe(
+                            'The host of the MQTT broker, including "mqtt://"',
+                        ),
                     username: z
                         .string()
                         .optional()
@@ -171,7 +175,11 @@ A longer time will smooth out load changes but may result in overshoot.`,
         z
             .object({
                 type: z.literal('mqtt'),
-                host: z.string().describe('The host of the MQTT broker'),
+                host: z
+                    .string()
+                    .describe(
+                        'The host of the MQTT broker, including "mqtt://"',
+                    ),
                 username: z
                     .string()
                     .optional()

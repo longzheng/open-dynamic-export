@@ -6,7 +6,10 @@ import type {
 import { numberWithPow10 } from './number.js';
 import type { SiteSample } from '../meters/siteSample.js';
 import type { DerSample } from '../coordinator/helpers/derSample.js';
-import type { InverterControlLimit } from '../coordinator/helpers/inverterController.js';
+import type {
+    ActiveInverterControlLimit,
+    InverterControlLimit,
+} from '../coordinator/helpers/inverterController.js';
 import type { FallbackControl } from '../sep2/helpers/fallbackControl.js';
 import { objectEntriesWithType } from './object.js';
 
@@ -17,6 +20,8 @@ const influxDB = new InfluxDB({
         flushInterval: 5_000,
     },
 });
+
+const queryApi = influxDB.getQueryApi(process.env['INFLUXDB_ORG']!);
 
 const writeApi = influxDB.getWriteApi(
     process.env['INFLUXDB_ORG']!,
@@ -340,9 +345,7 @@ export function writeControlSchedulerPoints({
         switch (controlType) {
             case 'opModConnect': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModConnect'
-                    ];
+                    activeControlSchedule.derControlBase['opModConnect'];
 
                 if (value === undefined) {
                     return null;
@@ -352,9 +355,7 @@ export function writeControlSchedulerPoints({
             }
             case 'opModEnergize': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModEnergize'
-                    ];
+                    activeControlSchedule.derControlBase['opModEnergize'];
 
                 if (value === undefined) {
                     return null;
@@ -364,9 +365,7 @@ export function writeControlSchedulerPoints({
             }
             case 'opModExpLimW': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModExpLimW'
-                    ];
+                    activeControlSchedule.derControlBase['opModExpLimW'];
 
                 if (value === undefined) {
                     return null;
@@ -379,9 +378,7 @@ export function writeControlSchedulerPoints({
             }
             case 'opModGenLimW': {
                 const value =
-                    activeControlSchedule.data.control.derControlBase[
-                        'opModGenLimW'
-                    ];
+                    activeControlSchedule.derControlBase['opModGenLimW'];
 
                 if (value === undefined) {
                     return null;
@@ -538,6 +535,133 @@ export function writeControlLimit({ limit }: { limit: InverterControlLimit }) {
     }
 
     writeApi.writePoint(point);
+}
+
+export function writeActiveControlLimit({
+    limit,
+}: {
+    limit: ActiveInverterControlLimit;
+}) {
+    if (limit.opModConnect !== undefined) {
+        writeApi.writePoint(
+            new Point('activeControlLimit')
+                .tag('name', limit.opModConnect.source)
+                .booleanField('opModConnect', limit.opModConnect.value),
+        );
+    }
+
+    if (limit.opModEnergize !== undefined) {
+        writeApi.writePoint(
+            new Point('activeControlLimit')
+                .tag('name', limit.opModEnergize.source)
+                .booleanField('opModEnergize', limit.opModEnergize.value),
+        );
+    }
+
+    if (limit.opModExpLimW !== undefined) {
+        writeApi.writePoint(
+            new Point('activeControlLimit')
+                .tag('name', limit.opModExpLimW.source)
+                .floatField('opModExpLimW', limit.opModExpLimW.value),
+        );
+    }
+
+    if (limit.opModGenLimW !== undefined) {
+        writeApi.writePoint(
+            new Point('activeControlLimit')
+                .tag('name', limit.opModGenLimW.source)
+                .floatField('opModGenLimW', limit.opModGenLimW.value),
+        );
+    }
+}
+
+export function queryRealPowerSite() {
+    return queryApi.collectRows<{
+        phase: string;
+        type: string;
+        _time: string;
+        _value: number | null;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "sample")
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "site")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+`,
+    );
+}
+
+export function queryExportLimit() {
+    return queryApi.collectRows<{
+        name: string;
+        _measurement: string;
+        _time: string;
+        _value: number | null;
+        control: string;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
+  |> filter(fn: (r) => r["_field"] == "opModExpLimW")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+`,
+    );
+}
+
+export function queryGenerationLimit() {
+    return queryApi.collectRows<{
+        name: string;
+        _measurement: string;
+        _time: string;
+        _value: number | null;
+        control: string;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
+  |> filter(fn: (r) => r["_field"] == "opModGenLimW")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+`,
+    );
+}
+
+export function queryConnection() {
+    return queryApi.collectRows<{
+        name: string;
+        _measurement: string;
+        _time: string;
+        _value: boolean | null;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
+  |> filter(fn: (r) => r["_field"] == "opModConnect")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> yield(name: "last")
+`,
+    );
+}
+
+export function queryEnergize() {
+    return queryApi.collectRows<{
+        name: string;
+        _measurement: string;
+        _time: string;
+        _value: boolean | null;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
+  |> filter(fn: (r) => r["_field"] == "opModEnergize")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> yield(name: "last")
+`,
+    );
 }
 
 export function writeLoadWatts(loadWatts: number) {

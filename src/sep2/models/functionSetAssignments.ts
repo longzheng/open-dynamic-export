@@ -1,20 +1,27 @@
+import { z } from 'zod';
 import {
+    identifiedObjectSchema,
     parseIdentifiedObjectXmlObject,
-    type IdentifiedObject,
 } from './identifiedObject.js';
-import { parseLinkXmlObject, type Link } from './link.js';
-import { parseListLinkXmlObject, type ListLink } from './listLink.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
+import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
 import {
     parseSubscribableResourceXmlObject,
-    type SubscribableResource,
+    subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export type FunctionSetAssignments = {
-    derProgramListLink: ListLink | undefined;
-    responseSetListLink: ListLink | undefined;
-    timeLink: Link | undefined;
-} & SubscribableResource &
-    IdentifiedObject;
+export const functionSetAssignmentsSchema = z
+    .object({
+        derProgramListLink: listLinkSchema.optional(),
+        responseSetListLink: listLinkSchema.optional(),
+        timeLink: linkSchema.optional(),
+    })
+    .merge(subscribableResourceSchema)
+    .merge(identifiedObjectSchema);
+
+export type FunctionSetAssignments = z.infer<
+    typeof functionSetAssignmentsSchema
+>;
 
 export function parseFunctionSetAssignmentsXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

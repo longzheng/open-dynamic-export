@@ -1,37 +1,51 @@
 import { numberToHex } from '../../helpers/number.js';
-import { type ActivePower } from './activePower.js';
-import { type ApparentPower } from './apparentPower.js';
-import type { DERControlType } from './derControlType.js';
-import type { DERType } from './derType.js';
-import type { DOEControlType } from './doeModesSupportedType.js';
+import { activePowerSchema } from './activePower.js';
+import { apparentPowerSchema } from './apparentPower.js';
+import { derControlTypeSchema } from './derControlType.js';
+import { derTypeSchema } from './derType.js';
+import { doeControlTypeSchema } from './doeModesSupportedType.js';
 import { xmlns } from '../helpers/namespace.js';
-import { type ReactivePower } from './reactivePower.js';
-import { type VoltageRMS } from './voltageRms.js';
-import type { PowerFactor } from './powerFactor.js';
+import { reactivePowerSchema } from './reactivePower.js';
+import { voltageRMSSchema } from './voltageRms.js';
+import { powerFactorSchema } from './powerFactor.js';
+import { z } from 'zod';
 
-export type DERCapability = {
-    // Bitmap indicating the DER Controls implemented by the device
-    modesSupported: DERControlType;
-    // Bitmap indicating the DOE controls enabled on the device. See DOEControlType for values.
-    doeModesSupported: DOEControlType;
-    // Type of DER
-    type: DERType;
-    // Maximum continuous apparent power output capability of the DER, in voltamperes
-    rtgMaxVA: ApparentPower;
-    // Maximum continuous active power output capability of the DER, in watts. Represents combined generation plus storage output if DERType == 83.
-    rtgMaxW: ActivePower;
-    // Maximum continuous reactive power delivered by the DER, in var.
-    rtgMaxVar: ReactivePower;
-    // Maximum continuous reactive power received by the DER, in var. If absent, defaults to negative rtgMaxVar.
-    rtgMaxVarNeg?: ReactivePower | undefined;
-    // Minimum Power Factor displacement capability of the DER when injecting reactive power (over-excited); SHALL be a positive value between 0.0 (typically > 0.7) and 1.0. If absent, defaults to unity.
-    rtgMinPFOverExcited?: PowerFactor | undefined;
-    // Minimum Power Factor displacement capability of the DER when absorbing reactive power (under-excited); SHALL be a positive value between 0.0 (typically > 0.7) and 0.9999. If absent, defaults to rtgMinPFOverExcited.
-    rtgMinPFUnderExcited?: PowerFactor | undefined;
-    // AC voltage nominal rating.
-    rtgVNom?: VoltageRMS | undefined;
-    // TODO: partially implemented
-};
+export const derCapabilitySchema = z.object({
+    modesSupported: derControlTypeSchema.describe(
+        'Bitmap indicating the DER Controls implemented by the device',
+    ),
+    doeModesSupported: doeControlTypeSchema.describe(
+        'Bitmap indicating the DOE controls enabled on the device. See DOEControlType for values.',
+    ),
+    type: derTypeSchema.describe('Type of DER'),
+    rtgMaxVA: apparentPowerSchema.describe(
+        'Maximum continuous apparent power output capability of the DER, in voltamperes',
+    ),
+    rtgMaxW: activePowerSchema.describe(
+        'Maximum continuous active power output capability of the DER, in watts. Represents combined generation plus storage output if DERType == 83.',
+    ),
+    rtgMaxVar: reactivePowerSchema.describe(
+        'Maximum continuous reactive power delivered by the DER, in var.',
+    ),
+    rtgMaxVarNeg: reactivePowerSchema
+        .optional()
+        .describe(
+            'Maximum continuous reactive power received by the DER, in var. If absent, defaults to negative rtgMaxVar.',
+        ),
+    rtgMinPFOverExcited: powerFactorSchema
+        .optional()
+        .describe(
+            'Minimum Power Factor displacement capability of the DER when injecting reactive power (over-excited); SHALL be a positive value between 0.0 (typically > 0.7) and 1.0. If absent, defaults to unity.',
+        ),
+    rtgMinPFUnderExcited: powerFactorSchema
+        .optional()
+        .describe(
+            'Minimum Power Factor displacement capability of the DER when absorbing reactive power (under-excited); SHALL be a positive value between 0.0 (typically > 0.7) and 0.9999. If absent, defaults to rtgMinPFOverExcited.',
+        ),
+    rtgVNom: voltageRMSSchema.optional().describe('AC voltage nominal rating.'),
+});
+
+export type DERCapability = z.infer<typeof derCapabilitySchema>;
 
 export function generateDerCapability({
     modesSupported,

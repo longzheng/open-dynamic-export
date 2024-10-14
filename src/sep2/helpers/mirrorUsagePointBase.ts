@@ -12,7 +12,6 @@ import type { RoleFlagsType } from '../models/roleFlagsType.js';
 import { ServiceKind } from '../models/serviceKind.js';
 import { objectToXml } from './xml.js';
 import type { Logger } from 'pino';
-import { UsagePointBaseStatus } from '../models/usagePointBase.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
@@ -20,6 +19,7 @@ import { objectEntriesWithType } from '../../helpers/object.js';
 import { addMilliseconds } from 'date-fns';
 import axiosRetry from 'axios-retry';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
+import { UsagePointBaseStatus } from '../models/usagePointBaseStatus.js';
 
 export type MirrorMeterReadingDefinitions = Required<
     Pick<MirrorMeterReading, 'description'> & {
