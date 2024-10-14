@@ -1,3 +1,5 @@
+import { numberWithPow10 } from '../../helpers/number.js';
+
 export function registersToString(registers: number[]) {
     const buffer = Buffer.from(
         registers.flatMap((register) => [
@@ -21,35 +23,74 @@ export function registersToStringNullable(registers: number[]) {
     return registersToString(registers);
 }
 
-export function registersToUint32(registers: number[]) {
+export function registersToUint32(registers: number[], pow10: number = 0) {
     if (registers.length !== 2) {
         throw new Error(
             `registersToUint32 invalid register length, should be 2, is ${registers.length}`,
         );
     }
 
-    return ((registers[0]! << 16) | (registers[1]! & 0xffff)) >>> 0;
+    const value = ((registers[0]! << 16) | (registers[1]! & 0xffff)) >>> 0;
+
+    if (pow10 === 0) {
+        return value;
+    }
+
+    return numberWithPow10(value, pow10);
 }
 
-export function registersToUint32Nullable(registers: number[]) {
+export function registersToUint32Nullable(
+    registers: number[],
+    decimal: number = 0,
+) {
     if (registers.every((register) => register === 0xffff)) {
         return null;
     }
 
-    return registersToUint32(registers);
+    return registersToUint32(registers, decimal);
 }
 
-export function registersToInt32(registers: number[]) {
+export function uint32ToRegisters(value: number, pow10: number = 0): number[] {
+    if (value < 0 || value > 0xffffffff) {
+        throw new Error('Value out of range for uint32');
+    }
+
+    const scaledValue = pow10 === 0 ? value : numberWithPow10(value, pow10);
+
+    return [(scaledValue >> 16) & 0xffff, scaledValue & 0xffff];
+}
+
+export function uint32NullableToRegisters(
+    value: number | null,
+    pow10: number = 0,
+): number[] {
+    if (value === null) {
+        return [0xffff, 0xffff];
+    }
+
+    return uint32ToRegisters(value, pow10);
+}
+
+export function registersToInt32(registers: number[], pow10: number = 0) {
     if (registers.length !== 2) {
         throw new Error(
             `registersToUint32 invalid register length, should be 2, is ${registers.length}`,
         );
     }
 
-    return (registers[0]! << 16) | (registers[1]! & 0xffff);
+    const value = (registers[0]! << 16) | (registers[1]! & 0xffff);
+
+    if (pow10 === 0) {
+        return value;
+    }
+
+    return numberWithPow10(value, pow10);
 }
 
-export function registersToInt32Nullable(registers: number[]) {
+export function registersToInt32Nullable(
+    registers: number[],
+    pow10: number = 0,
+) {
     if (
         registers.length === 2 &&
         registers[0] === 0x8000 &&
@@ -58,18 +99,27 @@ export function registersToInt32Nullable(registers: number[]) {
         return null;
     }
 
-    return registersToInt32(registers);
+    return registersToInt32(registers, pow10);
 }
 
-export function registersToUint16(registers: number[]) {
+export function registersToUint16(registers: number[], pow10: number = 0) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
 
-    return registers[0]! & 0xffff;
+    const value = registers[0]! & 0xffff;
+
+    if (pow10 === 0) {
+        return value;
+    }
+
+    return numberWithPow10(value, pow10);
 }
 
-export function registersToUint16Nullable(registers: number[]) {
+export function registersToUint16Nullable(
+    registers: number[],
+    pow10: number = 0,
+) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
@@ -78,7 +128,7 @@ export function registersToUint16Nullable(registers: number[]) {
         return null;
     }
 
-    return registersToUint16(registers);
+    return registersToUint16(registers, pow10);
 }
 
 export function uint16ToRegisters(value: number): number[] {
@@ -97,15 +147,24 @@ export function uint16NullableToRegisters(value: number | null): number[] {
     return uint16ToRegisters(value);
 }
 
-export function registersToInt16(registers: number[]) {
+export function registersToInt16(registers: number[], pow10: number = 0) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
 
-    return (registers[0]! << 16) >> 16;
+    const value = (registers[0]! << 16) >> 16;
+
+    if (pow10 === 0) {
+        return value;
+    }
+
+    return numberWithPow10(value, pow10);
 }
 
-export function registersToInt16Nullable(registers: number[]) {
+export function registersToInt16Nullable(
+    registers: number[],
+    pow10: number = 0,
+) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
@@ -114,25 +173,30 @@ export function registersToInt16Nullable(registers: number[]) {
         return null;
     }
 
-    return registersToInt16(registers);
+    return registersToInt16(registers, pow10);
 }
 
-export function int16ToRegisters(value: number): number[] {
+export function int16ToRegisters(value: number, pow10: number = 0): number[] {
     if (value < -32768 || value > 32767) {
         throw new Error('Value out of range for int16');
     }
 
+    const scaledValue = pow10 === 0 ? value : numberWithPow10(value, pow10);
+
     // Ensure the value is treated as a 16-bit signed integer
-    return [value & 0xffff];
+    return [scaledValue & 0xffff];
 }
 
-export function int16NullableToRegisters(value: number | null): number[] {
+export function int16NullableToRegisters(
+    value: number | null,
+    pow10: number = 0,
+): number[] {
     if (value === null) {
         return [0x8000];
     }
 
     // Ensure the value is treated as a 16-bit signed integer
-    return [value & 0xffff];
+    return int16ToRegisters(value, pow10);
 }
 
 export function registersToSunssf(registers: number[]) {
@@ -186,4 +250,28 @@ export function registersToId<ID extends number>(
     throw new Error(
         `Invalid model ID value, expected one of ${value.join('/')}, got ${registerValue}`,
     );
+}
+
+export function registersToUint64(registers: number[]): bigint {
+    if (registers.length !== 4) {
+        throw new Error(
+            `registersToUint64 invalid register length, should be 4, is ${registers.length}`,
+        );
+    }
+
+    const value =
+        (BigInt(registers[0]!) << 48n) |
+        (BigInt(registers[1]!) << 32n) |
+        (BigInt(registers[2]!) << 16n) |
+        BigInt(registers[3]!);
+
+    return value;
+}
+
+export function registersToUint64Nullable(registers: number[]) {
+    if (registers.every((register) => register === 0xffff)) {
+        return null;
+    }
+
+    return registersToUint64(registers);
 }

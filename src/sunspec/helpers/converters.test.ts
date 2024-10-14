@@ -16,8 +16,12 @@ import {
     registersToUint16Nullable,
     registersToUint32,
     registersToUint32Nullable,
+    registersToUint64,
+    registersToUint64Nullable,
     uint16NullableToRegisters,
     uint16ToRegisters,
+    uint32NullableToRegisters,
+    uint32ToRegisters,
 } from './converters.js';
 
 describe('registersToUint32', () => {
@@ -38,6 +42,12 @@ describe('registersToUint32', () => {
         const result = registersToUint32(registers);
         expect(result).toBe(0);
     });
+
+    it('should convert integer with decimals', () => {
+        const registers = [0x1234, 0xabcd];
+        const result = registersToUint32(registers, -2);
+        expect(result).toBe(3054417.41);
+    });
 });
 
 describe('registersToUint32Nullable', () => {
@@ -46,6 +56,26 @@ describe('registersToUint32Nullable', () => {
         const result = registersToUint32Nullable(registers);
         expect(result).toBe(null);
     });
+});
+
+describe('uint32ToRegisters', () => {
+    it('convert a 32-bit unsigned integer to registers', () => {
+        const value = 305441741;
+        const result = uint32ToRegisters(value);
+        expect(result).toEqual([0x1234, 0xabcd]);
+    });
+
+    it('convert a 32-bit unsigned integer with decimals', () => {
+        const value = 305441741;
+        const result = uint32ToRegisters(value, 2);
+        expect(result).toEqual([0x1c93, 0x1c14]);
+    });
+});
+
+it('uint32ToRegistersNullable should convert null to registers', () => {
+    const value = null;
+    const result = uint32NullableToRegisters(value);
+    expect(result).toEqual([0xffff, 0xffff]);
 });
 
 describe('registersToInt32', () => {
@@ -180,10 +210,18 @@ it('uint16ToRegisters should convert null to registers', () => {
     expect(result).toEqual([0xffff]);
 });
 
-it('int16ToRegisters should convert a 16-bit signed integer to registers', () => {
-    const value = -20;
-    const result = int16ToRegisters(value);
-    expect(result).toEqual([0xffec]);
+describe('int16ToRegisters', () => {
+    it('convert a 16-bit signed integer to registers', () => {
+        const value = -20;
+        const result = int16ToRegisters(value);
+        expect(result).toEqual([0xffec]);
+    });
+
+    it('convert a 16-bit signed integer with decimals', () => {
+        const value = -20;
+        const result = int16ToRegisters(value, 2);
+        expect(result).toEqual([0xf830]);
+    });
 });
 
 it('int16ToRegistersNullable should convert null to registers', () => {
@@ -217,5 +255,33 @@ describe('registersToId', () => {
         expect(() => registersToId(registers, [2, 3, 4])).toThrowError(
             'Invalid model ID value',
         );
+    });
+});
+
+describe('registersToUint64', () => {
+    it('should convert integer', () => {
+        const registers = [0x0001, 0x0000, 0x0000, 0x0000];
+        const result = registersToUint64(registers);
+        expect(result).toBe(281474976710656n);
+    });
+
+    it('should convert maximum integer', () => {
+        const registers = [0xffff, 0xffff, 0xffff, 0xffff];
+        const result = registersToUint64(registers);
+        expect(result).toBe(18_446_744_073_709_551_615n);
+    });
+
+    it('should convert zero', () => {
+        const registers = [0x0000, 0x0000, 0x0000, 0x0000];
+        const result = registersToUint64(registers);
+        expect(result).toBe(0n);
+    });
+});
+
+describe('registersToUint64Nullable', () => {
+    it('should convert null', () => {
+        const registers = [0x0001, 0x0000, 0x0000, 0x0000];
+        const result = registersToUint64Nullable(registers);
+        expect(result).toBe(281474976710656n);
     });
 });
