@@ -28,7 +28,7 @@ export function registersToUint32(registers: number[]) {
         );
     }
 
-    return (registers[0]! << 16) | registers[1]!;
+    return ((registers[0]! << 16) | (registers[1]! & 0xffff)) >>> 0;
 }
 
 export function registersToUint32Nullable(registers: number[]) {
@@ -39,12 +39,34 @@ export function registersToUint32Nullable(registers: number[]) {
     return registersToUint32(registers);
 }
 
+export function registersToInt32(registers: number[]) {
+    if (registers.length !== 2) {
+        throw new Error(
+            `registersToUint32 invalid register length, should be 2, is ${registers.length}`,
+        );
+    }
+
+    return (registers[0]! << 16) | (registers[1]! & 0xffff);
+}
+
+export function registersToInt32Nullable(registers: number[]) {
+    if (
+        registers.length === 2 &&
+        registers[0] === 0x8000 &&
+        registers[1] === 0x0000
+    ) {
+        return null;
+    }
+
+    return registersToInt32(registers);
+}
+
 export function registersToUint16(registers: number[]) {
     if (registers.length !== 1) {
         throw new Error('Invalid register length');
     }
 
-    return registers[0]!;
+    return registers[0]! & 0xffff;
 }
 
 export function registersToUint16Nullable(registers: number[]) {
@@ -126,7 +148,7 @@ export function registersToAcc32(registers: number[]) {
         throw new Error('Invalid register length');
     }
 
-    return (registers[0]! << 16) + registers[1]!;
+    return ((registers[0]! << 16) + (registers[1]! & 0xffff)) >>> 0;
 }
 
 export function registersToAcc64BigInt(registers: number[]): bigint {
@@ -138,7 +160,7 @@ export function registersToAcc64BigInt(registers: number[]): bigint {
         (BigInt(registers[0]!) << 48n) +
         (BigInt(registers[1]!) << 32n) +
         (BigInt(registers[2]!) << 16n) +
-        BigInt(registers[3]!)
+        BigInt(registers[3]! & 0xffff)
     );
 }
 
