@@ -7,6 +7,8 @@ import {
     registersToId,
     registersToInt16,
     registersToInt16Nullable,
+    registersToInt32,
+    registersToInt32Nullable,
     registersToString,
     registersToStringNullable,
     registersToSunssf,
@@ -18,16 +20,66 @@ import {
     uint16ToRegisters,
 } from './converters.js';
 
-it('registersToUint32 should convert registers to a 32-bit unsigned integer', () => {
-    const registers = [0x1234, 0x5678];
-    const result = registersToUint32(registers);
-    expect(result).toBe(305419896);
+describe('registersToUint32', () => {
+    it('should convert integer', () => {
+        const registers = [0x1234, 0xabcd];
+        const result = registersToUint32(registers);
+        expect(result).toBe(305441741);
+    });
+
+    it('should convert maximum integer', () => {
+        const registers = [0xffff, 0xfffe];
+        const result = registersToUint32(registers);
+        expect(result).toBe(4294967294);
+    });
+
+    it('should convert zero', () => {
+        const registers = [0x0000, 0x0000];
+        const result = registersToUint32(registers);
+        expect(result).toBe(0);
+    });
 });
 
-it('registersToUint32Nullabe should convert registers to null', () => {
-    const registers = [0xffff, 0xffff];
-    const result = registersToUint32Nullable(registers);
-    expect(result).toBe(null);
+describe('registersToUint32Nullable', () => {
+    it('should convert null', () => {
+        const registers = [0xffff, 0xffff];
+        const result = registersToUint32Nullable(registers);
+        expect(result).toBe(null);
+    });
+});
+
+describe('registersToInt32', () => {
+    it('should convert positive integer', () => {
+        const registers = [0x0001, 0x0000];
+        const result = registersToInt32(registers);
+        expect(result).toBe(65536);
+    });
+
+    it('should convert negative integer', () => {
+        const registers = [0xffff, 0x0000];
+        const result = registersToInt32(registers);
+        expect(result).toBe(-65536);
+    });
+
+    it('should convert maximum positive integer', () => {
+        const registers = [0x7fff, 0xffff];
+        const result = registersToInt32(registers);
+        expect(result).toBe(2147483647);
+    });
+
+    it('should convert minimum negative integer', () => {
+        const registers = [0x8000, 0x0000];
+        const result = registersToInt32(registers);
+        expect(result).toBe(-2147483648);
+    });
+});
+
+describe('registersToInt32Nullable', () => {
+    it('should convert null', () => {
+        const registers = [0x8000, 0x0000];
+        const result = registersToInt32Nullable(registers);
+        expect(result).toBe(null);
+    });
 });
 
 describe('registersToString', () => {
@@ -88,16 +140,32 @@ it('registersToSunssf should convert registers to a 16-bit signed integer', () =
     expect(result).toBe(-32767);
 });
 
-it('registersToAcc32 should convert registers to a 32 bit accumulator', () => {
-    const registers = [0x0001, 0x0001];
-    const result = registersToAcc32(registers);
-    expect(result).toBe(65537);
+describe('registersToAcc32', () => {
+    it('convert registers to a 32 bit accumulator', () => {
+        const registers = [0x0001, 0x0001];
+        const result = registersToAcc32(registers);
+        expect(result).toBe(65537);
+    });
+
+    it('maximum value', () => {
+        const registers = [0xffff, 0xffff];
+        const result = registersToAcc32(registers);
+        expect(result).toBe(4294967295);
+    });
 });
 
-it('registersToAcc64 should convert registers to a 64 bit accumulator', () => {
-    const registers = [0x0001, 0x0001, 0x0001, 0x0001];
-    const result = registersToAcc64BigInt(registers);
-    expect(result).toBe(281479271743489n);
+describe('registersToAcc64', () => {
+    it('should convert registers to a 64 bit accumulator', () => {
+        const registers = [0x0001, 0x0001, 0x0001, 0x0001];
+        const result = registersToAcc64BigInt(registers);
+        expect(result).toBe(281479271743489n);
+    });
+
+    it('maximum value', () => {
+        const registers = [0x7fff, 0xffff, 0xffff, 0xffff];
+        const result = registersToAcc64BigInt(registers);
+        expect(result).toBe(9223372036854775807n);
+    });
 });
 
 it('uint16ToRegisters should convert a 16-bit unsigned integer to registers', () => {
