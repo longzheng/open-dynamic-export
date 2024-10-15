@@ -7,7 +7,7 @@ import { getSmaConnection } from '../../modbus/connections.js';
 import type {
     SmaCore1Meter1,
     SmaCore1Meter2,
-} from '../../modbus/models/smaCore1meter.js';
+} from '../../modbus/models/smaCore1Meter.js';
 
 type SmaMeterConfig = Extract<Config['meter'], { type: 'sma' }>;
 

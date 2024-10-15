@@ -2,7 +2,7 @@ import { ModbusConnection } from './base.js';
 import {
     smaCore1MeterModel1,
     smaCore1MeterModel2,
-} from '../models/smaCore1meter.js';
+} from '../models/smaCore1Meter.js';
 
 export class SmaConnection extends ModbusConnection {
     async getMeterModel() {
