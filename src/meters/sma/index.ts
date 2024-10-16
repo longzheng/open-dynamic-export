@@ -5,9 +5,9 @@ import type { Config } from '../../helpers/config.js';
 import type { SmaConnection } from '../../modbus/connection/sma.js';
 import { getSmaConnection } from '../../modbus/connections.js';
 import type {
-    SmaCore1Meter1,
-    SmaCore1Meter2,
-} from '../../modbus/models/smaCore1Meter.js';
+    SmaCore1MeteringGridMs1,
+    SmaCore1MeteringGridMs2,
+} from '../../modbus/models/smaCore1MeteringGridMs.js';
 
 type SmaMeterConfig = Extract<Config['meter'], { type: 'sma' }>;
 
@@ -28,18 +28,19 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
         try {
             const start = performance.now();
 
-            const meterModel = await this.smaConnection.getMeterModel();
+            const meteringModel =
+                await this.smaConnection.getMeteringGridMsModel();
 
             const end = performance.now();
             const duration = end - start;
 
             this.logger.trace(
-                { duration, meterModel },
+                { duration, meterModel: meteringModel },
                 'polled SunSpec meter data',
             );
 
             const siteSample = generateSiteSample({
-                meter: meterModel,
+                metering: meteringModel,
             });
 
             return { success: true, value: siteSample };
@@ -61,34 +62,41 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
 }
 
 function generateSiteSample({
-    meter,
+    metering,
 }: {
-    meter: SmaCore1Meter1 & SmaCore1Meter2;
+    metering: SmaCore1MeteringGridMs1 & SmaCore1MeteringGridMs2;
 }): SiteSample {
     return {
         date: new Date(),
         realPower: {
             type: 'perPhaseNet',
-            phaseA: meter.W_phsA || meter.WIn_phsA,
-            phaseB: meter.W_phsB || meter.WIn_phsB,
-            phaseC: meter.W_phsC || meter.WIn_phsC,
+            phaseA: metering.W_phsA || metering.WIn_phsA,
+            phaseB: metering.W_phsB || metering.WIn_phsB,
+            phaseC: metering.W_phsC || metering.WIn_phsC,
             net:
-                meter.W_phsA + (meter.W_phsB ?? 0) + (meter.W_phsC ?? 0) ||
-                meter.WIn_phsA + (meter.WIn_phsB ?? 0) + (meter.WIn_phsC ?? 0),
+                metering.W_phsA +
+                    (metering.W_phsB ?? 0) +
+                    (metering.W_phsC ?? 0) ||
+                metering.WIn_phsA +
+                    (metering.WIn_phsB ?? 0) +
+                    (metering.WIn_phsC ?? 0),
         },
         reactivePower: {
             type: 'perPhaseNet',
-            phaseA: meter.VAr_phsA,
-            phaseB: meter.VAr_phsB,
-            phaseC: meter.VAr_phsC,
-            net: meter.VAr_phsA + (meter.VAr_phsB ?? 0) + (meter.VAr_phsC ?? 0),
+            phaseA: metering.VAr_phsA,
+            phaseB: metering.VAr_phsB,
+            phaseC: metering.VAr_phsC,
+            net:
+                metering.VAr_phsA +
+                (metering.VAr_phsB ?? 0) +
+                (metering.VAr_phsC ?? 0),
         },
         voltage: {
             type: 'perPhase',
-            phaseA: meter.PhV_phsA,
-            phaseB: meter.PhV_phsB,
-            phaseC: meter.PhV_phsC,
+            phaseA: metering.PhV_phsA,
+            phaseB: metering.PhV_phsB,
+            phaseC: metering.PhV_phsC,
         },
-        frequency: meter.Hz,
+        frequency: metering.Hz,
     };
 }
