@@ -4,10 +4,7 @@ import type { Result } from '../../helpers/result.js';
 import type { Config } from '../../helpers/config.js';
 import type { SmaConnection } from '../../modbus/connection/sma.js';
 import { getSmaConnection } from '../../modbus/connections.js';
-import type {
-    SmaCore1MeteringGridMs1,
-    SmaCore1MeteringGridMs2,
-} from '../../modbus/models/smaCore1MeteringGridMs.js';
+import type { SmaCore1MeteringGridMsModels } from '../../modbus/models/smaCore1MeteringGridMs.js';
 
 type SmaMeterConfig = Extract<Config['meter'], { type: 'sma' }>;
 
@@ -64,7 +61,7 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
 function generateSiteSample({
     metering,
 }: {
-    metering: SmaCore1MeteringGridMs1 & SmaCore1MeteringGridMs2;
+    metering: SmaCore1MeteringGridMsModels;
 }): SiteSample {
     return {
         date: new Date(),
