@@ -6,7 +6,11 @@ import {
     registersToUint32Nullable,
 } from '../../sunspec/helpers/converters.js';
 
-export type SmaCore1GridMs1 = {
+export type SmaCore1GridMsModels = SmaCore1GridMs1 &
+    SmaCore1GridMs2 &
+    SmaCore1GridMs3;
+
+type SmaCore1GridMs1 = {
     // Power
     TotW: number;
     // Power L1
@@ -31,12 +35,12 @@ export type SmaCore1GridMs1 = {
     TotA: number;
 };
 
-export type SmaCore1GridMs2 = {
+type SmaCore1GridMs2 = {
     // Grid frequency
     Hz: number;
 };
 
-export type SmaCore1GridMs3 = {
+type SmaCore1GridMs3 = {
     // Reactive power L1
     VAr_phsA: number;
     // Reactive power L2
@@ -53,8 +57,8 @@ export type SmaCore1GridMs3 = {
     VA_phsC: number | null;
 };
 
-export const SmaCore1GridMsModel1 = modbusModelFactory<SmaCore1GridMs1>({
-    name: 'SmaCore1GridMsModel1',
+export const SmaCore1GridMs1Model = modbusModelFactory<SmaCore1GridMs1>({
+    name: 'SmaCore1GridMs1Model',
     mapping: {
         TotW: {
             start: 0,
@@ -114,8 +118,8 @@ export const SmaCore1GridMsModel1 = modbusModelFactory<SmaCore1GridMs1>({
     },
 });
 
-export const SmaCore1GridMsModel2 = modbusModelFactory<SmaCore1GridMs2>({
-    name: 'SmaCore1GridMsModel2',
+export const SmaCore1GridMs2Model = modbusModelFactory<SmaCore1GridMs2>({
+    name: 'SmaCore1GridMs2Model',
     mapping: {
         Hz: {
             start: 0,
@@ -125,8 +129,8 @@ export const SmaCore1GridMsModel2 = modbusModelFactory<SmaCore1GridMs2>({
     },
 });
 
-export const SmaCore1GridMsModel3 = modbusModelFactory<SmaCore1GridMs3>({
-    name: 'SmaCore1GridMsModel3',
+export const SmaCore1GridMs3Model = modbusModelFactory<SmaCore1GridMs3>({
+    name: 'SmaCore1GridMs3Model',
     mapping: {
         VAr_phsA: {
             start: 0,

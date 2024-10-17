@@ -6,7 +6,10 @@ import {
     registersToUint32Nullable,
 } from '../../sunspec/helpers/converters.js';
 
-export type SmaCore1MeteringGridMs1 = {
+export type SmaCore1MeteringGridMsModels = SmaCore1MeteringGridMs1 &
+    SmaCore1MeteringGridMs2;
+
+type SmaCore1MeteringGridMs1 = {
     // Grid power phase L1
     PhV_phsA: number;
     // Grid power phase L2
@@ -35,7 +38,7 @@ export type SmaCore1MeteringGridMs1 = {
     TotVar: number;
 };
 
-export type SmaCore1MeteringGridMs2 = {
+type SmaCore1MeteringGridMs2 = {
     // Displacement power factor
     TotPF: number;
     // Grid current phase L1
@@ -62,9 +65,9 @@ export type SmaCore1MeteringGridMs2 = {
     TotVA: number;
 };
 
-export const SmaCore1MeteringGridMsModel1 =
+export const SmaCore1MeteringGridMs1Model =
     modbusModelFactory<SmaCore1MeteringGridMs1>({
-        name: 'SmaCore1MeteringGridMsModel1',
+        name: 'SmaCore1MeteringGridMs1Model',
         mapping: {
             PhV_phsA: {
                 start: 0,
@@ -134,9 +137,9 @@ export const SmaCore1MeteringGridMsModel1 =
         },
     });
 
-export const SmaCore1MeteringGridMsModel2 =
+export const SmaCore1MeteringGridMs2Model =
     modbusModelFactory<SmaCore1MeteringGridMs2>({
-        name: 'SmaCore1MeteringGridMsModel2',
+        name: 'SmaCore1MeteringGridMs2Model',
         mapping: {
             TotPF: {
                 start: 0,

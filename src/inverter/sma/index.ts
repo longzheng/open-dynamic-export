@@ -1,43 +1,34 @@
 import { type InverterData } from '../inverterData.js';
-import { enumHasValue } from '../../helpers/enum.js';
 import type { Result } from '../../helpers/result.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
-import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
-import { getNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
-import { getSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
-import { getStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
-import {
-    Conn,
-    OutPFSet_Ena,
-    VArPct_Ena,
-    WMaxLim_Ena,
-    type ControlsModel,
-    type ControlsModelWrite,
-} from '../../sunspec/models/controls.js';
-import {
-    InverterState,
-    type InverterModel,
-} from '../../sunspec/models/inverter.js';
-import type { NameplateModel } from '../../sunspec/models/nameplate.js';
-import type { SettingsModel } from '../../sunspec/models/settings.js';
-import type { StatusModel } from '../../sunspec/models/status.js';
-import { PVConn } from '../../sunspec/models/status.js';
+import { DERTyp } from '../../sunspec/models/nameplate.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
-import {
-    getWMaxLimPctFromTargetSolarPowerRatio,
-    type InverterConfiguration,
-} from '../../coordinator/helpers/inverterController.js';
+import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
 import type { Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 import type { SmaConnection } from '../../modbus/connection/sma.js';
 import { getSmaConnection } from '../../modbus/connections.js';
+import {
+    SmaCore1InverterControlFstStop,
+    SmaCore1InverterControlWModCfgWMod,
+    type SmaCore1InverterControl2,
+    type SmaCore1InverterControlModels,
+} from '../../modbus/models/smaCore1InverterControl.js';
+import { numberWithPow10 } from '../../helpers/number.js';
+import { Decimal } from 'decimal.js';
+import type { SmaCore1InverterModels } from '../../modbus/models/smaCore1Inverter.js';
+import type { SmaCore1GridMsModels } from '../../modbus/models/smaCore1GridMs.js';
+import type { SmaCore1Nameplate } from '../../modbus/models/smaCore1Nameplate.js';
+import {
+    SmaCore1OperationGriSwStt,
+    type SmaCore1Operation,
+} from '../../modbus/models/smaCore1Operation.js';
 
 export class SmaInverterDataPoller extends InverterDataPollerBase {
     private smaConnection: SmaConnection;
-    private cachedControlsModel: ControlsModel | null = null;
+    private cachedControlsModel: SmaCore1InverterControlModels | null = null;
     private sunSpecInverterIndex: number;
 
     constructor({
@@ -95,48 +86,48 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         },
                     });
 
-                    const settingsModel =
-                        await this.smaConnection.getSettingsModel();
+                    const inverterModel =
+                        await this.smaConnection.getInverterModel();
 
                     writeLatency({
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
                             inverterIndex: this.sunSpecInverterIndex.toString(),
-                            model: 'settings',
+                            model: 'inverter',
                         },
                     });
 
-                    const statusModel =
-                        await this.smaConnection.getStatusModel();
+                    const operationModel =
+                        await this.smaConnection.getOperationModel();
 
                     writeLatency({
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
                             inverterIndex: this.sunSpecInverterIndex.toString(),
-                            model: 'status',
+                            model: 'operation',
                         },
                     });
 
-                    const controlsModel =
-                        await this.smaConnection.getControlsModel();
+                    const inverterControlsModel =
+                        await this.smaConnection.getInverterControlModel();
 
                     writeLatency({
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
                             inverterIndex: this.sunSpecInverterIndex.toString(),
-                            model: 'controls',
+                            model: 'inverterControl',
                         },
                     });
 
-                    const models = {
+                    const models: InverterModels = {
                         inverter: inverterModel,
                         nameplate: nameplateModel,
-                        settings: settingsModel,
-                        status: statusModel,
-                        controls: controlsModel,
+                        operation: operationModel,
+                        gridMs: gridMsModel,
+                        inverterControl: inverterControlsModel,
                     };
 
                     const end = performance.now();
@@ -147,7 +138,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         'Got inverter data',
                     );
 
-                    this.cachedControlsModel = models.controls;
+                    this.cachedControlsModel = inverterControlsModel;
 
                     const inverterData = generateInverterData(models);
 
@@ -185,15 +176,29 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
             return;
         }
 
-        const writeControlsModel =
-            generateControlsModelWriteFromInverterConfiguration({
-                inverterConfiguration,
-                controlsModel: this.cachedControlsModel,
-            });
+        const writeControlsModel = gemerateSmaCore1InverterControl2({
+            inverterConfiguration,
+        });
 
         if (this.applyControl) {
             try {
-                await this.smaConnection.writeControlsModel(writeControlsModel);
+                const desiredWModCfg_WMod =
+                    SmaCore1InverterControlWModCfgWMod.ExternalSetting;
+
+                // only change WModCfg_WMod if the value is not already set
+                // this register cannot be written cyclically so it should only be written if necessary
+                if (
+                    this.cachedControlsModel.WModCfg_WMod !==
+                    desiredWModCfg_WMod
+                ) {
+                    await this.smaConnection.writeInverterControlModel1({
+                        WModCfg_WMod: desiredWModCfg_WMod,
+                    });
+                }
+
+                await this.smaConnection.writeInverterControlModel2(
+                    writeControlsModel,
+                );
             } catch (error) {
                 this.logger.error(
                     error,
@@ -204,162 +209,94 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
     }
 }
 
+type InverterModels = {
+    inverter: SmaCore1InverterModels;
+    nameplate: SmaCore1Nameplate;
+    operation: SmaCore1Operation;
+    gridMs: SmaCore1GridMsModels;
+    inverterControl: SmaCore1InverterControlModels;
+};
+
 export function generateInverterData({
     inverter,
-    nameplate,
-    settings,
-    status,
-}: {
-    inverter: InverterModel;
-    nameplate: NameplateModel;
-    settings: SettingsModel;
-    status: StatusModel;
-}): InverterData {
-    const inverterMetrics = getInverterMetrics(inverter);
-    const nameplateMetrics = getNameplateMetrics(nameplate);
-    const settingsMetrics = getSettingsMetrics(settings);
-
-    // observed some Fronius inverters randomly spit out 0 values even though the inverter is operating normally
-    // may be related to the constant polling of SunSpec Modbus?
-    // ignore this state and hope the next poll will return valid data
-    if (
-        inverterMetrics.W === 0 &&
-        inverterMetrics.Hz === 0 &&
-        inverterMetrics.PhVphA === 0 &&
-        inverter.St === InverterState.FAULT &&
-        // normal polling shouldn't return 0 for these values
-        inverter.W_SF === 0 &&
-        inverter.WH === 0
-    ) {
-        throw new Error('Inverter returned faulty metrics');
-    }
-
+    gridMs,
+    operation,
+}: InverterModels): InverterData {
     return {
         date: new Date(),
         inverter: {
-            realPower: inverterMetrics.W,
-            reactivePower: inverterMetrics.VAr ?? 0,
-            voltagePhaseA: inverterMetrics.PhVphA,
-            voltagePhaseB: inverterMetrics.PhVphB,
-            voltagePhaseC: inverterMetrics.PhVphC,
-            frequency: inverterMetrics.Hz,
+            realPower: gridMs.TotW,
+            reactivePower:
+                gridMs.VAr_phsA +
+                (gridMs.VAr_phsB ?? 0) +
+                (gridMs.VAr_phsC ?? 0),
+            voltagePhaseA: gridMs.PhV_phsA,
+            voltagePhaseB: gridMs.PhV_phsB,
+            voltagePhaseC: gridMs.PhV_phsC,
+            frequency: gridMs.Hz,
         },
         nameplate: {
-            type: nameplate.DERTyp,
-            maxW: nameplateMetrics.WRtg,
-            maxVA: nameplateMetrics.VARtg,
-            maxVar: nameplateMetrics.VArRtgQ1,
+            type: DERTyp.PV,
+            maxW: inverter.WLim,
+            maxVA: inverter.VAMaxOutRtg,
+            maxVar: inverter.VArMaxQ1Rtg,
         },
         settings: {
-            maxW: settingsMetrics.WMax,
-            maxVA: settingsMetrics.VAMax,
-            maxVar: settingsMetrics.VArMaxQ1,
+            maxW: inverter.WLim,
+            maxVA: inverter.VAMaxOutRtg,
+            maxVar: inverter.VArMaxQ1Rtg,
         },
-        status: generateInverterDataStatus({ status }),
+        status: generateInverterDataStatus({ operation }),
     };
 }
 
 export function generateInverterDataStatus({
-    status,
+    operation,
 }: {
-    status: StatusModel;
+    operation: SmaCore1Operation;
 }): InverterData['status'] {
-    const statusMetrics = getStatusMetrics(status);
-
     return {
-        operationalModeStatus: enumHasValue(
-            statusMetrics.PVConn,
-            PVConn.CONNECTED,
-        )
-            ? OperationalModeStatus.OperationalMode
-            : OperationalModeStatus.Off,
-        genConnectStatus: getGenConnectStatusFromPVConn(statusMetrics.PVConn),
+        operationalModeStatus:
+            operation.GriSwStt === SmaCore1OperationGriSwStt.Closed
+                ? OperationalModeStatus.OperationalMode
+                : OperationalModeStatus.Off,
+        genConnectStatus:
+            operation.GriSwStt === SmaCore1OperationGriSwStt.Closed
+                ? ConnectStatus.Available |
+                  ConnectStatus.Connected |
+                  ConnectStatus.Operating
+                : (0 as ConnectStatus),
     };
 }
 
-export function getGenConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
-    let result: ConnectStatus = 0 as ConnectStatus;
-
-    if (enumHasValue(pvConn, PVConn.CONNECTED)) {
-        result += ConnectStatus.Connected;
-    } else {
-        return result;
-    }
-
-    if (enumHasValue(pvConn, PVConn.AVAILABLE)) {
-        result += ConnectStatus.Available;
-    } else {
-        return result;
-    }
-
-    if (enumHasValue(pvConn, PVConn.OPERATING)) {
-        result += ConnectStatus.Operating;
-    } else {
-        return result;
-    }
-
-    if (enumHasValue(pvConn, PVConn.TEST)) {
-        result += ConnectStatus.Test;
-    } else {
-        return result;
-    }
-
-    return result;
-}
-
-export function generateControlsModelWriteFromInverterConfiguration({
+export function gemerateSmaCore1InverterControl2({
     inverterConfiguration,
-    controlsModel,
 }: {
     inverterConfiguration: InverterConfiguration;
-    controlsModel: ControlsModel;
-}): ControlsModelWrite {
+}): SmaCore1InverterControl2 {
     switch (inverterConfiguration.type) {
         case 'disconnect':
             return {
-                ...controlsModel,
-                Conn: Conn.DISCONNECT,
-                // revert Conn in 60 seconds
-                // this is a safety measure in case the SunSpec connection is lost
-                // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another config witin 60 seconds to reset this timeout
-                Conn_RvrtTms: 60,
-                WMaxLim_Ena: WMaxLim_Ena.DISABLED,
-                // set value to 0 to gracefully handle re-energising and calculating target power ratio
-                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
-                    targetSolarPowerRatio: 0,
-                    controlsModel,
-                }),
-                // revert WMaxLimtPct in 60 seconds
-                // this is a safety measure in case the SunSpec connection is lost
-                // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another config witin 60 seconds to reset this timeout
-                WMaxLimPct_RvrtTms: 60,
-                VArPct_Ena: VArPct_Ena.DISABLED,
-                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
+                FstStop: SmaCore1InverterControlFstStop.Stop,
+                WModCfg_WCtlComCfg_WNomPrc: 0,
             };
         case 'limit':
             return {
-                ...controlsModel,
-                Conn: Conn.CONNECT,
-                // revert Conn in 60 seconds
-                // this is a safety measure in case the SunSpec connection is lost
-                // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another config witin 60 seconds to reset this timeout
-                Conn_RvrtTms: 60,
-                WMaxLim_Ena: WMaxLim_Ena.ENABLED,
-                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
-                    targetSolarPowerRatio:
-                        inverterConfiguration.targetSolarPowerRatio,
-                    controlsModel,
-                }),
-                // revert WMaxLimtPct in 60 seconds
-                // this is a safety measure in case the SunSpec connection is lost
-                // we want to revert the inverter to the default which is assumed to be safe
-                // we assume we will write another config witin 60 seconds to reset this timeout
-                WMaxLimPct_RvrtTms: 60,
-                VArPct_Ena: VArPct_Ena.DISABLED,
-                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
+                FstStop: SmaCore1InverterControlFstStop.Stop,
+                // value in % with two decimal places
+                WModCfg_WCtlComCfg_WNomPrc: Math.round(
+                    numberWithPow10(
+                        Decimal.min(
+                            new Decimal(
+                                inverterConfiguration.targetSolarPowerRatio,
+                            ),
+                            1, // cap maximum to 1
+                        )
+                            .times(100)
+                            .toNumber(),
+                        2,
+                    ),
+                ),
             };
     }
 }
