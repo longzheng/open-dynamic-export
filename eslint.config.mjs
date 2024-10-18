@@ -12,6 +12,7 @@ export default tseslint.config(
             'logs/',
             'src/limiters/negativeFeedIn/amber/api.d.ts',
             'docs/.docusaurus/',
+            'docs/babel.config.js',
         ],
     },
     eslint.configs.recommended,
