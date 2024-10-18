@@ -1,6 +1,7 @@
-import { writeLatency } from '../../helpers/influxdb.js';
-import { objectEntriesWithType } from '../../helpers/object.js';
-import type { ModelAddress, SunSpecConnection } from '../connection/base.js';
+import { objectEntriesWithType } from '../helpers/object.js';
+import type { ModelAddress } from '../sunspec/connection/base.js';
+import { writeLatency } from '../helpers/influxdb.js';
+import type { ModbusConnection } from './connection/base.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +18,7 @@ export type Mapping<
         : { writeConverter?: undefined });
 };
 
-export function sunSpecModelFactory<
+export function modbusModelFactory<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Model extends Record<string, any>,
     WriteableKeys extends keyof Model = never,
@@ -26,11 +27,11 @@ export function sunSpecModelFactory<
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
-        modbusConnection: SunSpecConnection;
+        modbusConnection: ModbusConnection;
         address: ModelAddress;
     }): Promise<Model>;
     write(params: {
-        modbusConnection: SunSpecConnection;
+        modbusConnection: ModbusConnection;
         address: ModelAddress;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
@@ -38,7 +39,9 @@ export function sunSpecModelFactory<
     return {
         read: async ({ modbusConnection, address }) => {
             const logger = modbusConnection.logger.child({
-                module: `sunspec-model-${config.name}`,
+                module: 'modbusModelFactory',
+                model: config.name,
+                type: 'read',
             });
 
             const start = performance.now();
@@ -77,7 +80,9 @@ export function sunSpecModelFactory<
         },
         write: async ({ modbusConnection, address, values }) => {
             const logger = modbusConnection.logger.child({
-                module: `sunspec-model-${config.name}`,
+                module: 'modbusModelFactory',
+                model: config.name,
+                type: 'write',
             });
 
             const start = performance.now();
@@ -163,7 +168,7 @@ export function convertWriteRegisters<
     mapping: Mapping<Model, WriteableKeys>;
     length: number;
 }): number[] {
-    // sunspec allows for writing values to registers that do not support writing, they will simply be ignored
+    // modbus allows for writing values to registers that do not support writing, they will simply be ignored
     // we use this behaviour as a shortcut to use the same model definition and start address for reading and writing
 
     // start with all empty registers

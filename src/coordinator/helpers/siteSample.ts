@@ -4,6 +4,7 @@ import { Powerwall2SiteSamplePoller } from '../../meters/powerwall2/index.js';
 import { SunSpecMeterSiteSamplePoller } from '../../meters/sunspec/index.js';
 import type { SiteSamplePollerBase } from '../../meters/siteSamplePollerBase.js';
 import type { InvertersPoller } from './inverterSample.js';
+import { SmaMeterSiteSamplePoller } from '../../meters/sma/index.js';
 
 export function getSiteSamplePollerInstance({
     config,
@@ -27,6 +28,11 @@ export function getSiteSamplePollerInstance({
         case 'mqtt': {
             return new MqttSiteSamplePoller({
                 mqttConfig: config.meter,
+            });
+        }
+        case 'sma': {
+            return new SmaMeterSiteSamplePoller({
+                smaMeterConfig: config.meter,
             });
         }
     }

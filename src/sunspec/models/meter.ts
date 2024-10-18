@@ -7,7 +7,7 @@ import {
     registersToAcc32,
     registersToId,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // generated from SunSpec_Information_Model_Reference_20240701.xlsx
 
@@ -536,7 +536,7 @@ export type MeterModel = {
     Evt: MeterEvent;
 };
 
-export const meterModel = sunSpecModelFactory<MeterModel>({
+export const meterModel = modbusModelFactory<MeterModel>({
     name: 'meter',
     mapping: {
         ID: {

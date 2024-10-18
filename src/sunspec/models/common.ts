@@ -5,7 +5,7 @@ import {
     registersToUint16,
     registersToUint16Nullable,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // generated from SunSpec_Information_Model_Reference_20240701.xlsx
 
@@ -74,7 +74,7 @@ export type CommonModel = {
     DA: number | null;
 };
 
-export const commonModel = sunSpecModelFactory<CommonModel>({
+export const commonModel = modbusModelFactory<CommonModel>({
     name: 'common',
     mapping: {
         ID: {

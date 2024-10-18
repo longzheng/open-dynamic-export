@@ -7,7 +7,7 @@ import {
     registersToInt16Nullable,
     registersToId,
 } from '../helpers/converters.js';
-import { sunSpecModelFactory } from './sunSpecModelFactory.js';
+import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // generated from SunSpec_Information_Model_Reference_20240701.xlsx
 
@@ -207,7 +207,7 @@ export type NameplateModel = {
     MaxDisChaRte_SF: number | null;
 };
 
-export const nameplateModel = sunSpecModelFactory<NameplateModel>({
+export const nameplateModel = modbusModelFactory<NameplateModel>({
     name: 'nameplate',
     mapping: {
         ID: {

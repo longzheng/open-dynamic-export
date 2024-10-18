@@ -1,11 +1,7 @@
-import ModbusRTU from 'modbus-serial';
 import type { CommonModel } from '../models/common.js';
 import { commonModel } from '../models/common.js';
-import { logger as pinoLogger } from '../../helpers/logger.js';
 import { registersToUint32 } from '../helpers/converters.js';
-import type { Logger } from 'pino';
-
-const connectionTimeoutMs = 10_000;
+import { ModbusConnection } from '../../modbus/connection/base.js';
 
 export type ModelAddress = {
     start: number;
@@ -14,108 +10,13 @@ export type ModelAddress = {
 
 type ModelAddressById = Map<number, ModelAddress>;
 
-export abstract class SunSpecConnection {
-    public readonly client: ModbusRTU.default;
-    public readonly ip: string;
-    public readonly port: number;
-    public readonly unitId: number;
-    public readonly logger: Logger;
-
-    private state:
-        | { type: 'connected' }
-        | { type: 'connecting'; connectPromise: Promise<void> }
-        | { type: 'disconnected' } = { type: 'disconnected' };
-
+export abstract class SunSpecConnection extends ModbusConnection {
     private modelAddressById:
         | { type: 'cached'; cache: ModelAddressById }
         | { type: 'caching'; cachePromise: Promise<ModelAddressById> }
         | { type: 'notCached' } = { type: 'notCached' };
 
     private commonModelCache: CommonModel | null = null;
-
-    constructor({
-        ip,
-        port,
-        unitId,
-    }: {
-        ip: string;
-        port: number;
-        unitId: number;
-    }) {
-        this.client = new ModbusRTU.default();
-        this.ip = ip;
-        this.port = port;
-        this.unitId = unitId;
-        this.logger = pinoLogger.child({
-            module: 'sunspec-connection',
-            ip,
-            port,
-            unitId,
-        });
-
-        this.client.on('close', () => {
-            this.state = { type: 'disconnected' };
-
-            this.logger.error(`SunSpec Modbus client closed`);
-        });
-
-        // This is never observed to be triggered
-        this.client.on('error', (error) => {
-            this.state = { type: 'disconnected' };
-
-            this.logger.error(error, `SunSpec Modbus client error`);
-        });
-
-        this.connect().catch(() => {
-            // no op
-        });
-    }
-
-    async connect() {
-        switch (this.state.type) {
-            case 'connected':
-                return;
-            case 'connecting':
-                return this.state.connectPromise;
-            case 'disconnected': {
-                const connectPromise = (async () => {
-                    try {
-                        this.logger.info(`SunSpec Modbus client connecting`);
-
-                        await this.client.connectTCP(this.ip, {
-                            port: this.port,
-                            // timeout for connection
-                            timeout: connectionTimeoutMs,
-                        });
-
-                        this.client.setID(this.unitId);
-
-                        // timeout for requests
-                        this.client.setTimeout(connectionTimeoutMs);
-
-                        this.logger.info(`SunSpec Modbus client connected`);
-
-                        this.state = { type: 'connected' };
-                    } catch (error) {
-                        this.logger.error(
-                            {
-                                error,
-                            },
-                            `SunSpec Modbus client error connecting`,
-                        );
-
-                        this.state = { type: 'disconnected' };
-
-                        throw error;
-                    }
-                })();
-
-                this.state = { type: 'connecting', connectPromise };
-
-                return connectPromise;
-            }
-        }
-    }
 
     protected async getModelAddressById() {
         switch (this.modelAddressById.type) {

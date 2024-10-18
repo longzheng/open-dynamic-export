@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
     convertReadRegisters,
     convertWriteRegisters,
-    sunSpecModelFactory,
+    modbusModelFactory,
     type Mapping,
-} from './sunSpecModelFactory.js';
+} from './modbusModelFactory.js';
 import {
     int16ToRegisters,
     registersToInt16,
     registersToString,
     registersToUint16,
     uint16ToRegisters,
-} from '../helpers/converters.js';
-import { InverterSunSpecConnection } from '../connection/inverter.js';
-import { SunSpecConnection } from '../connection/base.js';
+} from '../sunspec/helpers/converters.js';
+import { InverterSunSpecConnection } from '../sunspec/connection/inverter.js';
+import { SunSpecConnection } from '../sunspec/connection/base.js';
 
 vi.mock(import('modbus-serial'));
 
@@ -84,10 +84,10 @@ it('convertWriteRegisters should convert registers to model', () => {
     expect(result).toEqual([0, 3, 0xff80, 0, 0, 0]);
 });
 
-describe('sunSpecModelFactory', () => {
+describe('modbusModelFactory', () => {
     let inverterSunSpecConnection: InverterSunSpecConnection;
 
-    const model = sunSpecModelFactory<Model, keyof ModelWrite>({
+    const model = modbusModelFactory<Model, keyof ModelWrite>({
         name: 'test',
         mapping,
     });

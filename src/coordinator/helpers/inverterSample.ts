@@ -9,6 +9,7 @@ import type { Config } from '../../helpers/config.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import type { InverterConfiguration } from './inverterController.js';
 import type { Logger } from 'pino';
+import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
 export class InvertersPoller extends EventEmitter<{
     data: [DerSample];
 }> {
@@ -23,18 +24,26 @@ export class InvertersPoller extends EventEmitter<{
 
         this.inverterDataPollers = config.inverters.map(
             (inverterConfig, index) => {
+                const inverterOnData = (data: Result<InverterData>) => {
+                    this.inverterDataCacheMapByIndex.set(index, data);
+
+                    this.onData();
+                };
+
                 switch (inverterConfig.type) {
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                     case 'sunspec': {
                         return new SunSpecInverterDataPoller({
                             sunspecInverterConfig: inverterConfig,
                             applyControl: config.inverterControl.enabled,
                             inverterIndex: index,
-                        }).on('data', (data) => {
-                            this.inverterDataCacheMapByIndex.set(index, data);
-
-                            this.onData();
-                        });
+                        }).on('data', inverterOnData);
+                    }
+                    case 'sma': {
+                        return new SmaInverterDataPoller({
+                            smaInverterConfig: inverterConfig,
+                            applyControl: config.inverterControl.enabled,
+                            inverterIndex: index,
+                        }).on('data', inverterOnData);
                     }
                 }
             },
