@@ -11,6 +11,7 @@ export default tseslint.config(
             'dist/',
             'logs/',
             'src/limiters/negativeFeedIn/amber/api.d.ts',
+            'docs/.docusaurus/',
         ],
     },
     eslint.configs.recommended,
@@ -19,6 +20,7 @@ export default tseslint.config(
         languageOptions: {
             parserOptions: {
                 projectService: true,
+                project: ['./tsconfig.json', './docs/tsconfig.json'],
                 tsconfigRootDir: import.meta.dirname,
             },
         },
