@@ -1,6 +1,8 @@
 # Getting started
 
-Open-dynamic-export is a Node/TypeScript project implementing dynamic export control/solar curtailment of inverters. It aims to solve these use cases:
+## Introduction
+
+*open-dynamic-export* is a Node/TypeScript project implementing dynamic export control/solar curtailment of inverters. It aims to solve these use cases:
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - two-way tariffs (e.g.time based) export limitation
@@ -39,22 +41,13 @@ flowchart LR
 ```
 
 ### Limiters
-The system uses one or more "limiters" to set the operating envelope of the site. All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive value of each control type at any one time. [Learn more about configuring limiters](./configuration/limiters).
-
-Currently there are four control modes, mapped to the CSIP-AUS modes
-
-| Mode            | Description                                                                                  | Overlap resolution     | Default value |
-|-----------------|----------------------------------------------------------------------------------------------|------------------------|---------------|
-| opModConnect    | Connection to the grid                                                                       | Prioritize disconnect  | Connect       |
-| opModEnergize   | Generate or consume energy (in practice for most inverters this is the same as opModConnect) | Prioritize de-energize | Energized     |
-| opModExportLimW | Maximum export limit (in watts)                                                              | Lower limit            | Unlimited     |
-| opModGenLimW    | Maximum inverter generation limit (in watts)                                                 | Lower limit            | Unlimited     |
+The system uses one or more "limiters" to set the operating envelope of the site. All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive value of each control type at any one time. [Learn more about configuring limiters](/configuration/limiters).
 
 ### Inverters
-The system supports one or more inverters to measure the site's generation metrics and control the power output. [Learn more about configuring inverters](./configuration/inverters).
+The system supports one or more inverters to measure the site's generation metrics and control the power output. [Learn more about configuring inverters](/configuration/inverters).
 
 ### Site meter
-The system supports one site meter to measure the site's load and export metrics. [Learn more about configuring site meter](./configuration/meter).
+The system supports one site meter to measure the site's load and export metrics. [Learn more about configuring site meter](/configuration/meter).
 
 ## Install
 

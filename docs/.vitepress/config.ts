@@ -15,25 +15,32 @@ export default withMermaid(
 
             nav: [
                 { text: 'Home', link: '/' },
-                { text: 'User guide', link: '/guide' },
+                { text: 'User guide', link: '/guide/' },
             ],
 
             sidebar: [
                 {
                     text: 'Getting started',
-                    link: '/getting-started',
+                    link: '/guide/',
                 },
                 {
                     text: 'Configuration',
                     items: [
-                        { text: 'Inverters', link: '/configuration/inverters' },
+                        {
+                            text: 'Inverters',
+                            link: '/configuration/inverters',
+                        },
+                        {
+                            text: 'Inverter control',
+                            link: '/configuration/inverter-control',
+                        },
                         { text: 'Site meter', link: '/configuration/meter' },
                         { text: 'Limiters', link: '/configuration/limiters' },
                     ],
                 },
                 {
                     text: 'CSIP-AUS',
-                    link: '/csip-aus',
+                    link: '/csip-aus/',
                 },
             ],
 
