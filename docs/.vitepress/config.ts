@@ -8,6 +8,7 @@ export default withMermaid(
         description: 'Free open-source inverter curtailment',
         appearance: 'force-dark',
         cleanUrls: true,
+        ignoreDeadLinks: true,
         themeConfig: {
             // https://vitepress.dev/reference/default-theme-config
             logo: '/logo.svg',
