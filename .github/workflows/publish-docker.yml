@@ -3,13 +3,8 @@ name: Publish Docker image
 on:
   workflow_dispatch:
   push:
-    branches:
-      - 'master'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - 'master'
 
 env:
   IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}
