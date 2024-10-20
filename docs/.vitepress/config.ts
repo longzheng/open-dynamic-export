@@ -1,43 +1,47 @@
 import { defineConfig } from 'vitepress';
+import { withMermaid } from 'vitepress-plugin-mermaid';
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
-    title: 'Open Dynamic Export',
-    description: 'Free open-source inverter curtailment',
-    appearance: 'force-dark',
-    themeConfig: {
-        // https://vitepress.dev/reference/default-theme-config
-        logo: '/logo.svg',
+export default withMermaid(
+    defineConfig({
+        title: 'Open Dynamic Export',
+        description: 'Free open-source inverter curtailment',
+        appearance: 'force-dark',
+        cleanUrls: true,
+        themeConfig: {
+            // https://vitepress.dev/reference/default-theme-config
+            logo: '/logo.svg',
 
-        nav: [
-            { text: 'Home', link: '/' },
-            { text: 'Guide', link: '/guide' },
-        ],
+            nav: [
+                { text: 'Home', link: '/' },
+                { text: 'User guide', link: '/guide' },
+            ],
 
-        sidebar: [
-            {
-                text: 'Guide',
-                items: [
-                    { text: 'Introduction', link: '/introduction' },
-                    { text: 'Getting started', link: '/getting-started' },
-                    { text: 'Configuration', link: '/configuration' },
-                    { text: 'Supported devices', link: '/supported-devices' },
-                ],
-            },
-            {
-                text: 'CSIP-AUS',
-                items: [
-                    { text: 'Queensland', link: '/csip-qld' },
-                    { text: 'Other states', link: '/csip-other' },
-                ],
-            },
-        ],
+            sidebar: [
+                {
+                    text: 'Getting started',
+                    link: '/getting-started',
+                },
+                {
+                    text: 'Configuration',
+                    items: [
+                        { text: 'Inverters', link: '/configuration/inverters' },
+                        { text: 'Site meter', link: '/configuration/meter' },
+                        { text: 'Limiters', link: '/configuration/limiters' },
+                    ],
+                },
+                {
+                    text: 'CSIP-AUS',
+                    link: '/csip-aus',
+                },
+            ],
 
-        socialLinks: [
-            {
-                icon: 'github',
-                link: 'https://github.com/longzheng/open-dynamic-export',
-            },
-        ],
-    },
-});
+            socialLinks: [
+                {
+                    icon: 'github',
+                    link: 'https://github.com/longzheng/open-dynamic-export',
+                },
+            ],
+        },
+    }),
+);
