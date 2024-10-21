@@ -58,6 +58,6 @@ As a direct gateway client, the client requires a device certificate and manufac
 
 ### Energex/Ergon Energy
 
-The client has been listed as a compliant provider for Energex/Ergon Energy and the project has been issued a manufacturer certificate for production use.
+The client has been listed as a compliant provider for Energex/Ergon Energy and the project is soon to be issued a manufacturer certificate for production use.
 
 A device certificate for Energex/Ergon Energy (Queensland) can be obtained by emailing long.zheng@gmail.com
