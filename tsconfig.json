@@ -17,7 +17,15 @@
         "allowUnreachableCode": true,
         // allow unused during dev
         "noUnusedLocals": false,
-        "experimentalDecorators": true,
+        "experimentalDecorators": true
     },
-    "include": ["src/", "scripts/", "tests/", "vitest.config.ts", "eslint.config.mjs", "docs/.vitepress/**/*.ts"]
+    "include": [
+        "src/",
+        "scripts/",
+        "tests/",
+        "vitest.config.ts",
+        "eslint.config.mjs",
+        "docs/.vitepress/config.ts",
+        "docs/.vitepress/theme/*.ts",
+    ]
 }
