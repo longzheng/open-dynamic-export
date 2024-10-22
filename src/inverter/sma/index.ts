@@ -15,16 +15,16 @@ import {
     SmaCore1InverterControlWModCfgWMod,
     type SmaCore1InverterControl2,
     type SmaCore1InverterControlModels,
-} from '../../modbus/models/smaCore1InverterControl.js';
+} from '../../modbus/models/sma/core1/inverterControl.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { Decimal } from 'decimal.js';
-import type { SmaCore1InverterModels } from '../../modbus/models/smaCore1Inverter.js';
-import type { SmaCore1GridMsModels } from '../../modbus/models/smaCore1GridMs.js';
-import type { SmaCore1Nameplate } from '../../modbus/models/smaCore1Nameplate.js';
+import type { SmaCore1InverterModels } from '../../modbus/models/sma/core1/inverter.js';
+import type { SmaCore1GridMsModels } from '../../modbus/models/sma/core1/gridMs.js';
+import type { SmaCore1Nameplate } from '../../modbus/models/sma/core1/nameplate.js';
 import {
     SmaCore1OperationGriSwStt,
     type SmaCore1Operation,
-} from '../../modbus/models/smaCore1Operation.js';
+} from '../../modbus/models/sma/core1/operation.js';
 
 export class SmaInverterDataPoller extends InverterDataPollerBase {
     private smaConnection: SmaConnection;

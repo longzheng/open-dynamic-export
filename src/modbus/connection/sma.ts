@@ -1,33 +1,33 @@
 import { ModbusConnection } from './base.js';
-import type { SmaCore1MeteringGridMsModels } from '../models/smaCore1MeteringGridMs.js';
+import type { SmaCore1MeteringGridMsModels } from '../models/sma/core1/meteringGridMs.js';
 import {
     SmaCore1MeteringGridMs1Model,
     SmaCore1MeteringGridMs2Model,
-} from '../models/smaCore1MeteringGridMs.js';
-import type { SmaCore1Nameplate } from '../models/smaCore1Nameplate.js';
-import { SmaCore1NameplateModel } from '../models/smaCore1Nameplate.js';
-import type { SmaCore1GridMsModels } from '../models/smaCore1GridMs.js';
+} from '../models/sma/core1/meteringGridMs.js';
+import type { SmaCore1Nameplate } from '../models/sma/core1/nameplate.js';
+import { SmaCore1NameplateModel } from '../models/sma/core1/nameplate.js';
+import type { SmaCore1GridMsModels } from '../models/sma/core1/gridMs.js';
 import {
     SmaCore1GridMs1Model,
     SmaCore1GridMs2Model,
     SmaCore1GridMs3Model,
-} from '../models/smaCore1GridMs.js';
-import type { SmaCore1Operation } from '../models/smaCore1Operation.js';
-import { SmaCore1OperationModel } from '../models/smaCore1Operation.js';
-import type { SmaCore1InverterModels } from '../models/smaCore1Inverter.js';
+} from '../models/sma/core1/gridMs.js';
+import type { SmaCore1Operation } from '../models/sma/core1/operation.js';
+import { SmaCore1OperationModel } from '../models/sma/core1/operation.js';
+import type { SmaCore1InverterModels } from '../models/sma/core1/inverter.js';
 import {
     SmaCore1Inverter1Model,
     SmaCore1Inverter2Model,
-} from '../models/smaCore1Inverter.js';
+} from '../models/sma/core1/inverter.js';
 import type {
     SmaCore1InverterControl1,
     SmaCore1InverterControl2,
     SmaCore1InverterControlModels,
-} from '../models/smaCore1InverterControl.js';
+} from '../models/sma/core1/inverterControl.js';
 import {
     SmaCore1InverterControl1Model,
     SmaCore1InverterControl2Model,
-} from '../models/smaCore1InverterControl.js';
+} from '../models/sma/core1/inverterControl.js';
 
 export class SmaConnection extends ModbusConnection {
     // the inverter model should never change so we can cache it

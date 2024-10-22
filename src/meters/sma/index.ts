@@ -4,7 +4,7 @@ import type { Result } from '../../helpers/result.js';
 import type { Config } from '../../helpers/config.js';
 import type { SmaConnection } from '../../modbus/connection/sma.js';
 import { getSmaConnection } from '../../modbus/connections.js';
-import type { SmaCore1MeteringGridMsModels } from '../../modbus/models/smaCore1MeteringGridMs.js';
+import type { SmaCore1MeteringGridMsModels } from '../../modbus/models/sma/core1/meteringGridMs.js';
 
 type SmaMeterConfig = Extract<Config['meter'], { type: 'sma' }>;
 

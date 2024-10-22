@@ -1,10 +1,10 @@
-import { modbusModelFactory } from '../modbusModelFactory.js';
+import { modbusModelFactory } from '../../../modbusModelFactory.js';
 import {
     registersToInt32,
     registersToInt32Nullable,
     registersToUint32,
     registersToUint32Nullable,
-} from '../../sunspec/helpers/converters.js';
+} from '../../../../sunspec/helpers/converters.js';
 
 export type SmaCore1GridMsModels = SmaCore1GridMs1 &
     SmaCore1GridMs2 &

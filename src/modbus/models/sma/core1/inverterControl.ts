@@ -1,10 +1,10 @@
-import { modbusModelFactory } from '../modbusModelFactory.js';
+import { modbusModelFactory } from '../../../modbusModelFactory.js';
 import {
     int16ToRegisters,
     registersToInt16,
     registersToUint32,
     uint32ToRegisters,
-} from '../../sunspec/helpers/converters.js';
+} from '../../../../sunspec/helpers/converters.js';
 
 export type SmaCore1InverterControlModels = SmaCore1InverterControl1 &
     SmaCore1InverterControl2;
