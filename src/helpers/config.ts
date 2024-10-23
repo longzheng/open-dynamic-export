@@ -73,6 +73,7 @@ export const configSchema = z.object({
                             .describe('The API key for the Amber API'),
                         siteId: z
                             .string()
+                            .optional()
                             .describe('The site ID for the Amber API'),
                     }),
                     z.never(), // TODO

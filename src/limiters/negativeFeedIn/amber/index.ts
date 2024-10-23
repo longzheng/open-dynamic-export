@@ -18,11 +18,17 @@ type Interval = {
 
 export class AmberLimiter implements LimiterType {
     private client: Client<paths>;
-    private siteId: string;
+    private siteId: string | null = null;
     private feedInIntervals: Interval[] = [];
     private logger: Logger;
 
-    constructor({ apiKey, siteId }: { apiKey: string; siteId: string }) {
+    constructor({
+        apiKey,
+        siteId,
+    }: {
+        apiKey: string;
+        siteId: string | undefined;
+    }) {
         this.client = createClient<paths>({
             baseUrl: 'https://api.amber.com.au/v1',
             headers: {
@@ -30,10 +36,12 @@ export class AmberLimiter implements LimiterType {
             },
             signal: AbortSignal.timeout(10_000),
         });
-        this.siteId = siteId;
         this.logger = pinoLogger.child({ inverter: 'AmberControlLimit' });
 
-        void this.poll();
+        void (async () => {
+            this.siteId = siteId ?? (await this.getSiteId());
+            void this.poll();
+        })();
     }
 
     getInverterControlLimit(): InverterControlLimit {
@@ -68,6 +76,10 @@ export class AmberLimiter implements LimiterType {
     }
 
     private async getSiteFeedInPrices() {
+        if (!this.siteId) {
+            throw new Error('Site ID not set');
+        }
+
         const { data, error } = await this.client.GET(
             '/sites/{siteId}/prices/current',
             {
@@ -101,6 +113,35 @@ export class AmberLimiter implements LimiterType {
             );
 
         this.feedInIntervals = feedInIntervals;
+    }
+
+    private async getSiteId(): Promise<string> {
+        const { data, error } = await this.client.GET('/sites');
+
+        // Amber API docs don't have error types defined
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (error) {
+            throw new Error(JSON.stringify(error));
+        }
+
+        const siteIds = data
+            .filter((site) => site.status === 'active')
+            .map((site) => site.id);
+
+        if (siteIds.length === 1) {
+            this.logger.info(
+                { siteId: siteIds[0] },
+                'Amber site ID automatically selected',
+            );
+
+            return siteIds[0]!;
+        }
+
+        throw new Error(
+            `Multiple active sites found, please specify site ID in config: ${siteIds.join(
+                ', ',
+            )}`,
+        );
     }
 
     private async poll() {
