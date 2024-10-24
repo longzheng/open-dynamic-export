@@ -21,7 +21,7 @@ flowchart LR
     Configuration --> F
     A["Amber API"] --> NFI
     R["Tariff rules"] --> T
-    ODE <--> SunSpec & HTTP & Proprietary & MQTT
+    ODE <--> SunSpec & Modbus & HTTP & Proprietary & MQTT
     Protocols <--> I & M
 
     subgraph Limiters
@@ -34,6 +34,7 @@ flowchart LR
 
     subgraph Protocols
     SunSpec
+    Modbus["Modbus TCP/RTU"]
     HTTP
     MQTT
     Proprietary
