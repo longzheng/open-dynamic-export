@@ -17,8 +17,6 @@ This project aims to implement dynamic export control/solar curtailment of inver
 - [x] Limits control
   - [x] Fixed limits
   - [x] Dynamic negative feed-in
-    - [x] Amber
-    - [ ] Localvolts
   - [x] Two-way tariffs
   - [x] CSIP-AUS
 - [x] Inverter integration
