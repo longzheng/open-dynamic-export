@@ -19,9 +19,7 @@ void (async () => {
 
     for (const inverterConnection of invertersConnections) {
         const inverterLogger = logger.child({
-            ip: inverterConnection.ip,
-            port: inverterConnection.port,
-            unitId: inverterConnection.unitId,
+            config: inverterConnection.config,
         });
 
         let currentAddress = 40002;
@@ -56,9 +54,7 @@ void (async () => {
         const meterConnection = getSunSpecMeterConnection(config.meter);
 
         const meterLogger = logger.child({
-            ip: meterConnection.ip,
-            port: meterConnection.port,
-            unitId: meterConnection.unitId,
+            config: meterConnection.config,
         });
 
         let currentAddress = 40002;

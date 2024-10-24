@@ -1,34 +1,33 @@
-import type { Config } from '../helpers/config.js';
+import type { Config, ModbusSchema } from '../helpers/config.js';
 import { SmaConnection } from './connection/sma.js';
 
-function getConnectionKey({
-    ip,
-    port,
+export function getModbusConnectionKey({
+    connection,
     unitId,
-}: {
-    ip: string;
-    port: number;
-    unitId: number;
-}) {
-    return `${ip}:${port}:${unitId}`;
+}: ModbusSchema): string {
+    switch (connection.type) {
+        case 'tcp':
+            return `${connection.ip}:${connection.port}:${unitId}`;
+        case 'rtu':
+            return `${connection.path}:${unitId}`;
+    }
 }
 
 const smaConnectionsMap = new Map<string, SmaConnection>();
 
 export function getSmaConnection({
-    ip,
-    port,
+    connection,
     unitId,
-}: Extract<Config['inverters'][number], { type: 'sma' }>) {
-    const key = getConnectionKey({ ip, port, unitId });
+}: Extract<Config['inverters'][number], { type: 'sma' }>): SmaConnection {
+    const key = getModbusConnectionKey({ connection, unitId });
 
     if (smaConnectionsMap.has(key)) {
         return smaConnectionsMap.get(key)!;
     }
 
-    const connection = new SmaConnection({ ip, port, unitId });
+    const smaConnection = new SmaConnection({ connection, unitId });
 
-    smaConnectionsMap.set(key, connection);
+    smaConnectionsMap.set(key, smaConnection);
 
-    return connection;
+    return smaConnection;
 }

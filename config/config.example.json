@@ -8,8 +8,11 @@
     "inverters": [
         {
             "type": "sunspec",
-            "ip": "192.168.1.6",
-            "port": 502,
+            "connection": {
+                "type": "tcp",
+                "ip": "192.168.1.6",
+                "port": 502
+            },
             "unitId": 1
         }
     ],
@@ -18,8 +21,11 @@
     },
     "meter": {
         "type": "sunspec",
-        "ip": "192.168.1.6",
-        "port": 502,
+        "connection": {
+            "type": "tcp",
+            "ip": "192.168.1.6",
+            "port": 502
+        },
         "unitId": 240,
         "location": "feedin"
     }
