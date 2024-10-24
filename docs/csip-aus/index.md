@@ -44,10 +44,10 @@ The CSIP-AUS client was tested and certified by the [South Australia Power Netwo
 
 Unfortunately due to different regional requirements, some DNSPs also require CSIP-AUS clients to be listed by the Clean Energy Council. Even though Clean Energy Council accepts SAPN testing certificates, the listing fee is $1,000 per device OEM which is cost prohibitive for open source projects.
 
-| State | Utility                       | Certification              | Listing                                                            |
-|-------|-------------------------------|----------------------------|--------------------------------------------------------------------|
-| SA    | South Australia Power Network | Accepts SAPN certification | :x: Requires CEC listing                                               |
-| QLD   | Energex<br>Ergon Energy       | Accepts SAPN certification | :white_check_mark: Does not require CEC listing,  [separate complaint providers list](https://www.energex.com.au/__data/assets/pdf_file/0005/1097744/Dynamic-Connections-Compliant-Providers.pdf)  |
+| State | Utility                       | Certification              | Tested             | Approved use                                                                                                                                                                                      |
+|-------|-------------------------------|----------------------------|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SA    | South Australia Power Network | Accepts SAPN certification | :white_check_mark: | :x: Requires CEC listing                                                                                                                                                                          |
+| QLD   | Energex<br>Ergon Energy       | Accepts SAPN certification | :white_check_mark: | :white_check_mark: Does not require CEC listing,  [separate complaint providers list](https://www.energex.com.au/__data/assets/pdf_file/0005/1097744/Dynamic-Connections-Compliant-Providers.pdf) |
 
 
 ## Device certificate
