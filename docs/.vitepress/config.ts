@@ -5,7 +5,8 @@ import { withMermaid } from 'vitepress-plugin-mermaid';
 export default withMermaid(
     defineConfig({
         title: 'Open Dynamic Export',
-        description: 'Free open-source inverter curtailment',
+        description:
+            'Free open source local solar inverter export control/curtailment',
         appearance: 'force-dark',
         cleanUrls: true,
         ignoreDeadLinks: true,

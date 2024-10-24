@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "Open Dynamic Export"
-  tagline: Open source solar inverter export control/curtailment
+  tagline: Free open source local solar inverter export control/curtailment
   actions:
     - theme: brand
       text: User guide
