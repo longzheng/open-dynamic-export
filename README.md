@@ -21,8 +21,10 @@ This project aims to implement dynamic export control/solar curtailment of inver
   - [x] CSIP-AUS
 - [x] Inverter integration
   - [x] SunSpec Modbus TCP
+  - [x] SunSpec Modbus RTU
 - [x] Meter integration
   - [x] SunSpec Modbus TCP
+  - [x] SunSpec Modbus RTU
   - [x] Tesla Powerwall
 - [x] CSIP-AUS/SEP2/IEEE 2030.5 client
   - [x] Discovery and scheduled entity polling
