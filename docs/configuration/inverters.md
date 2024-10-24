@@ -18,8 +18,11 @@ To configure a SMA inverter connection, add the following property to `config.js
         {
             "type": "sma", // (string) required: the type of inverter
             "model": "core1", // (string) required: the model of the inverter
-            "ip": "192.168.1.6", // (string) required: the IP address of the inverter
-            "port": 502, // (number) required: the Modbus TCP port of the inverter
+            "connection": {
+                "type": "tcp", // (string) required: the type of connection (tcp, rtu)
+                "ip": "192.168.1.6", // (string) required: the IP address of the inverter
+                "port": 502 // (number) required: the Modbus TCP port of the inverter
+            },
             "unitId": 1 // (number) required: the Modbus unit ID of the inverter
         }
     ],
@@ -35,20 +38,33 @@ The project requires SunSpec models `1`, `101` (or `102` or `103`), `120`, `121`
 
 ### config.json
 
-To configure a SunSpec inverter connection, add the following property to `config.json`
+To configure a SunSpec inverter connection over TCP, add the following property to `config.json`
 
 ```js
 {
     "inverters": [ // (array) required: list of inverters
         {
             "type": "sunspec", // (string) required: the type of inverter
-            "ip": "192.168.1.6", // (string) required: the IP address of the inverter
-            "port": 502, // (number) required: the Modbus TCP port of the inverter
+            "connection": {
+                "type": "tcp", // (string) required: the type of connection (tcp, rtu)
+                "ip": "192.168.1.6", // (string) required: the IP address of the inverter
+                "port": 502 // (number) required: the Modbus TCP port of the inverter
+            },
             "unitId": 1 // (number) required: the Modbus unit ID of the inverter
         }
     ],
     ...
 }
+```
+
+For SunSpec over RTU, you need to modify the `connection`
+
+```js
+            "connection": {
+                "type": "rtu", // (string) required: the type of connection (tcp, rtu)
+                "path": "/dev/ttyUSB0",  // (string) required: the path to the serial port
+                "baudRate": 9600 // (number) required: the baud rate of the serial port
+            },
 ```
 
 ### Fronius

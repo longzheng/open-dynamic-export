@@ -1,55 +1,48 @@
 import type { Config } from '../helpers/config.js';
+import { getModbusConnectionKey } from '../modbus/connections.js';
 import { InverterSunSpecConnection } from './connection/inverter.js';
 import { MeterSunSpecConnection } from './connection/meter.js';
-
-function getConnectionKey({
-    ip,
-    port,
-    unitId,
-}: {
-    ip: string;
-    port: number;
-    unitId: number;
-}) {
-    return `${ip}:${port}:${unitId}`;
-}
 
 const inverterConnectionsMap = new Map<string, InverterSunSpecConnection>();
 
 export function getSunSpecInvertersConnection({
-    ip,
-    port,
+    connection,
     unitId,
 }: Extract<Config['inverters'][number], { type: 'sunspec' }>) {
-    const key = getConnectionKey({ ip, port, unitId });
+    const key = getModbusConnectionKey({ connection, unitId });
 
     if (inverterConnectionsMap.has(key)) {
         return inverterConnectionsMap.get(key)!;
     }
 
-    const connection = new InverterSunSpecConnection({ ip, port, unitId });
+    const inverterSunspecConnection = new InverterSunSpecConnection({
+        connection,
+        unitId,
+    });
 
-    inverterConnectionsMap.set(key, connection);
+    inverterConnectionsMap.set(key, inverterSunspecConnection);
 
-    return connection;
+    return inverterSunspecConnection;
 }
 
 const meterConnectionsMap = new Map<string, MeterSunSpecConnection>();
 
 export function getSunSpecMeterConnection({
-    ip,
-    port,
+    connection,
     unitId,
 }: Extract<Config['meter'], { type: 'sunspec' }>) {
-    const key = getConnectionKey({ ip, port, unitId });
+    const key = getModbusConnectionKey({ connection, unitId });
 
     if (meterConnectionsMap.has(key)) {
         return meterConnectionsMap.get(key)!;
     }
 
-    const connection = new MeterSunSpecConnection({ ip, port, unitId });
+    const meterSunSpecconnection = new MeterSunSpecConnection({
+        connection,
+        unitId,
+    });
 
-    meterConnectionsMap.set(key, connection);
+    meterConnectionsMap.set(key, meterSunSpecconnection);
 
-    return connection;
+    return meterSunSpecconnection;
 }

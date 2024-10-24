@@ -94,8 +94,11 @@ describe('modbusModelFactory', () => {
 
     beforeEach(() => {
         inverterSunSpecConnection = new InverterSunSpecConnection({
-            ip: '127.0.0.1',
-            port: 502,
+            connection: {
+                type: 'tcp',
+                ip: '127.0.0.1',
+                port: 502,
+            },
             unitId: 1,
         });
 

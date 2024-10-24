@@ -1,14 +1,13 @@
 import ModbusRTU from 'modbus-serial';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
+import type { ModbusSchema } from '../../helpers/config.js';
 
 const connectionTimeoutMs = 10_000;
 
 export abstract class ModbusConnection {
     public readonly client: ModbusRTU.default;
-    public readonly ip: string;
-    public readonly port: number;
-    public readonly unitId: number;
+    public readonly config: ModbusSchema;
     public readonly logger: Logger;
 
     private state:
@@ -16,24 +15,12 @@ export abstract class ModbusConnection {
         | { type: 'connecting'; connectPromise: Promise<void> }
         | { type: 'disconnected' } = { type: 'disconnected' };
 
-    constructor({
-        ip,
-        port,
-        unitId,
-    }: {
-        ip: string;
-        port: number;
-        unitId: number;
-    }) {
+    constructor(config: ModbusSchema) {
         this.client = new ModbusRTU.default();
-        this.ip = ip;
-        this.port = port;
-        this.unitId = unitId;
+        this.config = config;
         this.logger = pinoLogger.child({
             module: 'ModbusConnection',
-            ip,
-            port,
-            unitId,
+            config,
         });
 
         this.client.on('close', () => {
@@ -65,13 +52,29 @@ export abstract class ModbusConnection {
                     try {
                         this.logger.info(`Modbus client connecting`);
 
-                        await this.client.connectTCP(this.ip, {
-                            port: this.port,
-                            // timeout for connection
-                            timeout: connectionTimeoutMs,
-                        });
+                        switch (this.config.connection.type) {
+                            case 'tcp':
+                                await this.client.connectTCP(
+                                    this.config.connection.ip,
+                                    {
+                                        port: this.config.connection.port,
+                                        // timeout for connection
+                                        timeout: connectionTimeoutMs,
+                                    },
+                                );
+                                break;
+                            case 'rtu':
+                                await this.client.connectRTUBuffered(
+                                    this.config.connection.path,
+                                    {
+                                        baudRate:
+                                            this.config.connection.baudRate,
+                                    },
+                                );
+                                break;
+                        }
 
-                        this.client.setID(this.unitId);
+                        this.client.setID(this.config.unitId);
 
                         // timeout for requests
                         this.client.setTimeout(connectionTimeoutMs);
