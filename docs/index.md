@@ -35,9 +35,9 @@ features:
 
 If you're a home owner or electrician interested in a plug and play hardware package with an integrated dashboard user interface, contact long.zheng@gmail.com
 
-## Get in touch
+## OEM/commercial integrations
 
-For integrations with other devices, more advanced load management or commercial use cases, contact long.zheng@gmail.com
+For cloud integrations with OEM inverter devices, more advanced load management or commercial use cases, contact long.zheng@gmail.com
 
 <style>
 :root {
