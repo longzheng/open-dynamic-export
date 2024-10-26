@@ -27,13 +27,12 @@ void (async () => {
         for (;;) {
             await inverter.connection.connect();
 
-            inverter.connection.client.setID(inverter.config.unitId);
-
-            const response =
-                await inverter.connection.client.readHoldingRegisters(
-                    currentAddress,
-                    2,
-                );
+            const response = await inverter.connection.readRegisters({
+                type: 'holding',
+                unitId: inverter.config.unitId,
+                start: currentAddress,
+                length: 2,
+            });
             const modelId = response.data[0]!;
             const modelLength = response.data[1]!;
 
@@ -64,12 +63,12 @@ void (async () => {
         for (;;) {
             await meterConnection.connect();
 
-            meterConnection.client.setID(config.meter.unitId);
-
-            const response = await meterConnection.client.readHoldingRegisters(
-                currentAddress,
-                2,
-            );
+            const response = await meterConnection.readRegisters({
+                type: 'holding',
+                unitId: config.meter.unitId,
+                start: currentAddress,
+                length: 2,
+            });
             const modelId = response.data[0]!;
             const modelLength = response.data[1]!;
 

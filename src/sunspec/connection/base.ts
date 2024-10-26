@@ -99,19 +99,18 @@ export abstract class SunSpecConnection {
     private async scanModelAddresses(): Promise<Map<number, ModelAddress>> {
         await this.modbusConnection.connect();
 
-        this.modbusConnection.client.setID(this.unitId);
-
         this.logger.debug(`Scanning SunSpec models for SunSpec Modbus client`);
 
         // 40002 is a well-known base address
         let currentAddress = 40000;
 
         // read the first two registers to get the model ID and length
-        const response =
-            await this.modbusConnection.client.readHoldingRegisters(
-                currentAddress,
-                2,
-            );
+        const response = await this.modbusConnection.readRegisters({
+            type: 'holding',
+            unitId: this.unitId,
+            start: currentAddress,
+            length: 2,
+        });
 
         const SID = registersToUint32(response.data);
 
@@ -130,14 +129,14 @@ export abstract class SunSpecConnection {
         for (;;) {
             await this.modbusConnection.connect();
 
-            this.modbusConnection.client.setID(this.unitId);
-
             // read the first two registers to get the model ID and length
-            const response =
-                await this.modbusConnection.client.readHoldingRegisters(
-                    currentAddress,
-                    2,
-                );
+            const response = await this.modbusConnection.readRegisters({
+                type: 'holding',
+                unitId: this.unitId,
+                start: currentAddress,
+                length: 2,
+            });
+
             const modelId = response.data.at(0);
             const modelLength = response.data.at(1);
 
@@ -172,6 +171,6 @@ export abstract class SunSpecConnection {
     }
 
     public onDestroy(): void {
-        this.modbusConnection.client.close(() => {});
+        this.modbusConnection.close();
     }
 }

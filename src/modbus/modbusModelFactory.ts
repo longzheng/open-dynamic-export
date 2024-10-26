@@ -1,7 +1,10 @@
 import { objectEntriesWithType } from '../helpers/object.js';
 import type { ModelAddress } from '../sunspec/connection/base.js';
 import { writeLatency } from '../helpers/influxdb.js';
-import type { ModbusConnection } from './connection/base.js';
+import type {
+    ModbusConnection,
+    ModbusRegisterType,
+} from './connection/base.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,11 +27,11 @@ export function modbusModelFactory<
     WriteableKeys extends keyof Model = never,
 >({
     name,
-    registerType = 'holding',
+    type = 'holding',
     mapping,
 }: {
     name: string;
-    registerType?: 'holding' | 'input';
+    type?: ModbusRegisterType;
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
@@ -55,24 +58,12 @@ export function modbusModelFactory<
 
             await modbusConnection.connect();
 
-            modbusConnection.client.setID(unitId);
-
-            const registers = await (async () => {
-                switch (registerType) {
-                    case 'holding': {
-                        return await modbusConnection.client.readHoldingRegisters(
-                            address.start,
-                            address.length,
-                        );
-                    }
-                    case 'input': {
-                        return await modbusConnection.client.readInputRegisters(
-                            address.start,
-                            address.length,
-                        );
-                    }
-                }
-            })();
+            const registers = await modbusConnection.readRegisters({
+                type,
+                unitId,
+                start: address.start,
+                length: address.length,
+            });
 
             const end = performance.now();
             const duration = end - start;
@@ -115,21 +106,12 @@ export function modbusModelFactory<
 
             await modbusConnection.connect();
 
-            modbusConnection.client.setID(unitId);
-
-            await (async () => {
-                switch (registerType) {
-                    case 'holding': {
-                        return await modbusConnection.client.writeRegisters(
-                            address.start,
-                            registerValues,
-                        );
-                    }
-                    case 'input': {
-                        throw new Error('Cannot write to input registers');
-                    }
-                }
-            })();
+            await modbusConnection.writeRegisters({
+                type,
+                unitId,
+                start: address.start,
+                data: registerValues,
+            });
 
             const end = performance.now();
             const duration = end - start;
