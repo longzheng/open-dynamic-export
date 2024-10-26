@@ -4,7 +4,7 @@ import {
     registersToInt32Nullable,
     registersToUint32,
     registersToUint32Nullable,
-} from '../../../../sunspec/helpers/converters.js';
+} from '../../../helpers/converters.js';
 
 export type SmaCore1MeteringGridMsModels = SmaCore1MeteringGridMs1 &
     SmaCore1MeteringGridMs2;

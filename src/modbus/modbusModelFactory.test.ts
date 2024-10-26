@@ -11,7 +11,7 @@ import {
     registersToString,
     registersToUint16,
     uint16ToRegisters,
-} from '../sunspec/helpers/converters.js';
+} from './helpers/converters.js';
 import { InverterSunSpecConnection } from '../sunspec/connection/inverter.js';
 import { SunSpecConnection } from '../sunspec/connection/base.js';
 

@@ -2,7 +2,7 @@ import { modbusModelFactory } from '../../../modbusModelFactory.js';
 import {
     registersToInt32,
     registersToUint32,
-} from '../../../../sunspec/helpers/converters.js';
+} from '../../../helpers/converters.js';
 
 export type SmaCore1InverterModels = SmaCore1Inverter1 & SmaCore1Inverter2;
 

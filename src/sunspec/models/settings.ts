@@ -6,7 +6,7 @@ import {
     registersToSunssfNullable,
     registersToUint16,
     registersToUint16Nullable,
-} from '../helpers/converters.js';
+} from '../../modbus/helpers/converters.js';
 import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
 // generated from SunSpec_Information_Model_Reference_20240701.xlsx
