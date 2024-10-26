@@ -12,7 +12,7 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
     private model: SmaMeterConfig['model'];
 
     constructor({ smaMeterConfig }: { smaMeterConfig: SmaMeterConfig }) {
-        super({ name: 'SunSpecMeterPoller', pollingIntervalMs: 200 });
+        super({ name: 'sma', pollingIntervalMs: 200 });
 
         this.smaConnection = new SmaConnection(smaMeterConfig);
         this.model = smaMeterConfig.model;
