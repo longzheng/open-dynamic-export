@@ -1,7 +1,7 @@
 import {
     registersToUint16,
     registersToUint32,
-} from '../../../sunspec/helpers/converters.js';
+} from '../../helpers/converters.js';
 import { modbusModelFactory } from '../../modbusModelFactory.js';
 
 export type GrowattMeterModels = GrowattMeter1 & GrowattMeter2;
