@@ -12,8 +12,8 @@ import {
     registersToUint16,
     uint16ToRegisters,
 } from './helpers/converters.js';
-import { InverterSunSpecConnection } from '../sunspec/connection/inverter.js';
 import { SunSpecConnection } from '../sunspec/connection/base.js';
+import { ModbusConnection } from './connection/base.js';
 
 vi.mock(import('modbus-serial'));
 
@@ -85,7 +85,7 @@ it('convertWriteRegisters should convert registers to model', () => {
 });
 
 describe('modbusModelFactory', () => {
-    let inverterSunSpecConnection: InverterSunSpecConnection;
+    let modbusConnection: ModbusConnection;
 
     const model = modbusModelFactory<Model, keyof ModelWrite>({
         name: 'test',
@@ -93,13 +93,10 @@ describe('modbusModelFactory', () => {
     });
 
     beforeEach(() => {
-        inverterSunSpecConnection = new InverterSunSpecConnection({
-            connection: {
-                type: 'tcp',
-                ip: '127.0.0.1',
-                port: 502,
-            },
-            unitId: 1,
+        modbusConnection = new ModbusConnection({
+            type: 'tcp',
+            ip: '127.0.0.1',
+            port: 502,
         });
 
         // intercept SunSpecConnection scanModelAddresses to prevent actual scanning
@@ -116,14 +113,15 @@ describe('modbusModelFactory', () => {
 
     it('sunSpecModelFactory.read returns correct data', async () => {
         const readHoldingRegistersMock = vi
-            .spyOn(inverterSunSpecConnection.client, 'readHoldingRegisters')
+            .spyOn(modbusConnection.client, 'readHoldingRegisters')
             .mockResolvedValue({
                 data: [0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00],
                 buffer: Buffer.from([]), // buffer value is not used
             });
 
         const result = await model.read({
-            modbusConnection: inverterSunSpecConnection,
+            modbusConnection,
+            unitId: 1,
             address: { start: 40000, length: 6 },
         });
 
@@ -140,7 +138,7 @@ describe('modbusModelFactory', () => {
 
     it('sunSpecModelFactory.write returns if data updated', async () => {
         const writeRegistersMock = vi
-            .spyOn(inverterSunSpecConnection.client, 'writeRegisters')
+            .spyOn(modbusConnection.client, 'writeRegisters')
             .mockResolvedValue({ address: 40000, length: 6 });
 
         const values = {
@@ -151,7 +149,8 @@ describe('modbusModelFactory', () => {
         await expect(
             model.write({
                 values,
-                modbusConnection: inverterSunSpecConnection,
+                modbusConnection,
+                unitId: 1,
                 address: { start: 40000, length: 6 },
             }),
         ).resolves.toBeUndefined();

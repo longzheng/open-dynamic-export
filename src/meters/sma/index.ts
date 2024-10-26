@@ -2,8 +2,7 @@ import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { Result } from '../../helpers/result.js';
 import type { Config } from '../../helpers/config.js';
-import type { SmaConnection } from '../../modbus/connection/sma.js';
-import { getSmaConnection } from '../../modbus/connections.js';
+import { SmaConnection } from '../../modbus/connection/sma.js';
 import type { SmaCore1MeteringGridMsModels } from '../../modbus/models/sma/core1/meteringGridMs.js';
 
 type SmaMeterConfig = Extract<Config['meter'], { type: 'sma' }>;
@@ -15,7 +14,7 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
     constructor({ smaMeterConfig }: { smaMeterConfig: SmaMeterConfig }) {
         super({ name: 'sma', pollingIntervalMs: 200 });
 
-        this.smaConnection = getSmaConnection(smaMeterConfig);
+        this.smaConnection = new SmaConnection(smaMeterConfig);
         this.model = smaMeterConfig.model;
 
         void this.startPolling();
@@ -54,7 +53,7 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
     }
 
     override onDestroy() {
-        this.smaConnection.client.close(() => {});
+        this.smaConnection.onDestroy();
     }
 }
 

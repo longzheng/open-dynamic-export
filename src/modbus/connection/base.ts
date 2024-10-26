@@ -5,9 +5,9 @@ import type { ModbusSchema } from '../../helpers/config.js';
 
 const connectionTimeoutMs = 10_000;
 
-export abstract class ModbusConnection {
+export class ModbusConnection {
     public readonly client: ModbusRTU.default;
-    public readonly config: ModbusSchema;
+    public readonly config: ModbusSchema['connection'];
     public readonly logger: Logger;
 
     private state:
@@ -15,7 +15,7 @@ export abstract class ModbusConnection {
         | { type: 'connecting'; connectPromise: Promise<void> }
         | { type: 'disconnected' } = { type: 'disconnected' };
 
-    constructor(config: ModbusSchema) {
+    constructor(config: ModbusSchema['connection']) {
         this.client = new ModbusRTU.default();
         this.config = config;
         this.logger = pinoLogger.child({
@@ -52,29 +52,23 @@ export abstract class ModbusConnection {
                     try {
                         this.logger.info(`Modbus client connecting`);
 
-                        switch (this.config.connection.type) {
+                        switch (this.config.type) {
                             case 'tcp':
-                                await this.client.connectTCP(
-                                    this.config.connection.ip,
-                                    {
-                                        port: this.config.connection.port,
-                                        // timeout for connection
-                                        timeout: connectionTimeoutMs,
-                                    },
-                                );
+                                await this.client.connectTCP(this.config.ip, {
+                                    port: this.config.port,
+                                    // timeout for connection
+                                    timeout: connectionTimeoutMs,
+                                });
                                 break;
                             case 'rtu':
                                 await this.client.connectRTUBuffered(
-                                    this.config.connection.path,
+                                    this.config.path,
                                     {
-                                        baudRate:
-                                            this.config.connection.baudRate,
+                                        baudRate: this.config.baudRate,
                                     },
                                 );
                                 break;
                         }
-
-                        this.client.setID(this.config.unitId);
 
                         // timeout for requests
                         this.client.setTimeout(connectionTimeoutMs);
@@ -84,9 +78,7 @@ export abstract class ModbusConnection {
                         this.state = { type: 'connected' };
                     } catch (error) {
                         this.logger.error(
-                            {
-                                error,
-                            },
+                            error,
                             `Modbus client error connecting`,
                         );
 
