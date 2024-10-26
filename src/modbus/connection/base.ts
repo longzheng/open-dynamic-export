@@ -84,9 +84,7 @@ export abstract class ModbusConnection {
                         this.state = { type: 'connected' };
                     } catch (error) {
                         this.logger.error(
-                            {
-                                error,
-                            },
+                            error,
                             `Modbus client error connecting`,
                         );
 
