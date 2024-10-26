@@ -8,8 +8,7 @@ import { type InverterConfiguration } from '../../coordinator/helpers/inverterCo
 import type { Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
-import { getGrowattConnection } from '../../modbus/connections.js';
-import type { GrowattConnection } from '../../modbus/connection/growatt.js';
+import { GrowattConnection } from '../../modbus/connection/growatt.js';
 import type { GrowattInverterModels } from '../../modbus/models/growatt/inveter.js';
 
 export class GrowattInverterDataPoller extends InverterDataPollerBase {
@@ -34,7 +33,7 @@ export class GrowattInverterDataPoller extends InverterDataPollerBase {
             inverterIndex,
         });
 
-        this.growattConnection = getGrowattConnection(growattInverterConfig);
+        this.growattConnection = new GrowattConnection(growattInverterConfig);
 
         void this.startPolling();
     }
@@ -95,7 +94,7 @@ export class GrowattInverterDataPoller extends InverterDataPollerBase {
     }
 
     override onDestroy(): void {
-        this.growattConnection.client.close(() => {});
+        this.growattConnection.onDestroy();
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
