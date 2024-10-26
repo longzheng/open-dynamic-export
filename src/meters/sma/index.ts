@@ -33,7 +33,7 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
 
             this.logger.trace(
                 { duration, meterModel: meteringModel },
-                'polled SunSpec meter data',
+                'polled meter data',
             );
 
             const siteSample = generateSiteSample({
@@ -45,7 +45,7 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
             return {
                 success: false,
                 error: new Error(
-                    `Error loading SunSpec meter data: ${
+                    `Error loading meter data: ${
                         error instanceof Error ? error.message : 'Unknown error'
                     }`,
                 ),
