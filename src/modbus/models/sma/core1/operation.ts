@@ -1,5 +1,5 @@
 import { modbusModelFactory } from '../../../modbusModelFactory.js';
-import { registersToUint32 } from '../../../../sunspec/helpers/converters.js';
+import { registersToUint32 } from '../../../helpers/converters.js';
 
 export type SmaCore1Operation = {
     // Grid relay/contactor

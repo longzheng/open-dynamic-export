@@ -4,7 +4,7 @@ import {
     registersToInt16,
     registersToUint32,
     uint32ToRegisters,
-} from '../../../../sunspec/helpers/converters.js';
+} from '../../../helpers/converters.js';
 
 export type SmaCore1InverterControlModels = SmaCore1InverterControl1 &
     SmaCore1InverterControl2;

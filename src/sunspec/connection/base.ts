@@ -1,6 +1,6 @@
 import type { CommonModel } from '../models/common.js';
 import { commonModel } from '../models/common.js';
-import { registersToUint32 } from '../helpers/converters.js';
+import { registersToUint32 } from '../../modbus/helpers/converters.js';
 import { ModbusConnection } from '../../modbus/connection/base.js';
 
 export type ModelAddress = {
