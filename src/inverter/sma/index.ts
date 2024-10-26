@@ -29,7 +29,6 @@ import {
 export class SmaInverterDataPoller extends InverterDataPollerBase {
     private smaConnection: SmaConnection;
     private cachedControlsModel: SmaCore1InverterControlModels | null = null;
-    private sunSpecInverterIndex: number;
 
     constructor({
         smaInverterConfig,
@@ -51,7 +50,6 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
         });
 
         this.smaConnection = getSmaConnection(smaInverterConfig);
-        this.sunSpecInverterIndex = inverterIndex;
 
         void this.startPolling();
     }
@@ -69,7 +67,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'gridMs',
                         },
                     });
@@ -81,7 +79,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'nameplate',
                         },
                     });
@@ -93,7 +91,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'inverter',
                         },
                     });
@@ -105,7 +103,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'operation',
                         },
                     });
@@ -117,7 +115,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
                         field: 'SmaInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'inverterControl',
                         },
                     });

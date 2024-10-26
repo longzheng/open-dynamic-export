@@ -14,8 +14,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
     private pollingTimer: NodeJS.Timeout | null = null;
     private inverterDataCache: Result<InverterData> | null = null;
     protected applyControl: boolean;
-    // todo refactor this to protected?
-    private inverterIndex: number;
+    protected readonly inverterIndex: number;
     private inverterPollerName: string;
 
     constructor({

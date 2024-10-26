@@ -37,7 +37,6 @@ import { writeLatency } from '../../helpers/influxdb.js';
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
     private cachedControlsModel: ControlsModel | null = null;
-    private sunSpecInverterIndex: number;
 
     constructor({
         sunspecInverterConfig,
@@ -61,7 +60,6 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
         this.inverterConnection = getSunSpecInvertersConnection(
             sunspecInverterConfig,
         );
-        this.sunSpecInverterIndex = inverterIndex;
 
         void this.startPolling();
     }
@@ -79,7 +77,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                         field: 'sunSpecInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'inverter',
                         },
                     });
@@ -91,7 +89,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                         field: 'sunSpecInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'nameplate',
                         },
                     });
@@ -103,7 +101,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                         field: 'sunSpecInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'settings',
                         },
                     });
@@ -115,7 +113,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                         field: 'sunSpecInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'status',
                         },
                     });
@@ -127,7 +125,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                         field: 'sunSpecInverterDataPoller',
                         duration: performance.now() - start,
                         tags: {
-                            inverterIndex: this.sunSpecInverterIndex.toString(),
+                            inverterIndex: this.inverterIndex.toString(),
                             model: 'controls',
                         },
                     });
