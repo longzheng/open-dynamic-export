@@ -22,8 +22,13 @@ export function modbusModelFactory<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Model extends Record<string, any>,
     WriteableKeys extends keyof Model = never,
->(config: {
+>({
+    name,
+    registerType = 'holding',
+    mapping,
+}: {
     name: string;
+    registerType?: 'holding' | 'input';
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
@@ -40,7 +45,7 @@ export function modbusModelFactory<
         read: async ({ modbusConnection, address }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
-                model: config.name,
+                model: name,
                 type: 'read',
             });
 
@@ -48,11 +53,22 @@ export function modbusModelFactory<
 
             await modbusConnection.connect();
 
-            const registers =
-                await modbusConnection.client.readHoldingRegisters(
-                    address.start,
-                    address.length,
-                );
+            const registers = await (async () => {
+                switch (registerType) {
+                    case 'holding': {
+                        return await modbusConnection.client.readHoldingRegisters(
+                            address.start,
+                            address.length,
+                        );
+                    }
+                    case 'input': {
+                        return await modbusConnection.client.readInputRegisters(
+                            address.start,
+                            address.length,
+                        );
+                    }
+                }
+            })();
 
             const end = performance.now();
             const duration = end - start;
@@ -62,7 +78,7 @@ export function modbusModelFactory<
                 duration,
                 tags: {
                     operation: 'read',
-                    model: config.name,
+                    model: name,
                     addressStart: address.start.toString(),
                     addressLength: address.length.toString(),
                 },
@@ -75,13 +91,13 @@ export function modbusModelFactory<
 
             return convertReadRegisters({
                 registers: registers.data,
-                mapping: config.mapping,
+                mapping,
             });
         },
         write: async ({ modbusConnection, address, values }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
-                model: config.name,
+                model: name,
                 type: 'write',
             });
 
@@ -91,14 +107,23 @@ export function modbusModelFactory<
 
             const registerValues = convertWriteRegisters({
                 values,
-                mapping: config.mapping,
+                mapping,
                 length: address.length,
             });
 
-            await modbusConnection.client.writeRegisters(
-                address.start,
-                registerValues,
-            );
+            await (async () => {
+                switch (registerType) {
+                    case 'holding': {
+                        return await modbusConnection.client.writeRegisters(
+                            address.start,
+                            registerValues,
+                        );
+                    }
+                    case 'input': {
+                        throw new Error('Cannot write to input registers');
+                    }
+                }
+            })();
 
             const end = performance.now();
             const duration = end - start;
@@ -108,7 +133,7 @@ export function modbusModelFactory<
                 duration,
                 tags: {
                     operation: 'write',
-                    model: config.name,
+                    model: name,
                     addressStart: address.start.toString(),
                     addressLength: address.length.toString(),
                 },

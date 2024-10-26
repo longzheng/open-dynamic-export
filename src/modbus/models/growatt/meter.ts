@@ -38,6 +38,7 @@ type GrowattMeter2 = {
 
 export const GrowattMeter1Model = modbusModelFactory<GrowattMeter1>({
     name: 'GrowattMeter1Model',
+    registerType: 'input',
     mapping: {
         Fac: {
             start: 0,
@@ -64,6 +65,7 @@ export const GrowattMeter1Model = modbusModelFactory<GrowattMeter1>({
 
 export const GrowattMeter2Model = modbusModelFactory<GrowattMeter2>({
     name: 'GrowattMeter2Model',
+    registerType: 'input',
     mapping: {
         PactouserR: {
             start: 0,
