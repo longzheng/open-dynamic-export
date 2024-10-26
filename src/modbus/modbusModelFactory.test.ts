@@ -113,7 +113,7 @@ describe('modbusModelFactory', () => {
 
     it('sunSpecModelFactory.read returns correct data', async () => {
         const readHoldingRegistersMock = vi
-            .spyOn(modbusConnection.client, 'readHoldingRegisters')
+            .spyOn(modbusConnection['client'], 'readHoldingRegisters')
             .mockResolvedValue({
                 data: [0x0001, 0x0011, 0x0111, 0x6865, 0x6c6c, 0x6f00],
                 buffer: Buffer.from([]), // buffer value is not used
@@ -138,7 +138,7 @@ describe('modbusModelFactory', () => {
 
     it('sunSpecModelFactory.write returns if data updated', async () => {
         const writeRegistersMock = vi
-            .spyOn(modbusConnection.client, 'writeRegisters')
+            .spyOn(modbusConnection['client'], 'writeRegisters')
             .mockResolvedValue({ address: 40000, length: 6 });
 
         const values = {

@@ -50,13 +50,12 @@ export function modbusModelFactory<
 
             await modbusConnection.connect();
 
-            modbusConnection.client.setID(unitId);
-
-            const registers =
-                await modbusConnection.client.readHoldingRegisters(
-                    address.start,
-                    address.length,
-                );
+            const registers = await modbusConnection.readRegisters({
+                type: 'holding',
+                unitId,
+                start: address.start,
+                length: address.length,
+            });
 
             const end = performance.now();
             const duration = end - start;
@@ -99,12 +98,12 @@ export function modbusModelFactory<
 
             await modbusConnection.connect();
 
-            modbusConnection.client.setID(unitId);
-
-            await modbusConnection.client.writeRegisters(
-                address.start,
-                registerValues,
-            );
+            await modbusConnection.writeRegisters({
+                type: 'holding',
+                unitId,
+                start: address.start,
+                data: registerValues,
+            });
 
             const end = performance.now();
             const duration = end - start;

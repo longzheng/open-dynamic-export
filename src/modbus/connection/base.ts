@@ -2,13 +2,17 @@ import ModbusRTU from 'modbus-serial';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
 import type { ModbusSchema } from '../../helpers/config.js';
+import { Mutex } from 'async-mutex';
 
 const connectionTimeoutMs = 10_000;
 
+type RegisterType = 'holding' | 'input';
+
 export class ModbusConnection {
-    public readonly client: ModbusRTU.default;
+    private readonly client: ModbusRTU.default;
     public readonly config: ModbusSchema['connection'];
     public readonly logger: Logger;
+    private readonly mutex = new Mutex();
 
     private state:
         | { type: 'connected' }
@@ -93,5 +97,59 @@ export class ModbusConnection {
                 return connectPromise;
             }
         }
+    }
+
+    readRegisters({
+        type,
+        unitId,
+        start,
+        length,
+    }: {
+        type: RegisterType;
+        unitId: number;
+        start: number;
+        length: number;
+    }) {
+        return this.mutex.runExclusive(async () => {
+            await this.connect();
+
+            this.client.setID(unitId);
+
+            switch (type) {
+                case 'holding':
+                    return this.client.readHoldingRegisters(start, length);
+                case 'input':
+                    return this.client.readInputRegisters(start, length);
+            }
+        });
+    }
+
+    writeRegisters({
+        type,
+        unitId,
+        start,
+        data,
+    }: {
+        type: RegisterType;
+        unitId: number;
+        start: number;
+        data: number[];
+    }) {
+        return this.mutex.runExclusive(async () => {
+            await this.connect();
+
+            this.client.setID(unitId);
+
+            switch (type) {
+                case 'holding':
+                    return this.client.writeRegisters(start, data);
+                case 'input':
+                    throw new Error(`Cannot write to input registers`);
+            }
+        });
+    }
+
+    close() {
+        this.client.close(() => {});
     }
 }

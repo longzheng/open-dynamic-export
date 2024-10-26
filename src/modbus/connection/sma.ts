@@ -222,6 +222,6 @@ export class SmaConnection {
     }
 
     public onDestroy(): void {
-        this.modbusConnection.client.close(() => {});
+        this.modbusConnection.close();
     }
 }
