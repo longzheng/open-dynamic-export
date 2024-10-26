@@ -2,8 +2,7 @@ import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { Result } from '../../helpers/result.js';
 import type { Config } from '../../helpers/config.js';
-import { getGrowattConnection } from '../../modbus/connections.js';
-import type { GrowattConnection } from '../../modbus/connection/growatt.js';
+import { GrowattConnection } from '../../modbus/connection/growatt.js';
 import type { GrowattMeterModels } from '../../modbus/models/growatt/meter.js';
 
 type GrowattMeterConfig = Extract<Config['meter'], { type: 'growatt' }>;
@@ -18,7 +17,7 @@ export class GrowattMeterSiteSamplePoller extends SiteSamplePollerBase {
     }) {
         super({ name: 'growattMeter', pollingIntervalMs: 200 });
 
-        this.growattConnection = getGrowattConnection(growattMeterConfig);
+        this.growattConnection = new GrowattConnection(growattMeterConfig);
 
         void this.startPolling();
     }
@@ -52,7 +51,7 @@ export class GrowattMeterSiteSamplePoller extends SiteSamplePollerBase {
     }
 
     override onDestroy() {
-        this.growattConnection.client.close(() => {});
+        this.growattConnection.onDestroy();
     }
 }
 
