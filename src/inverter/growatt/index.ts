@@ -1,0 +1,150 @@
+import { type InverterData } from '../inverterData.js';
+import type { Result } from '../../helpers/result.js';
+import { ConnectStatus } from '../../sep2/models/connectStatus.js';
+import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
+import { DERTyp } from '../../sunspec/models/nameplate.js';
+import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
+import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
+import type { Config } from '../../helpers/config.js';
+import { withRetry } from '../../helpers/withRetry.js';
+import { writeLatency } from '../../helpers/influxdb.js';
+import { getGrowattConnection } from '../../modbus/connections.js';
+import type { GrowattConnection } from '../../modbus/connection/growatt.js';
+import type { GrowattInverterModels } from '../../modbus/models/growatt/inveter.js';
+
+export class GrowattInverterDataPoller extends InverterDataPollerBase {
+    private growattConnection: GrowattConnection;
+
+    constructor({
+        growattInverterConfig,
+        inverterIndex,
+        applyControl,
+    }: {
+        growattInverterConfig: Extract<
+            Config['inverters'][number],
+            { type: 'growatt' }
+        >;
+        inverterIndex: number;
+        applyControl: boolean;
+    }) {
+        super({
+            name: 'GrowattInverterDataPoller',
+            pollingIntervalMs: 200,
+            applyControl,
+            inverterIndex,
+        });
+
+        this.growattConnection = getGrowattConnection(growattInverterConfig);
+
+        void this.startPolling();
+    }
+
+    override async getInverterData(): Promise<Result<InverterData>> {
+        try {
+            return await withRetry(
+                async () => {
+                    const start = performance.now();
+
+                    const inverterModel =
+                        await this.growattConnection.getInverterModel();
+
+                    writeLatency({
+                        field: 'GrowattInverterDataPoller',
+                        duration: performance.now() - start,
+                        tags: {
+                            inverterIndex: this.inverterIndex.toString(),
+                            model: 'inverter',
+                        },
+                    });
+
+                    const models: InverterModels = {
+                        inverter: inverterModel,
+                    };
+
+                    const end = performance.now();
+                    const duration = end - start;
+
+                    this.logger.trace(
+                        { duration, models },
+                        'Got inverter data',
+                    );
+
+                    const inverterData = generateInverterData(models);
+
+                    return {
+                        success: true,
+                        value: inverterData,
+                    };
+                },
+                {
+                    attempts: 3,
+                    delayMilliseconds: 100,
+                    functionName: 'get inverter data',
+                },
+            );
+        } catch (error) {
+            this.logger.error(error, 'Failed to get inverter data');
+
+            return {
+                success: false,
+                error: new Error(
+                    `Error loading inverter data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                ),
+            };
+        }
+    }
+
+    override onDestroy(): void {
+        this.growattConnection.client.close(() => {});
+    }
+
+    // eslint-disable-next-line @typescript-eslint/require-await
+    override async onControl(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _inverterConfiguration: InverterConfiguration,
+    ): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+}
+
+type InverterModels = {
+    inverter: GrowattInverterModels;
+};
+
+export function generateInverterData({
+    inverter,
+}: InverterModels): InverterData {
+    return {
+        date: new Date(),
+        inverter: {
+            realPower: inverter.Ppv,
+            reactivePower: 0,
+            voltagePhaseA: 0,
+            voltagePhaseB: null,
+            voltagePhaseC: null,
+            frequency: 0,
+        },
+        nameplate: {
+            type: DERTyp.PV,
+            maxW: 0,
+            maxVA: 0,
+            maxVar: 0,
+        },
+        settings: {
+            maxW: 0,
+            maxVA: 0,
+            maxVar: 0,
+        },
+        status: generateInverterDataStatus(),
+    };
+}
+
+export function generateInverterDataStatus(): InverterData['status'] {
+    return {
+        operationalModeStatus: OperationalModeStatus.OperationalMode,
+        genConnectStatus:
+            ConnectStatus.Available |
+            ConnectStatus.Connected |
+            ConnectStatus.Operating,
+    };
+}

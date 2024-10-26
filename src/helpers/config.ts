@@ -146,6 +146,12 @@ export const configSchema = z.object({
                     })
                     .merge(modbusSchema)
                     .describe('SMA inverter configuration'),
+                z
+                    .object({
+                        type: z.literal('growatt'),
+                    })
+                    .merge(modbusSchema)
+                    .describe('Growatt inverter configuration'),
             ]),
         )
         .describe('Inverter configuration'),

@@ -10,6 +10,7 @@ import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import type { InverterConfiguration } from './inverterController.js';
 import type { Logger } from 'pino';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
+import { GrowattInverterDataPoller } from '../../inverter/growatt/index.js';
 export class InvertersPoller extends EventEmitter<{
     data: [DerSample];
 }> {
@@ -41,6 +42,13 @@ export class InvertersPoller extends EventEmitter<{
                     case 'sma': {
                         return new SmaInverterDataPoller({
                             smaInverterConfig: inverterConfig,
+                            applyControl: config.inverterControl.enabled,
+                            inverterIndex: index,
+                        }).on('data', inverterOnData);
+                    }
+                    case 'growatt': {
+                        return new GrowattInverterDataPoller({
+                            growattInverterConfig: inverterConfig,
                             applyControl: config.inverterControl.enabled,
                             inverterIndex: index,
                         }).on('data', inverterOnData);
