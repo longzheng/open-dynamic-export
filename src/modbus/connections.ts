@@ -1,4 +1,5 @@
-import type { Config, ModbusSchema } from '../helpers/config.js';
+import type { ModbusSchema } from '../helpers/config.js';
+import { GrowattConnection } from './connection/growatt.js';
 import { SmaConnection } from './connection/sma.js';
 
 export function getModbusConnectionKey({
@@ -18,7 +19,7 @@ const smaConnectionsMap = new Map<string, SmaConnection>();
 export function getSmaConnection({
     connection,
     unitId,
-}: Extract<Config['inverters'][number], { type: 'sma' }>): SmaConnection {
+}: ModbusSchema): SmaConnection {
     const key = getModbusConnectionKey({ connection, unitId });
 
     if (smaConnectionsMap.has(key)) {
@@ -30,4 +31,23 @@ export function getSmaConnection({
     smaConnectionsMap.set(key, smaConnection);
 
     return smaConnection;
+}
+
+const growattConnectionsMap = new Map<string, GrowattConnection>();
+
+export function getGrowattConnection({
+    connection,
+    unitId,
+}: ModbusSchema): GrowattConnection {
+    const key = getModbusConnectionKey({ connection, unitId });
+
+    if (growattConnectionsMap.has(key)) {
+        return growattConnectionsMap.get(key)!;
+    }
+
+    const growattConnection = new GrowattConnection({ connection, unitId });
+
+    growattConnectionsMap.set(key, growattConnection);
+
+    return growattConnection;
 }
