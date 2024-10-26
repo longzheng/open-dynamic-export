@@ -252,6 +252,27 @@
                 ],
                 "additionalProperties": false,
                 "description": "SMA inverter configuration"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "growatt"
+                  },
+                  "connection": {
+                    "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/connection"
+                  },
+                  "unitId": {
+                    "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/unitId"
+                  }
+                },
+                "required": [
+                  "type",
+                  "connection"
+                ],
+                "additionalProperties": false,
+                "description": "Growatt inverter configuration"
               }
             ]
           },
