@@ -29,15 +29,17 @@ export function modbusModelFactory<
     read(params: {
         modbusConnection: ModbusConnection;
         address: ModelAddress;
+        unitId: number;
     }): Promise<Model>;
     write(params: {
         modbusConnection: ModbusConnection;
         address: ModelAddress;
+        unitId: number;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
 } {
     return {
-        read: async ({ modbusConnection, address }) => {
+        read: async ({ modbusConnection, address, unitId }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
                 model: config.name,
@@ -47,6 +49,8 @@ export function modbusModelFactory<
             const start = performance.now();
 
             await modbusConnection.connect();
+
+            modbusConnection.client.setID(unitId);
 
             const registers =
                 await modbusConnection.client.readHoldingRegisters(
@@ -78,7 +82,7 @@ export function modbusModelFactory<
                 mapping: config.mapping,
             });
         },
-        write: async ({ modbusConnection, address, values }) => {
+        write: async ({ modbusConnection, address, unitId, values }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
                 model: config.name,
@@ -87,13 +91,15 @@ export function modbusModelFactory<
 
             const start = performance.now();
 
-            await modbusConnection.connect();
-
             const registerValues = convertWriteRegisters({
                 values,
                 mapping: config.mapping,
                 length: address.length,
             });
+
+            await modbusConnection.connect();
+
+            modbusConnection.client.setID(unitId);
 
             await modbusConnection.client.writeRegisters(
                 address.start,

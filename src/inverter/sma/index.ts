@@ -8,8 +8,7 @@ import { type InverterConfiguration } from '../../coordinator/helpers/inverterCo
 import type { Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
-import type { SmaConnection } from '../../modbus/connection/sma.js';
-import { getSmaConnection } from '../../modbus/connections.js';
+import { SmaConnection } from '../../modbus/connection/sma.js';
 import {
     SmaCore1InverterControlFstStop,
     SmaCore1InverterControlWModCfgWMod,
@@ -49,7 +48,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
             inverterIndex,
         });
 
-        this.smaConnection = getSmaConnection(smaInverterConfig);
+        this.smaConnection = new SmaConnection(smaInverterConfig);
 
         void this.startPolling();
     }
@@ -164,7 +163,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
     }
 
     override onDestroy(): void {
-        this.smaConnection.client.close(() => {});
+        this.smaConnection.onDestroy();
     }
 
     override async onControl(

@@ -1,10 +1,7 @@
 import 'dotenv/config';
 import { getConfig } from '../src/helpers/config.js';
 import { logger } from '../src/helpers/logger.js';
-import {
-    getSunSpecInvertersConnection,
-    getSunSpecMeterConnection,
-} from '../src/sunspec/connections.js';
+import { getModbusConnection } from '../src/modbus/connections.js';
 
 // This debugging script dumps all the SunSpec models
 // It polls the inverters and smart meters once
@@ -13,22 +10,27 @@ import {
 const config = getConfig();
 
 void (async () => {
-    const invertersConnections = config.inverters
+    const inverters = config.inverters
         .filter((inverter) => inverter.type === 'sunspec')
-        .map((inverter) => getSunSpecInvertersConnection(inverter));
+        .map((inverter) => ({
+            config: inverter,
+            connection: getModbusConnection(inverter.connection),
+        }));
 
-    for (const inverterConnection of invertersConnections) {
+    for (const inverter of inverters) {
         const inverterLogger = logger.child({
-            config: inverterConnection.config,
+            config: inverter.config,
         });
 
         let currentAddress = 40002;
 
         for (;;) {
-            await inverterConnection.connect();
+            await inverter.connection.connect();
+
+            inverter.connection.client.setID(inverter.config.unitId);
 
             const response =
-                await inverterConnection.client.readHoldingRegisters(
+                await inverter.connection.client.readHoldingRegisters(
                     currentAddress,
                     2,
                 );
@@ -51,7 +53,7 @@ void (async () => {
     }
 
     if (config.meter.type === 'sunspec') {
-        const meterConnection = getSunSpecMeterConnection(config.meter);
+        const meterConnection = getModbusConnection(config.meter.connection);
 
         const meterLogger = logger.child({
             config: meterConnection.config,
@@ -61,6 +63,8 @@ void (async () => {
 
         for (;;) {
             await meterConnection.connect();
+
+            meterConnection.client.setID(config.meter.unitId);
 
             const response = await meterConnection.client.readHoldingRegisters(
                 currentAddress,

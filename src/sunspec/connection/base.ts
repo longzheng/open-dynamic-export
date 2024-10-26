@@ -1,7 +1,10 @@
 import type { CommonModel } from '../models/common.js';
 import { commonModel } from '../models/common.js';
 import { registersToUint32 } from '../../modbus/helpers/converters.js';
-import { ModbusConnection } from '../../modbus/connection/base.js';
+import type { ModbusConnection } from '../../modbus/connection/base.js';
+import type { ModbusSchema } from '../../helpers/config.js';
+import { getModbusConnection } from '../../modbus/connections.js';
+import type { Logger } from 'pino';
 
 export type ModelAddress = {
     start: number;
@@ -10,13 +13,25 @@ export type ModelAddress = {
 
 type ModelAddressById = Map<number, ModelAddress>;
 
-export abstract class SunSpecConnection extends ModbusConnection {
+export abstract class SunSpecConnection {
+    protected readonly modbusConnection: ModbusConnection;
+    protected readonly unitId: number;
+    private logger: Logger;
+
     private modelAddressById:
         | { type: 'cached'; cache: ModelAddressById }
         | { type: 'caching'; cachePromise: Promise<ModelAddressById> }
         | { type: 'notCached' } = { type: 'notCached' };
-
     private commonModelCache: CommonModel | null = null;
+
+    constructor({ connection, unitId }: ModbusSchema) {
+        this.modbusConnection = getModbusConnection(connection);
+        this.unitId = unitId;
+        this.logger = this.modbusConnection.logger.child({
+            module: 'SunSpecConnection',
+            unitId,
+        });
+    }
 
     protected async getModelAddressById() {
         switch (this.modelAddressById.type) {
@@ -69,8 +84,9 @@ export abstract class SunSpecConnection extends ModbusConnection {
         }
 
         const data = await commonModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         // cache common model
@@ -81,7 +97,9 @@ export abstract class SunSpecConnection extends ModbusConnection {
     }
 
     private async scanModelAddresses(): Promise<Map<number, ModelAddress>> {
-        await this.connect();
+        await this.modbusConnection.connect();
+
+        this.modbusConnection.client.setID(this.unitId);
 
         this.logger.debug(`Scanning SunSpec models for SunSpec Modbus client`);
 
@@ -89,10 +107,11 @@ export abstract class SunSpecConnection extends ModbusConnection {
         let currentAddress = 40000;
 
         // read the first two registers to get the model ID and length
-        const response = await this.client.readHoldingRegisters(
-            currentAddress,
-            2,
-        );
+        const response =
+            await this.modbusConnection.client.readHoldingRegisters(
+                currentAddress,
+                2,
+            );
 
         const SID = registersToUint32(response.data);
 
@@ -109,13 +128,16 @@ export abstract class SunSpecConnection extends ModbusConnection {
         const modelAddressById = new Map<number, ModelAddress>();
 
         for (;;) {
-            await this.connect();
+            await this.modbusConnection.connect();
+
+            this.modbusConnection.client.setID(this.unitId);
 
             // read the first two registers to get the model ID and length
-            const response = await this.client.readHoldingRegisters(
-                currentAddress,
-                2,
-            );
+            const response =
+                await this.modbusConnection.client.readHoldingRegisters(
+                    currentAddress,
+                    2,
+                );
             const modelId = response.data.at(0);
             const modelLength = response.data.at(1);
 
@@ -147,5 +169,9 @@ export abstract class SunSpecConnection extends ModbusConnection {
         );
 
         return modelAddressById;
+    }
+
+    public onDestroy(): void {
+        this.modbusConnection.client.close(() => {});
     }
 }
