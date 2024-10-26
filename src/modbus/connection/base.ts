@@ -6,7 +6,7 @@ import { Mutex } from 'async-mutex';
 
 const connectionTimeoutMs = 10_000;
 
-type RegisterType = 'holding' | 'input';
+export type ModbusRegisterType = 'holding' | 'input';
 
 export class ModbusConnection {
     private readonly client: ModbusRTU.default;
@@ -105,7 +105,7 @@ export class ModbusConnection {
         start,
         length,
     }: {
-        type: RegisterType;
+        type: ModbusRegisterType;
         unitId: number;
         start: number;
         length: number;
@@ -130,7 +130,7 @@ export class ModbusConnection {
         start,
         data,
     }: {
-        type: RegisterType;
+        type: ModbusRegisterType;
         unitId: number;
         start: number;
         data: number[];

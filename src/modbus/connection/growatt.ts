@@ -64,6 +64,6 @@ export class GrowattConnection {
     }
 
     public onDestroy(): void {
-        this.modbusConnection.client.close(() => {});
+        this.modbusConnection.close();
     }
 }

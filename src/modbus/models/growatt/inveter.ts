@@ -16,7 +16,7 @@ type GrowattInveter1 = {
 
 export const GrowattInveter1Model = modbusModelFactory<GrowattInveter1>({
     name: 'GrowattInveter1Model',
-    registerType: 'input',
+    type: 'input',
     mapping: {
         InverterStatus: {
             start: 0,
