@@ -99,7 +99,7 @@ export class ModbusConnection {
         }
     }
 
-    readRegisters({
+    async readRegisters({
         type,
         unitId,
         start,
@@ -124,7 +124,7 @@ export class ModbusConnection {
         });
     }
 
-    writeRegisters({
+    async writeRegisters({
         type,
         unitId,
         start,
