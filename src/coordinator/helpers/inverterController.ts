@@ -47,6 +47,7 @@ export type InverterConfiguration =
     | { type: 'disconnect' }
     | {
           type: 'limit';
+          targetSolarWatts: number;
           targetSolarPowerRatio: number;
       };
 
@@ -277,7 +278,7 @@ export class InverterController {
             })),
         );
 
-        const inverterConfiguration = ((): InverterConfiguration => {
+        const rampedInverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit:
                     this.controlLimitsCache.activeInverterControlLimit,
@@ -293,7 +294,10 @@ export class InverterController {
                     // ramp the target solar power ratio to prevent sudden changes (e.g. 0% > 100% > 0%)
                     // prevents inverter from potential hardware damage
                     // also prevents feedback cycle with batteries constantly switching between charge/discharge
-                    const previousTargetSolarPowerRatio = (() => {
+                    const previousTarget = ((): {
+                        targetSolarWatts: number;
+                        targetSolarPowerRatio: number;
+                    } | null => {
                         if (!this.lastAppliedInverterConfiguration) {
                             return null;
                         }
@@ -301,33 +305,44 @@ export class InverterController {
                         switch (this.lastAppliedInverterConfiguration.type) {
                             case 'disconnect':
                                 // slowly ramp from 0 if previously disconnected
-                                return 0;
+                                return {
+                                    targetSolarWatts: 0,
+                                    targetSolarPowerRatio: 0,
+                                };
                             case 'limit':
-                                return this.lastAppliedInverterConfiguration
-                                    .targetSolarPowerRatio;
+                                return this.lastAppliedInverterConfiguration;
                         }
                     })();
 
-                    if (previousTargetSolarPowerRatio === null) {
+                    if (previousTarget === null) {
                         return configuration;
                     }
 
+                    // max 10% change
+                    const maxChange = 0.1;
+
+                    const rampedTargetSolarWatts = cappedChange({
+                        previousValue: previousTarget.targetSolarWatts,
+                        targetValue: configuration.targetSolarWatts,
+                        maxChange,
+                    });
+
                     const rampedTargetSolarPowerRatio = cappedChange({
-                        previousValue: previousTargetSolarPowerRatio,
+                        previousValue: previousTarget.targetSolarPowerRatio,
                         targetValue: configuration.targetSolarPowerRatio,
-                        // max 10% change
-                        maxChange: 0.1,
+                        maxChange,
                     });
 
                     return {
                         type: 'limit',
+                        targetSolarWatts: rampedTargetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
                     };
                 }
             }
         })();
 
-        return inverterConfiguration;
+        return rampedInverterConfiguration;
     }
 }
 
@@ -420,6 +435,7 @@ export function calculateInverterConfiguration({
 
     return {
         type: 'limit',
+        targetSolarWatts,
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
     };
 }
