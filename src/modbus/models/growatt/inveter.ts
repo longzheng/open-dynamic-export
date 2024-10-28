@@ -4,9 +4,9 @@ import {
 } from '../../helpers/converters.js';
 import { modbusModelFactory } from '../../modbusModelFactory.js';
 
-export type GrowattInverterModels = GrowattInveter1;
+export type GrowattInverterModels = GrowattInverter1;
 
-type GrowattInveter1 = {
+type GrowattInverter1 = {
     // Inverter run state
     // 0:waiting, 1:normal, 3:fault
     InverterStatus: number;
@@ -14,7 +14,7 @@ type GrowattInveter1 = {
     Ppv: number;
 };
 
-export const GrowattInveter1Model = modbusModelFactory<GrowattInveter1>({
+export const GrowattInveter1Model = modbusModelFactory<GrowattInverter1>({
     name: 'GrowattInveter1Model',
     type: 'input',
     mapping: {
