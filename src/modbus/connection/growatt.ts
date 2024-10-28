@@ -7,7 +7,7 @@ import {
 import {
     GrowattInveter1Model,
     type GrowattInverterModels,
-} from '../models/growatt/inveter.js';
+} from '../models/growatt/inverter.js';
 import { getModbusConnection } from '../connections.js';
 import type { ModbusSchema } from '../../helpers/config.js';
 import type { Logger } from 'pino';

@@ -9,7 +9,7 @@ import type { Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 import { GrowattConnection } from '../../modbus/connection/growatt.js';
-import type { GrowattInverterModels } from '../../modbus/models/growatt/inveter.js';
+import type { GrowattInverterModels } from '../../modbus/models/growatt/inverter.js';
 
 export class GrowattInverterDataPoller extends InverterDataPollerBase {
     private growattConnection: GrowattConnection;
