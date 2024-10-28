@@ -3,7 +3,7 @@ import { enumHasValue } from '../../helpers/enum.js';
 import type { Result } from '../../helpers/result.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
-import type { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
+import { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
 import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
 import { getNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
 import { getSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
@@ -30,7 +30,6 @@ import {
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
 import type { Config } from '../../helpers/config.js';
-import { getSunSpecInvertersConnection } from '../../sunspec/connections.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 
@@ -57,7 +56,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
             inverterIndex,
         });
 
-        this.inverterConnection = getSunSpecInvertersConnection(
+        this.inverterConnection = new InverterSunSpecConnection(
             sunspecInverterConfig,
         );
 
@@ -174,7 +173,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     }
 
     override onDestroy(): void {
-        this.inverterConnection.client.close(() => {});
+        this.inverterConnection.onDestroy();
     }
 
     override async onControl(

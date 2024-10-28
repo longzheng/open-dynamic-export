@@ -1,4 +1,4 @@
-import type { MeterSunSpecConnection } from '../../sunspec/connection/meter.js';
+import { MeterSunSpecConnection } from '../../sunspec/connection/meter.js';
 import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { assertNonNull } from '../../helpers/null.js';
@@ -6,7 +6,6 @@ import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
 import type { MeterModel } from '../../sunspec/models/meter.js';
 import type { Result } from '../../helpers/result.js';
 import type { InvertersPoller } from '../../coordinator/helpers/inverterSample.js';
-import { getSunSpecMeterConnection } from '../../sunspec/connections.js';
 import type { Config } from '../../helpers/config.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
 
@@ -28,7 +27,7 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     }) {
         super({ name: 'SunSpecMeterPoller', pollingIntervalMs: 200 });
 
-        this.meterConnection = getSunSpecMeterConnection(sunspecMeterConfig);
+        this.meterConnection = new MeterSunSpecConnection(sunspecMeterConfig);
         this.location = sunspecMeterConfig.location;
 
         invertersPoller.on('data', (derSample) => {
@@ -82,7 +81,7 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
     }
 
     override onDestroy() {
-        this.meterConnection.client.close(() => {});
+        this.meterConnection.onDestroy();
     }
 }
 

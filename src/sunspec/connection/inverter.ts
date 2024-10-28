@@ -38,8 +38,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         const data = await inverterModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         return data;
@@ -59,8 +60,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         const data = await nameplateModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         this.nameplateModelCache = data;
@@ -82,8 +84,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         const data = await settingsModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         this.settingsModelCache = data;
@@ -109,8 +112,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         const data = await statusModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         this.statusModelCache = {
@@ -135,8 +139,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         const data = await controlsModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         this.controlsModelCache = data;
@@ -154,8 +159,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         return await controlsModel.write({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
             values,
         });
     }

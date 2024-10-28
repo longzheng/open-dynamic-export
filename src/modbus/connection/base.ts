@@ -2,20 +2,24 @@ import ModbusRTU from 'modbus-serial';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import type { Logger } from 'pino';
 import type { ModbusSchema } from '../../helpers/config.js';
+import { Mutex } from 'async-mutex';
 
 const connectionTimeoutMs = 10_000;
 
-export abstract class ModbusConnection {
-    public readonly client: ModbusRTU.default;
-    public readonly config: ModbusSchema;
+export type ModbusRegisterType = 'holding' | 'input';
+
+export class ModbusConnection {
+    private readonly client: ModbusRTU.default;
+    public readonly config: ModbusSchema['connection'];
     public readonly logger: Logger;
+    private readonly mutex = new Mutex();
 
     private state:
         | { type: 'connected' }
         | { type: 'connecting'; connectPromise: Promise<void> }
         | { type: 'disconnected' } = { type: 'disconnected' };
 
-    constructor(config: ModbusSchema) {
+    constructor(config: ModbusSchema['connection']) {
         this.client = new ModbusRTU.default();
         this.config = config;
         this.logger = pinoLogger.child({
@@ -52,29 +56,23 @@ export abstract class ModbusConnection {
                     try {
                         this.logger.info(`Modbus client connecting`);
 
-                        switch (this.config.connection.type) {
+                        switch (this.config.type) {
                             case 'tcp':
-                                await this.client.connectTCP(
-                                    this.config.connection.ip,
-                                    {
-                                        port: this.config.connection.port,
-                                        // timeout for connection
-                                        timeout: connectionTimeoutMs,
-                                    },
-                                );
+                                await this.client.connectTCP(this.config.ip, {
+                                    port: this.config.port,
+                                    // timeout for connection
+                                    timeout: connectionTimeoutMs,
+                                });
                                 break;
                             case 'rtu':
                                 await this.client.connectRTUBuffered(
-                                    this.config.connection.path,
+                                    this.config.path,
                                     {
-                                        baudRate:
-                                            this.config.connection.baudRate,
+                                        baudRate: this.config.baudRate,
                                     },
                                 );
                                 break;
                         }
-
-                        this.client.setID(this.config.unitId);
 
                         // timeout for requests
                         this.client.setTimeout(connectionTimeoutMs);
@@ -99,5 +97,59 @@ export abstract class ModbusConnection {
                 return connectPromise;
             }
         }
+    }
+
+    async readRegisters({
+        type,
+        unitId,
+        start,
+        length,
+    }: {
+        type: ModbusRegisterType;
+        unitId: number;
+        start: number;
+        length: number;
+    }) {
+        return this.mutex.runExclusive(async () => {
+            await this.connect();
+
+            this.client.setID(unitId);
+
+            switch (type) {
+                case 'holding':
+                    return this.client.readHoldingRegisters(start, length);
+                case 'input':
+                    return this.client.readInputRegisters(start, length);
+            }
+        });
+    }
+
+    async writeRegisters({
+        type,
+        unitId,
+        start,
+        data,
+    }: {
+        type: ModbusRegisterType;
+        unitId: number;
+        start: number;
+        data: number[];
+    }) {
+        return this.mutex.runExclusive(async () => {
+            await this.connect();
+
+            this.client.setID(unitId);
+
+            switch (type) {
+                case 'holding':
+                    return this.client.writeRegisters(start, data);
+                case 'input':
+                    throw new Error(`Cannot write to input registers`);
+            }
+        });
+    }
+
+    close() {
+        this.client.close(() => {});
     }
 }

@@ -1,4 +1,4 @@
-import { ModbusConnection } from './base.js';
+import type { ModbusConnection } from './base.js';
 import type { SmaCore1MeteringGridMsModels } from '../models/sma/core1/meteringGridMs.js';
 import {
     SmaCore1MeteringGridMs1Model,
@@ -28,13 +28,29 @@ import {
     SmaCore1InverterControl1Model,
     SmaCore1InverterControl2Model,
 } from '../models/sma/core1/inverterControl.js';
+import type { Logger } from 'pino';
+import type { ModbusSchema } from '../../helpers/config.js';
+import { getModbusConnection } from '../connections.js';
 
-export class SmaConnection extends ModbusConnection {
+export class SmaConnection {
+    protected readonly modbusConnection: ModbusConnection;
+    protected readonly unitId: number;
+    private logger: Logger;
+
     // the inverter model should never change so we can cache it
     private inverterModeLCache: SmaCore1InverterModels | null = null;
 
     // the nameplate model should never change so we can cache it
     private nameplateModelCache: SmaCore1Nameplate | null = null;
+
+    constructor({ connection, unitId }: ModbusSchema) {
+        this.modbusConnection = getModbusConnection(connection);
+        this.unitId = unitId;
+        this.logger = this.modbusConnection.logger.child({
+            module: 'SmaConnection',
+            unitId,
+        });
+    }
 
     async getInverterModel(): Promise<SmaCore1InverterModels> {
         if (this.inverterModeLCache) {
@@ -42,19 +58,21 @@ export class SmaConnection extends ModbusConnection {
         }
 
         const model1 = await SmaCore1Inverter1Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 30231,
                 length: 2,
             },
+            unitId: this.unitId,
         });
 
         const model2 = await SmaCore1Inverter2Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 33025,
                 length: 20,
             },
+            unitId: this.unitId,
         });
 
         const data = { ...model1, ...model2 };
@@ -66,27 +84,30 @@ export class SmaConnection extends ModbusConnection {
 
     async getGridMsModel(): Promise<SmaCore1GridMsModels> {
         const model1 = await SmaCore1GridMs1Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 30775,
                 length: 22,
             },
+            unitId: this.unitId,
         });
 
         const model2 = await SmaCore1GridMs2Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 30803,
                 length: 2,
             },
+            unitId: this.unitId,
         });
 
         const model3 = await SmaCore1GridMs3Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 30807,
                 length: 14,
             },
+            unitId: this.unitId,
         });
 
         const data = { ...model1, ...model2, ...model3 };
@@ -100,11 +121,12 @@ export class SmaConnection extends ModbusConnection {
         }
 
         const data = await SmaCore1NameplateModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 30053,
                 length: 2,
             },
+            unitId: this.unitId,
         });
 
         this.nameplateModelCache = data;
@@ -114,11 +136,12 @@ export class SmaConnection extends ModbusConnection {
 
     async getOperationModel(): Promise<SmaCore1Operation> {
         const data = await SmaCore1OperationModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 30217,
                 length: 2,
             },
+            unitId: this.unitId,
         });
 
         return data;
@@ -126,19 +149,21 @@ export class SmaConnection extends ModbusConnection {
 
     async getMeteringGridMsModel(): Promise<SmaCore1MeteringGridMsModels> {
         const model1 = await SmaCore1MeteringGridMs1Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 31253,
                 length: 26,
             },
+            unitId: this.unitId,
         });
 
         const model2 = await SmaCore1MeteringGridMs2Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 31433,
                 length: 24,
             },
+            unitId: this.unitId,
         });
 
         const data = { ...model1, ...model2 };
@@ -148,19 +173,21 @@ export class SmaConnection extends ModbusConnection {
 
     async getInverterControlModel(): Promise<SmaCore1InverterControlModels> {
         const model1 = await SmaCore1InverterControl1Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 40210,
                 length: 2,
             },
+            unitId: this.unitId,
         });
 
         const model2 = await SmaCore1InverterControl2Model.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 41253,
                 length: 3,
             },
+            unitId: this.unitId,
         });
 
         const data = { ...model1, ...model2 };
@@ -172,23 +199,29 @@ export class SmaConnection extends ModbusConnection {
     // Warning against cyclical writing - Cyclic modification of these parameters may destroy the flash memory of the product
     async writeInverterControlModel1(values: SmaCore1InverterControl1) {
         return await SmaCore1InverterControl1Model.write({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 40210,
                 length: 2,
             },
+            unitId: this.unitId,
             values,
         });
     }
 
     async writeInverterControlModel2(values: SmaCore1InverterControl2) {
         return await SmaCore1InverterControl2Model.write({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address: {
                 start: 41253,
                 length: 3,
             },
+            unitId: this.unitId,
             values,
         });
+    }
+
+    public onDestroy(): void {
+        this.modbusConnection.close();
     }
 }

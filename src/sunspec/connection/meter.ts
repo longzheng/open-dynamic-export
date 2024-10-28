@@ -15,8 +15,9 @@ export class MeterSunSpecConnection extends SunSpecConnection {
         }
 
         const data = await meterModel.read({
-            modbusConnection: this,
+            modbusConnection: this.modbusConnection,
             address,
+            unitId: this.unitId,
         });
 
         return data;

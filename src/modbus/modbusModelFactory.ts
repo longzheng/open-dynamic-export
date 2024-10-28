@@ -29,15 +29,17 @@ export function modbusModelFactory<
     read(params: {
         modbusConnection: ModbusConnection;
         address: ModelAddress;
+        unitId: number;
     }): Promise<Model>;
     write(params: {
         modbusConnection: ModbusConnection;
         address: ModelAddress;
+        unitId: number;
         values: Pick<Model, WriteableKeys>;
     }): Promise<void>;
 } {
     return {
-        read: async ({ modbusConnection, address }) => {
+        read: async ({ modbusConnection, address, unitId }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
                 model: config.name,
@@ -48,11 +50,12 @@ export function modbusModelFactory<
 
             await modbusConnection.connect();
 
-            const registers =
-                await modbusConnection.client.readHoldingRegisters(
-                    address.start,
-                    address.length,
-                );
+            const registers = await modbusConnection.readRegisters({
+                type: 'holding',
+                unitId,
+                start: address.start,
+                length: address.length,
+            });
 
             const end = performance.now();
             const duration = end - start;
@@ -78,7 +81,7 @@ export function modbusModelFactory<
                 mapping: config.mapping,
             });
         },
-        write: async ({ modbusConnection, address, values }) => {
+        write: async ({ modbusConnection, address, unitId, values }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
                 model: config.name,
@@ -87,18 +90,20 @@ export function modbusModelFactory<
 
             const start = performance.now();
 
-            await modbusConnection.connect();
-
             const registerValues = convertWriteRegisters({
                 values,
                 mapping: config.mapping,
                 length: address.length,
             });
 
-            await modbusConnection.client.writeRegisters(
-                address.start,
-                registerValues,
-            );
+            await modbusConnection.connect();
+
+            await modbusConnection.writeRegisters({
+                type: 'holding',
+                unitId,
+                start: address.start,
+                data: registerValues,
+            });
 
             const end = performance.now();
             const duration = end - start;
