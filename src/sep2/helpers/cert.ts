@@ -240,6 +240,13 @@ export function generateDeviceCertificate({
     appendFileSync(certPath, micaCertPem);
 
     console.log(`Device certificate file "${certPath}" created`);
+
+    const fingerprint = getCertificateFingerprint(pemCert);
+    const lfdi = getCertificateLfdi(fingerprint);
+    console.log(`Device LFDI ${lfdi}`);
+
+    const lfdiFormatted = formatStringWithDashes(lfdi);
+    console.log(`Device LFDI formatted with dashes ${lfdiFormatted}`);
 }
 
 export function formatDateToYYMMDDhhmmssZ(date: Date): string {
@@ -257,4 +264,8 @@ function randomSerialNumberHex() {
     const buffer = randomBytes(20);
     const num = BigInt('0x' + buffer.toString('hex'));
     return (num >> 1n).toString();
+}
+
+function formatStringWithDashes(input: string): string {
+    return input.replace(/(.{4})(?=.)/g, '$1-');
 }

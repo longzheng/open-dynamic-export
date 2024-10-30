@@ -26,9 +26,9 @@ HwYDVR0jBBgwFoAUdEYDPJta6xnRJIA4U1e+keJH09swDwYDVR0TAQH/BAUwAwEB
 +ov7KgIhAIb+m/lof7dw7UJzAsQHHdE1r/Ln/p09KFAkymItyygB
 -----END CERTIFICATE-----`;
 
-        const lfdi = getCertificateFingerprint(certString);
+        const fingerprint = getCertificateFingerprint(certString);
 
-        expect(lfdi).toBe(
+        expect(fingerprint).toBe(
             'B9A8A75E324D2312AD09F8DAF9C1295A3CE4142EDE6D372A5D033BE6A4294207',
         );
     });
@@ -79,9 +79,9 @@ EAKsOJor4O3nAiEA49GIjhIUlKVggODrt9nUnhKZcxn0qSmmBAdeN0pd1y8=
 -----END CERTIFICATE-----
 `;
 
-        const lfdi = getCertificateFingerprint(certString);
+        const fingerprint = getCertificateFingerprint(certString);
 
-        expect(lfdi).toBe(
+        expect(fingerprint).toBe(
             '0F8872FF54ACDC4A9B789F0872255051D0BDBB64D0E1C7E3FC562F40D852A494',
         );
     });
