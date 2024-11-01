@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    privileged: true # access to USB devices
     env_file:
       - .env
     ports:
