@@ -97,12 +97,28 @@ export class GrowattInverterDataPoller extends InverterDataPollerBase {
         this.growattConnection.onDestroy();
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     override async onControl(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _inverterConfiguration: InverterConfiguration,
+        inverterConfiguration: InverterConfiguration,
     ): Promise<void> {
-        throw new Error('Method not implemented.');
+        const targetPowerRatio = (() => {
+            switch (inverterConfiguration.type) {
+                case 'disconnect':
+                    return 0;
+                case 'limit':
+                    return (
+                        (inverterConfiguration.targetSolarWatts /
+                            inverterConfiguration.invertersCount -
+                            250) /
+                        6000
+                    );
+            }
+        })();
+
+        const ActivePRate = Math.floor(targetPowerRatio * 100);
+
+        await this.growattConnection.writeInverterControlModel({
+            ActivePRate,
+        });
     }
 }
 

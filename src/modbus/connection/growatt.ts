@@ -11,6 +11,10 @@ import {
 import { getModbusConnection } from '../connections.js';
 import type { ModbusSchema } from '../../helpers/config.js';
 import type { Logger } from 'pino';
+import {
+    GrowattInverterControl1Model,
+    type GrowattInverterControl,
+} from '../models/growatt/inverterControl.js';
 
 export class GrowattConnection {
     protected readonly modbusConnection: ModbusConnection;
@@ -61,6 +65,18 @@ export class GrowattConnection {
         const data = { ...model1, ...model2 };
 
         return data;
+    }
+
+    async writeInverterControlModel(values: GrowattInverterControl) {
+        return await GrowattInverterControl1Model.write({
+            modbusConnection: this.modbusConnection,
+            address: {
+                start: 3,
+                length: 1,
+            },
+            unitId: this.unitId,
+            values,
+        });
     }
 
     public onDestroy(): void {
