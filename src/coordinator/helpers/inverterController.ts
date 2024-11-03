@@ -47,6 +47,7 @@ export type InverterConfiguration =
     | { type: 'disconnect' }
     | {
           type: 'limit';
+          invertersCount: number;
           targetSolarWatts: number;
           targetSolarPowerRatio: number;
       };
@@ -278,6 +279,10 @@ export class InverterController {
             })),
         );
 
+        const maxInvertersCount = Math.max(
+            ...recentDerSamples.map((sample) => sample.invertersCount),
+        );
+
         const rampedInverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit:
@@ -285,6 +290,7 @@ export class InverterController {
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
                 solarWatts: averagedSolarWatts,
+                maxInvertersCount,
             });
 
             switch (configuration.type) {
@@ -335,6 +341,7 @@ export class InverterController {
 
                     return {
                         type: 'limit',
+                        invertersCount: configuration.invertersCount,
                         targetSolarWatts: rampedTargetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
                     };
@@ -351,11 +358,13 @@ export function calculateInverterConfiguration({
     siteWatts,
     solarWatts,
     nameplateMaxW,
+    maxInvertersCount,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
     solarWatts: number;
     nameplateMaxW: number;
+    maxInvertersCount: number;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
         module: 'calculateInverterConfiguration',
@@ -435,6 +444,7 @@ export function calculateInverterConfiguration({
 
     return {
         type: 'limit',
+        invertersCount: maxInvertersCount,
         targetSolarWatts,
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
     };
