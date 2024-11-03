@@ -114,7 +114,12 @@ export class GrowattInverterDataPoller extends InverterDataPollerBase {
             }
         })();
 
-        const ActivePRate = Math.floor(targetPowerRatio * 100);
+        // clamp between 0 and 100
+        // no decimal points, round down
+        const ActivePRate = Math.max(
+            Math.min(Math.floor(targetPowerRatio * 100), 100),
+            0,
+        );
 
         await this.growattConnection.writeInverterControlModel({
             ActivePRate,
