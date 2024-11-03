@@ -90,6 +90,7 @@ describe('generateDerSample', () => {
                     ConnectStatus.Connected |
                     ConnectStatus.Operating,
             },
+            invertersCount: 1,
         } satisfies typeof result);
     });
 
@@ -193,6 +194,7 @@ describe('generateDerSample', () => {
                     ConnectStatus.Connected |
                     ConnectStatus.Operating,
             },
+            invertersCount: 2,
         } satisfies typeof result);
     });
 });

@@ -43,6 +43,7 @@ export const derSampleDataSchema = z.object({
         operationalModeStatus: z.number(),
         genConnectStatus: z.number(),
     }),
+    invertersCount: z.number(),
 });
 
 export type DerSampleData = z.infer<typeof derSampleDataSchema>;
@@ -124,5 +125,6 @@ export function generateDerSample({
                 0,
             ) satisfies ConnectStatus,
         },
+        invertersCount: invertersData.length,
     };
 }
