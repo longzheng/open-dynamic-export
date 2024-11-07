@@ -80,6 +80,8 @@ export class AmberLimiter implements LimiterType {
             throw new Error('Site ID not set');
         }
 
+        this.logger.debug('Fetching Amber feed-in prices');
+
         const { data, error } = await this.client.GET(
             '/sites/{siteId}/prices/current',
             {
@@ -111,6 +113,8 @@ export class AmberLimiter implements LimiterType {
                         price: interval.perKwh,
                     }) satisfies Interval,
             );
+
+        this.logger.debug({ feedInIntervals }, 'Fetched Amber feed-in prices');
 
         this.feedInIntervals = feedInIntervals;
     }
