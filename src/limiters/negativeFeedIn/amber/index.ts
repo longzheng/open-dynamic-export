@@ -34,7 +34,6 @@ export class AmberLimiter implements LimiterType {
             headers: {
                 Authorization: `Bearer ${apiKey}`,
             },
-            signal: AbortSignal.timeout(10_000),
         });
         this.logger = pinoLogger.child({ inverter: 'AmberControlLimit' });
 
@@ -94,6 +93,7 @@ export class AmberLimiter implements LimiterType {
                         next: 2 * 2,
                     },
                 },
+                signal: AbortSignal.timeout(10_000),
             },
         );
 
