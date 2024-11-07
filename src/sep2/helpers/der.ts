@@ -213,7 +213,7 @@ export class DerHelper {
 
             this.lastSentDerStatus = derStatus;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER capability');
+            this.logger.error(error, 'Error updating DER status');
         }
     }
 
