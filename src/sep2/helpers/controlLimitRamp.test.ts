@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ControlLimitRampHelper } from './controlLimitRamp.js';
-import { calculateRampedValue } from './controlLimitRamp.js';
+import {
+    ControlLimitRampHelper,
+    calculateRampedValue,
+} from './controlLimitRamp.js';
 import { RampRateHelper } from './rampRate.js';
 import { addSeconds } from 'date-fns';
 

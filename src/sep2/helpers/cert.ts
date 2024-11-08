@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { KEYUTIL, KJUR } from 'jsrsasign';
 import { randomBytes, createHash, randomUUID } from 'crypto';
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from 'fs';
-import rs from 'jsrsasign';
+import rs, { KEYUTIL, KJUR } from 'jsrsasign';
 
 // ported from https://github.com/aguinane/SEP2-Tools/blob/213b19d8c1ebd4144fc8c4a226e7f02f702ff337/sep2tools/cert_create.py
 // SEP2 requires certificates that don't expire

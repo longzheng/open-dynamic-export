@@ -17,7 +17,7 @@ import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { addMilliseconds } from 'date-fns';
-import axiosRetry from 'axios-retry';
+import { isNetworkError, isRetryableError } from 'axios-retry';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { UsagePointBaseStatus } from '../models/usagePointBaseStatus.js';
 
@@ -323,10 +323,7 @@ export abstract class MirrorUsagePointHelperBase<
                     // by default axios-retry will not retry POST errors
                     // we know these calls are idempotent so we can retry them
                     retryCondition: (error) => {
-                        return (
-                            axiosRetry.isNetworkError(error) ||
-                            axiosRetry.isRetryableError(error)
-                        );
+                        return isNetworkError(error) || isRetryableError(error);
                     },
                 },
             },

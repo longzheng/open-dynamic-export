@@ -12,7 +12,7 @@ import type { RoleFlagsType } from './models/roleFlagsType.js';
 import { numberToHex } from '../helpers/number.js';
 import { createHash } from 'node:crypto';
 import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
-import axiosRetry from 'axios-retry';
+import axiosRetry, { exponentialDelay } from 'axios-retry';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -68,7 +68,7 @@ export class SEP2Client {
         // exponential backoff retry
         axiosRetry(axiosClient, {
             retryDelay: (retryCount, error) =>
-                axiosRetry.exponentialDelay(retryCount, error),
+                exponentialDelay(retryCount, error),
         });
 
         this.axiosInstance = axiosClient;

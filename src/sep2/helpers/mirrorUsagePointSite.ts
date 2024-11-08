@@ -3,13 +3,13 @@ import type {
     AvgMaxMin,
     NoPhaseMeasurement,
     PerPhaseNetMeasurement,
+    PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import {
     assertPerPhaseNetOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurements,
     getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements,
-    type PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import { DataQualifierType } from '../models/dataQualifierType.js';
 import { FlowDirectionType } from '../models/flowDirectionType.js';

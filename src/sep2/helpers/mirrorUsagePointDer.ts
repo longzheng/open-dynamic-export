@@ -2,14 +2,14 @@ import { RoleFlagsType } from '../models/roleFlagsType.js';
 import type {
     NoPhaseMeasurement,
     PerPhaseNetMeasurement,
+    AvgMaxMin,
+    PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import {
     assertPerPhaseNetOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurementsNullable,
     getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements,
-    type AvgMaxMin,
-    type PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import { DataQualifierType } from '../models/dataQualifierType.js';
 import { FlowDirectionType } from '../models/flowDirectionType.js';
