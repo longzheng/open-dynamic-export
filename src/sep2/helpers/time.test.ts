@@ -1,28 +1,59 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+    afterAll,
+    beforeAll,
+} from 'vitest';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
-import MockAdapter from 'axios-mock-adapter';
-import { type AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
-import axios from 'axios';
 import { getMockFile } from './mocks.js';
 import { TimeHelper } from './time.js';
-
-const mockAxios = new MockAdapter(axios as AxiosInstance)
-    .onGet('http://example.com/api/v2/tm')
-    .reply(200, getMockFile('getTm.xml'));
-
-const sep2Client = new SEP2Client({
-    sep2Config: {
-        host: 'http://example.com',
-        dcapUri: '/dcap',
-    },
-    cert: mockCert,
-    key: mockKey,
-    pen: '12345',
-});
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 
 describe('TimeHelper', () => {
+    const sep2Client = new SEP2Client({
+        sep2Config: {
+            host: 'http://example.com',
+            dcapUri: '/dcap',
+        },
+        cert: mockCert,
+        key: mockKey,
+        pen: '12345',
+    });
+
+    let timeHandlerCount = 0;
+    let timeHandler2Count = 0;
+
+    const mockRestHandlers = [
+        http.get('http://example.com/api/v2/tm', () => {
+            timeHandlerCount++;
+
+            return HttpResponse.xml(getMockFile('getTm.xml'));
+        }),
+        http.get('http://example.com/api/v2/tm2', () => {
+            timeHandler2Count++;
+
+            return HttpResponse.xml(getMockFile('getTm.xml'));
+        }),
+    ];
+
+    const mockServer = setupServer(...mockRestHandlers);
+
+    // Start server before all tests
+    beforeAll(() => mockServer.listen({ onUnhandledRequest: 'error' }));
+
+    //  Close server after all tests
+    afterAll(() => mockServer.close());
+
     beforeEach(() => {
+        timeHandlerCount = 0;
+        timeHandler2Count = 0;
+
         // tell vitest we use mocked time
         vi.useFakeTimers();
     });
@@ -30,8 +61,6 @@ describe('TimeHelper', () => {
     afterEach(() => {
         // restoring date after each test run
         vi.useRealTimers();
-
-        mockAxios.resetHistory();
     });
 
     it('should not should if clock is in sync', async () => {
@@ -50,7 +79,7 @@ describe('TimeHelper', () => {
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalled());
 
-        expect(mockAxios.history['get']?.length).toBe(1);
+        expect(timeHandlerCount).toBe(1);
         expect(assertTimeSpy).toHaveBeenCalledOnce();
     });
 
@@ -73,7 +102,7 @@ describe('TimeHelper', () => {
         vi.setSystemTime(mockDate);
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalled());
-        expect(mockAxios.history['get']?.length).toBe(1);
+        expect(timeHandlerCount).toBe(1);
         expect(assertTimeSpy).toHaveBeenCalledOnce();
         expect(fn).toHaveBeenCalledOnce();
     });
@@ -95,7 +124,7 @@ describe('TimeHelper', () => {
         vi.setSystemTime(mockDate);
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalled());
-        expect(mockAxios.history['get']?.length).toBe(1);
+        expect(timeHandlerCount).toBe(1);
         expect(destroySpy).toHaveBeenCalledOnce();
         expect(assertTimeSpy).toHaveBeenCalledOnce();
 
@@ -103,16 +132,12 @@ describe('TimeHelper', () => {
             href: '/api/v2/tm',
         });
 
-        expect(mockAxios.history['get']?.length).toBe(1);
+        expect(timeHandlerCount).toBe(1);
         expect(destroySpy).toHaveBeenCalledOnce();
         expect(assertTimeSpy).toHaveBeenCalledOnce();
     });
 
     it('should change pollable resource if initialised again with different URL', async () => {
-        mockAxios
-            .onGet('http://example.com/api/v2/tm2')
-            .reply(200, getMockFile('getTm.xml'));
-
         const time = new TimeHelper({ client: sep2Client });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -129,7 +154,7 @@ describe('TimeHelper', () => {
         vi.setSystemTime(mockDate);
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalled());
-        expect(mockAxios.history['get']?.length).toBe(1);
+        expect(timeHandlerCount).toBe(1);
         expect(destroySpy).toHaveBeenCalledTimes(1);
         expect(assertTimeSpy).toHaveBeenCalledOnce();
 
@@ -138,10 +163,8 @@ describe('TimeHelper', () => {
         });
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalledTimes(2));
-        expect(mockAxios.history['get']?.length).toBe(2);
-        expect(mockAxios.history['get']?.at(1)?.url).toBe(
-            'http://example.com/api/v2/tm2',
-        );
+        expect(timeHandlerCount).toBe(1);
+        expect(timeHandler2Count).toBe(1);
         expect(destroySpy).toHaveBeenCalledTimes(2);
         expect(assertTimeSpy).toHaveBeenCalledTimes(2);
     });

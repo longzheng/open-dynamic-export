@@ -1,27 +1,45 @@
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    afterEach,
+    beforeEach,
+    afterAll,
+    beforeAll,
+} from 'vitest';
 import { defaultPollPushRates, SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import { DeviceCapabilityHelper } from './deviceCapability.js';
-import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
-import { type AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
+import { http, HttpResponse } from 'msw';
 import { getMockFile } from './mocks.js';
-
-new MockAdapter(axios as AxiosInstance)
-    .onGet('http://example.com/dcap')
-    .reply(200, getMockFile('getDcap.xml'));
-
-const sep2Client = new SEP2Client({
-    sep2Config: {
-        host: 'http://example.com',
-        dcapUri: '/dcap',
-    },
-    cert: mockCert,
-    key: mockKey,
-    pen: '12345',
-});
+import { setupServer } from 'msw/node';
 
 describe('DeviceCapabilityHelper', () => {
+    const sep2Client = new SEP2Client({
+        sep2Config: {
+            host: 'http://example.com',
+            dcapUri: '/dcap',
+        },
+        cert: mockCert,
+        key: mockKey,
+        pen: '12345',
+    });
+
+    const mockRestHandlers = [
+        http.get('http://example.com/dcap', () => {
+            return HttpResponse.xml(getMockFile('getDcap.xml'));
+        }),
+    ];
+
+    const mockServer = setupServer(...mockRestHandlers);
+
+    // Start server before all tests
+    beforeAll(() => mockServer.listen({ onUnhandledRequest: 'error' }));
+
+    //  Close server after all tests
+    afterAll(() => mockServer.close());
+
     beforeEach(() => {
         // tell vitest we use mocked time
         vi.useFakeTimers();

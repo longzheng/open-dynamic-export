@@ -36,7 +36,6 @@
     "@types/jsrsasign": "^10.5.14",
     "@types/node": "^22.7.4",
     "@types/xml2js": "^0.4.14",
-    "axios-mock-adapter": "^2.0.0",
     "eslint": "^9.11.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.3",
