@@ -4,6 +4,7 @@
         "target": "ESNext",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
+        "baseUrl": ".",
         "outDir": "dist",
         "sourceMap": true,
         "resolveJsonModule": true,
