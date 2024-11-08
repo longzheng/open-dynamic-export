@@ -5,10 +5,10 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
 } from '../../sep2/helpers/cert.js';
-import type { Sep2Limiter } from '../../limiters/sep2/index.js';
-import type { ResponseRequiredType } from '../../sep2/models/responseRequired.js';
+import { type Sep2Limiter } from '../../limiters/sep2/index.js';
+import { type ResponseRequiredType } from '../../sep2/models/responseRequired.js';
 import { coordinatorService } from './coordinatorService.js';
-import type { SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
+import { type SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
 
 type CertificateIds = {
     lfdi: string;

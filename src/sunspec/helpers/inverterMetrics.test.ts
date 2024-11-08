@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import type { InverterEvent1, InverterModel } from '../models/inverter.js';
+import { type InverterEvent1, type InverterModel } from '../models/inverter.js';
 import { InverterState } from '../models/inverter.js';
 import { getInverterMetrics } from './inverterMetrics.js';
 

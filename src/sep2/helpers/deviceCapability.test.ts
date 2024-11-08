@@ -4,7 +4,7 @@ import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import { DeviceCapabilityHelper } from './deviceCapability.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import type { AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
+import { type AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
 import { getMockFile } from './mocks.js';
 
 new MockAdapter(axios as AxiosInstance)

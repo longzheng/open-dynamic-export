@@ -1,6 +1,6 @@
-import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../limiter.js';
-import type { Config } from '../../helpers/config.js';
+import { type InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
+import { type LimiterType } from '../limiter.js';
+import { type Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 
 type FixedLimiterConfig = NonNullable<Config['limiters']['fixed']>;

@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
-import type { PollRate } from '../models/pollRate.js';
-import type { SEP2Client } from '../client.js';
+import { type PollRate } from '../models/pollRate.js';
+import { type SEP2Client } from '../client.js';
 import { logger } from '../../helpers/logger.js';
 
 export abstract class PollableResource<

@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import type { MeterEvent, MeterModel } from '../models/meter.js';
+import { type MeterEvent, type MeterModel } from '../models/meter.js';
 import { getMeterMetrics } from './meterMetrics.js';
 
 it('getMeterMetrics returns data', () => {

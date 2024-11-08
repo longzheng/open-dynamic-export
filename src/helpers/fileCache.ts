@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'fs/promises';
-import type { ZodSchema } from 'zod';
+import { type ZodSchema } from 'zod';
 import { env } from './env.js';
 import { logger } from './logger.js';
 

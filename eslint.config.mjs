@@ -31,6 +31,10 @@ export default tseslint.config(
         rules: {
             'no-unused-vars': 'off',
             'import-x/no-dynamic-require': 'warn',
+            'import-x/consistent-type-specifier-style': [
+                'error',
+                'prefer-inline',
+            ],
         },
     },
     ...configs.recommendedTypeChecked,

@@ -1,4 +1,4 @@
-import type { ControlType } from '../../sep2/helpers/controlScheduler.js';
+import { type ControlType } from '../../sep2/helpers/controlScheduler.js';
 import { type ControlsModel } from '../../sunspec/models/controls.js';
 import { Decimal } from 'decimal.js';
 import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
@@ -10,15 +10,15 @@ import {
     writeLatency,
     writeLoadWatts,
 } from '../../helpers/influxdb.js';
-import type { SiteSample } from '../../meters/siteSample.js';
-import type { Limiters } from '../../limiters/index.js';
+import { type SiteSample } from '../../meters/siteSample.js';
+import { type Limiters } from '../../limiters/index.js';
 import {
     objectEntriesWithType,
     objectFromEntriesWithType,
 } from '../../helpers/object.js';
-import type { Config, LimiterKeys } from '../../helpers/config.js';
+import { type Config, type LimiterKeys } from '../../helpers/config.js';
 import { cappedChange } from '../../helpers/math.js';
-import type { DerSample } from './derSample.js';
+import { type DerSample } from './derSample.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import { differenceInSeconds } from 'date-fns';

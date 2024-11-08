@@ -1,11 +1,11 @@
 import { type InverterData } from '../inverterData.js';
-import type { Result } from '../../helpers/result.js';
+import { type Result } from '../../helpers/result.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
 import { DERTyp } from '../../sunspec/models/nameplate.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
-import type { Config } from '../../helpers/config.js';
+import { type Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 import { SmaConnection } from '../../modbus/connection/sma.js';
@@ -17,9 +17,9 @@ import {
 } from '../../modbus/models/sma/core1/inverterControl.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { Decimal } from 'decimal.js';
-import type { SmaCore1InverterModels } from '../../modbus/models/sma/core1/inverter.js';
-import type { SmaCore1GridMsModels } from '../../modbus/models/sma/core1/gridMs.js';
-import type { SmaCore1Nameplate } from '../../modbus/models/sma/core1/nameplate.js';
+import { type SmaCore1InverterModels } from '../../modbus/models/sma/core1/inverter.js';
+import { type SmaCore1GridMsModels } from '../../modbus/models/sma/core1/gridMs.js';
+import { type SmaCore1Nameplate } from '../../modbus/models/sma/core1/nameplate.js';
 import {
     SmaCore1OperationGriSwStt,
     type SmaCore1Operation,

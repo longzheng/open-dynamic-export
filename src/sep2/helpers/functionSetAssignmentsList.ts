@@ -1,5 +1,5 @@
 import EventEmitter from 'node:events';
-import type { SEP2Client } from '../client.js';
+import { type SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
 import { PollableResource } from './pollableResource.js';
 import {
@@ -7,7 +7,7 @@ import {
     type FunctionSetAssignmentsList,
 } from '../models/functionSetAssignmentsList.js';
 import { getListAll } from './pagination.js';
-import type { DerProgramListData } from './derProgramList.js';
+import { type DerProgramListData } from './derProgramList.js';
 import {
     derProgramListDataSchema,
     DerProgramListHelper,
@@ -18,7 +18,7 @@ import {
 } from '../models/functionSetAssignments.js';
 import { z } from 'zod';
 import { createFileCache } from '../../helpers/fileCache.js';
-import type { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 
 const functionSetAssignmentsListDataSchema = z.array(

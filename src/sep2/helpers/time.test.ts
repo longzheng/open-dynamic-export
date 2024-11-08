@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import MockAdapter from 'axios-mock-adapter';
-import type { AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
+import { type AxiosInstance } from 'axios' with { 'resolution-mode': 'require' };
 import axios from 'axios';
 import { getMockFile } from './mocks.js';
 import { TimeHelper } from './time.js';

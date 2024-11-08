@@ -1,4 +1,4 @@
-import type { InverterControlLimit } from '../coordinator/helpers/inverterController.js';
+import { type InverterControlLimit } from '../coordinator/helpers/inverterController.js';
 
 export type LimiterType = {
     getInverterControlLimit(): InverterControlLimit;

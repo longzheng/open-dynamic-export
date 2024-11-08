@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import type {
-    ECPConn,
-    PVConn,
-    StActCtl,
-    StatusModel,
-    StorConn,
+import {
+    type ECPConn,
+    type PVConn,
+    type StActCtl,
+    type StatusModel,
+    type StorConn,
 } from '../models/status.js';
 import { getStatusMetrics } from './statusMetrics.js';
 

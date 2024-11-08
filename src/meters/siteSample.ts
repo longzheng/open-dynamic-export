@@ -3,7 +3,7 @@ import {
     perPhaseMeasurementSchema,
     perPhaseNetMeasurementSchema,
 } from '../helpers/measurement.js';
-import type { SampleBase } from '../coordinator/helpers/sampleBase.js';
+import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
 import { z } from 'zod';
 
 // aligns with the CSIP-AUS requirements for site sample

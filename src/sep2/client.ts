@@ -1,4 +1,8 @@
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import {
+    type AxiosInstance,
+    type AxiosRequestConfig,
+    type AxiosResponse,
+} from 'axios';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import * as https from 'node:https';
@@ -7,8 +11,8 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
 } from './helpers/cert.js';
-import type { Config } from '../helpers/config.js';
-import type { RoleFlagsType } from './models/roleFlagsType.js';
+import { type Config } from '../helpers/config.js';
+import { type RoleFlagsType } from './models/roleFlagsType.js';
 import { numberToHex } from '../helpers/number.js';
 import { createHash } from 'node:crypto';
 import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';

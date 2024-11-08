@@ -1,5 +1,5 @@
-import type { RampRateHelper } from './helpers/rampRate.js';
-import type { Config } from '../helpers/config.js';
+import { type RampRateHelper } from './helpers/rampRate.js';
+import { type Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
 import { logger } from '../helpers/logger.js';
 import { SEP2Client } from './client.js';
@@ -12,7 +12,7 @@ import { FunctionSetAssignmentsListHelper } from './helpers/functionSetAssignmen
 import { MirrorUsagePointListHelper } from './helpers/mirrorUsagePointList.js';
 import { TimeHelper } from './helpers/time.js';
 import { getSep2Certificate } from '../helpers/sep2Cert.js';
-import type { EndDeviceList } from './models/endDeviceList.js';
+import { type EndDeviceList } from './models/endDeviceList.js';
 import {
     generateEndDeviceResponse,
     parseEndDeviceXml,

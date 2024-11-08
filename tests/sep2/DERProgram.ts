@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import type { DERProgram } from '../../src/sep2/models/derProgram.js';
+import { type DERProgram } from '../../src/sep2/models/derProgram.js';
 
 export function generateMockDERProgram({
     primacy,
