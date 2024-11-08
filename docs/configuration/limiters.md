@@ -52,6 +52,8 @@ To set fixed limits (such as for fixed export limits), add the following propert
             "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
             "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
             "generationLimitWatts": 10000 // (number) optional: the maximum generation limit in watts
+            "importLimitWatts": 5000 // (number) optional: the maximum import limit in watts (not currently used)
+            "loadLimitWatts": 10000 // (number) optional: the maximum load limit in watts (not currently used)
         }
     }
     ...
@@ -82,7 +84,19 @@ z.object({
     opModEnergize: z.boolean().optional(),
     opModExpLimW: z.number().optional(),
     opModGenLimW: z.number().optional(),
+    opModImpLimW: z.number().optional(),
+    opModLoadLimW: z.number().optional(),
 });
+```
+
+For example
+
+```js
+{
+    "opModEnergize": true,
+    "opModExpLimW": 5000,
+    "opModGenLimW": 10000
+}
 ```
 
 ## Negative feed-in
@@ -96,7 +110,7 @@ For Amber Electric:
         "negativeFeedIn": {
             "type": "amber", // (string) required: the source of the negative feed-in data
             "apiKey": "asdf", // (string) required: the Amber API key
-            "siteId": "12345" // (string) required: the Amber site ID
+            "siteId": "12345" // (string) optional: the Amber site ID. If not supplied, it will automatically select the first site in the account (will error if there are multiple sites)
         }
     }
     ...

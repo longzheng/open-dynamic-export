@@ -25,7 +25,12 @@ import { differenceInSeconds } from 'date-fns';
 
 export type SupportedControlTypes = Extract<
     ControlType,
-    'opModExpLimW' | 'opModGenLimW' | 'opModEnergize' | 'opModConnect'
+    | 'opModExpLimW'
+    | 'opModGenLimW'
+    | 'opModImpLimW'
+    | 'opModLoadLimW'
+    | 'opModEnergize'
+    | 'opModConnect'
 >;
 
 export type InverterControlTypes =
@@ -41,6 +46,8 @@ export type InverterControlLimit = {
     opModConnect: boolean | undefined;
     opModGenLimW: number | undefined;
     opModExpLimW: number | undefined;
+    opModImpLimW: number | undefined;
+    opModLoadLimW: number | undefined;
 };
 
 export type InverterConfiguration =
@@ -535,6 +542,18 @@ export type ActiveInverterControlLimit = {
               source: InverterControlTypes;
           }
         | undefined;
+    opModImpLimW:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    opModLoadLimW:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
 };
 
 export function getActiveInverterControlLimit(
@@ -544,6 +563,8 @@ export function getActiveInverterControlLimit(
     let opModConnect: ActiveInverterControlLimit['opModConnect'] = undefined;
     let opModGenLimW: ActiveInverterControlLimit['opModGenLimW'] = undefined;
     let opModExpLimW: ActiveInverterControlLimit['opModExpLimW'] = undefined;
+    let opModImpLimW: ActiveInverterControlLimit['opModImpLimW'] = undefined;
+    let opModLoadLimW: ActiveInverterControlLimit['opModLoadLimW'] = undefined;
 
     for (const controlLimit of controlLimits) {
         if (!controlLimit) {
@@ -603,6 +624,32 @@ export function getActiveInverterControlLimit(
                 };
             }
         }
+
+        if (controlLimit.opModImpLimW !== undefined) {
+            if (
+                opModImpLimW === undefined ||
+                // take the lesser value
+                controlLimit.opModImpLimW < opModImpLimW.value
+            ) {
+                opModImpLimW = {
+                    source: controlLimit.source,
+                    value: controlLimit.opModImpLimW,
+                };
+            }
+        }
+
+        if (controlLimit.opModLoadLimW !== undefined) {
+            if (
+                opModLoadLimW === undefined ||
+                // take the lesser value
+                controlLimit.opModLoadLimW < opModLoadLimW.value
+            ) {
+                opModLoadLimW = {
+                    source: controlLimit.source,
+                    value: controlLimit.opModLoadLimW,
+                };
+            }
+        }
     }
 
     return {
@@ -610,5 +657,7 @@ export function getActiveInverterControlLimit(
         opModConnect,
         opModGenLimW,
         opModExpLimW,
+        opModImpLimW,
+        opModLoadLimW,
     };
 }

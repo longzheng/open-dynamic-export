@@ -47,6 +47,8 @@ export class MqttLimiter implements LimiterType {
             opModEnergize: this.cachedMessage?.opModEnergize,
             opModExpLimW: this.cachedMessage?.opModExpLimW,
             opModGenLimW: this.cachedMessage?.opModGenLimW,
+            opModImpLimW: this.cachedMessage?.opModImpLimW,
+            opModLoadLimW: this.cachedMessage?.opModLoadLimW,
         };
 
         writeControlLimit({ limit });
@@ -60,4 +62,6 @@ const mqttSchema = z.object({
     opModEnergize: z.boolean().optional(),
     opModExpLimW: z.number().optional(),
     opModGenLimW: z.number().optional(),
+    opModImpLimW: z.number().optional(),
+    opModLoadLimW: z.number().optional(),
 });

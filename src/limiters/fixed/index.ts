@@ -19,6 +19,8 @@ export class FixedLimiter implements LimiterType {
             opModEnergize: this.config.connect,
             opModExpLimW: this.config.exportLimitWatts,
             opModGenLimW: this.config.generationLimitWatts,
+            opModImpLimW: this.config.importLimitWatts,
+            opModLoadLimW: this.config.loadLimitWatts,
         };
 
         writeControlLimit({ limit });
