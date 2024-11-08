@@ -28,6 +28,8 @@ describe('AusgridEA029Limiter', () => {
             opModEnergize: undefined,
             opModExpLimW: 0,
             opModGenLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
         } satisfies typeof result);
     });
 
@@ -43,6 +45,8 @@ describe('AusgridEA029Limiter', () => {
             opModEnergize: undefined,
             opModExpLimW: undefined,
             opModGenLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
         } satisfies typeof result);
     });
 

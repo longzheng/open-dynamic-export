@@ -35,6 +35,8 @@ export class SapnRELE2WLimiter implements LimiterType {
                       opModEnergize: undefined,
                       opModExpLimW: 0,
                       opModGenLimW: undefined,
+                      opModImpLimW: undefined,
+                      opModLoadLimW: undefined,
                   }
                 : {
                       source: 'twoWayTariff',
@@ -42,6 +44,8 @@ export class SapnRELE2WLimiter implements LimiterType {
                       opModEnergize: undefined,
                       opModExpLimW: undefined,
                       opModGenLimW: undefined,
+                      opModImpLimW: undefined,
+                      opModLoadLimW: undefined,
                   };
 
         writeControlLimit({ limit });

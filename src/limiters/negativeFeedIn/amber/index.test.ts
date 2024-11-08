@@ -62,6 +62,8 @@ describe('AmberLimiter', () => {
             opModEnergize: undefined,
             opModExpLimW: 0,
             opModGenLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
         } satisfies typeof result);
     });
 
@@ -79,6 +81,8 @@ describe('AmberLimiter', () => {
             opModEnergize: undefined,
             opModExpLimW: undefined,
             opModGenLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
         } satisfies typeof result);
     });
 });

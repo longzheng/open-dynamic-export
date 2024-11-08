@@ -58,6 +58,8 @@ export class AmberLimiter implements LimiterType {
                   opModEnergize: undefined,
                   opModExpLimW: 0,
                   opModGenLimW: undefined,
+                  opModImpLimW: undefined,
+                  opModLoadLimW: undefined,
               }
             : {
                   source: 'negativeFeedIn',
@@ -67,6 +69,8 @@ export class AmberLimiter implements LimiterType {
                   opModEnergize: undefined,
                   opModExpLimW: undefined,
                   opModGenLimW: undefined,
+                  opModImpLimW: undefined,
+                  opModLoadLimW: undefined,
               };
 
         writeControlLimit({ limit });

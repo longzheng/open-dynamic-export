@@ -150,6 +150,8 @@ describe('getActiveInverterControlLimit', () => {
                 opModEnergize: undefined,
                 opModExpLimW: undefined,
                 opModGenLimW: 20000,
+                opModImpLimW: 10000,
+                opModLoadLimW: 5000,
             },
             {
                 source: 'mqtt',
@@ -157,6 +159,8 @@ describe('getActiveInverterControlLimit', () => {
                 opModEnergize: true,
                 opModExpLimW: 5000,
                 opModGenLimW: 5000,
+                opModImpLimW: 5000,
+                opModLoadLimW: 5000,
             },
             {
                 source: 'sep2',
@@ -164,6 +168,8 @@ describe('getActiveInverterControlLimit', () => {
                 opModEnergize: false,
                 opModExpLimW: 2000,
                 opModGenLimW: 10000,
+                opModImpLimW: 10000,
+                opModLoadLimW: 10000,
             },
         ]);
 
@@ -184,6 +190,14 @@ describe('getActiveInverterControlLimit', () => {
                 source: 'mqtt',
                 value: 5000,
             },
+            opModImpLimW: {
+                source: 'mqtt',
+                value: 5000,
+            },
+            opModLoadLimW: {
+                source: 'fixed',
+                value: 5000,
+            },
         } satisfies typeof inverterControlLimit);
     });
 
@@ -195,6 +209,8 @@ describe('getActiveInverterControlLimit', () => {
                 opModEnergize: undefined,
                 opModExpLimW: undefined,
                 opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
             },
             {
                 source: 'mqtt',
@@ -202,6 +218,8 @@ describe('getActiveInverterControlLimit', () => {
                 opModEnergize: undefined,
                 opModExpLimW: 1000,
                 opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
             },
         ]);
 
@@ -213,6 +231,8 @@ describe('getActiveInverterControlLimit', () => {
                 value: 1000,
             },
             opModGenLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
         } satisfies typeof inverterControlLimit);
     });
 });
