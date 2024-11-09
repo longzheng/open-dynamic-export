@@ -1,9 +1,9 @@
-import type { SiteSample } from '../siteSample.js';
+import { type SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import type { Result } from '../../helpers/result.js';
-import type { Config } from '../../helpers/config.js';
+import { type Result } from '../../helpers/result.js';
+import { type Config } from '../../helpers/config.js';
 import { GrowattConnection } from '../../modbus/connection/growatt.js';
-import type { GrowattMeterModels } from '../../modbus/models/growatt/meter.js';
+import { type GrowattMeterModels } from '../../modbus/models/growatt/meter.js';
 
 type GrowattMeterConfig = Extract<Config['meter'], { type: 'growatt' }>;
 

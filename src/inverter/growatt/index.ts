@@ -1,15 +1,15 @@
 import { type InverterData } from '../inverterData.js';
-import type { Result } from '../../helpers/result.js';
+import { type Result } from '../../helpers/result.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
 import { DERTyp } from '../../sunspec/models/nameplate.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
-import type { Config } from '../../helpers/config.js';
+import { type Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 import { GrowattConnection } from '../../modbus/connection/growatt.js';
-import type { GrowattInverterModels } from '../../modbus/models/growatt/inverter.js';
+import { type GrowattInverterModels } from '../../modbus/models/growatt/inverter.js';
 
 export class GrowattInverterDataPoller extends InverterDataPollerBase {
     private growattConnection: GrowattConnection;

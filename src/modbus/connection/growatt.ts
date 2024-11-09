@@ -1,4 +1,4 @@
-import type { ModbusConnection } from './base.js';
+import { type ModbusConnection } from './base.js';
 import {
     GrowattMeter1Model,
     GrowattMeter2Model,
@@ -9,8 +9,8 @@ import {
     type GrowattInverterModels,
 } from '../models/growatt/inverter.js';
 import { getModbusConnection } from '../connections.js';
-import type { ModbusSchema } from '../../helpers/config.js';
-import type { Logger } from 'pino';
+import { type ModbusSchema } from '../../helpers/config.js';
+import { type Logger } from 'pino';
 import {
     GrowattInverterControl1Model,
     type GrowattInverterControl,
