@@ -77,6 +77,16 @@ export const configSchema = z.object({
                         .min(0)
                         .optional()
                         .describe('The generation limit in watts'),
+                    importLimitWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe('The import limit in watts'),
+                    loadLimitWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe('The load limit in watts'),
                 })
                 .optional()
                 .describe('If defined, limits by manual configuration'),

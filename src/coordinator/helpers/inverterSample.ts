@@ -1,14 +1,14 @@
 import EventEmitter from 'events';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import { type DerSample } from '../../coordinator/helpers/derSample.js';
 import { generateDerSample } from '../../coordinator/helpers/derSample.js';
-import type { InverterData } from '../../inverter/inverterData.js';
-import type { Result } from '../../helpers/result.js';
-import type { InverterDataPollerBase } from '../../inverter/inverterDataPollerBase.js';
-import type { Config } from '../../helpers/config.js';
+import { type InverterData } from '../../inverter/inverterData.js';
+import { type Result } from '../../helpers/result.js';
+import { type InverterDataPollerBase } from '../../inverter/inverterDataPollerBase.js';
+import { type Config } from '../../helpers/config.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
-import type { InverterConfiguration } from './inverterController.js';
-import type { Logger } from 'pino';
+import { type InverterConfiguration } from './inverterController.js';
+import { type Logger } from 'pino';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
 import { GrowattInverterDataPoller } from '../../inverter/growatt/index.js';
 export class InvertersPoller extends EventEmitter<{

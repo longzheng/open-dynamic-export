@@ -1,6 +1,6 @@
 import { type InverterData } from '../inverterData.js';
 import { enumHasValue } from '../../helpers/enum.js';
-import type { Result } from '../../helpers/result.js';
+import { type Result } from '../../helpers/result.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
 import { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
@@ -20,16 +20,16 @@ import {
     InverterState,
     type InverterModel,
 } from '../../sunspec/models/inverter.js';
-import type { NameplateModel } from '../../sunspec/models/nameplate.js';
-import type { SettingsModel } from '../../sunspec/models/settings.js';
-import type { StatusModel } from '../../sunspec/models/status.js';
+import { type NameplateModel } from '../../sunspec/models/nameplate.js';
+import { type SettingsModel } from '../../sunspec/models/settings.js';
+import { type StatusModel } from '../../sunspec/models/status.js';
 import { PVConn } from '../../sunspec/models/status.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import {
     getWMaxLimPctFromTargetSolarPowerRatio,
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
-import type { Config } from '../../helpers/config.js';
+import { type Config } from '../../helpers/config.js';
 import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 

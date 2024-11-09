@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { getNameplateMetrics } from './nameplateMetrics.js';
-import type { NameplateModel } from '../models/nameplate.js';
+import { type NameplateModel } from '../models/nameplate.js';
 
 it('getNameplateMetrics returns data', () => {
     const nameplate: NameplateModel = {

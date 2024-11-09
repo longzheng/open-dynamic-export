@@ -1,12 +1,12 @@
-import type {
-    ActiveInverterControlLimit,
-    InverterConfiguration,
-    InverterControlLimit,
+import {
+    type ActiveInverterControlLimit,
+    type InverterConfiguration,
+    type InverterControlLimit,
 } from '../../coordinator/helpers/inverterController.js';
-import type { Coordinator } from '../../coordinator/index.js';
+import { type Coordinator } from '../../coordinator/index.js';
 import { createCoordinator } from '../../coordinator/index.js';
-import type { Result } from '../../helpers/result.js';
-import type { InverterData } from '../../inverter/inverterData.js';
+import { type Result } from '../../helpers/result.js';
+import { type InverterData } from '../../inverter/inverterData.js';
 
 type InvertersDataCache = Result<InverterData>[];
 

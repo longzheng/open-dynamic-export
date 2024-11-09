@@ -49,6 +49,16 @@
                   "type": "number",
                   "minimum": 0,
                   "description": "The generation limit in watts"
+                },
+                "importLimitWatts": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "The import limit in watts"
+                },
+                "loadLimitWatts": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "The load limit in watts"
                 }
               },
               "additionalProperties": false,

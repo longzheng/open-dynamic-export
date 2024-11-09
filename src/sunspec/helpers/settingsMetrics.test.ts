@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import type { SettingsModel } from '../models/settings.js';
+import { type SettingsModel } from '../models/settings.js';
 import { getSettingsMetrics } from './settingsMetrics.js';
 
 it('getSettingsMetrics returns data', () => {

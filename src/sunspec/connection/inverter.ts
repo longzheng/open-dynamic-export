@@ -1,12 +1,15 @@
 import { differenceInSeconds } from 'date-fns';
-import type { ControlsModel, ControlsModelWrite } from '../models/controls.js';
+import {
+    type ControlsModel,
+    type ControlsModelWrite,
+} from '../models/controls.js';
 import { controlsModel } from '../models/controls.js';
 import { inverterModel } from '../models/inverter.js';
-import type { NameplateModel } from '../models/nameplate.js';
+import { type NameplateModel } from '../models/nameplate.js';
 import { nameplateModel } from '../models/nameplate.js';
-import type { SettingsModel } from '../models/settings.js';
+import { type SettingsModel } from '../models/settings.js';
 import { settingsModel } from '../models/settings.js';
-import type { StatusModel } from '../models/status.js';
+import { type StatusModel } from '../models/status.js';
 import { statusModel } from '../models/status.js';
 import { SunSpecConnection } from './base.js';
 

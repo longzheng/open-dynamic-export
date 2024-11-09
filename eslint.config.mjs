@@ -1,9 +1,10 @@
 // @ts-check
-
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import js from '@eslint/js';
+import tseslint, { configs } from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import eslintPluginImportX from 'eslint-plugin-import-x';
+import tsParser from '@typescript-eslint/parser';
 
 export default tseslint.config(
     {
@@ -16,8 +17,27 @@ export default tseslint.config(
             'docs/babel.config.js',
         ],
     },
-    eslint.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
+    js.configs.recommended,
+    eslintPluginImportX.flatConfigs.recommended,
+    eslintPluginImportX.flatConfigs.typescript,
+    {
+        files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+        ignores: ['eslint.config.js'],
+        languageOptions: {
+            parser: tsParser,
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+        },
+        rules: {
+            'no-unused-vars': 'off',
+            'import-x/no-dynamic-require': 'warn',
+            'import-x/consistent-type-specifier-style': [
+                'error',
+                'prefer-inline',
+            ],
+        },
+    },
+    ...configs.recommendedTypeChecked,
     {
         languageOptions: {
             parserOptions: {

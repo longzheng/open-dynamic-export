@@ -1,6 +1,6 @@
-import type { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { AxiosInstance } from 'axios';
+import { type AxiosInstance } from 'axios';
 import * as https from 'node:https';
 import axios, { AxiosError } from 'axios';
 import {

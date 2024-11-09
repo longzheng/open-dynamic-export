@@ -1,11 +1,11 @@
-import type { Config, LimiterKeys } from '../helpers/config.js';
+import { type Config, type LimiterKeys } from '../helpers/config.js';
 import { FixedLimiter } from './fixed/index.js';
-import type { LimiterType } from './limiter.js';
+import { type LimiterType } from './limiter.js';
 import { MqttLimiter } from './mqtt/index.js';
 import { AmberLimiter } from './negativeFeedIn/amber/index.js';
 import { AusgridEA029Limiter } from './twoWayTariff/ausgridEA029/index.js';
 import { SapnRELE2WLimiter } from './twoWayTariff/sapnRELE2W/index.js';
-import type { Sep2Instance } from '../sep2/index.js';
+import { type Sep2Instance } from '../sep2/index.js';
 
 export type Limiters = Record<LimiterKeys, LimiterType | null>;
 

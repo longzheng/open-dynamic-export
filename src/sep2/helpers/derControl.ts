@@ -1,6 +1,6 @@
 import { addSeconds } from 'date-fns';
-import type { DERControl } from '../models/derControl.js';
-import type { DERProgram } from '../models/derProgram.js';
+import { type DERControl } from '../models/derControl.js';
+import { type DERProgram } from '../models/derProgram.js';
 
 export function sortByProgramPrimacy<
     T extends { program: Pick<DERProgram, 'primacy'> },

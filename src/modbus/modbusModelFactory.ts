@@ -1,9 +1,9 @@
 import { objectEntriesWithType } from '../helpers/object.js';
-import type { ModelAddress } from '../sunspec/connection/base.js';
+import { type ModelAddress } from '../sunspec/connection/base.js';
 import { writeLatency } from '../helpers/influxdb.js';
-import type {
-    ModbusConnection,
-    ModbusRegisterType,
+import {
+    type ModbusConnection,
+    type ModbusRegisterType,
 } from './connection/base.js';
 
 export type Mapping<

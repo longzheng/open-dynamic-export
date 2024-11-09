@@ -1,10 +1,10 @@
 import mqtt from 'mqtt';
-import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../limiter.js';
-import type { Config } from '../../helpers/config.js';
+import { type InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
+import { type LimiterType } from '../limiter.js';
+import { type Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { z } from 'zod';
-import type { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 
 type MqttLimiterConfig = NonNullable<Config['limiters']['mqtt']>;
@@ -47,6 +47,8 @@ export class MqttLimiter implements LimiterType {
             opModEnergize: this.cachedMessage?.opModEnergize,
             opModExpLimW: this.cachedMessage?.opModExpLimW,
             opModGenLimW: this.cachedMessage?.opModGenLimW,
+            opModImpLimW: this.cachedMessage?.opModImpLimW,
+            opModLoadLimW: this.cachedMessage?.opModLoadLimW,
         };
 
         writeControlLimit({ limit });
@@ -60,4 +62,6 @@ const mqttSchema = z.object({
     opModEnergize: z.boolean().optional(),
     opModExpLimW: z.number().optional(),
     opModGenLimW: z.number().optional(),
+    opModImpLimW: z.number().optional(),
+    opModLoadLimW: z.number().optional(),
 });

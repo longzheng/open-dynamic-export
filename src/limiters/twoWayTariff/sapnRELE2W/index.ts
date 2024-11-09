@@ -1,6 +1,6 @@
-import type { Logger } from 'pino';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import type { LimiterType } from '../../limiter.js';
+import { type Logger } from 'pino';
+import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
+import { type LimiterType } from '../../limiter.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { logger as pinoLogger } from '../../../helpers/logger.js';
 
@@ -35,6 +35,8 @@ export class SapnRELE2WLimiter implements LimiterType {
                       opModEnergize: undefined,
                       opModExpLimW: 0,
                       opModGenLimW: undefined,
+                      opModImpLimW: undefined,
+                      opModLoadLimW: undefined,
                   }
                 : {
                       source: 'twoWayTariff',
@@ -42,6 +44,8 @@ export class SapnRELE2WLimiter implements LimiterType {
                       opModEnergize: undefined,
                       opModExpLimW: undefined,
                       opModGenLimW: undefined,
+                      opModImpLimW: undefined,
+                      opModLoadLimW: undefined,
                   };
 
         writeControlLimit({ limit });

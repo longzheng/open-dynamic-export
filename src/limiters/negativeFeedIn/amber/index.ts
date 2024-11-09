@@ -1,9 +1,9 @@
-import type { Client } from 'openapi-fetch';
+import { type Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
-import type { paths } from './api.js';
-import type { LimiterType } from '../../limiter.js';
-import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import type { Logger } from 'pino';
+import { type paths } from './api.js';
+import { type LimiterType } from '../../limiter.js';
+import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
+import { type Logger } from 'pino';
 import { logger as pinoLogger } from '../../../helpers/logger.js';
 import {
     writeAmberPrice,
@@ -34,7 +34,6 @@ export class AmberLimiter implements LimiterType {
             headers: {
                 Authorization: `Bearer ${apiKey}`,
             },
-            signal: AbortSignal.timeout(10_000),
         });
         this.logger = pinoLogger.child({ inverter: 'AmberControlLimit' });
 
@@ -59,6 +58,8 @@ export class AmberLimiter implements LimiterType {
                   opModEnergize: undefined,
                   opModExpLimW: 0,
                   opModGenLimW: undefined,
+                  opModImpLimW: undefined,
+                  opModLoadLimW: undefined,
               }
             : {
                   source: 'negativeFeedIn',
@@ -68,6 +69,8 @@ export class AmberLimiter implements LimiterType {
                   opModEnergize: undefined,
                   opModExpLimW: undefined,
                   opModGenLimW: undefined,
+                  opModImpLimW: undefined,
+                  opModLoadLimW: undefined,
               };
 
         writeControlLimit({ limit });
@@ -79,6 +82,8 @@ export class AmberLimiter implements LimiterType {
         if (!this.siteId) {
             throw new Error('Site ID not set');
         }
+
+        this.logger.debug('Fetching Amber feed-in prices');
 
         const { data, error } = await this.client.GET(
             '/sites/{siteId}/prices/current',
@@ -92,6 +97,7 @@ export class AmberLimiter implements LimiterType {
                         next: 2 * 2,
                     },
                 },
+                signal: AbortSignal.timeout(10_000),
             },
         );
 
@@ -111,6 +117,8 @@ export class AmberLimiter implements LimiterType {
                         price: interval.perKwh,
                     }) satisfies Interval,
             );
+
+        this.logger.debug({ feedInIntervals }, 'Fetched Amber feed-in prices');
 
         this.feedInIntervals = feedInIntervals;
     }

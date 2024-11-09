@@ -1,14 +1,14 @@
-import type { Logger } from 'pino';
-import type {
-    InverterControlLimit,
-    SupportedControlTypes,
+import { type Logger } from 'pino';
+import {
+    type InverterControlLimit,
+    type SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController.js';
-import type { RampRateHelper } from '../../sep2/helpers/rampRate.js';
-import type { SEP2Client } from '../../sep2/client.js';
+import { type RampRateHelper } from '../../sep2/helpers/rampRate.js';
+import { type SEP2Client } from '../../sep2/client.js';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
-import type { LimiterType } from '../limiter.js';
+import { type DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
+import { type LimiterType } from '../limiter.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
@@ -19,6 +19,8 @@ export class Sep2Limiter implements LimiterType {
     };
     private opModExpLimWRampRateHelper: ControlLimitRampHelper;
     private opModGenLimWRampRateHelper: ControlLimitRampHelper;
+    private opModImpLimWRampRateHelper: ControlLimitRampHelper;
+    private opModLoadLimWRampRateHelper: ControlLimitRampHelper;
     private logger: Logger;
 
     constructor({
@@ -47,6 +49,14 @@ export class Sep2Limiter implements LimiterType {
                 client,
                 controlType: 'opModGenLimW',
             }),
+            opModImpLimW: new ControlSchedulerHelper({
+                client,
+                controlType: 'opModImpLimW',
+            }),
+            opModLoadLimW: new ControlSchedulerHelper({
+                client,
+                controlType: 'opModLoadLimW',
+            }),
         };
 
         this.opModExpLimWRampRateHelper = new ControlLimitRampHelper({
@@ -54,6 +64,14 @@ export class Sep2Limiter implements LimiterType {
         });
 
         this.opModGenLimWRampRateHelper = new ControlLimitRampHelper({
+            rampRateHelper,
+        });
+
+        this.opModImpLimWRampRateHelper = new ControlLimitRampHelper({
+            rampRateHelper,
+        });
+
+        this.opModLoadLimWRampRateHelper = new ControlLimitRampHelper({
             rampRateHelper,
         });
     }
@@ -119,6 +137,56 @@ export class Sep2Limiter implements LimiterType {
             })(),
         );
 
+        const opModImpLimW =
+            this.schedulerByControlType.opModImpLimW.getActiveScheduleDerControlBaseValue();
+
+        this.opModImpLimWRampRateHelper.updateTarget(
+            (() => {
+                switch (opModImpLimW.type) {
+                    case 'active':
+                    case 'default': {
+                        return {
+                            type: opModImpLimW.type,
+                            value: opModImpLimW.control
+                                ? numberWithPow10(
+                                      opModImpLimW.control.value,
+                                      opModImpLimW.control.multiplier,
+                                  )
+                                : undefined,
+                            rampTimeSeconds: opModImpLimW.rampTms,
+                        };
+                    }
+                    case 'none':
+                        return { type: 'none' };
+                }
+            })(),
+        );
+
+        const opModLoadLimW =
+            this.schedulerByControlType.opModLoadLimW.getActiveScheduleDerControlBaseValue();
+
+        this.opModLoadLimWRampRateHelper.updateTarget(
+            (() => {
+                switch (opModLoadLimW.type) {
+                    case 'active':
+                    case 'default': {
+                        return {
+                            type: opModLoadLimW.type,
+                            value: opModLoadLimW.control
+                                ? numberWithPow10(
+                                      opModLoadLimW.control.value,
+                                      opModLoadLimW.control.multiplier,
+                                  )
+                                : undefined,
+                            rampTimeSeconds: opModLoadLimW.rampTms,
+                        };
+                    }
+                    case 'none':
+                        return { type: 'none' };
+                }
+            })(),
+        );
+
         const limit: InverterControlLimit = {
             source: 'sep2',
             opModExpLimW: this.opModExpLimWRampRateHelper.getRampedValue(),
@@ -129,6 +197,8 @@ export class Sep2Limiter implements LimiterType {
             opModConnect:
                 this.schedulerByControlType.opModConnect.getActiveScheduleDerControlBaseValue()
                     .control,
+            opModImpLimW: this.opModImpLimWRampRateHelper.getRampedValue(),
+            opModLoadLimW: this.opModLoadLimWRampRateHelper.getRampedValue(),
         };
 
         writeControlLimit({ limit });

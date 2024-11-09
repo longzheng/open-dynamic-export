@@ -1,35 +1,35 @@
-import type { ModbusConnection } from './base.js';
-import type { SmaCore1MeteringGridMsModels } from '../models/sma/core1/meteringGridMs.js';
+import { type ModbusConnection } from './base.js';
+import { type SmaCore1MeteringGridMsModels } from '../models/sma/core1/meteringGridMs.js';
 import {
     SmaCore1MeteringGridMs1Model,
     SmaCore1MeteringGridMs2Model,
 } from '../models/sma/core1/meteringGridMs.js';
-import type { SmaCore1Nameplate } from '../models/sma/core1/nameplate.js';
+import { type SmaCore1Nameplate } from '../models/sma/core1/nameplate.js';
 import { SmaCore1NameplateModel } from '../models/sma/core1/nameplate.js';
-import type { SmaCore1GridMsModels } from '../models/sma/core1/gridMs.js';
+import { type SmaCore1GridMsModels } from '../models/sma/core1/gridMs.js';
 import {
     SmaCore1GridMs1Model,
     SmaCore1GridMs2Model,
     SmaCore1GridMs3Model,
 } from '../models/sma/core1/gridMs.js';
-import type { SmaCore1Operation } from '../models/sma/core1/operation.js';
+import { type SmaCore1Operation } from '../models/sma/core1/operation.js';
 import { SmaCore1OperationModel } from '../models/sma/core1/operation.js';
-import type { SmaCore1InverterModels } from '../models/sma/core1/inverter.js';
+import { type SmaCore1InverterModels } from '../models/sma/core1/inverter.js';
 import {
     SmaCore1Inverter1Model,
     SmaCore1Inverter2Model,
 } from '../models/sma/core1/inverter.js';
-import type {
-    SmaCore1InverterControl1,
-    SmaCore1InverterControl2,
-    SmaCore1InverterControlModels,
+import {
+    type SmaCore1InverterControl1,
+    type SmaCore1InverterControl2,
+    type SmaCore1InverterControlModels,
 } from '../models/sma/core1/inverterControl.js';
 import {
     SmaCore1InverterControl1Model,
     SmaCore1InverterControl2Model,
 } from '../models/sma/core1/inverterControl.js';
-import type { Logger } from 'pino';
-import type { ModbusSchema } from '../../helpers/config.js';
+import { type Logger } from 'pino';
+import { type ModbusSchema } from '../../helpers/config.js';
 import { getModbusConnection } from '../connections.js';
 
 export class SmaConnection {

@@ -1,7 +1,7 @@
 import { it, expect, describe } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks.js';
-import type { EndDevice } from './endDevice.js';
+import { type EndDevice } from './endDevice.js';
 import { generateEndDeviceResponse, parseEndDeviceXml } from './endDevice.js';
 import { objectToXml } from '../helpers/xml.js';
 

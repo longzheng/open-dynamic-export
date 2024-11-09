@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type {
-    ControlSchedule,
-    RandomizedControlSchedule,
+import {
+    type ControlSchedule,
+    type RandomizedControlSchedule,
 } from './controlScheduler.js';
 import {
     generateControlsSchedule,
@@ -10,7 +10,7 @@ import {
     applyRandomizationToControlSchedule,
     applyRandomizationToDatetime,
 } from './controlScheduler.js';
-import type { MergedControlsData } from './derControls.js';
+import { type MergedControlsData } from './derControls.js';
 import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
