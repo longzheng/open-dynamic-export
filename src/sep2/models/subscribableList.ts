@@ -3,7 +3,7 @@ import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
 } from './subscribableResource.js';
-import type { z } from 'zod';
+import { type z } from 'zod';
 
 export const subscribableListSchema = listSchema.merge(
     subscribableResourceSchema,

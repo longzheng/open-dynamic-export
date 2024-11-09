@@ -1,27 +1,27 @@
 import { RoleFlagsType } from '../models/roleFlagsType.js';
-import type {
-    AvgMaxMin,
-    NoPhaseMeasurement,
-    PerPhaseNetMeasurement,
+import {
+    type AvgMaxMin,
+    type NoPhaseMeasurement,
+    type PerPhaseNetMeasurement,
+    type PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import {
     assertPerPhaseNetOrNoPhaseMeasurementArray,
     getAvgMaxMinOfNumbersNullable,
     getAvgMaxMinOfPerPhaseMeasurements,
     getAvgMaxMinOfPerPhaseNetOrNoPhaseMeasurements,
-    type PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import { DataQualifierType } from '../models/dataQualifierType.js';
 import { FlowDirectionType } from '../models/flowDirectionType.js';
 import { PhaseCode } from '../models/phaseCode.js';
 import { UomType } from '../models/uomType.js';
-import type { MirrorMeterReadingDefinitions } from './mirrorUsagePointBase.js';
+import { type MirrorMeterReadingDefinitions } from './mirrorUsagePointBase.js';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { SiteSample } from '../../meters/siteSample.js';
+import { type SiteSample } from '../../meters/siteSample.js';
 import { CommodityType } from '../models/commodityType.js';
 import { KindType } from '../models/kindType.js';
-import type { SEP2Client } from '../client.js';
+import { type SEP2Client } from '../client.js';
 import {
     objectEntriesWithType,
     objectFromEntriesWithType,

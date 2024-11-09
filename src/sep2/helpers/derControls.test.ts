@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
-import type { MergedControlsData } from './derControls.js';
+import { type MergedControlsData } from './derControls.js';
 import {
     DerControlsHelper,
     sortMergedControlsDataByStartTimeAscending,

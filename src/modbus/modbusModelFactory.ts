@@ -1,7 +1,7 @@
 import { objectEntriesWithType } from '../helpers/object.js';
-import type { ModelAddress } from '../sunspec/connection/base.js';
+import { type ModelAddress } from '../sunspec/connection/base.js';
 import { writeLatency } from '../helpers/influxdb.js';
-import type { ModbusConnection } from './connection/base.js';
+import { type ModbusConnection } from './connection/base.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

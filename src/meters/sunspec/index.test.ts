@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { convertConsumptionRealPowerToFeedInRealPower } from './index.js';
-import type { SiteSampleData } from '../siteSample.js';
-import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import { type SiteSampleData } from '../siteSample.js';
+import { type DerSample } from '../../coordinator/helpers/derSample.js';
 
 describe('convertConsumptionRealPowerToFeedInRealPower', () => {
     it('should convert noPhase real power correctly exporting', () => {

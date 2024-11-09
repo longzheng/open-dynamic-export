@@ -1,5 +1,5 @@
 import { cappedChange } from '../../helpers/math.js';
-import type { RampRateHelper } from './rampRate.js';
+import { type RampRateHelper } from './rampRate.js';
 
 export class ControlLimitRampHelper {
     private rampRateHelper: RampRateHelper;

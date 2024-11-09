@@ -1,5 +1,5 @@
-import type { SitePhases } from '../../helpers/phases.js';
-import type { InverterModel } from '../models/inverter.js';
+import { type SitePhases } from '../../helpers/phases.js';
+import { type InverterModel } from '../models/inverter.js';
 import { type MeterModel } from '../models/meter.js';
 
 export function getSitePhasesFromMeter(meter: MeterModel): SitePhases {

@@ -1,10 +1,10 @@
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import type { SiteSample } from '../siteSample.js';
+import { type SiteSample } from '../siteSample.js';
 import { Powerwall2Client } from './client.js';
-import type { z } from 'zod';
-import type { metersSiteSchema } from './api.js';
-import type { Config } from '../../helpers/config.js';
-import type { Result } from '../../helpers/result.js';
+import { type z } from 'zod';
+import { type metersSiteSchema } from './api.js';
+import { type Config } from '../../helpers/config.js';
+import { type Result } from '../../helpers/result.js';
 
 export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;

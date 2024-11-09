@@ -1,7 +1,7 @@
 import { Decimal } from 'decimal.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
-import type { Logger } from 'pino';
-import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import { type Logger } from 'pino';
+import { type DerSample } from '../../coordinator/helpers/derSample.js';
 
 // The default ramp-rate derived from 16.67% per minute (roughly 0.28% per second)
 // which is the default value for Wgra in AS/NZS 4777.2

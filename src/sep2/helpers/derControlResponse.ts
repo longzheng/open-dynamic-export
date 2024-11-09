@@ -1,5 +1,5 @@
-import type { Logger } from 'pino';
-import type { SEP2Client } from '../client.js';
+import { type Logger } from 'pino';
+import { type SEP2Client } from '../client.js';
 import { logger as pinoLogger } from '../../helpers/logger.js';
 import { generateDerControlResponse } from '../models/derControlResponse.js';
 import { objectToXml } from './xml.js';

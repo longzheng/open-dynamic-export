@@ -10,11 +10,11 @@ import {
     sumNumbersArray,
     sumNumbersNullableArray,
 } from '../../helpers/number.js';
-import type { InverterData } from '../../inverter/inverterData.js';
-import type { SampleBase } from './sampleBase.js';
+import { type InverterData } from '../../inverter/inverterData.js';
+import { type SampleBase } from './sampleBase.js';
 import { DERType } from '../../sep2/models/derType.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
-import type { ConnectStatus } from '../../sep2/models/connectStatus.js';
+import { type ConnectStatus } from '../../sep2/models/connectStatus.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
 export const derSampleDataSchema = z.object({
