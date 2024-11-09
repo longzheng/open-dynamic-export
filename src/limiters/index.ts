@@ -34,7 +34,7 @@ export function getLimiters({
                     return new AusgridEA029Limiter();
                 case 'sapnRELE2W':
                     return new SapnRELE2WLimiter();
-                default:
+                case undefined:
                     return null;
             }
         })(),

@@ -103,7 +103,7 @@ export class AmberLimiter implements LimiterType {
 
         // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (error) {
+        if (error || !data) {
             throw new Error(JSON.stringify(error));
         }
 
@@ -128,7 +128,7 @@ export class AmberLimiter implements LimiterType {
 
         // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (error) {
+        if (error || !data) {
             throw new Error(JSON.stringify(error));
         }
 
