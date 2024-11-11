@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../src/helpers/config.js';
-import { logger } from '../src/helpers/logger.js';
+import { pinoLogger } from '../src/helpers/logger.js';
 import { getModbusConnection } from '../src/modbus/connections.js';
 
 // This debugging script dumps all the SunSpec models
@@ -18,7 +18,7 @@ void (async () => {
         }));
 
     for (const inverter of inverters) {
-        const inverterLogger = logger.child({
+        const inverterLogger = pinoLogger.child({
             config: inverter.config,
         });
 
@@ -54,7 +54,7 @@ void (async () => {
     if (config.meter.type === 'sunspec') {
         const meterConnection = getModbusConnection(config.meter.connection);
 
-        const meterLogger = logger.child({
+        const meterLogger = pinoLogger.child({
             config: meterConnection.config,
         });
 

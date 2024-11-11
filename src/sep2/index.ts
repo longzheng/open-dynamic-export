@@ -1,7 +1,7 @@
 import { type RampRateHelper } from './helpers/rampRate.js';
 import { type Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
-import { logger } from '../helpers/logger.js';
+import { pinoLogger } from '../helpers/logger.js';
 import { SEP2Client } from './client.js';
 import { Sep2Limiter } from '../limiters/sep2/index.js';
 import { DerHelper } from './helpers/der.js';
@@ -86,7 +86,7 @@ export function getSep2Instance({
     const derControlsHelper = new DerControlsHelper({
         client: sep2Client,
     }).on('data', (data) => {
-        logger.debug(data, 'DER controls data changed');
+        pinoLogger.debug(data, 'DER controls data changed');
 
         limiter.updateSep2ControlsData(data);
 
@@ -99,7 +99,10 @@ export function getSep2Instance({
 
     endDeviceListHelper.on('data', (endDeviceList) => {
         void (async () => {
-            logger.debug({ endDeviceList }, 'Received SEP2 end device list');
+            pinoLogger.debug(
+                { endDeviceList },
+                'Received SEP2 end device list',
+            );
 
             const endDevice = await getOrCreateEndDevice({ endDeviceList });
 
@@ -134,7 +137,7 @@ export function getSep2Instance({
     });
 
     derListHelper.on('data', (derList) => {
-        logger.debug({ derList }, 'Received SEP2 end device DER list');
+        pinoLogger.debug({ derList }, 'Received SEP2 end device DER list');
 
         if (derList.ders.length !== 1) {
             throw new Error(
@@ -153,7 +156,7 @@ export function getSep2Instance({
     functionSetAssignmentsListHelper.on(
         'data',
         (functionSetAssignmentsList) => {
-            logger.debug(
+            pinoLogger.debug(
                 { functionSetAssignmentsList },
                 'Received SEP2 function set assignments list',
             );
@@ -162,10 +165,13 @@ export function getSep2Instance({
         },
     );
 
-    logger.info('Discovering SEP2');
+    pinoLogger.info('Discovering SEP2');
 
     sep2Client.discover().on('data', (deviceCapability) => {
-        logger.debug({ deviceCapability }, 'Received SEP2 device capability');
+        pinoLogger.debug(
+            { deviceCapability },
+            'Received SEP2 device capability',
+        );
 
         timeHelper.updateHref({
             href: deviceCapability.timeLink.href,

@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'fs/promises';
 import { type ZodSchema } from 'zod';
 import { env } from './env.js';
-import { logger } from './logger.js';
+import { pinoLogger } from './logger.js';
 
 export function createFileCache<T>({
     filename,
@@ -28,7 +28,7 @@ export function createFileCache<T>({
         const result = schema.safeParse(JSON.parse(cachedFile));
 
         if (!result.success) {
-            logger.warn({
+            pinoLogger.warn({
                 error: result.error,
                 message: 'Failed to parse cache file',
             });

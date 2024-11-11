@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { type PollRate } from '../models/pollRate.js';
 import { type SEP2Client } from '../client.js';
-import { logger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 
 export abstract class PollableResource<
     ResponseType extends { pollRate: PollRate },
@@ -49,7 +49,7 @@ export abstract class PollableResource<
             try {
                 return await this.get({ client: this.client, url: this.url });
             } catch (error) {
-                logger.error(error, 'Failed to poll resource');
+                pinoLogger.error(error, 'Failed to poll resource');
 
                 return null;
             }

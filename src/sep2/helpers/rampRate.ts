@@ -1,5 +1,5 @@
 import { Decimal } from 'decimal.js';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 import { type Logger } from 'pino';
 import { type DerSample } from '../../coordinator/helpers/derSample.js';
 

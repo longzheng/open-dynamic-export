@@ -4,7 +4,7 @@ import { type paths } from './api.js';
 import { type LimiterType } from '../../limiter.js';
 import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import { type Logger } from 'pino';
-import { logger as pinoLogger } from '../../../helpers/logger.js';
+import { pinoLogger } from '../../../helpers/logger.js';
 import {
     writeAmberPrice,
     writeControlLimit,
@@ -103,7 +103,7 @@ export class AmberLimiter implements LimiterType {
 
         // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (error) {
+        if (error || !data) {
             throw new Error(JSON.stringify(error));
         }
 
@@ -128,7 +128,7 @@ export class AmberLimiter implements LimiterType {
 
         // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (error) {
+        if (error || !data) {
             throw new Error(JSON.stringify(error));
         }
 

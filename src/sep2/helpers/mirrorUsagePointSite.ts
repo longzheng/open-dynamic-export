@@ -17,7 +17,7 @@ import { PhaseCode } from '../models/phaseCode.js';
 import { UomType } from '../models/uomType.js';
 import { type MirrorMeterReadingDefinitions } from './mirrorUsagePointBase.js';
 import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 import { type SiteSample } from '../../meters/siteSample.js';
 import { CommodityType } from '../models/commodityType.js';
 import { KindType } from '../models/kindType.js';

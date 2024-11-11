@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 import { type DerSample } from '../../coordinator/helpers/derSample.js';
 import { generateDerSample } from '../../coordinator/helpers/derSample.js';
 import { type InverterData } from '../../inverter/inverterData.js';

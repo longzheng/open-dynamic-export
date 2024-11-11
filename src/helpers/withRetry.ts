@@ -1,5 +1,5 @@
 import { setTimeout } from 'node:timers/promises';
-import { logger } from './logger.js';
+import { pinoLogger } from './logger.js';
 
 export async function withRetry<T>(
     fn: () => T | Promise<T>,
@@ -19,7 +19,7 @@ export async function withRetry<T>(
 
             return result;
         } catch (error) {
-            logger.error(
+            pinoLogger.error(
                 error,
                 `${functionName} withRetry attempt ${attempt} of ${attempts} failed`,
             );

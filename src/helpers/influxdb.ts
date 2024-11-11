@@ -389,8 +389,32 @@ export function writeControlSchedulerPoints({
                 );
                 break;
             }
-            default:
+            case 'opModImpLimW': {
+                const value =
+                    activeControlSchedule.derControlBase['opModImpLimW'];
+
+                if (value === undefined) {
+                    return null;
+                }
+                point.floatField(
+                    'opModImpLimW',
+                    numberWithPow10(value.value, value.multiplier),
+                );
                 break;
+            }
+            case 'opModLoadLimW': {
+                const value =
+                    activeControlSchedule.derControlBase['opModLoadLimW'];
+
+                if (value === undefined) {
+                    return null;
+                }
+                point.floatField(
+                    'opModLoadLimW',
+                    numberWithPow10(value.value, value.multiplier),
+                );
+                break;
+            }
         }
 
         return point;
@@ -458,8 +482,37 @@ export function writeControlSchedulerPoints({
                 );
                 break;
             }
-            default:
+            case 'opModImpLimW': {
+                const value =
+                    fallbackControl.data.defaultControl.derControlBase[
+                        'opModImpLimW'
+                    ];
+
+                if (value === undefined) {
+                    return null;
+                }
+                point.floatField(
+                    'opModImpLimW',
+                    numberWithPow10(value.value, value.multiplier),
+                );
                 break;
+            }
+
+            case 'opModLoadLimW': {
+                const value =
+                    fallbackControl.data.defaultControl.derControlBase[
+                        'opModLoadLimW'
+                    ];
+
+                if (value === undefined) {
+                    return null;
+                }
+                point.floatField(
+                    'opModLoadLimW',
+                    numberWithPow10(value.value, value.multiplier),
+                );
+                break;
+            }
         }
 
         return point;

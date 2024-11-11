@@ -6,7 +6,7 @@ import {
 import { type RampRateHelper } from '../../sep2/helpers/rampRate.js';
 import { type SEP2Client } from '../../sep2/client.js';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 import { type DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
 import { type LimiterType } from '../limiter.js';
 import { numberWithPow10 } from '../../helpers/number.js';

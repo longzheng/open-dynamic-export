@@ -9,7 +9,7 @@ import {
     type DERStatus,
 } from '../models/derStatus.js';
 import { objectToXml } from './xml.js';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 import { type Logger } from 'pino';
 import { type PollRate } from '../models/pollRate.js';
 import deepEqual from 'fast-deep-equal';
