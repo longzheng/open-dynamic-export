@@ -1,12 +1,12 @@
 import 'dotenv/config';
 import { getConfig } from '../../helpers/config.js';
-import { getInverterMetrics } from '../../sunspec/helpers/inverterMetrics.js';
-import { getMeterMetrics } from '../../sunspec/helpers/meterMetrics.js';
-import { getNameplateMetrics } from '../../sunspec/helpers/nameplateMetrics.js';
-import { getSettingsMetrics } from '../../sunspec/helpers/settingsMetrics.js';
-import { getStatusMetrics } from '../../sunspec/helpers/statusMetrics.js';
-import { InverterSunSpecConnection } from '../../sunspec/connection/inverter.js';
-import { MeterSunSpecConnection } from '../../sunspec/connection/meter.js';
+import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
+import { MeterSunSpecConnection } from '../../connections/sunspec/connection/meter.js';
+import { getInverterMetrics } from '../../connections/sunspec/helpers/inverterMetrics.js';
+import { getMeterMetrics } from '../../connections/sunspec/helpers/meterMetrics.js';
+import { getNameplateMetrics } from '../../connections/sunspec/helpers/nameplateMetrics.js';
+import { getSettingsMetrics } from '../../connections/sunspec/helpers/settingsMetrics.js';
+import { getStatusMetrics } from '../../connections/sunspec/helpers/statusMetrics.js';
 
 export async function getSunSpecData() {
     const config = getConfig();

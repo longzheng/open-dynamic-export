@@ -1,6 +1,6 @@
+import { type DERTyp } from '../connections/sunspec/models/nameplate.js';
 import { type ConnectStatus } from '../sep2/models/connectStatus.js';
 import { type OperationalModeStatus } from '../sep2/models/operationModeStatus.js';
-import { type DERTyp } from '../sunspec/models/nameplate.js';
 
 export type InverterData = {
     date: Date;

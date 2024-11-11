@@ -1,5 +1,4 @@
 import { type ControlType } from '../../sep2/helpers/controlScheduler.js';
-import { type ControlsModel } from '../../sunspec/models/controls.js';
 import { Decimal } from 'decimal.js';
 import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
 import { type Logger } from 'pino';
@@ -22,6 +21,7 @@ import { type DerSample } from './derSample.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import { differenceInSeconds } from 'date-fns';
+import { type ControlsModel } from '../../connections/sunspec/models/controls.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
