@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import z from 'zod';
 import { safeParseIntString } from './number.js';
-import { logger } from './logger.js';
+import { pinoLogger } from './logger.js';
 
 const envSchema = z.object({
     TZ: z.string(),
@@ -21,7 +21,7 @@ const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-    logger.error(parsedEnv.error);
+    pinoLogger.error(parsedEnv.error);
     throw new Error('Invalid environment variables');
 }
 

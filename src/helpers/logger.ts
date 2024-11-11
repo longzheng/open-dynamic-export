@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import { pino, stdTimeFunctions, stdSerializers } from 'pino';
 
-export const logger = pino({
+export const pinoLogger = pino({
     level: 'trace',
     base: null, // disable PID and hostname
     timestamp: stdTimeFunctions.isoTime, // write ISO time to log file

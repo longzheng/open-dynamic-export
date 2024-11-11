@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getConfig } from '../helpers/config.js';
-import { logger as pinoLogger } from '../helpers/logger.js';
+import { pinoLogger } from '../helpers/logger.js';
 import { InverterController } from './helpers/inverterController.js';
 import { RampRateHelper } from '../sep2/helpers/rampRate.js';
 import {

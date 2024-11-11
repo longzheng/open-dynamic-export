@@ -5,7 +5,7 @@ import { type Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { z } from 'zod';
 import { type Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 
 type MqttLimiterConfig = NonNullable<Config['limiters']['mqtt']>;
 

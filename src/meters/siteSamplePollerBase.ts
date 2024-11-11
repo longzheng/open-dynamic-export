@@ -1,5 +1,5 @@
 import { type Logger } from 'pino';
-import { logger as pinoLogger } from '../helpers/logger.js';
+import { pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
 import { type SiteSample } from './siteSample.js';
 import { type Result } from '../helpers/result.js';

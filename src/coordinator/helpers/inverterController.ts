@@ -3,7 +3,7 @@ import { type ControlsModel } from '../../sunspec/models/controls.js';
 import { Decimal } from 'decimal.js';
 import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
 import { type Logger } from 'pino';
-import { logger as pinoLogger } from '../../helpers/logger.js';
+import { pinoLogger } from '../../helpers/logger.js';
 import {
     writeActiveControlLimit,
     writeInverterControllerPoints,
