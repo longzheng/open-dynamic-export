@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { DERTyp } from '../../sunspec/models/nameplate.js';
 import { type DERCapability } from '../../sep2/models/derCapability.js';
 import { DERControlType } from '../../sep2/models/derControlType.js';
 import { DOEControlType } from '../../sep2/models/doeModesSupportedType.js';
 import { getDerCapabilityResponse } from './der.js';
 import { DERType } from '../../sep2/models/derType.js';
 import { type DerSample } from '../../coordinator/helpers/derSample.js';
+import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
 
 describe('getDerCapabilityResponse', () => {
     it('should return the correct DERCapabilityResponse for valid DerSample', () => {

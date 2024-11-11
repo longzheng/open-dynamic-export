@@ -1,7 +1,7 @@
 import {
-    numberNullableWithPow10,
     numberWithPow10,
-} from '../../helpers/number.js';
+    numberNullableWithPow10,
+} from '../../../helpers/number.js';
 import { type SettingsModel } from '../models/settings.js';
 
 export function getSettingsMetrics(settings: SettingsModel) {

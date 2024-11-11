@@ -29,8 +29,8 @@ import {
     SmaCore1InverterControl2Model,
 } from '../models/sma/core1/inverterControl.js';
 import { type Logger } from 'pino';
-import { type ModbusSchema } from '../../helpers/config.js';
 import { getModbusConnection } from '../connections.js';
+import { type ModbusSchema } from '../../../helpers/config.js';
 
 export class SmaConnection {
     protected readonly modbusConnection: ModbusConnection;

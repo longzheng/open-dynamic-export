@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateDerSample } from './derSample.js';
 import { type InverterData } from '../../inverter/inverterData.js';
-import { DERTyp } from '../../sunspec/models/nameplate.js';
 import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
 import { ConnectStatus } from '../../sep2/models/connectStatus.js';
+import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
 
 describe('generateDerSample', () => {
     beforeEach(() => {

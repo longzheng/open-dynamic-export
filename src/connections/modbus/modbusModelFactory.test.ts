@@ -12,8 +12,8 @@ import {
     registersToUint16,
     uint16ToRegisters,
 } from './helpers/converters.js';
-import { SunSpecConnection } from '../sunspec/connection/base.js';
 import { ModbusConnection } from './connection/base.js';
+import { SunSpecConnection } from '../sunspec/connection/base.js';
 
 vi.mock(import('modbus-serial'));
 
