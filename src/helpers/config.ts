@@ -156,6 +156,13 @@ export const configSchema = z.object({
                     })
                     .merge(modbusSchema)
                     .describe('SMA inverter configuration'),
+                z
+                    .object({
+                        type: z.literal('goodwe'),
+                        model: z.literal('et'),
+                    })
+                    .merge(modbusSchema)
+                    .describe('Goodwe inverter configuration'),
             ]),
         )
         .describe('Inverter configuration'),

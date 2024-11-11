@@ -18,6 +18,11 @@ import { type ConnectStatus } from '../../sep2/models/connectStatus.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
 export const derSampleDataSchema = z.object({
+    /**
+     * Positive values = DER export power
+     *
+     * Negative values = DER import power
+     */
     realPower: z.union([
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
