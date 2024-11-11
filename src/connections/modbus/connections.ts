@@ -1,4 +1,4 @@
-import { type ModbusSchema } from '../helpers/config.js';
+import { type ModbusSchema } from '../../helpers/config.js';
 import { ModbusConnection } from './connection/base.js';
 
 export function getModbusConnectionKey(

@@ -1,4 +1,4 @@
-import { numberWithPow10 } from '../../helpers/number.js';
+import { numberWithPow10 } from '../../../helpers/number.js';
 
 export function registersToString(registers: number[]) {
     const buffer = Buffer.from(

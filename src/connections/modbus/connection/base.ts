@@ -1,8 +1,8 @@
 import ModbusRTU from 'modbus-serial';
-import { pinoLogger } from '../../helpers/logger.js';
 import { type Logger } from 'pino';
-import { type ModbusSchema } from '../../helpers/config.js';
 import { Mutex } from 'async-mutex';
+import { type ModbusSchema } from '../../../helpers/config.js';
+import { pinoLogger } from '../../../helpers/logger.js';
 
 const connectionTimeoutMs = 10_000;
 

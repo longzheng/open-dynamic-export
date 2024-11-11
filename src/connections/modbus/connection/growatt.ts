@@ -1,20 +1,16 @@
-import { type ModbusConnection } from './base.js';
+import { type ModbusSchema } from '../../../helpers/config.js';
+import { getModbusConnection } from '../connections.js';
+import { type GrowattInverterModels } from '../models/growatt/inverter.js';
+import { GrowattInveter1Model } from '../models/growatt/inverter.js';
+import { type GrowattInverterControl } from '../models/growatt/inverterControl.js';
+import { GrowattInverterControl1Model } from '../models/growatt/inverterControl.js';
+import { type GrowattMeterModels } from '../models/growatt/meter.js';
 import {
     GrowattMeter1Model,
     GrowattMeter2Model,
-    type GrowattMeterModels,
 } from '../models/growatt/meter.js';
-import {
-    GrowattInveter1Model,
-    type GrowattInverterModels,
-} from '../models/growatt/inverter.js';
-import { getModbusConnection } from '../connections.js';
-import { type ModbusSchema } from '../../helpers/config.js';
+import { type ModbusConnection } from './base.js';
 import { type Logger } from 'pino';
-import {
-    GrowattInverterControl1Model,
-    type GrowattInverterControl,
-} from '../models/growatt/inverterControl.js';
 
 export class GrowattConnection {
     protected readonly modbusConnection: ModbusConnection;

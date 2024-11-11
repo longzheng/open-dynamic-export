@@ -1,10 +1,11 @@
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { type SiteSample } from '../siteSample.js';
-import { Powerwall2Client } from './client.js';
 import { type z } from 'zod';
-import { type metersSiteSchema } from './api.js';
 import { type Config } from '../../helpers/config.js';
 import { type Result } from '../../helpers/result.js';
+import { getPowerwall2Client } from '../../connections/powerwall2/getClient.js';
+import { type Powerwall2Client } from '../../connections/powerwall2/client.js';
+import { type metersSiteSchema } from '../../connections/powerwall2/api.js';
 
 export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;
@@ -19,7 +20,7 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
             pollingIntervalMs: 200,
         });
 
-        this.client = new Powerwall2Client({
+        this.client = getPowerwall2Client({
             ip: powerwall2Config.ip,
             password: powerwall2Config.password,
             timeoutSeconds: powerwall2Config.timeoutSeconds,
