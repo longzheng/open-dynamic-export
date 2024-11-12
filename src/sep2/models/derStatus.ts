@@ -7,14 +7,8 @@ import { z } from 'zod';
 
 export const derStatusSchema = z.object({
     readingTime: z.coerce.date(),
-    operationalModeStatus: z.object({
-        dateTime: z.coerce.date(),
-        value: operationalModeStatusSchema,
-    }),
-    genConnectStatus: z.object({
-        dateTime: z.coerce.date(),
-        value: connectStatusSchema,
-    }),
+    operationalModeStatus: operationalModeStatusSchema,
+    genConnectStatus: connectStatusSchema,
 });
 
 export type DERStatus = z.infer<typeof derStatusSchema>;

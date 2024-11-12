@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
 
 // DER ConnectStatus value (bitmap):
@@ -7,7 +8,7 @@ import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
 // 3 - Test
 // 4 - Fault / Error
 // All other values reserved.
-export enum ConnectStatus {
+export enum ConnectStatusValue {
     Connected = 1 << 0,
     Available = 1 << 1,
     Operating = 1 << 2,
@@ -15,4 +16,9 @@ export enum ConnectStatus {
     Fault = 1 << 4,
 }
 
-export const connectStatusSchema = zodBitwiseEnumSchema(ConnectStatus);
+const connectStatusValueSchema = zodBitwiseEnumSchema(ConnectStatusValue);
+
+export const connectStatusSchema = z.object({
+    dateTime: z.coerce.date(),
+    value: connectStatusValueSchema,
+});

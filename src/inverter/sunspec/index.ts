@@ -1,8 +1,8 @@
 import { type InverterData } from '../inverterData.js';
 import { enumHasValue } from '../../helpers/enum.js';
 import { type Result } from '../../helpers/result.js';
-import { ConnectStatus } from '../../sep2/models/connectStatus.js';
-import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
+import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import {
     getWMaxLimPctFromTargetSolarPowerRatio,
@@ -271,35 +271,37 @@ export function generateInverterDataStatus({
             statusMetrics.PVConn,
             PVConn.CONNECTED,
         )
-            ? OperationalModeStatus.OperationalMode
-            : OperationalModeStatus.Off,
+            ? OperationalModeStatusValue.OperationalMode
+            : OperationalModeStatusValue.Off,
         genConnectStatus: getGenConnectStatusFromPVConn(statusMetrics.PVConn),
     };
 }
 
-export function getGenConnectStatusFromPVConn(pvConn: PVConn): ConnectStatus {
-    let result: ConnectStatus = 0 as ConnectStatus;
+export function getGenConnectStatusFromPVConn(
+    pvConn: PVConn,
+): ConnectStatusValue {
+    let result: ConnectStatusValue = 0 as ConnectStatusValue;
 
     if (enumHasValue(pvConn, PVConn.CONNECTED)) {
-        result += ConnectStatus.Connected;
+        result += ConnectStatusValue.Connected;
     } else {
         return result;
     }
 
     if (enumHasValue(pvConn, PVConn.AVAILABLE)) {
-        result += ConnectStatus.Available;
+        result += ConnectStatusValue.Available;
     } else {
         return result;
     }
 
     if (enumHasValue(pvConn, PVConn.OPERATING)) {
-        result += ConnectStatus.Operating;
+        result += ConnectStatusValue.Operating;
     } else {
         return result;
     }
 
     if (enumHasValue(pvConn, PVConn.TEST)) {
-        result += ConnectStatus.Test;
+        result += ConnectStatusValue.Test;
     } else {
         return result;
     }
