@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ConnectStatus } from '../../sep2/models/connectStatus.js';
+import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { getGenConnectStatusFromPVConn } from './index.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 
@@ -7,7 +7,7 @@ describe('getGenConnectStatusFromPVConn', () => {
     it('should return value if inverter is disconnected', () => {
         const result = getGenConnectStatusFromPVConn(0 as PVConn);
 
-        expect(result).toEqual(0 as ConnectStatus);
+        expect(result).toEqual(0 as ConnectStatusValue);
     });
 
     it('should return correct value if inverter is connected, available, operating', () => {
@@ -16,9 +16,9 @@ describe('getGenConnectStatusFromPVConn', () => {
         );
 
         expect(result).toEqual(
-            ConnectStatus.Available |
-                ConnectStatus.Connected |
-                ConnectStatus.Operating,
+            ConnectStatusValue.Available |
+                ConnectStatusValue.Connected |
+                ConnectStatusValue.Operating,
         );
     });
 

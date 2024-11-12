@@ -6,11 +6,18 @@ import { z } from 'zod';
 /// 2 - Operational mode
 /// 3 - Test mode
 /// All other values reserved.
-export enum OperationalModeStatus {
+export enum OperationalModeStatusValue {
     NotApplicable = 0,
     Off = 1,
     OperationalMode = 2,
     TestMode = 3,
 }
 
-export const operationalModeStatusSchema = z.nativeEnum(OperationalModeStatus);
+const operationalModeStatusValueSchema = z.nativeEnum(
+    OperationalModeStatusValue,
+);
+
+export const operationalModeStatusSchema = z.object({
+    dateTime: z.coerce.date(),
+    value: operationalModeStatusValueSchema,
+});
