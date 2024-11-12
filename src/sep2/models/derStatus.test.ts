@@ -1,19 +1,19 @@
 import { it, expect } from 'vitest';
 import { objectToXml } from '../helpers/xml.js';
 import { generateDerStatusResponse } from './derStatus.js';
-import { ConnectStatus } from './connectStatus.js';
-import { OperationalModeStatus } from './operationModeStatus.js';
+import { ConnectStatusValue } from './connectStatus.js';
+import { OperationalModeStatusValue } from './operationModeStatus.js';
 
 it('should generate DERStatus XML', () => {
     const response = generateDerStatusResponse({
         readingTime: new Date(1682475028 * 1000),
         operationalModeStatus: {
             dateTime: new Date(1682475028 * 1000),
-            value: OperationalModeStatus.OperationalMode,
+            value: OperationalModeStatusValue.OperationalMode,
         },
         genConnectStatus: {
             dateTime: new Date(1682475028 * 1000),
-            value: ConnectStatus.Connected,
+            value: ConnectStatusValue.Connected,
         },
     });
 

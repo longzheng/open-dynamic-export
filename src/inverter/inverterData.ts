@@ -1,6 +1,6 @@
 import { type DERTyp } from '../connections/sunspec/models/nameplate.js';
-import { type ConnectStatus } from '../sep2/models/connectStatus.js';
-import { type OperationalModeStatus } from '../sep2/models/operationModeStatus.js';
+import { type ConnectStatusValue } from '../sep2/models/connectStatus.js';
+import { type OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
 
 export type InverterData = {
     date: Date;
@@ -24,7 +24,7 @@ export type InverterData = {
         maxVar: number | null;
     };
     status: {
-        operationalModeStatus: OperationalModeStatus;
-        genConnectStatus: ConnectStatus;
+        operationalModeStatus: OperationalModeStatusValue;
+        genConnectStatus: ConnectStatusValue;
     };
 };
