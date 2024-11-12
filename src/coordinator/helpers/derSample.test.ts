@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateDerSample } from './derSample.js';
 import { type InverterData } from '../../inverter/inverterData.js';
-import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
-import { ConnectStatus } from '../../sep2/models/connectStatus.js';
+import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
+import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
 
 describe('generateDerSample', () => {
@@ -44,11 +44,11 @@ describe('generateDerSample', () => {
                 },
                 status: {
                     operationalModeStatus:
-                        OperationalModeStatus.OperationalMode,
+                        OperationalModeStatusValue.OperationalMode,
                     genConnectStatus:
-                        ConnectStatus.Available |
-                        ConnectStatus.Connected |
-                        ConnectStatus.Operating,
+                        ConnectStatusValue.Available |
+                        ConnectStatusValue.Connected |
+                        ConnectStatusValue.Operating,
                 },
             },
         ];
@@ -84,11 +84,12 @@ describe('generateDerSample', () => {
                 setMaxW: 7000,
             },
             status: {
-                operationalModeStatus: OperationalModeStatus.OperationalMode,
+                operationalModeStatus:
+                    OperationalModeStatusValue.OperationalMode,
                 genConnectStatus:
-                    ConnectStatus.Available |
-                    ConnectStatus.Connected |
-                    ConnectStatus.Operating,
+                    ConnectStatusValue.Available |
+                    ConnectStatusValue.Connected |
+                    ConnectStatusValue.Operating,
             },
             invertersCount: 1,
         } satisfies typeof result);
@@ -122,11 +123,11 @@ describe('generateDerSample', () => {
                 },
                 status: {
                     operationalModeStatus:
-                        OperationalModeStatus.OperationalMode,
+                        OperationalModeStatusValue.OperationalMode,
                     genConnectStatus:
-                        ConnectStatus.Available |
-                        ConnectStatus.Connected |
-                        ConnectStatus.Operating,
+                        ConnectStatusValue.Available |
+                        ConnectStatusValue.Connected |
+                        ConnectStatusValue.Operating,
                 },
             },
             {
@@ -151,8 +152,8 @@ describe('generateDerSample', () => {
                     maxVar: 7000,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatus.Off,
-                    genConnectStatus: ConnectStatus.Connected,
+                    operationalModeStatus: OperationalModeStatusValue.Off,
+                    genConnectStatus: ConnectStatusValue.Connected,
                 },
             },
         ];
@@ -188,11 +189,12 @@ describe('generateDerSample', () => {
                 setMaxW: 14000,
             },
             status: {
-                operationalModeStatus: OperationalModeStatus.OperationalMode,
+                operationalModeStatus:
+                    OperationalModeStatusValue.OperationalMode,
                 genConnectStatus:
-                    ConnectStatus.Available |
-                    ConnectStatus.Connected |
-                    ConnectStatus.Operating,
+                    ConnectStatusValue.Available |
+                    ConnectStatusValue.Connected |
+                    ConnectStatusValue.Operating,
             },
             invertersCount: 2,
         } satisfies typeof result);

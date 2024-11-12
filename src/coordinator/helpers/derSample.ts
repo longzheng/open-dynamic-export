@@ -13,8 +13,8 @@ import {
 import { type InverterData } from '../../inverter/inverterData.js';
 import { type SampleBase } from './sampleBase.js';
 import { DERType } from '../../sep2/models/derType.js';
-import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
-import { type ConnectStatus } from '../../sep2/models/connectStatus.js';
+import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
+import { type ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
 export const derSampleDataSchema = z.object({
@@ -121,14 +121,14 @@ export function generateDerSample({
                 ...invertersData.map(
                     (data) => data.status.operationalModeStatus,
                     // fallback to Off if no inverters are connected
-                    OperationalModeStatus.Off,
+                    OperationalModeStatusValue.Off,
                 ),
-            ) satisfies OperationalModeStatus,
+            ) satisfies OperationalModeStatusValue,
             genConnectStatus: Math.max(
                 ...invertersData.map((data) => data.status.genConnectStatus),
                 // fallback to 0 if no inverters are connected
                 0,
-            ) satisfies ConnectStatus,
+            ) satisfies ConnectStatusValue,
         },
         invertersCount: invertersData.length,
     };
