@@ -1,7 +1,7 @@
 import { type InverterData } from '../inverterData.js';
 import { type Result } from '../../helpers/result.js';
-import { ConnectStatus } from '../../sep2/models/connectStatus.js';
-import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
+import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
@@ -170,20 +170,20 @@ export function generateInverterDataStatus({
     return {
         operationalModeStatus:
             inverterRunningData1.GridMode === GridMode.OK
-                ? OperationalModeStatus.OperationalMode
-                : OperationalModeStatus.Off,
+                ? OperationalModeStatusValue.OperationalMode
+                : OperationalModeStatusValue.Off,
         genConnectStatus: (() => {
             switch (inverterRunningData1.GridMode) {
                 case GridMode.OK:
                     return (
-                        ConnectStatus.Connected |
-                        ConnectStatus.Available |
-                        ConnectStatus.Operating
+                        ConnectStatusValue.Connected |
+                        ConnectStatusValue.Available |
+                        ConnectStatusValue.Operating
                     );
                 case GridMode.Loss:
-                    return 0 as ConnectStatus;
+                    return 0 as ConnectStatusValue;
                 case GridMode.Fault:
-                    return ConnectStatus.Fault;
+                    return ConnectStatusValue.Fault;
             }
         })(),
     };
