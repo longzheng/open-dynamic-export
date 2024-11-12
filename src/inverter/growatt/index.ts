@@ -1,7 +1,7 @@
 import { type InverterData } from '../inverterData.js';
 import { type Result } from '../../helpers/result.js';
-import { ConnectStatus } from '../../sep2/models/connectStatus.js';
-import { OperationalModeStatus } from '../../sep2/models/operationModeStatus.js';
+import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
@@ -161,10 +161,10 @@ export function generateInverterData({
 
 export function generateInverterDataStatus(): InverterData['status'] {
     return {
-        operationalModeStatus: OperationalModeStatus.OperationalMode,
+        operationalModeStatus: OperationalModeStatusValue.OperationalMode,
         genConnectStatus:
-            ConnectStatus.Available |
-            ConnectStatus.Connected |
-            ConnectStatus.Operating,
+            ConnectStatusValue.Available |
+            ConnectStatusValue.Connected |
+            ConnectStatusValue.Operating,
     };
 }
