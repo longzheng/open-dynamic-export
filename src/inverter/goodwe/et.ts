@@ -62,7 +62,7 @@ export class GoodweEtInverterDataPoller extends InverterDataPollerBase {
                     });
 
                     const inverterRunningData1 =
-                        await this.connection.inverterRunningData1();
+                        await this.connection.getInverterRunningData1();
 
                     writeLatency({
                         field: 'GoodweEtInverterDataPoller',

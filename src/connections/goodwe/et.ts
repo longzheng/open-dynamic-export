@@ -8,6 +8,11 @@ import {
 } from './models/et/deviceParameters.js';
 import { type GoodweEtInverterRunningData1 } from './models/et/inverterRunningData1.js';
 import { GoodweEtInverterRunningData1Model } from './models/et/inverterRunningData1.js';
+import {
+    GoodweEtMeterDataModel,
+    type GoodweEtMeterData,
+} from './models/et/meterData.js';
+import { writeLatency } from '../../helpers/influxdb.js';
 
 export class GoodweEtConnection {
     protected readonly modbusConnection: ModbusConnection;
@@ -45,7 +50,7 @@ export class GoodweEtConnection {
         return data;
     }
 
-    async inverterRunningData1(): Promise<GoodweEtInverterRunningData1> {
+    async getInverterRunningData1(): Promise<GoodweEtInverterRunningData1> {
         const data = await GoodweEtInverterRunningData1Model.read({
             modbusConnection: this.modbusConnection,
             address: {
@@ -53,6 +58,29 @@ export class GoodweEtConnection {
                 length: 24,
             },
             unitId: this.unitId,
+        });
+
+        return data;
+    }
+
+    async getMeterData(): Promise<GoodweEtMeterData> {
+        const start = performance.now();
+
+        const data = await GoodweEtMeterDataModel.read({
+            modbusConnection: this.modbusConnection,
+            address: {
+                start: 36003,
+                length: 55,
+            },
+            unitId: this.unitId,
+        });
+
+        writeLatency({
+            field: 'GoodweEtConnection',
+            duration: performance.now() - start,
+            tags: {
+                model: 'GoodweEtMeterDataModel',
+            },
         });
 
         return data;

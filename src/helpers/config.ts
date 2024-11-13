@@ -205,6 +205,13 @@ A longer time will smooth out load changes but may result in overshoot.`,
             .describe('SMA meter configuration'),
         z
             .object({
+                type: z.literal('goodwe'),
+                model: z.literal('et'),
+            })
+            .merge(modbusSchema)
+            .describe('Goodwe meter configuration'),
+        z
+            .object({
                 type: z.literal('powerwall2'),
                 ip: z
                     .string()
