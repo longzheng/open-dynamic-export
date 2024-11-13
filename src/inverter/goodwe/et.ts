@@ -148,15 +148,15 @@ export function generateInverterData({
             ])!,
         },
         nameplate: {
-            type: DERTyp.PV,
+            type: DERTyp.PV_STOR,
             maxW: deviceParameters.RatePower,
-            maxVA: 0,
-            maxVar: 0,
+            maxVA: deviceParameters.RatePower,
+            maxVar: deviceParameters.RatePower,
         },
         settings: {
             maxW: deviceParameters.RatePower,
-            maxVA: 0,
-            maxVar: 0,
+            maxVA: deviceParameters.RatePower,
+            maxVar: deviceParameters.RatePower,
         },
         status: generateInverterDataStatus({ inverterRunningData1 }),
     };
