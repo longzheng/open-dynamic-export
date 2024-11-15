@@ -79,8 +79,6 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
         const end = performance.now();
         const duration = end - start;
 
-        this.logger.trace({ duration, inverterData }, 'polled inverter data');
-
         writeLatency({
             field: 'inverterDataPoller',
             duration,
@@ -89,6 +87,15 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
                 inverterPollerName: this.inverterPollerName,
             },
         });
+
+        if (inverterData.success) {
+            this.logger.trace(
+                { duration, inverterData },
+                'polled inverter data',
+            );
+        } else {
+            this.logger.error(inverterData.error, 'Error polling site sample');
+        }
 
         // this loop must meet sampling requirements and dynamic export requirements
         // Energex SEP2 Client Handbook specifies "As per the standard, samples should be taken every 200ms (10 cycles). If not capable of sampling this frequently, 1 second samples may be sufficient."
