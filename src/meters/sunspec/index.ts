@@ -1,7 +1,6 @@
 import { type SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { assertNonNull } from '../../helpers/null.js';
-import { type Result } from '../../helpers/result.js';
 import { type InvertersPoller } from '../../coordinator/helpers/inverterSample.js';
 import { type Config } from '../../helpers/config.js';
 import { type DerSample } from '../../coordinator/helpers/derSample.js';
@@ -37,47 +36,36 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSample(): Promise<Result<SiteSample>> {
-        try {
-            const start = performance.now();
+    override async getSiteSample(): Promise<SiteSample> {
+        const start = performance.now();
 
-            const meterModel = await this.meterConnection.getMeterModel();
+        const meterModel = await this.meterConnection.getMeterModel();
 
-            const end = performance.now();
-            const duration = end - start;
+        const end = performance.now();
+        const duration = end - start;
 
-            this.logger.trace(
-                { duration, meterModel },
-                'polled SunSpec meter data',
-            );
+        this.logger.trace(
+            { duration, meterModel },
+            'polled SunSpec meter data',
+        );
 
-            const siteSample = (() => {
-                const sample = generateSiteSample({
-                    meter: meterModel,
-                });
+        const siteSample = (() => {
+            const sample = generateSiteSample({
+                meter: meterModel,
+            });
 
-                switch (this.location) {
-                    case 'consumption':
-                        return convertConsumptionMeteringToFeedInMetering({
-                            siteSample: sample,
-                            derSample: this.derSampleCache,
-                        });
-                    case 'feedin':
-                        return sample;
-                }
-            })();
+            switch (this.location) {
+                case 'consumption':
+                    return convertConsumptionMeteringToFeedInMetering({
+                        siteSample: sample,
+                        derSample: this.derSampleCache,
+                    });
+                case 'feedin':
+                    return sample;
+            }
+        })();
 
-            return { success: true, value: siteSample };
-        } catch (error) {
-            return {
-                success: false,
-                error: new Error(
-                    `Error loading SunSpec meter data: ${
-                        error instanceof Error ? error.message : 'Unknown error'
-                    }`,
-                ),
-            };
-        }
+        return siteSample;
     }
 
     override onDestroy() {

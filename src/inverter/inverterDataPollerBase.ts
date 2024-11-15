@@ -1,10 +1,11 @@
 import { type Logger } from 'pino';
 import { pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
-import { type Result } from '../helpers/result.js';
+import { tryCatchResult, type Result } from '../helpers/result.js';
 import { type InverterData } from './inverterData.js';
 import { type InverterConfiguration } from '../coordinator/helpers/inverterController.js';
 import { writeLatency } from '../helpers/influxdb.js';
+import { withRetry } from '../helpers/withRetry.js';
 
 export abstract class InverterDataPollerBase extends EventEmitter<{
     data: [Result<InverterData>];
@@ -50,7 +51,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
         this.onDestroy();
     }
 
-    abstract getInverterData(): Promise<Result<InverterData>>;
+    abstract getInverterData(): Promise<InverterData>;
 
     abstract onControl(
         inverterConfiguration: InverterConfiguration,
@@ -65,7 +66,13 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
     protected async startPolling() {
         const start = performance.now();
 
-        const inverterData = await this.getInverterData();
+        const inverterData = await tryCatchResult(() =>
+            withRetry(() => this.getInverterData(), {
+                attempts: 3,
+                functionName: 'getInverterData',
+                delayMilliseconds: 100,
+            }),
+        );
 
         this.inverterDataCache = inverterData;
 

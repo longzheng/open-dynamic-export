@@ -1,6 +1,5 @@
 import { type InverterData } from '../inverterData.js';
 import { enumHasValue } from '../../helpers/enum.js';
-import { type Result } from '../../helpers/result.js';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
@@ -9,7 +8,6 @@ import {
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
-import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
 import { getInverterMetrics } from '../../connections/sunspec/helpers/inverterMetrics.js';
@@ -63,113 +61,83 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
         void this.startPolling();
     }
 
-    override async getInverterData(): Promise<Result<InverterData>> {
-        try {
-            return await withRetry(
-                async () => {
-                    const start = performance.now();
+    override async getInverterData(): Promise<InverterData> {
+        const start = performance.now();
 
-                    const inverterModel =
-                        await this.inverterConnection.getInverterModel();
+        const inverterModel = await this.inverterConnection.getInverterModel();
 
-                    writeLatency({
-                        field: 'sunSpecInverterDataPoller',
-                        duration: performance.now() - start,
-                        tags: {
-                            inverterIndex: this.inverterIndex.toString(),
-                            model: 'inverter',
-                        },
-                    });
+        writeLatency({
+            field: 'sunSpecInverterDataPoller',
+            duration: performance.now() - start,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                model: 'inverter',
+            },
+        });
 
-                    const nameplateModel =
-                        await this.inverterConnection.getNameplateModel();
+        const nameplateModel =
+            await this.inverterConnection.getNameplateModel();
 
-                    writeLatency({
-                        field: 'sunSpecInverterDataPoller',
-                        duration: performance.now() - start,
-                        tags: {
-                            inverterIndex: this.inverterIndex.toString(),
-                            model: 'nameplate',
-                        },
-                    });
+        writeLatency({
+            field: 'sunSpecInverterDataPoller',
+            duration: performance.now() - start,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                model: 'nameplate',
+            },
+        });
 
-                    const settingsModel =
-                        await this.inverterConnection.getSettingsModel();
+        const settingsModel = await this.inverterConnection.getSettingsModel();
 
-                    writeLatency({
-                        field: 'sunSpecInverterDataPoller',
-                        duration: performance.now() - start,
-                        tags: {
-                            inverterIndex: this.inverterIndex.toString(),
-                            model: 'settings',
-                        },
-                    });
+        writeLatency({
+            field: 'sunSpecInverterDataPoller',
+            duration: performance.now() - start,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                model: 'settings',
+            },
+        });
 
-                    const statusModel =
-                        await this.inverterConnection.getStatusModel();
+        const statusModel = await this.inverterConnection.getStatusModel();
 
-                    writeLatency({
-                        field: 'sunSpecInverterDataPoller',
-                        duration: performance.now() - start,
-                        tags: {
-                            inverterIndex: this.inverterIndex.toString(),
-                            model: 'status',
-                        },
-                    });
+        writeLatency({
+            field: 'sunSpecInverterDataPoller',
+            duration: performance.now() - start,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                model: 'status',
+            },
+        });
 
-                    const controlsModel =
-                        await this.inverterConnection.getControlsModel();
+        const controlsModel = await this.inverterConnection.getControlsModel();
 
-                    writeLatency({
-                        field: 'sunSpecInverterDataPoller',
-                        duration: performance.now() - start,
-                        tags: {
-                            inverterIndex: this.inverterIndex.toString(),
-                            model: 'controls',
-                        },
-                    });
+        writeLatency({
+            field: 'sunSpecInverterDataPoller',
+            duration: performance.now() - start,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                model: 'controls',
+            },
+        });
 
-                    const models = {
-                        inverter: inverterModel,
-                        nameplate: nameplateModel,
-                        settings: settingsModel,
-                        status: statusModel,
-                        controls: controlsModel,
-                    };
+        const models = {
+            inverter: inverterModel,
+            nameplate: nameplateModel,
+            settings: settingsModel,
+            status: statusModel,
+            controls: controlsModel,
+        };
 
-                    const end = performance.now();
-                    const duration = end - start;
+        const end = performance.now();
+        const duration = end - start;
 
-                    this.logger.trace(
-                        { duration, models },
-                        'Got inverter data',
-                    );
+        this.logger.trace({ duration, models }, 'Got inverter data');
 
-                    this.cachedControlsModel = models.controls;
+        this.cachedControlsModel = models.controls;
 
-                    const inverterData = generateInverterData(models);
+        const inverterData = generateInverterData(models);
 
-                    return {
-                        success: true,
-                        value: inverterData,
-                    };
-                },
-                {
-                    attempts: 3,
-                    delayMilliseconds: 100,
-                    functionName: 'get inverter data',
-                },
-            );
-        } catch (error) {
-            this.logger.error(error, 'Failed to get inverter data');
-
-            return {
-                success: false,
-                error: new Error(
-                    `Error loading inverter data: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                ),
-            };
-        }
+        return inverterData;
     }
 
     override onDestroy(): void {
