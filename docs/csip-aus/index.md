@@ -32,7 +32,7 @@ sequenceDiagram
     SC->>U: Send site and DER telemetry
     end
 
-    box open-dynamic-export
+    box rgb(50,50,50) open-dynamic-export 
     participant SC
     participant C
     end
