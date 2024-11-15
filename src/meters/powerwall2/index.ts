@@ -83,7 +83,7 @@ export function generateSiteSample({
         },
         reactivePower: {
             type: 'perPhaseNet',
-            phaseA: firstMeter.Cached_readings.reactive_power_a,
+            phaseA: firstMeter.Cached_readings.reactive_power_a ?? 0,
             phaseB: firstMeter.Cached_readings.reactive_power_b ?? null,
             phaseC: firstMeter.Cached_readings.reactive_power_c ?? null,
             net: firstMeter.Cached_readings.instant_reactive_power,
