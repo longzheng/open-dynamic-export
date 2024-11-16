@@ -60,4 +60,4 @@ As a direct gateway client, the client requires a device certificate and manufac
 
 The client has been listed as a [compliant provider for Energex/Ergon Energy](https://www.energex.com.au/__data/assets/pdf_file/0005/1097744/Dynamic-Connections-Compliant-Providers.pdf).
 
-A free device certificate for Energex/Ergon Energy (Queensland) can be obtained by contacting long.zheng@gmail.com
+A free device certificate for Energex/Ergon Energy (Queensland) can be obtained by contacting support@opendynamicexport.com

@@ -33,11 +33,11 @@ features:
 
 </div>
 
-If you're a home owner or electrician interested in a plug and play hardware package with an integrated dashboard user interface, contact long.zheng@gmail.com
+If you're a home owner or electrician interested in a plug and play hardware package with an integrated dashboard user interface, contact support@opendynamicexport.com
 
 ## OEM/commercial integrations
 
-For cloud integrations with OEM inverter devices, more advanced load management or commercial use cases, contact long.zheng@gmail.com
+For cloud integrations with OEM inverter devices, more advanced load management or commercial use cases, contact support@opendynamicexport.com
 
 <style>
 :root {
