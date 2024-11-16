@@ -1,10 +1,11 @@
 import { type Logger } from 'pino';
 import { pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
-import { type Result } from '../helpers/result.js';
+import { tryCatchResult, type Result } from '../helpers/result.js';
 import { type InverterData } from './inverterData.js';
 import { type InverterConfiguration } from '../coordinator/helpers/inverterController.js';
 import { writeLatency } from '../helpers/influxdb.js';
+import { withRetry } from '../helpers/withRetry.js';
 
 export abstract class InverterDataPollerBase extends EventEmitter<{
     data: [Result<InverterData>];
@@ -50,7 +51,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
         this.onDestroy();
     }
 
-    abstract getInverterData(): Promise<Result<InverterData>>;
+    abstract getInverterData(): Promise<InverterData>;
 
     abstract onControl(
         inverterConfiguration: InverterConfiguration,
@@ -65,14 +66,18 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
     protected async startPolling() {
         const start = performance.now();
 
-        const inverterData = await this.getInverterData();
+        const inverterData = await tryCatchResult(() =>
+            withRetry(() => this.getInverterData(), {
+                attempts: 3,
+                functionName: 'getInverterData',
+                delayMilliseconds: 100,
+            }),
+        );
 
         this.inverterDataCache = inverterData;
 
         const end = performance.now();
         const duration = end - start;
-
-        this.logger.trace({ duration, inverterData }, 'polled inverter data');
 
         writeLatency({
             field: 'inverterDataPoller',
@@ -82,6 +87,15 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
                 inverterPollerName: this.inverterPollerName,
             },
         });
+
+        if (inverterData.success) {
+            this.logger.trace(
+                { duration, inverterData },
+                'polled inverter data',
+            );
+        } else {
+            this.logger.error(inverterData.error, 'Error polling site sample');
+        }
 
         // this loop must meet sampling requirements and dynamic export requirements
         // Energex SEP2 Client Handbook specifies "As per the standard, samples should be taken every 200ms (10 cycles). If not capable of sampling this frequently, 1 second samples may be sufficient."

@@ -2,8 +2,9 @@ import { type Logger } from 'pino';
 import { pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
 import { type SiteSample } from './siteSample.js';
-import { type Result } from '../helpers/result.js';
+import { tryCatchResult } from '../helpers/result.js';
 import { writeLatency } from '../helpers/influxdb.js';
+import { withRetry } from '../helpers/withRetry.js';
 
 export abstract class SiteSamplePollerBase extends EventEmitter<{
     data: [
@@ -44,7 +45,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
         this.onDestroy();
     }
 
-    abstract getSiteSample(): Promise<Result<SiteSample>>;
+    abstract getSiteSample(): Promise<SiteSample>;
 
     abstract onDestroy(): void;
 
@@ -55,7 +56,13 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
     protected async startPolling() {
         const start = performance.now();
 
-        const siteSample = await this.getSiteSample();
+        const siteSample = await tryCatchResult(() =>
+            withRetry(() => this.getSiteSample(), {
+                attempts: 3,
+                functionName: 'getSiteSample',
+                delayMilliseconds: 100,
+            }),
+        );
 
         const end = performance.now();
         const duration = end - start;

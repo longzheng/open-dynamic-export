@@ -19,7 +19,7 @@ export async function withRetry<T>(
 
             return result;
         } catch (error) {
-            pinoLogger.error(
+            pinoLogger.warn(
                 error,
                 `${functionName} withRetry attempt ${attempt} of ${attempts} failed`,
             );
