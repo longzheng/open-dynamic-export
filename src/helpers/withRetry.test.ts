@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { withRetry } from './withRetry.js';
 import { pinoLogger } from './logger.js';
 
@@ -9,8 +9,14 @@ vi.mock('./logger', () => ({
 }));
 
 describe('withRetry', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
+
     afterEach(() => {
         vi.clearAllMocks();
+
+        vi.useRealTimers();
     });
 
     it('should return result on first attempt', async () => {
@@ -60,19 +66,23 @@ describe('withRetry', () => {
             .mockResolvedValueOnce('success');
 
         const delayMilliseconds = 100;
-        const start = Date.now();
 
-        const result = await withRetry(fn, {
+        let result;
+        void withRetry(fn, {
             attempts: 3,
             functionName: 'testFn',
             delayMilliseconds,
-        });
+        }).then((res) => (result = res));
 
-        const end = Date.now();
+        // before retry
+        await vi.advanceTimersByTimeAsync(delayMilliseconds - 1);
+        expect(result).toBeUndefined();
+        expect(fn).toHaveBeenCalledTimes(1);
 
+        // after retry
+        await vi.advanceTimersByTimeAsync(delayMilliseconds);
         expect(result).toBe('success');
         expect(fn).toHaveBeenCalledTimes(2);
-        expect(end - start).toBeGreaterThanOrEqual(delayMilliseconds);
         expect(pinoLogger.warn).toHaveBeenCalledTimes(1);
     });
 });

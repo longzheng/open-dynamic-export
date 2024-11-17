@@ -1,4 +1,3 @@
-import { setTimeout } from 'node:timers/promises';
 import { pinoLogger } from './logger.js';
 
 export async function withRetry<T>(
@@ -25,7 +24,10 @@ export async function withRetry<T>(
             );
 
             if (attempt < attempts && delayMilliseconds) {
-                await setTimeout(delayMilliseconds);
+                // todo: refactor to use import { setTimeout } from 'node:timers/promises'; when vitest supports mocking it
+                await new Promise((resolve) =>
+                    setTimeout(resolve, delayMilliseconds),
+                );
             } else if (attempt === attempts) {
                 // If this was the last attempt, rethrow the error
                 throw error;
