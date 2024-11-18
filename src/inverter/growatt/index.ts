@@ -1,11 +1,9 @@
 import { type InverterData } from '../inverterData.js';
-import { type Result } from '../../helpers/result.js';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
-import { withRetry } from '../../helpers/withRetry.js';
 import { writeLatency } from '../../helpers/influxdb.js';
 import { type GrowattInverterModels } from '../../connections/modbus/models/growatt/inverter.js';
 import { GrowattConnection } from '../../connections/modbus/connection/growatt.js';
@@ -38,59 +36,32 @@ export class GrowattInverterDataPoller extends InverterDataPollerBase {
         void this.startPolling();
     }
 
-    override async getInverterData(): Promise<Result<InverterData>> {
-        try {
-            return await withRetry(
-                async () => {
-                    const start = performance.now();
+    override async getInverterData(): Promise<InverterData> {
+        const start = performance.now();
 
-                    const inverterModel =
-                        await this.growattConnection.getInverterModel();
+        const inverterModel = await this.growattConnection.getInverterModel();
 
-                    writeLatency({
-                        field: 'GrowattInverterDataPoller',
-                        duration: performance.now() - start,
-                        tags: {
-                            inverterIndex: this.inverterIndex.toString(),
-                            model: 'inverter',
-                        },
-                    });
+        writeLatency({
+            field: 'GrowattInverterDataPoller',
+            duration: performance.now() - start,
+            tags: {
+                inverterIndex: this.inverterIndex.toString(),
+                model: 'inverter',
+            },
+        });
 
-                    const models: InverterModels = {
-                        inverter: inverterModel,
-                    };
+        const models: InverterModels = {
+            inverter: inverterModel,
+        };
 
-                    const end = performance.now();
-                    const duration = end - start;
+        const end = performance.now();
+        const duration = end - start;
 
-                    this.logger.trace(
-                        { duration, models },
-                        'Got inverter data',
-                    );
+        this.logger.trace({ duration, models }, 'Got inverter data');
 
-                    const inverterData = generateInverterData(models);
+        const inverterData = generateInverterData(models);
 
-                    return {
-                        success: true,
-                        value: inverterData,
-                    };
-                },
-                {
-                    attempts: 3,
-                    delayMilliseconds: 100,
-                    functionName: 'get inverter data',
-                },
-            );
-        } catch (error) {
-            this.logger.error(error, 'Failed to get inverter data');
-
-            return {
-                success: false,
-                error: new Error(
-                    `Error loading inverter data: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                ),
-            };
-        }
+        return inverterData;
     }
 
     override onDestroy(): void {

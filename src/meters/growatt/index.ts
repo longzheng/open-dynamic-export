@@ -1,6 +1,5 @@
 import { type SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import { type Result } from '../../helpers/result.js';
 import { type Config } from '../../helpers/config.js';
 import { type GrowattMeterModels } from '../../connections/modbus/models/growatt/meter.js';
 import { GrowattConnection } from '../../connections/modbus/connection/growatt.js';
@@ -22,32 +21,21 @@ export class GrowattMeterSiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSample(): Promise<Result<SiteSample>> {
-        try {
-            const start = performance.now();
+    override async getSiteSample(): Promise<SiteSample> {
+        const start = performance.now();
 
-            const meterModel = await this.growattConnection.getMeterModel();
+        const meterModel = await this.growattConnection.getMeterModel();
 
-            const end = performance.now();
-            const duration = end - start;
+        const end = performance.now();
+        const duration = end - start;
 
-            this.logger.trace({ duration, meterModel }, 'polled meter data');
+        this.logger.trace({ duration, meterModel }, 'polled meter data');
 
-            const siteSample = generateSiteSample({
-                meter: meterModel,
-            });
+        const siteSample = generateSiteSample({
+            meter: meterModel,
+        });
 
-            return { success: true, value: siteSample };
-        } catch (error) {
-            return {
-                success: false,
-                error: new Error(
-                    `Error loading meter data: ${
-                        error instanceof Error ? error.message : 'Unknown error'
-                    }`,
-                ),
-            };
-        }
+        return siteSample;
     }
 
     override onDestroy() {
