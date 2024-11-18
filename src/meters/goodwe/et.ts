@@ -1,6 +1,4 @@
-import { type Result } from '../../helpers/result.js';
 import { type Config } from '../../helpers/config.js';
-import { withRetry } from '../../helpers/withRetry.js';
 import { GoodweEtConnection } from '../../connections/goodwe/et.js';
 import { SiteSamplePollerBase } from '../../meters/siteSamplePollerBase.js';
 import { type GoodweEtMeterData } from '../../connections/goodwe/models/et/meterData.js';
@@ -27,45 +25,19 @@ export class GoodweEtSiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSample(): Promise<Result<SiteSample>> {
-        try {
-            return await withRetry(
-                async () => {
-                    const start = performance.now();
+    override async getSiteSample(): Promise<SiteSample> {
+        const start = performance.now();
 
-                    const meterData = await this.connection.getMeterData();
+        const meterData = await this.connection.getMeterData();
 
-                    const end = performance.now();
-                    const duration = end - start;
+        const end = performance.now();
+        const duration = end - start;
 
-                    this.logger.trace(
-                        { duration, meterData },
-                        'got meter data',
-                    );
+        this.logger.trace({ duration, meterData }, 'got meter data');
 
-                    const siteSample = generateSiteSample({ meterData });
+        const siteSample = generateSiteSample({ meterData });
 
-                    return {
-                        success: true,
-                        value: siteSample,
-                    };
-                },
-                {
-                    attempts: 3,
-                    delayMilliseconds: 100,
-                    functionName: 'getSiteSample',
-                },
-            );
-        } catch (error) {
-            this.logger.error(error, 'Failed to get meter data');
-
-            return {
-                success: false,
-                error: new Error(
-                    `Error loading meter data: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                ),
-            };
-        }
+        return siteSample;
     }
 
     override onDestroy(): void {
