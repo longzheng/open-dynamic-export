@@ -1,6 +1,5 @@
 import { type SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import { type Result } from '../../helpers/result.js';
 import { type Config } from '../../helpers/config.js';
 import { SmaConnection } from '../../connections/modbus/connection/sma.js';
 import { type SmaCore1MeteringGridMsModels } from '../../connections/modbus/models/sma/core1/meteringGridMs.js';
@@ -20,36 +19,24 @@ export class SmaMeterSiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    override async getSiteSample(): Promise<Result<SiteSample>> {
-        try {
-            const start = performance.now();
+    override async getSiteSample(): Promise<SiteSample> {
+        const start = performance.now();
 
-            const meteringModel =
-                await this.smaConnection.getMeteringGridMsModel();
+        const meteringModel = await this.smaConnection.getMeteringGridMsModel();
 
-            const end = performance.now();
-            const duration = end - start;
+        const end = performance.now();
+        const duration = end - start;
 
-            this.logger.trace(
-                { duration, meterModel: meteringModel },
-                'polled meter data',
-            );
+        this.logger.trace(
+            { duration, meterModel: meteringModel },
+            'polled SMA meter data',
+        );
 
-            const siteSample = generateSiteSample({
-                metering: meteringModel,
-            });
+        const siteSample = generateSiteSample({
+            metering: meteringModel,
+        });
 
-            return { success: true, value: siteSample };
-        } catch (error) {
-            return {
-                success: false,
-                error: new Error(
-                    `Error loading meter data: ${
-                        error instanceof Error ? error.message : 'Unknown error'
-                    }`,
-                ),
-            };
-        }
+        return siteSample;
     }
 
     override onDestroy() {

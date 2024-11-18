@@ -71,8 +71,9 @@ export class SEP2Client {
 
         // exponential backoff retry
         axiosRetry(axiosClient, {
+            retries: 5,
             retryDelay: (retryCount, error) =>
-                exponentialDelay(retryCount, error),
+                exponentialDelay(retryCount, error, 100),
         });
 
         this.axiosInstance = axiosClient;

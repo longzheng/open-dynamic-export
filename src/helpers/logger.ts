@@ -54,6 +54,18 @@ export const pinoLogger = pino({
                 },
             },
             {
+                target: 'pino-rotating-file-stream',
+                level: 'error',
+                options: {
+                    filename: 'error.log',
+                    path: `./logs/`,
+                    // maximum each log
+                    size: '10MB',
+                    // maximum all logs
+                    maxSize: '100MB',
+                },
+            },
+            {
                 target: 'pino-pretty',
                 level: 'info',
                 options: {
