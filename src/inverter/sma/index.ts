@@ -4,7 +4,6 @@ import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatu
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
-import { writeLatency } from '../../helpers/influxdb.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { Decimal } from 'decimal.js';
 import { SmaConnection } from '../../connections/modbus/connection/sma.js';
@@ -56,59 +55,14 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
 
         const gridMsModel = await this.smaConnection.getGridMsModel();
 
-        writeLatency({
-            field: 'SmaInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'gridMs',
-            },
-        });
-
         const nameplateModel = await this.smaConnection.getNameplateModel();
-
-        writeLatency({
-            field: 'SmaInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'nameplate',
-            },
-        });
 
         const inverterModel = await this.smaConnection.getInverterModel();
 
-        writeLatency({
-            field: 'SmaInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'inverter',
-            },
-        });
-
         const operationModel = await this.smaConnection.getOperationModel();
-
-        writeLatency({
-            field: 'SmaInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'operation',
-            },
-        });
 
         const inverterControlsModel =
             await this.smaConnection.getInverterControlModel();
-
-        writeLatency({
-            field: 'SmaInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'inverterControl',
-            },
-        });
 
         const models: InverterModels = {
             inverter: inverterModel,
