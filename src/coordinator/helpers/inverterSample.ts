@@ -10,6 +10,7 @@ import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import { type InverterConfiguration } from './inverterController.js';
 import { type Logger } from 'pino';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
+
 export class InvertersPoller extends EventEmitter<{
     data: [DerSample];
 }> {
