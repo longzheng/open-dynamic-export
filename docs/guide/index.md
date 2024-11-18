@@ -2,7 +2,7 @@
 
 ## Introduction
 
-*open-dynamic-export* is a Node/TypeScript project implementing dynamic export control/solar curtailment of inverters. It aims to solve these use cases:
+*Open Dynamic Export* is a Node/TypeScript project implementing dynamic export control/solar curtailment of inverters. It aims to solve these use cases:
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - two-way tariffs (e.g.time based) export limitation

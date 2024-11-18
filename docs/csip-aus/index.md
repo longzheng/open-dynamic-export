@@ -32,7 +32,7 @@ sequenceDiagram
     SC->>U: Send site and DER telemetry
     end
 
-    box open-dynamic-export
+    box rgb(50,50,50) open-dynamic-export 
     participant SC
     participant C
     end
@@ -58,6 +58,6 @@ As a direct gateway client, the client requires a device certificate and manufac
 
 ### Energex/Ergon Energy
 
-The client has been listed as a compliant provider for Energex/Ergon Energy and the project is soon to be issued a manufacturer certificate for production use.
+The client has been listed as a [compliant provider for Energex/Ergon Energy](https://www.energex.com.au/__data/assets/pdf_file/0005/1097744/Dynamic-Connections-Compliant-Providers.pdf).
 
-A device certificate for Energex/Ergon Energy (Queensland) can be obtained by emailing long.zheng@gmail.com
+A free device certificate for Energex/Ergon Energy (Queensland) can be obtained by contacting support@opendynamicexport.com
