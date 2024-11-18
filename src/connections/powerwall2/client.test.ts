@@ -14,6 +14,7 @@ import loginBasicJson from '../../../tests/tesla/powerwall2/mocks/loginBasic.jso
 import metersAggregatesJson from '../../../tests/tesla/powerwall2/mocks/metersAggregates.json';
 import metersSiteSinglePhaseJson from '../../../tests/tesla/powerwall2/mocks/metersSiteSinglePhase.json';
 import metersSiteThreePhaseJson from '../../../tests/tesla/powerwall2/mocks/metersSiteThreePhase.json';
+import systemStatusJson from '../../../tests/tesla/powerwall2/mocks/systemStatus.json';
 
 describe('Powerwall2Client', () => {
     const mockIp = '192.168.1.123';
@@ -25,6 +26,10 @@ describe('Powerwall2Client', () => {
 
         http.get(`https://${mockIp}/api/meters/aggregates`, () => {
             return HttpResponse.json(metersAggregatesJson);
+        }),
+
+        http.get(`https://${mockIp}/api/system_status`, () => {
+            return HttpResponse.json(systemStatusJson);
         }),
 
         http.get(`https://${mockIp}/api/system_status/soe`, () => {
@@ -87,5 +92,12 @@ describe('Powerwall2Client', () => {
 
         expect(result[0]?.Cached_readings.reactive_power_a).toBe(-600);
         expect(result[0]?.Cached_readings.reactive_power_b).toBe(undefined);
+    });
+
+    it('can get system status', async () => {
+        const result = await power2Client.getSystemStatus();
+
+        expect(result.battery_target_power).toBe(0);
+        expect(result.max_discharge_power).toBe(15000);
     });
 });

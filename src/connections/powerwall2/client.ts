@@ -6,6 +6,7 @@ import axios, { AxiosError } from 'axios';
 import {
     meterAggregatesSchema,
     metersSiteSchema,
+    systemStatusSchema,
     systemStatusSoeSchema,
 } from './api.js';
 
@@ -46,6 +47,14 @@ export class Powerwall2Client {
         const response = await this.get('/api/meters/aggregates');
 
         const data = meterAggregatesSchema.parse(response);
+
+        return data;
+    }
+
+    public async getSystemStatus() {
+        const response = await this.get('/api/system_status');
+
+        const data = systemStatusSchema.parse(response);
 
         return data;
     }
