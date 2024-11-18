@@ -89,7 +89,7 @@ type DerSample = {
     realPower:
         | {
               type: 'perPhaseNet';
-              phaseA: number;
+              phaseA: number | null;
               phaseB: number | null;
               phaseC: number | null;
               net: number;
@@ -101,7 +101,7 @@ type DerSample = {
     reactivePower:
         | {
               type: 'perPhaseNet';
-              phaseA: number;
+              phaseA: number | null;
               phaseB: number | null;
               phaseC: number | null;
               net: number;
@@ -112,7 +112,7 @@ type DerSample = {
           };
     voltage: {
         type: 'perPhase';
-        phaseA: number;
+        phaseA: number | null;
         phaseB: number | null;
         phaseC: number | null;
     } | null;
@@ -139,7 +139,7 @@ type SiteSample = {
     realPower:
         | {
               type: 'perPhaseNet';
-              phaseA: number;
+              phaseA: number | null;
               phaseB: number | null;
               phaseC: number | null;
               net: number;
@@ -151,7 +151,7 @@ type SiteSample = {
     reactivePower:
         | {
               type: 'perPhaseNet';
-              phaseA: number;
+              phaseA: number | null;
               phaseB: number | null;
               phaseC: number | null;
               net: number;
@@ -162,7 +162,7 @@ type SiteSample = {
           };
     voltage: {
         type: 'perPhase';
-        phaseA: number;
+        phaseA: number | null;
         phaseB: number | null;
         phaseC: number | null;
     };

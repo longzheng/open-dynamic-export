@@ -46,6 +46,15 @@ This project aims to implement dynamic export control/solar curtailment of inver
 
 1. Run `docker compose up -d` (or run `docker compose up -d --build`)
 
+## Debug
+### VSCode
+
+Run debug configuration "Docker: Build and attach to Node".
+
+### Docker compose
+
+Run `docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d --build` to start the Node.js container with debugging port opened.
+
 ## CSIP-AUS Private key and CSR
 
 CSIP-AUS uses PKI certificates to authorise and identify clients.

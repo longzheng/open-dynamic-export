@@ -11,25 +11,25 @@ export type SmaCore1MeteringGridMsModels = SmaCore1MeteringGridMs1 &
 
 type SmaCore1MeteringGridMs1 = {
     // Grid power phase L1
-    PhV_phsA: number;
+    PhV_phsA: number | null;
     // Grid power phase L2
     PhV_phsB: number | null;
     // Grid power phase L3
     PhV_phsC: number | null;
     // Power grid feeding L1
-    W_phsA: number;
+    W_phsA: number | null;
     // Power grid feeding L2
     W_phsB: number | null;
     // Power grid feeding L3
     W_phsC: number | null;
     // Power drawn from grid phase L1
-    WIn_phsA: number;
+    WIn_phsA: number | null;
     // Power drawn from grid phase L2
     WIn_phsB: number | null;
     // Power drawn from grid phase L3
     WIn_phsC: number | null;
     // Reactive power grid feeding phase L1
-    VAr_phsA: number;
+    VAr_phsA: number | null;
     // Reactive power grid feeding phase L2
     VAr_phsB: number | null;
     // Reactive power grid feeding phase L3
@@ -42,13 +42,13 @@ type SmaCore1MeteringGridMs2 = {
     // Displacement power factor
     TotPF: number;
     // Grid current phase L1
-    A_phsA: number;
+    A_phsA: number | null;
     // 	Grid current phase L2
     A_phsB: number | null;
     // Grid current phase L3
     A_phsC: number | null;
     // Apparent power L1
-    VA_phsA: number;
+    VA_phsA: number | null;
     // Apparent power L2
     VA_phsB: number | null;
     // Apparent power L3
@@ -72,7 +72,7 @@ export const SmaCore1MeteringGridMs1Model =
             PhV_phsA: {
                 start: 0,
                 end: 2,
-                readConverter: (value) => registersToUint32(value, -2),
+                readConverter: (value) => registersToUint32Nullable(value, -2),
             },
             PhV_phsB: {
                 start: 2,
@@ -87,7 +87,7 @@ export const SmaCore1MeteringGridMs1Model =
             W_phsA: {
                 start: 6,
                 end: 8,
-                readConverter: registersToUint32,
+                readConverter: registersToUint32Nullable,
             },
             W_phsB: {
                 start: 8,
@@ -102,7 +102,7 @@ export const SmaCore1MeteringGridMs1Model =
             WIn_phsA: {
                 start: 12,
                 end: 14,
-                readConverter: registersToUint32,
+                readConverter: registersToUint32Nullable,
             },
             WIn_phsB: {
                 start: 14,
@@ -117,7 +117,7 @@ export const SmaCore1MeteringGridMs1Model =
             VAr_phsA: {
                 start: 18,
                 end: 20,
-                readConverter: registersToInt32,
+                readConverter: registersToInt32Nullable,
             },
             VAr_phsB: {
                 start: 20,
@@ -149,7 +149,7 @@ export const SmaCore1MeteringGridMs2Model =
             A_phsA: {
                 start: 2,
                 end: 4,
-                readConverter: (value) => registersToInt32(value, -3),
+                readConverter: (value) => registersToInt32Nullable(value, -3),
             },
             A_phsB: {
                 start: 4,
@@ -164,7 +164,7 @@ export const SmaCore1MeteringGridMs2Model =
             VA_phsA: {
                 start: 8,
                 end: 10,
-                readConverter: registersToInt32,
+                readConverter: registersToInt32Nullable,
             },
             VA_phsB: {
                 start: 10,

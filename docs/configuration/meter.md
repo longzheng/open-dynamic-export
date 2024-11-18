@@ -22,6 +22,112 @@ To configure a MQTT meter connection, add the following property to `config.json
     ...
 }
 ```
+
+The MQTT topic must contain a JSON message that meets the following schema
+
+```js
+z.object({
+    /**
+     * Positive values = site import power
+     *
+     * Negative values = site export power
+     */
+    realPower: z.union([
+        // either per phase measurements
+        z.object({
+            type: z.literal('perPhaseNet'),
+            phaseA: z.number().nullable(),
+            phaseB: z.number().nullable(),
+            phaseC: z.number().nullable(),
+            net: z.number(),
+        }),
+        // or total (net across all phases) measurement
+        z.object({
+            type: z.literal('noPhase'),
+            net: z.number(),
+        }),
+    ]),
+    reactivePower: z.union([
+        // either per phase measurements
+        z.object({
+            type: z.literal('perPhaseNet'),
+            phaseA: z.number().nullable(),
+            phaseB: z.number().nullable(),
+            phaseC: z.number().nullable(),
+            net: z.number(),
+        }),
+        // or total (net across all phases) measurement
+        z.object({
+            type: z.literal('noPhase'),
+            net: z.number(),
+        }),
+    ]),
+    voltage: z.object({
+        // must be per phase measurements
+        type: z.literal('perPhaseNet'),
+        phaseA: z.number().nullable(),
+        phaseB: z.number().nullable(),
+        phaseC: z.number().nullable(),
+        net: z.number(),
+    }),
+    frequency: z.number().nullable(),
+});
+```
+
+For example
+
+```js
+// three phase
+{
+    "realPower": {
+        "type": "perPhaseNet",
+        "phaseA": -1000,
+        "phaseB": -2000,
+        "phaseC": -3000,
+        "net": -6000
+    },
+    "reactivePower": {
+        "type": "noPhase",
+        "net": 1500
+    },
+    "voltage": {
+        "type": "perPhaseNet",
+        "phaseA": 230,
+        "phaseB": 232,
+        "phaseC": 228,
+        "net": 230
+    },
+    "frequency": 50
+}
+```
+
+or
+
+```js
+// single phase
+{
+    "realPower": {
+        "type": "perPhaseNet",
+        "phaseA": -1200,
+        "phaseB": null,
+        "phaseC": null,
+        "net": -1200
+    },
+    "reactivePower": {
+        "type": "noPhase",
+        "net": 800
+    },
+    "voltage": {
+        "type": "perPhaseNet",
+        "phaseA": 230,
+        "phaseB": null,
+        "phaseC": null,
+        "net": 230
+    },
+    "frequency": 50
+}
+```
+
 ## SMA
 
 SMA inverters support [SMA Modbus protocol](https://www.sma.de/en/products/product-features-interfaces/modbus-protocol-interface), however the register map differs across models.
