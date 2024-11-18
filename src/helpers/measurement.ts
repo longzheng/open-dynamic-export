@@ -9,7 +9,7 @@ import { z } from 'zod';
 // per-phase measurements where the phases cannot be net metered (e.g. voltage)
 export const perPhaseMeasurementSchema = z.object({
     type: z.literal('perPhase'),
-    phaseA: z.number(),
+    phaseA: z.number().nullable(),
     phaseB: z.number().nullable(),
     phaseC: z.number().nullable(),
 });
@@ -19,7 +19,7 @@ export type PerPhaseMeasurement = z.infer<typeof perPhaseMeasurementSchema>;
 // per-phase measurements where the phases can be net metered (e.g. power)
 export const perPhaseNetMeasurementSchema = z.object({
     type: z.literal('perPhaseNet'),
-    phaseA: z.number(),
+    phaseA: z.number().nullable(),
     phaseB: z.number().nullable(),
     phaseC: z.number().nullable(),
     net: z.number(),
@@ -78,7 +78,7 @@ export function assertPerPhaseNetOrNoPhaseMeasurementArray(
 }
 
 type PhaseValues = {
-    phaseA: number[];
+    phaseA: (number | null)[];
     phaseB: (number | null)[];
     phaseC: (number | null)[];
 };
@@ -94,7 +94,7 @@ function getPhaseValuesFromPerPhaseMeasurements(
 }
 
 type PhaseNetValues = {
-    phaseA: number[];
+    phaseA: (number | null)[];
     phaseB: (number | null)[];
     phaseC: (number | null)[];
     net: number[];
@@ -116,7 +116,7 @@ function getAverageFromPerPhaseMeasurements(
 ): PerPhaseMeasurement {
     return {
         type: 'perPhase',
-        phaseA: averageNumbersArray(phaseValues.phaseA),
+        phaseA: averageNumbersNullableArray(phaseValues.phaseA),
         phaseB: averageNumbersNullableArray(phaseValues.phaseB),
         phaseC: averageNumbersNullableArray(phaseValues.phaseC),
     };
@@ -127,7 +127,7 @@ function getAverageFromPerPhaseNetMeasurements(
 ): PerPhaseNetMeasurement {
     return {
         type: 'perPhaseNet',
-        phaseA: averageNumbersArray(phaseValues.phaseA),
+        phaseA: averageNumbersNullableArray(phaseValues.phaseA),
         phaseB: averageNumbersNullableArray(phaseValues.phaseB),
         phaseC: averageNumbersNullableArray(phaseValues.phaseC),
         net: averageNumbersArray(phaseValues.net),
@@ -139,7 +139,7 @@ function getMinimumFromPerPhaseMeasurements(
 ): PerPhaseMeasurement {
     return {
         type: 'perPhase',
-        phaseA: Math.min(...phaseValues.phaseA),
+        phaseA: mathMinNullableArray(phaseValues.phaseA),
         phaseB: mathMinNullableArray(phaseValues.phaseB),
         phaseC: mathMinNullableArray(phaseValues.phaseC),
     };
@@ -150,7 +150,7 @@ function getMinimumFromPerPhaseNetMeasurements(
 ): PerPhaseNetMeasurement {
     return {
         type: 'perPhaseNet',
-        phaseA: Math.min(...phaseValues.phaseA),
+        phaseA: mathMinNullableArray(phaseValues.phaseA),
         phaseB: mathMinNullableArray(phaseValues.phaseB),
         phaseC: mathMinNullableArray(phaseValues.phaseC),
         net: Math.min(...phaseValues.net),
@@ -162,7 +162,7 @@ function getMaximumFromPerPhaseMeasurements(
 ): PerPhaseMeasurement {
     return {
         type: 'perPhase',
-        phaseA: Math.max(...phaseValues.phaseA),
+        phaseA: mathMaxNullableArray(phaseValues.phaseA),
         phaseB: mathMaxNullableArray(phaseValues.phaseB),
         phaseC: mathMaxNullableArray(phaseValues.phaseC),
     };
@@ -173,7 +173,7 @@ function getMaximumFromPerPhaseNetMeasurements(
 ): PerPhaseNetMeasurement {
     return {
         type: 'perPhaseNet',
-        phaseA: Math.max(...phaseValues.phaseA),
+        phaseA: mathMaxNullableArray(phaseValues.phaseA),
         phaseB: mathMaxNullableArray(phaseValues.phaseB),
         phaseC: mathMaxNullableArray(phaseValues.phaseC),
         net: Math.max(...phaseValues.net),

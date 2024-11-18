@@ -14,13 +14,13 @@ type SmaCore1GridMs1 = {
     // Power
     TotW: number;
     // Power L1
-    W_phsA: number;
+    W_phsA: number | null;
     // Power L2
     W_phsB: number | null;
     // Power L3
     W_phsC: number | null;
     // Grid voltage phase L1
-    PhV_phsA: number;
+    PhV_phsA: number | null;
     // Grid voltage phase L2
     PhV_phsB: number | null;
     // Grid voltage phase L3
@@ -42,7 +42,7 @@ type SmaCore1GridMs2 = {
 
 type SmaCore1GridMs3 = {
     // Reactive power L1
-    VAr_phsA: number;
+    VAr_phsA: number | null;
     // Reactive power L2
     VAr_phsB: number | null;
     // Reactive power L3
@@ -50,7 +50,7 @@ type SmaCore1GridMs3 = {
     // Apparent power
     TotVA: number;
     // Apparent power L1
-    VA_phsA: number;
+    VA_phsA: number | null;
     // Apparent power L2
     VA_phsB: number | null;
     // Apparent power L3
@@ -68,7 +68,7 @@ export const SmaCore1GridMs1Model = modbusModelFactory<SmaCore1GridMs1>({
         W_phsA: {
             start: 2,
             end: 4,
-            readConverter: registersToInt32,
+            readConverter: registersToInt32Nullable,
         },
         W_phsB: {
             start: 4,
@@ -83,7 +83,7 @@ export const SmaCore1GridMs1Model = modbusModelFactory<SmaCore1GridMs1>({
         PhV_phsA: {
             start: 8,
             end: 10,
-            readConverter: (value) => registersToUint32(value, -2),
+            readConverter: (value) => registersToUint32Nullable(value, -2),
         },
         PhV_phsB: {
             start: 10,
@@ -135,7 +135,7 @@ export const SmaCore1GridMs3Model = modbusModelFactory<SmaCore1GridMs3>({
         VAr_phsA: {
             start: 0,
             end: 2,
-            readConverter: registersToInt32,
+            readConverter: registersToInt32Nullable,
         },
         VAr_phsB: {
             start: 2,
@@ -155,7 +155,7 @@ export const SmaCore1GridMs3Model = modbusModelFactory<SmaCore1GridMs3>({
         VA_phsA: {
             start: 8,
             end: 10,
-            readConverter: registersToInt32,
+            readConverter: registersToInt32Nullable,
         },
         VA_phsB: {
             start: 10,

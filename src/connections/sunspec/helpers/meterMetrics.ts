@@ -11,7 +11,7 @@ export function getMeterMetrics(meter: MeterModel) {
 
     const scaledValues = {
         A: numberWithPow10(meter.A, meter.A_SF),
-        AphA: numberWithPow10(meter.AphA, meter.A_SF),
+        AphA: numberNullableWithPow10(meter.AphA, meter.A_SF),
         AphB: numberNullableWithPow10(meter.AphB, meter.A_SF),
         AphC: numberNullableWithPow10(meter.AphC, meter.A_SF),
         PhV: numberNullableWithPow10(meter.PhV, meter.V_SF),

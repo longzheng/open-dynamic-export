@@ -146,7 +146,7 @@ export function generateInverterData({
         inverter: {
             realPower: gridMs.TotW,
             reactivePower:
-                gridMs.VAr_phsA +
+                (gridMs.VAr_phsA ?? 0) +
                 (gridMs.VAr_phsB ?? 0) +
                 (gridMs.VAr_phsC ?? 0),
             voltagePhaseA: gridMs.PhV_phsA,

@@ -43,7 +43,7 @@ export type MeterModel = {
      *
      * Phase A Current.
      */
-    AphA: number;
+    AphA: number | null;
 
     /**
      * AphB
@@ -557,7 +557,7 @@ export const meterModel = modbusModelFactory<MeterModel>({
         AphA: {
             start: 3,
             end: 4,
-            readConverter: registersToInt16,
+            readConverter: registersToInt16Nullable,
         },
         AphB: {
             start: 4,
