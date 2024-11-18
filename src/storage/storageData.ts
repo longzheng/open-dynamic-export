@@ -1,4 +1,5 @@
 import { type ConnectStatusValue } from '../sep2/models/connectStatus.js';
+import { type StorageModeStatusValue } from '../sep2/models/storageModeStatus.js';
 
 export type StorageData = {
     date: Date;
@@ -7,6 +8,7 @@ export type StorageData = {
      */
     socRatio: number;
     status: {
-        storConnectStatus: ConnectStatusValue;
+        connectStatus: ConnectStatusValue;
+        modeStatus: StorageModeStatusValue;
     };
 };
