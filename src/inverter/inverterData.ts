@@ -7,7 +7,7 @@ export type InverterData = {
     inverter: {
         realPower: number;
         reactivePower: number;
-        voltagePhaseA: number;
+        voltagePhaseA: number | null;
         voltagePhaseB: number | null;
         voltagePhaseC: number | null;
         frequency: number;

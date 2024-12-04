@@ -146,7 +146,10 @@ export function convertConsumptionRealPowerToFeedInRealPower({
     ) {
         return {
             type: 'perPhaseNet',
-            phaseA: (derRealPower.phaseA + consumptionRealPower.phaseA) * -1,
+            phaseA:
+                ((derRealPower.phaseA ?? 0) +
+                    (consumptionRealPower.phaseA ?? 0)) *
+                -1,
             phaseB:
                 ((derRealPower.phaseB ?? 0) +
                     (consumptionRealPower.phaseB ?? 0)) *

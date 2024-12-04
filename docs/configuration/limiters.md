@@ -9,14 +9,16 @@ All limiters are restrictive, that is a combination of multiple limiters will ev
 
 ## Control modes
 
-Currently there are four control modes, mapped to the CSIP-AUS modes
+The software supports 6 control modes mapped to the CSIP-AUS Dynamic Operating Envelope (DOE) modes.
 
-| Mode            | Description                                                                                  | Overlap resolution     | Default value |
-|-----------------|----------------------------------------------------------------------------------------------|------------------------|---------------|
-| opModConnect    | Connection to the grid                                                                       | Prioritize disconnect  | Connect       |
+| Mode            | Description                                                                                    | Overlap resolution     | Default value |
+|-----------------|------------------------------------------------------------------------------------------------|------------------------|---------------|
+| opModConnect    | Connection to the grid                                                                         | Prioritize disconnect  | Connect       |
 | opModEnergize   | Generate or consume energy (in practice for most inverters this is the same as `opModConnect`) | Prioritize de-energize | Energized     |
-| opModExportLimW | Maximum export limit (in watts)                                                              | Lower limit            | Unlimited     |
-| opModGenLimW    | Maximum inverter generation limit (in watts)                                                 | Lower limit            | Unlimited     |
+| opModExportLimW | Maximum site export limit (in watts)                                                           | Lower limit            | Unlimited     |
+| opModGenLimW    | Maximum inverter generation limit (in watts)                                                   | Lower limit            | Unlimited     |
+| opModImpLimW    | Maximum site import limit (in watts)                                                           | Lower limit            | Unlimited     |
+| opModLoadLimW   | Maximum controllable load limit (in watts)                                                     | Lower limit            | Unlimited     |
 
 
 ## CSIP-AUS dynamic connection

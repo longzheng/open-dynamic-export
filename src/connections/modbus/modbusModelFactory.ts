@@ -65,6 +65,18 @@ export function modbusModelFactory<
                 duration,
                 tags: {
                     operation: 'read',
+                    connectionType: modbusConnection.config.type,
+                    connectionAddress: (() => {
+                        switch (modbusConnection.config.type) {
+                            case 'tcp': {
+                                return `${modbusConnection.config.ip}:${modbusConnection.config.port}`;
+                            }
+                            case 'rtu': {
+                                return modbusConnection.config.path;
+                            }
+                        }
+                    })(),
+                    unitId: unitId.toString(),
                     model: config.name,
                     addressStart: address.start.toString(),
                     addressLength: address.length.toString(),
@@ -113,6 +125,18 @@ export function modbusModelFactory<
                 duration,
                 tags: {
                     operation: 'write',
+                    connectionType: modbusConnection.config.type,
+                    connectionAddress: (() => {
+                        switch (modbusConnection.config.type) {
+                            case 'tcp': {
+                                return `${modbusConnection.config.ip}:${modbusConnection.config.port}`;
+                            }
+                            case 'rtu': {
+                                return modbusConnection.config.path;
+                            }
+                        }
+                    })(),
+                    unitId: unitId.toString(),
                     model: config.name,
                     addressStart: address.start.toString(),
                     addressLength: address.length.toString(),

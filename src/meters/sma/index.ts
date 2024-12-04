@@ -57,10 +57,10 @@ function generateSiteSample({
             phaseB: metering.W_phsB || metering.WIn_phsB,
             phaseC: metering.W_phsC || metering.WIn_phsC,
             net:
-                metering.W_phsA +
+                (metering.W_phsA ?? 0) +
                     (metering.W_phsB ?? 0) +
                     (metering.W_phsC ?? 0) ||
-                metering.WIn_phsA +
+                (metering.WIn_phsA ?? 0) +
                     (metering.WIn_phsB ?? 0) +
                     (metering.WIn_phsC ?? 0),
         },
@@ -70,7 +70,7 @@ function generateSiteSample({
             phaseB: metering.VAr_phsB,
             phaseC: metering.VAr_phsC,
             net:
-                metering.VAr_phsA +
+                (metering.VAr_phsA ?? 0) +
                 (metering.VAr_phsB ?? 0) +
                 (metering.VAr_phsC ?? 0),
         },
