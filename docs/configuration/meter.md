@@ -139,7 +139,7 @@ To configure a SMA inverter with meter connection, add the following property to
 ```js
 {
     "meter": {
-        "type": "sunspec", // (string) required: the type of meter
+        "type": "sma", // (string) required: the type of meter
         "model": "core1", // (string) required: the model of the inverter
         "connection": {
             "type": "tcp", // (string) required: the type of connection (tcp, rtu)
