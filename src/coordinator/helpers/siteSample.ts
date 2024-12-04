@@ -5,6 +5,7 @@ import { SunSpecMeterSiteSamplePoller } from '../../meters/sunspec/index.js';
 import { type SiteSamplePollerBase } from '../../meters/siteSamplePollerBase.js';
 import { type InvertersPoller } from './inverterSample.js';
 import { SmaMeterSiteSamplePoller } from '../../meters/sma/index.js';
+import { GrowattMeterSiteSamplePoller } from '../../meters/growatt/index.js';
 
 export function getSiteSamplePollerInstance({
     config,
@@ -33,6 +34,11 @@ export function getSiteSamplePollerInstance({
         case 'sma': {
             return new SmaMeterSiteSamplePoller({
                 smaMeterConfig: config.meter,
+            });
+        }
+        case 'growatt': {
+            return new GrowattMeterSiteSamplePoller({
+                growattMeterConfig: config.meter,
             });
         }
     }
