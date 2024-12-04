@@ -71,7 +71,7 @@ export function generateDerSample({
         },
         voltage: {
             type: 'perPhase',
-            phaseA: averageNumbersArray(
+            phaseA: averageNumbersNullableArray(
                 invertersData.map((data) => data.inverter.voltagePhaseA),
             ),
             phaseB: averageNumbersNullableArray(

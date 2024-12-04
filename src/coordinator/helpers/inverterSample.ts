@@ -11,6 +11,7 @@ import { type InverterConfiguration } from './inverterController.js';
 import { type Logger } from 'pino';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
 import { GrowattInverterDataPoller } from '../../inverter/growatt/index.js';
+
 export class InvertersPoller extends EventEmitter<{
     data: [DerSample];
 }> {

@@ -8,7 +8,6 @@ import {
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
-import { writeLatency } from '../../helpers/influxdb.js';
 import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
 import { getInverterMetrics } from '../../connections/sunspec/helpers/inverterMetrics.js';
 import { getNameplateMetrics } from '../../connections/sunspec/helpers/nameplateMetrics.js';
@@ -66,59 +65,14 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
         const inverterModel = await this.inverterConnection.getInverterModel();
 
-        writeLatency({
-            field: 'sunSpecInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'inverter',
-            },
-        });
-
         const nameplateModel =
             await this.inverterConnection.getNameplateModel();
 
-        writeLatency({
-            field: 'sunSpecInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'nameplate',
-            },
-        });
-
         const settingsModel = await this.inverterConnection.getSettingsModel();
-
-        writeLatency({
-            field: 'sunSpecInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'settings',
-            },
-        });
 
         const statusModel = await this.inverterConnection.getStatusModel();
 
-        writeLatency({
-            field: 'sunSpecInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'status',
-            },
-        });
-
         const controlsModel = await this.inverterConnection.getControlsModel();
-
-        writeLatency({
-            field: 'sunSpecInverterDataPoller',
-            duration: performance.now() - start,
-            tags: {
-                inverterIndex: this.inverterIndex.toString(),
-                model: 'controls',
-            },
-        });
 
         const models = {
             inverter: inverterModel,

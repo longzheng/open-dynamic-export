@@ -94,7 +94,10 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
                 'polled inverter data',
             );
         } else {
-            this.logger.error(inverterData.error, 'Error polling site sample');
+            this.logger.error(
+                inverterData.error,
+                'Error polling inverter data',
+            );
         }
 
         // this loop must meet sampling requirements and dynamic export requirements

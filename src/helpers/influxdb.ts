@@ -49,13 +49,15 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                     .floatField('realPower', siteSample.realPower.net),
             );
 
-            writeApi.writePoint(
-                new Point('sample')
-                    .timestamp(siteSample.date)
-                    .tag('type', 'site')
-                    .tag('phase', 'A')
-                    .floatField('realPower', siteSample.realPower.phaseA),
-            );
+            if (siteSample.realPower.phaseA) {
+                writeApi.writePoint(
+                    new Point('sample')
+                        .timestamp(siteSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'A')
+                        .floatField('realPower', siteSample.realPower.phaseA),
+                );
+            }
 
             if (siteSample.realPower.phaseB) {
                 writeApi.writePoint(
@@ -99,16 +101,18 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
                     .floatField('reactivePower', siteSample.reactivePower.net),
             );
 
-            writeApi.writePoint(
-                new Point('sample')
-                    .timestamp(siteSample.date)
-                    .tag('type', 'site')
-                    .tag('phase', 'A')
-                    .floatField(
-                        'reactivePower',
-                        siteSample.reactivePower.phaseA,
-                    ),
-            );
+            if (siteSample.reactivePower.phaseA) {
+                writeApi.writePoint(
+                    new Point('sample')
+                        .timestamp(siteSample.date)
+                        .tag('type', 'site')
+                        .tag('phase', 'A')
+                        .floatField(
+                            'reactivePower',
+                            siteSample.reactivePower.phaseA,
+                        ),
+                );
+            }
 
             if (siteSample.reactivePower.phaseB) {
                 writeApi.writePoint(
@@ -138,13 +142,15 @@ export function writeSiteSamplePoints(siteSample: SiteSample) {
         }
     }
 
-    writeApi.writePoint(
-        new Point('sample')
-            .timestamp(siteSample.date)
-            .tag('type', 'site')
-            .tag('phase', 'A')
-            .floatField('voltage', siteSample.voltage.phaseA),
-    );
+    if (siteSample.voltage.phaseA) {
+        writeApi.writePoint(
+            new Point('sample')
+                .timestamp(siteSample.date)
+                .tag('type', 'site')
+                .tag('phase', 'A')
+                .floatField('voltage', siteSample.voltage.phaseA),
+        );
+    }
 
     if (siteSample.voltage.phaseB) {
         writeApi.writePoint(
@@ -197,13 +203,15 @@ export function writeDerSamplePoints(derSample: DerSample) {
                     .floatField('realPower', derSample.realPower.net),
             );
 
-            writeApi.writePoint(
-                new Point('sample')
-                    .timestamp(derSample.date)
-                    .tag('type', 'der')
-                    .tag('phase', 'A')
-                    .floatField('realPower', derSample.realPower.phaseA),
-            );
+            if (derSample.realPower.phaseA) {
+                writeApi.writePoint(
+                    new Point('sample')
+                        .timestamp(derSample.date)
+                        .tag('type', 'der')
+                        .tag('phase', 'A')
+                        .floatField('realPower', derSample.realPower.phaseA),
+                );
+            }
 
             if (derSample.realPower.phaseB) {
                 writeApi.writePoint(
@@ -247,16 +255,18 @@ export function writeDerSamplePoints(derSample: DerSample) {
                     .floatField('reactivePower', derSample.reactivePower.net),
             );
 
-            writeApi.writePoint(
-                new Point('sample')
-                    .timestamp(derSample.date)
-                    .tag('type', 'der')
-                    .tag('phase', 'A')
-                    .floatField(
-                        'reactivePower',
-                        derSample.reactivePower.phaseA,
-                    ),
-            );
+            if (derSample.reactivePower.phaseA) {
+                writeApi.writePoint(
+                    new Point('sample')
+                        .timestamp(derSample.date)
+                        .tag('type', 'der')
+                        .tag('phase', 'A')
+                        .floatField(
+                            'reactivePower',
+                            derSample.reactivePower.phaseA,
+                        ),
+                );
+            }
 
             if (derSample.reactivePower.phaseB) {
                 writeApi.writePoint(
@@ -287,13 +297,15 @@ export function writeDerSamplePoints(derSample: DerSample) {
     }
 
     if (derSample.voltage) {
-        writeApi.writePoint(
-            new Point('sample')
-                .timestamp(derSample.date)
-                .tag('type', 'der')
-                .tag('phase', 'A')
-                .floatField('voltage', derSample.voltage.phaseA),
-        );
+        if (derSample.voltage.phaseA) {
+            writeApi.writePoint(
+                new Point('sample')
+                    .timestamp(derSample.date)
+                    .tag('type', 'der')
+                    .tag('phase', 'A')
+                    .floatField('voltage', derSample.voltage.phaseA),
+            );
+        }
 
         if (derSample.voltage.phaseB) {
             writeApi.writePoint(
