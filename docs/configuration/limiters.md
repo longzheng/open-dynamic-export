@@ -35,7 +35,7 @@ To use the CSIP-AUS limiter, add following property to `config.json`
     "limiters": {
         "sep2": {
             "host": "https://sep2-test.energyq.com.au", // (string) required: the SEP2 server host
-            "dcapUri": "/api/v2/dcap" // (string) required: the device capability discovery URI
+            "dcapUri": "/api/v2/dcap", // (string) required: the device capability discovery URI
             "nmi": "1234567890" // (string) optional: for utilities that require in-band registration, the NMI of the site
         }
     }
@@ -53,8 +53,8 @@ To set fixed limits (such as for fixed export limits), add the following propert
         "fixed": {
             "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
             "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
-            "generationLimitWatts": 10000 // (number) optional: the maximum generation limit in watts
-            "importLimitWatts": 5000 // (number) optional: the maximum import limit in watts (not currently used)
+            "generationLimitWatts": 10000, // (number) optional: the maximum generation limit in watts
+            "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (not currently used)
             "loadLimitWatts": 10000 // (number) optional: the maximum load limit in watts (not currently used)
         }
     }
