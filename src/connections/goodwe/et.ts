@@ -13,6 +13,11 @@ import {
     type GoodweEtMeterData,
 } from './models/et/meterData.js';
 import { writeLatency } from '../../helpers/influxdb.js';
+import {
+    type GoodweEtMeterControlWrite,
+    GoodweGoodweEtMeterControlModel,
+    type GoodweEtMeterControl,
+} from './models/et/goodweEtMeterControl.js';
 
 export class GoodweEtConnection {
     protected readonly modbusConnection: ModbusConnection;
@@ -84,6 +89,31 @@ export class GoodweEtConnection {
         });
 
         return data;
+    }
+
+    async getMeterControl(): Promise<GoodweEtMeterControl> {
+        const data = await GoodweGoodweEtMeterControlModel.read({
+            modbusConnection: this.modbusConnection,
+            address: {
+                start: 47509,
+                length: 2,
+            },
+            unitId: this.unitId,
+        });
+
+        return data;
+    }
+
+    async setMeterControl(values: GoodweEtMeterControlWrite): Promise<void> {
+        await GoodweGoodweEtMeterControlModel.write({
+            modbusConnection: this.modbusConnection,
+            address: {
+                start: 47509,
+                length: 2,
+            },
+            unitId: this.unitId,
+            values,
+        });
     }
 
     public onDestroy(): void {
