@@ -54,21 +54,24 @@ function generateSiteSample({
         date: new Date(),
         realPower: {
             type: 'perPhaseNet',
-            phaseA: meterData.MeterActivepowerR2 || meterData.MeterActivepowerR,
-            phaseB: meterData.MeterActivepowerS2 || meterData.MeterActivepowerS,
-            phaseC: meterData.MeterActivepowerT2 || meterData.MeterActivepowerT,
+            phaseA:
+                -meterData.MeterActivepowerR2 || -meterData.MeterActivepowerR,
+            phaseB:
+                -meterData.MeterActivepowerS2 || -meterData.MeterActivepowerS,
+            phaseC:
+                -meterData.MeterActivepowerT2 || -meterData.MeterActivepowerT,
             net:
-                meterData.MeterTotalActivepower2 ||
-                meterData.MeterTotalActivepower,
+                -meterData.MeterTotalActivepower2 ||
+                -meterData.MeterTotalActivepower,
         },
         reactivePower: {
             type: 'perPhaseNet',
-            phaseA: meterData.MeterReactivepowerR,
-            phaseB: meterData.MeterReactivepowerS,
-            phaseC: meterData.MeterReactivepowerT,
+            phaseA: -meterData.MeterReactivepowerR,
+            phaseB: -meterData.MeterReactivepowerS,
+            phaseC: -meterData.MeterReactivepowerT,
             net:
-                meterData.MeterTotalReactivepower2 ||
-                meterData.MeterTotalReactivepower,
+                -meterData.MeterTotalReactivepower2 ||
+                -meterData.MeterTotalReactivepower,
         },
         voltage: {
             type: 'perPhase',
