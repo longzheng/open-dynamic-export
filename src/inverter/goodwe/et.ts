@@ -107,7 +107,7 @@ export function generateInverterData({
     return {
         date: new Date(),
         inverter: {
-            realPower: inverterRunningData1.ACActivePower,
+            realPower: inverterRunningData1.TotalINVPower,
             reactivePower: inverterRunningData1.ACReactivePower,
             voltagePhaseA: inverterRunningData1.Vgrid_R,
             voltagePhaseB: inverterRunningData1.Vgrid_S,
