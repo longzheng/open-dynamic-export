@@ -1,12 +1,12 @@
 import mqtt from 'mqtt';
 import { type Config } from '../../helpers/config.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import { type SiteSample } from '../siteSample.js';
+import { type SiteSampleData, type SiteSample } from '../siteSample.js';
 import { siteSampleDataSchema } from '../siteSample.js';
 
 export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     private client: mqtt.MqttClient;
-    private cachedMessage: SiteSample | null = null;
+    private cachedMessage: SiteSampleData | null = null;
 
     constructor({
         mqttConfig,
@@ -37,7 +37,7 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
                 return;
             }
 
-            this.cachedMessage = { date: new Date(), ...result.data };
+            this.cachedMessage = result.data;
         });
 
         void this.startPolling();
@@ -49,7 +49,7 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
             throw new Error('No site sample data on MQTT');
         }
 
-        return this.cachedMessage;
+        return { date: new Date(), ...this.cachedMessage };
     }
 
     override onDestroy() {
