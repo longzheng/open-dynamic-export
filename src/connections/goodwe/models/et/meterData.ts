@@ -4,6 +4,7 @@ import {
     registersToInt32,
     registersToInt16,
     registersToUint16,
+    registersToUint16Nullable,
 } from '../../../modbus/helpers/converters.js';
 
 export type GoodweEtMeterData = {
@@ -76,11 +77,11 @@ export type GoodweEtMeterData = {
     CT2_E_Total_buy: number;
     MeterCT2status: number;
     // Phase R voltage frommeter
-    meterVoltageR: number;
+    meterVoltageR: number | null;
     // Phase S voltage frommeter
-    meterVoltageS: number;
+    meterVoltageS: number | null;
     // Phase T voltage frommeter
-    meterVoltageT: number;
+    meterVoltageT: number | null;
     // Phase R current frommeter
     meterCurrentR: number;
     // Phase S current frommeter
@@ -255,17 +256,17 @@ export const GoodweEtMeterDataModel = modbusModelFactory<GoodweEtMeterData>({
         meterVoltageR: {
             start: 49, // 36052 - 36003
             end: 50,
-            readConverter: (value) => registersToUint16(value, -1), // /10
+            readConverter: (value) => registersToUint16Nullable(value, -1), // /10
         },
         meterVoltageS: {
             start: 50, // 36053 - 36003
             end: 51,
-            readConverter: (value) => registersToUint16(value, -1), // /10
+            readConverter: (value) => registersToUint16Nullable(value, -1), // /10
         },
         meterVoltageT: {
             start: 51, // 36054 - 36003
             end: 52,
-            readConverter: (value) => registersToUint16(value, -1), // /10
+            readConverter: (value) => registersToUint16Nullable(value, -1), // /10
         },
         meterCurrentR: {
             start: 52, // 36055 - 36003
