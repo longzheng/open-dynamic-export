@@ -10,6 +10,7 @@ import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import { type InverterConfiguration } from './inverterController.js';
 import { type Logger } from 'pino';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
+import { GoodweEtInverterDataPoller } from '../../inverter/goodwe/et.js';
 
 export class InvertersPoller extends EventEmitter<{
     data: [DerSample];
@@ -45,6 +46,19 @@ export class InvertersPoller extends EventEmitter<{
                             applyControl: config.inverterControl.enabled,
                             inverterIndex: index,
                         }).on('data', inverterOnData);
+                    }
+                    case 'goodwe': {
+                        switch (inverterConfig.model) {
+                            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                            case 'et': {
+                                return new GoodweEtInverterDataPoller({
+                                    goodweEtInverterConfig: inverterConfig,
+                                    applyControl:
+                                        config.inverterControl.enabled,
+                                    inverterIndex: index,
+                                }).on('data', inverterOnData);
+                            }
+                        }
                     }
                 }
             },
