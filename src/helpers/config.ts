@@ -237,7 +237,7 @@ A longer time will smooth out load changes but may result in overshoot.`,
             })
             .describe('MQTT meter configuration'),
     ]),
-    outputActiveLimits: z
+    publish: z
         .object({
             mqtt: z
                 .object({
@@ -258,7 +258,7 @@ A longer time will smooth out load changes but may result in overshoot.`,
                 })
                 .optional(),
         })
-        .describe('Optionally output active control limits')
+        .describe('Publish active control limits')
         .optional(),
 });
 

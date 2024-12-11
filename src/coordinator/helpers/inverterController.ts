@@ -22,7 +22,7 @@ import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import { differenceInSeconds } from 'date-fns';
 import { type ControlsModel } from '../../connections/sunspec/models/controls.js';
-import { ActiveLimitOutput } from './activeLimitOutput.js';
+import { Publish } from './publish.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -70,7 +70,7 @@ const defaultValues = {
 } as const satisfies Record<ControlType, unknown>;
 
 export class InverterController {
-    private activeLimitOutput: ActiveLimitOutput;
+    private activeLimitOutput: Publish;
     private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 100 });
     private cachedSiteSample = new CappedArrayStack<SiteSample>({ limit: 100 });
     private logger: Logger;
@@ -107,7 +107,7 @@ export class InverterController {
             inverterConfiguration: InverterConfiguration,
         ) => Promise<void>;
     }) {
-        this.activeLimitOutput = new ActiveLimitOutput({ config });
+        this.activeLimitOutput = new Publish({ config });
         this.secondsToSample = config.inverterControl.sampleSeconds;
         this.controlFrequencyMinimumSeconds =
             config.inverterControl.controlFrequencyMinimumSeconds;

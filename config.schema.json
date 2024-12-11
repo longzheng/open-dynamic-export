@@ -413,7 +413,7 @@
             }
           ]
         },
-        "outputActiveLimits": {
+        "publish": {
           "type": "object",
           "properties": {
             "mqtt": {
@@ -444,7 +444,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Optionally output active control limits"
+          "description": "Publish active control limits"
         }
       },
       "required": [
