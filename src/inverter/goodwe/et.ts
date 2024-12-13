@@ -86,12 +86,30 @@ export class GoodweEtInverterDataPoller extends InverterDataPollerBase {
         this.connection.onDestroy();
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     override async onControl(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _inverterConfiguration: InverterConfiguration,
+        inverterConfiguration: InverterConfiguration,
     ): Promise<void> {
-        throw new Error('Method not implemented.');
+        switch (inverterConfiguration.type) {
+            case 'disconnect':
+                throw new Error('Disconnect not supported');
+            case 'limit': {
+                const deviceParameters =
+                    await this.connection.getDeviceParameters();
+
+                const exportLimitPercentageOfRatedPower = Math.min(
+                    inverterConfiguration.exportLimitWatts /
+                        deviceParameters.RatePower,
+                    1,
+                );
+
+                await this.connection.setMeterControl({
+                    FeedPowerEnable: true,
+                    FeedPowerPara: Math.floor(
+                        exportLimitPercentageOfRatedPower * 10000,
+                    ),
+                });
+            }
+        }
     }
 }
 

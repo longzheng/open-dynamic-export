@@ -55,6 +55,7 @@ export type InverterConfiguration =
     | { type: 'disconnect' }
     | {
           type: 'limit';
+          exportLimitWatts: number;
           invertersCount: number;
           targetSolarWatts: number;
           targetSolarPowerRatio: number;
@@ -355,6 +356,7 @@ export class InverterController {
 
                     return {
                         type: 'limit',
+                        exportLimitWatts: configuration.exportLimitWatts,
                         invertersCount: configuration.invertersCount,
                         targetSolarWatts: rampedTargetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
@@ -458,6 +460,7 @@ export function calculateInverterConfiguration({
 
     return {
         type: 'limit',
+        exportLimitWatts,
         invertersCount: maxInvertersCount,
         targetSolarWatts,
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
