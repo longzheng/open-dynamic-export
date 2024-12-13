@@ -24,54 +24,61 @@ To configure a MQTT output, add the following property to `config.json`
 }
 ```
 
-The MQTT topic will contain a JSON message that meets the following schema
+The MQTT topic will contain a JSON message that meets the following Zod schema
 
 ```ts
-type ActiveInverterControlLimit = {
-    opModEnergize:
-        | {
-              value: boolean;
-              source: InverterControlTypes;
-          }
-        | undefined;
-    opModConnect:
-        | {
-              value: boolean;
-              source: InverterControlTypes;
-          }
-        | undefined;
-    opModGenLimW:
-        | {
-              value: number;
-              source: InverterControlTypes;
-          }
-        | undefined;
-    opModExpLimW:
-        | {
-              value: number;
-              source: InverterControlTypes;
-          }
-        | undefined;
-    opModImpLimW:
-        | {
-              value: number;
-              source: InverterControlTypes;
-          }
-        | undefined;
-    opModLoadLimW:
-        | {
-              value: number;
-              source: InverterControlTypes;
-          }
-        | undefined;
-};
+const inverterControlTypesSchema = z.union([
+  z.literal("fixed"),
+  z.literal("mqtt"),
+  z.literal("sep2"),
+  z.literal("twoWayTariff"),
+  z.literal("negativeFeedIn")
+])
 
-type InverterControlTypes =
-    | 'fixed'
-    | 'mqtt'
-    | 'sep2'
-    | 'twoWayTariff'
-    | 'negativeFeedIn';
+const activeInverterControlLimitSchema = z.object({
+  opModEnergize: z.union([
+    z.object({
+      value: z.boolean(),
+      source: inverterControlTypesSchema
+    }),
+    z.undefined()
+  ]),
+  opModConnect: z.union([
+    z.object({
+      value: z.boolean(),
+      source: inverterControlTypesSchema
+    }),
+    z.undefined()
+  ]),
+  opModGenLimW: z.union([
+    z.object({
+      value: z.number(),
+      source: inverterControlTypesSchema
+    }),
+    z.undefined()
+  ]),
+  opModExpLimW: z.union([
+    z.object({
+      value: z.number(),
+      source: inverterControlTypesSchema
+    }),
+    z.undefined()
+  ]),
+  opModImpLimW: z.union([
+    z.object({
+      value: z.number(),
+      source: inverterControlTypesSchema
+    }),
+    z.undefined()
+  ]),
+  opModLoadLimW: z.union([
+    z.object({
+      value: z.number(),
+      source: inverterControlTypesSchema
+    }),
+    z.undefined()
+  ])
+})
 ```
 
 For example
