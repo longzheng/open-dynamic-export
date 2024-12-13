@@ -516,8 +516,8 @@ export function calculateTargetSolarWatts({
     siteWatts: number;
     exportLimitWatts: number;
 }) {
-    const changeToMeetExportLimit = new Decimal(-siteWatts).plus(
-        -exportLimitWatts,
+    const changeToMeetExportLimit = new Decimal(-siteWatts).sub(
+        exportLimitWatts,
     );
     const solarTarget = new Decimal(solarWatts).sub(changeToMeetExportLimit);
 
