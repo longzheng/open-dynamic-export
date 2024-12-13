@@ -5,7 +5,7 @@ import { type ActiveInverterControlLimit } from './inverterController.js';
 export class Publish {
     private mqtt: { client: mqtt.MqttClient; topic: string } | undefined;
 
-    constructor({ config }: { config: Config }) {
+    constructor({ config }: { config: Pick<Config, 'publish'> }) {
         if (config.publish?.mqtt) {
             this.mqtt = {
                 client: mqtt.connect(config.publish.mqtt.host, {

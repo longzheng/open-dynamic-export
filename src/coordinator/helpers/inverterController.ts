@@ -70,7 +70,7 @@ const defaultValues = {
 } as const satisfies Record<ControlType, unknown>;
 
 export class InverterController {
-    private activeLimitOutput: Publish;
+    private publish: Publish;
     private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 100 });
     private cachedSiteSample = new CappedArrayStack<SiteSample>({ limit: 100 });
     private logger: Logger;
@@ -107,7 +107,7 @@ export class InverterController {
             inverterConfiguration: InverterConfiguration,
         ) => Promise<void>;
     }) {
-        this.activeLimitOutput = new Publish({ config });
+        this.publish = new Publish({ config });
         this.secondsToSample = config.inverterControl.sampleSeconds;
         this.controlFrequencyMinimumSeconds =
             config.inverterControl.controlFrequencyMinimumSeconds;
@@ -175,7 +175,7 @@ export class InverterController {
 
         writeActiveControlLimit({ limit: activeInverterControlLimit });
 
-        this.activeLimitOutput.onActiveInverterControlLimit({
+        this.publish.onActiveInverterControlLimit({
             limit: activeInverterControlLimit,
         });
 
