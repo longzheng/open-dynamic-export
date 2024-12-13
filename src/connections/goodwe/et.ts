@@ -17,7 +17,7 @@ import {
     type GoodweEtMeterControlWrite,
     GoodweGoodweEtMeterControlModel,
     type GoodweEtMeterControl,
-} from './models/et/goodweEtMeterControl.js';
+} from './models/et/meterControl.js';
 
 export class GoodweEtConnection {
     protected readonly modbusConnection: ModbusConnection;
