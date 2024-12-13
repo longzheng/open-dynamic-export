@@ -1,9 +1,5 @@
 {
     "limiters": {
-        "sep2": {
-            "host": "https://sep2-test.energyq.com.au",
-            "dcapUri": "/api/v2/dcap"
-        }
     },
     "inverters": [
         {
