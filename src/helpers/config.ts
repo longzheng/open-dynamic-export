@@ -156,6 +156,13 @@ export const configSchema = z.object({
                     })
                     .merge(modbusSchema)
                     .describe('SMA inverter configuration'),
+                z
+                    .object({
+                        type: z.literal('goodwe'),
+                        model: z.literal('et'),
+                    })
+                    .merge(modbusSchema)
+                    .describe('Goodwe inverter configuration'),
             ]),
         )
         .describe('Inverter configuration'),
@@ -196,6 +203,13 @@ A longer time will smooth out load changes but may result in overshoot.`,
             })
             .merge(modbusSchema)
             .describe('SMA meter configuration'),
+        z
+            .object({
+                type: z.literal('goodwe'),
+                model: z.literal('et'),
+            })
+            .merge(modbusSchema)
+            .describe('Goodwe meter configuration'),
         z
             .object({
                 type: z.literal('powerwall2'),
