@@ -37,6 +37,7 @@ export default withMermaid(
                         },
                         { text: 'Site meter', link: '/configuration/meter' },
                         { text: 'Limiters', link: '/configuration/limiters' },
+                        { text: 'Publish', link: '/configuration/publish' },
                     ],
                 },
                 {
