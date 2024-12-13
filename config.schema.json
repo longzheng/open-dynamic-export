@@ -464,6 +464,39 @@
               "description": "MQTT meter configuration"
             }
           ]
+        },
+        "publish": {
+          "type": "object",
+          "properties": {
+            "mqtt": {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "The host of the MQTT broker, including \"mqtt://\""
+                },
+                "username": {
+                  "type": "string",
+                  "description": "The username for the MQTT broker"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password for the MQTT broker"
+                },
+                "topic": {
+                  "type": "string",
+                  "description": "The topic to publish limits"
+                }
+              },
+              "required": [
+                "host",
+                "topic"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "description": "Publish active control limits"
         }
       },
       "required": [

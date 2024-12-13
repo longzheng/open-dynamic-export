@@ -251,6 +251,29 @@ A longer time will smooth out load changes but may result in overshoot.`,
             })
             .describe('MQTT meter configuration'),
     ]),
+    publish: z
+        .object({
+            mqtt: z
+                .object({
+                    host: z
+                        .string()
+                        .describe(
+                            'The host of the MQTT broker, including "mqtt://"',
+                        ),
+                    username: z
+                        .string()
+                        .optional()
+                        .describe('The username for the MQTT broker'),
+                    password: z
+                        .string()
+                        .optional()
+                        .describe('The password for the MQTT broker'),
+                    topic: z.string().describe('The topic to publish limits'),
+                })
+                .optional(),
+        })
+        .describe('Publish active control limits')
+        .optional(),
 });
 
 export type Config = z.infer<typeof configSchema>;
