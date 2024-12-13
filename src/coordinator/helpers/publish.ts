@@ -3,14 +3,17 @@ import { type Config } from '../../helpers/config.js';
 import { type ActiveInverterControlLimit } from './inverterController.js';
 
 export class Publish {
-    private mqttClient: mqtt.MqttClient | undefined;
+    private mqtt: { client: mqtt.MqttClient; topic: string } | undefined;
 
     constructor({ config }: { config: Config }) {
         if (config.publish?.mqtt) {
-            this.mqttClient = mqtt.connect(config.publish.mqtt.host, {
-                username: config.publish.mqtt.username,
-                password: config.publish.mqtt.password,
-            });
+            this.mqtt = {
+                client: mqtt.connect(config.publish.mqtt.host, {
+                    username: config.publish.mqtt.username,
+                    password: config.publish.mqtt.password,
+                }),
+                topic: config.publish.mqtt.topic,
+            };
         }
     }
 
@@ -19,11 +22,8 @@ export class Publish {
     }: {
         limit: ActiveInverterControlLimit;
     }) {
-        if (this.mqttClient) {
-            this.mqttClient.publish(
-                'inverterControlLimit',
-                JSON.stringify(limit),
-            );
+        if (this.mqtt) {
+            this.mqtt.client.publish(this.mqtt.topic, JSON.stringify(limit));
         }
     }
 }
