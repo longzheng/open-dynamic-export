@@ -1,7 +1,10 @@
 import { writeLatency } from '../../helpers/influxdb.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { type ModelAddress } from '../sunspec/connection/base.js';
-import { type ModbusConnection } from './connection/base.js';
+import {
+    type ModbusConnection,
+    type ModbusRegisterType,
+} from './connection/base.js';
 
 export type Mapping<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,8 +25,13 @@ export function modbusModelFactory<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Model extends Record<string, any>,
     WriteableKeys extends keyof Model = never,
->(config: {
+>({
+    name,
+    type = 'holding',
+    mapping,
+}: {
     name: string;
+    type?: ModbusRegisterType;
     mapping: Mapping<Model, WriteableKeys>;
 }): {
     read(params: {
@@ -42,7 +50,7 @@ export function modbusModelFactory<
         read: async ({ modbusConnection, address, unitId }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
-                model: config.name,
+                model: name,
                 type: 'read',
             });
 
@@ -51,7 +59,7 @@ export function modbusModelFactory<
             await modbusConnection.connect();
 
             const registers = await modbusConnection.readRegisters({
-                type: 'holding',
+                type,
                 unitId,
                 start: address.start,
                 length: address.length,
@@ -77,7 +85,7 @@ export function modbusModelFactory<
                         }
                     })(),
                     unitId: unitId.toString(),
-                    model: config.name,
+                    model: name,
                     addressStart: address.start.toString(),
                     addressLength: address.length.toString(),
                 },
@@ -90,13 +98,13 @@ export function modbusModelFactory<
 
             return convertReadRegisters({
                 registers: registers.data,
-                mapping: config.mapping,
+                mapping,
             });
         },
         write: async ({ modbusConnection, address, unitId, values }) => {
             const logger = modbusConnection.logger.child({
                 module: 'modbusModelFactory',
-                model: config.name,
+                model: name,
                 type: 'write',
             });
 
@@ -104,14 +112,14 @@ export function modbusModelFactory<
 
             const registerValues = convertWriteRegisters({
                 values,
-                mapping: config.mapping,
+                mapping,
                 length: address.length,
             });
 
             await modbusConnection.connect();
 
             await modbusConnection.writeRegisters({
-                type: 'holding',
+                type,
                 unitId,
                 start: address.start,
                 data: registerValues,
@@ -137,7 +145,7 @@ export function modbusModelFactory<
                         }
                     })(),
                     unitId: unitId.toString(),
-                    model: config.name,
+                    model: name,
                     addressStart: address.start.toString(),
                     addressLength: address.length.toString(),
                 },
