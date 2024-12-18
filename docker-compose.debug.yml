@@ -1,5 +1,8 @@
 services:
   open-dynamic-export:
+    build:
+      args:
+        DEBUG: "true"
     environment:
       NODE_ENV: development
     ports:

@@ -1,6 +1,12 @@
 {
     "configurations": [
         {
+            "command": "npm run dev",
+            "name": "Run with tsx",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
             "type": "node",
             "request": "attach",
             "name": "Docker: Attach to Node",

@@ -3,6 +3,8 @@
 # Build
 FROM node:22-alpine AS build
 
+ARG DEBUG=false
+
 WORKDIR /app
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
@@ -17,7 +19,8 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Copy the rest of the source files into the image.
 COPY . .
 
-RUN npm run build
+# Conditional debug build
+RUN if [ "$DEBUG" = "true" ]; then npm run build:debug; else npm run build; fi
 
 # Production
 FROM node:22-alpine AS production
