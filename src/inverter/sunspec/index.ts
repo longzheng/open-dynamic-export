@@ -48,7 +48,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     }) {
         super({
             name: 'SunSpecInverterDataPoller',
-            pollingIntervalMs: 200,
+            pollingIntervalMs: sunspecInverterConfig.pollingIntervalMs,
             applyControl,
             inverterIndex,
         });

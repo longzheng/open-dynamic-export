@@ -228,6 +228,11 @@
                     "maximum": 255,
                     "default": 1,
                     "description": "The unit/slave ID of the Modbus device. Defaults to 1."
+                  },
+                  "pollingIntervalMs": {
+                    "type": "number",
+                    "description": "The minimum number of seconds between polling, subject to the latency of the polling loop.",
+                    "default": 200
                   }
                 },
                 "required": [
@@ -253,6 +258,9 @@
                   },
                   "unitId": {
                     "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/unitId"
+                  },
+                  "pollingIntervalMs": {
+                    "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/pollingIntervalMs"
                   }
                 },
                 "required": [
@@ -313,6 +321,9 @@
                 },
                 "unitId": {
                   "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/unitId"
+                },
+                "pollingIntervalMs": {
+                  "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/pollingIntervalMs"
                 }
               },
               "required": [
@@ -339,6 +350,9 @@
                 },
                 "unitId": {
                   "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/unitId"
+                },
+                "pollingIntervalMs": {
+                  "$ref": "#/definitions/config/properties/inverters/items/anyOf/0/properties/pollingIntervalMs"
                 }
               },
               "required": [
@@ -369,6 +383,11 @@
                   "type": "number",
                   "description": "Request timeout in seconds",
                   "default": 2
+                },
+                "pollingIntervalMs": {
+                  "type": "number",
+                  "description": "The minimum number of seconds between polling, subject to the latency of the polling loop.",
+                  "default": 200
                 }
               },
               "required": [
@@ -401,6 +420,11 @@
                 "topic": {
                   "type": "string",
                   "description": "The topic to pull meter readings from"
+                },
+                "pollingIntervalMs": {
+                  "type": "number",
+                  "description": "The minimum number of seconds between polling, subject to the latency of the polling loop.",
+                  "default": 200
                 }
               },
               "required": [
