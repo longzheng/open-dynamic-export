@@ -170,6 +170,6 @@ type SiteSample = {
 };
 
 type ControlLimitsByLimiter = Record<
-    'sep2' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
+    'csipAus' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
     InverterControlLimit | null
 >;

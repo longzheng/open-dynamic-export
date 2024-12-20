@@ -11,7 +11,6 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
 } from './helpers/cert.js';
-import { type Config } from '../helpers/config.js';
 import { type RoleFlagsType } from './models/roleFlagsType.js';
 import { numberToHex } from '../helpers/number.js';
 import { createHash } from 'node:crypto';
@@ -29,21 +28,20 @@ export class SEP2Client {
     private readonly axiosInstance: AxiosInstance;
 
     constructor({
-        sep2Config,
+        host,
+        dcapUri,
         cert,
         key,
         pen,
     }: {
-        sep2Config: Pick<
-            NonNullable<Config['limiters']['sep2']>,
-            'host' | 'dcapUri'
-        >;
+        host: string;
+        dcapUri: string;
         cert: string;
         key: string;
         pen: string;
     }) {
-        this.host = sep2Config.host;
-        this.dcapUri = sep2Config.dcapUri;
+        this.host = host;
+        this.dcapUri = dcapUri;
         this.pen = pen.padStart(8, '0');
 
         const certificateFingerprint = getCertificateFingerprint(cert);

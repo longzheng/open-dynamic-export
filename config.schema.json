@@ -7,13 +7,13 @@
         "limiters": {
           "type": "object",
           "properties": {
-            "sep2": {
+            "csipAus": {
               "type": "object",
               "properties": {
                 "host": {
                   "type": "string",
                   "format": "uri",
-                  "description": "The host of the SEP2 server"
+                  "description": "The host of the CSIP-AUS server"
                 },
                 "dcapUri": {
                   "type": "string",
@@ -31,7 +31,7 @@
                 "dcapUri"
               ],
               "additionalProperties": false,
-              "description": "If defined, limit by CSIP-AUS/SEP2 server"
+              "description": "If defined, limit by CSIP-AUS server"
             },
             "fixed": {
               "type": "object",

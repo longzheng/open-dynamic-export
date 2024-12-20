@@ -4,7 +4,7 @@
 
 It is based on the [IEEE 2030.5](https://standards.ieee.org/ieee/2030.5/5897/) standard and is used by Australian electricity utilities/DNSPs (Distributed Network Service Providers) to dyamically control site import and exports for dynamic/flexible connections. It is also referenced as SEP2 (Smart Energy Profile 2).
 
-The project implements a CSIP-AUS compatible gateway client that interacts with the utility server (CSIP-AUS/SEP2 server). The initial implementation focuses on the [SA Power Networks requirements](https://www.talkingpower.com.au/71619/widgets/376925/documents/239205) and [Energy Queensland requirements](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
+The project implements a CSIP-AUS compatible gateway client that interacts with the utility CSIP-AUS server. The initial implementation focuses on the [SA Power Networks requirements](https://www.talkingpower.com.au/71619/widgets/376925/documents/239205) and [Energy Queensland requirements](https://www.energex.com.au/__data/assets/pdf_file/0007/1072618/SEP2-Client-Handbook-13436740.pdf).
 
 ```mermaid
 sequenceDiagram

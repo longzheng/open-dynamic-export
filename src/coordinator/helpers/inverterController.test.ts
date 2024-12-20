@@ -163,7 +163,7 @@ describe('getActiveInverterControlLimit', () => {
                 opModLoadLimW: 5000,
             },
             {
-                source: 'sep2',
+                source: 'csipAus',
                 opModConnect: true,
                 opModEnergize: false,
                 opModExpLimW: 2000,
@@ -179,11 +179,11 @@ describe('getActiveInverterControlLimit', () => {
                 value: false,
             },
             opModEnergize: {
-                source: 'sep2',
+                source: 'csipAus',
                 value: false,
             },
             opModExpLimW: {
-                source: 'sep2',
+                source: 'csipAus',
                 value: 2000,
             },
             opModGenLimW: {

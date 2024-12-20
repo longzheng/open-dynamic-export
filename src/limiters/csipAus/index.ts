@@ -13,7 +13,7 @@ import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
 
-export class Sep2Limiter implements LimiterType {
+export class CsipAusLimiter implements LimiterType {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
     };
@@ -188,7 +188,7 @@ export class Sep2Limiter implements LimiterType {
         );
 
         const limit: InverterControlLimit = {
-            source: 'sep2',
+            source: 'csipAus',
             opModExpLimW: this.opModExpLimWRampRateHelper.getRampedValue(),
             opModGenLimW: this.opModGenLimWRampRateHelper.getRampedValue(),
             opModEnergize:

@@ -22,10 +22,8 @@ beforeAll(() => {
     server.listen();
 
     sep2Client = new SEP2Client({
-        sep2Config: {
-            host: 'http://example.com',
-            dcapUri: '/dcap',
-        },
+        host: 'http://example.com',
+        dcapUri: '/dcap',
         cert: mockCert,
         key: mockKey,
         pen: '12345',

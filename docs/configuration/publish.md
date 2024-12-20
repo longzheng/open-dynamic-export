@@ -28,11 +28,11 @@ The MQTT topic will contain a JSON message that meets the following Zod schema
 
 ```ts
 const inverterControlTypesSchema = z.union([
+  z.literal("csipAus"),
   z.literal("fixed"),
   z.literal("mqtt"),
-  z.literal("sep2"),
-  z.literal("twoWayTariff"),
   z.literal("negativeFeedIn")
+  z.literal("twoWayTariff"),
 ])
 
 const activeInverterControlLimitSchema = z.object({
@@ -86,19 +86,19 @@ For example
 ```js
 {
     "opModEnergize": {
-        "source": "sep2",
+        "source": "csipAus",
         "value": true
     },
     "opModConnect": {
-        "source": "sep2",
+        "source": "csipAus",
         "value": true
     },
     "opModExpLimW": {
-        "source": "sep2",
+        "source": "csipAus",
         "value": 1500
     },
     "opModImpLimW": {
-        "source": "sep2",
+        "source": "csipAus",
         "value": 1500
     }
 }

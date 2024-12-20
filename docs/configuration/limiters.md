@@ -23,7 +23,7 @@ The software supports 6 control modes mapped to the CSIP-AUS Dynamic Operating E
 
 ## CSIP-AUS dynamic connection
 
-Apply dynamic limits from an Australian energy utility CSIP-AUS/SEP2 server.
+Apply dynamic limits from an Australian energy utility CSIP-AUS server.
 
 > [!IMPORTANT]
 > This CSIP-AUS client cannot run without device certificates (and manufacturer certificates). See the [CSIP-AUS section](/csip-aus) for more information.
@@ -33,8 +33,8 @@ To use the CSIP-AUS limiter, add following property to `config.json`
 ```js
 {
     "limiters": {
-        "sep2": {
-            "host": "https://sep2-test.energyq.com.au", // (string) required: the SEP2 server host
+        "csipAus": {
+            "host": "https://sep2-test.energyq.com.au", // (string) required: the CSIP-AUS server host
             "dcapUri": "/api/v2/dcap", // (string) required: the device capability discovery URI
             "nmi": "1234567890" // (string) optional: for utilities that require in-band registration, the NMI of the site
         }
