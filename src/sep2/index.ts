@@ -3,7 +3,7 @@ import { type Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
 import { pinoLogger } from '../helpers/logger.js';
 import { SEP2Client } from './client.js';
-import { Sep2Limiter } from '../limiters/sep2/index.js';
+import { CsipAusLimiter } from '../limiters/csipAus/index.js';
 import { DerHelper } from './helpers/der.js';
 import { DerControlsHelper } from './helpers/derControls.js';
 import { DerListHelper } from './helpers/derList.js';
@@ -25,7 +25,7 @@ export type Sep2Instance = {
     sep2Client: SEP2Client;
     derHelper: DerHelper;
     mirrorUsagePointListHelper: MirrorUsagePointListHelper;
-    limiter: Sep2Limiter;
+    limiter: CsipAusLimiter;
 };
 
 export function getSep2Instance({
@@ -35,14 +35,15 @@ export function getSep2Instance({
     config: Config;
     rampRateHelper: RampRateHelper;
 }): Sep2Instance | null {
-    if (!config.limiters.sep2) {
+    if (!config.limiters.csipAus) {
         return null;
     }
 
     const sep2Certificate = getSep2Certificate();
 
     const sep2Client = new SEP2Client({
-        sep2Config: config.limiters.sep2,
+        host: config.limiters.csipAus.host,
+        dcapUri: config.limiters.csipAus.dcapUri,
         cert: sep2Certificate.cert,
         key: sep2Certificate.key,
         pen: env.SEP2_PEN,
@@ -78,7 +79,7 @@ export function getSep2Instance({
         client: sep2Client,
     });
 
-    const limiter = new Sep2Limiter({
+    const limiter = new CsipAusLimiter({
         client: sep2Client,
         rampRateHelper,
     });
@@ -243,7 +244,7 @@ export function getSep2Instance({
     }: {
         connectionPointHref: string;
     }) {
-        const nmi = config.limiters.sep2?.nmi;
+        const nmi = config.limiters.csipAus?.nmi;
 
         if (!nmi) {
             throw new Error(

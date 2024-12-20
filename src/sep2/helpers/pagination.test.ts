@@ -12,10 +12,8 @@ let sep2Client: SEP2Client;
 
 beforeAll(() => {
     sep2Client = new SEP2Client({
-        sep2Config: {
-            host: 'http://example.com',
-            dcapUri: '/dcap',
-        },
+        host: 'http://example.com',
+        dcapUri: '/dcap',
         cert: mockCert,
         key: mockKey,
         pen: '12345',

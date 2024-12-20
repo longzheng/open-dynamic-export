@@ -46,12 +46,12 @@ export type ModbusSchema = z.infer<typeof modbusSchema>;
 export const configSchema = z.object({
     limiters: z
         .object({
-            sep2: z
+            csipAus: z
                 .object({
                     host: z
                         .string()
                         .url()
-                        .describe('The host of the SEP2 server'),
+                        .describe('The host of the CSIP-AUS server'),
                     dcapUri: z
                         .string()
                         .describe('The URI of the DeviceCapability resource'),
@@ -65,7 +65,7 @@ export const configSchema = z.object({
                         ),
                 })
                 .optional()
-                .describe('If defined, limit by CSIP-AUS/SEP2 server'),
+                .describe('If defined, limit by CSIP-AUS server'),
             fixed: z
                 .object({
                     connect: z

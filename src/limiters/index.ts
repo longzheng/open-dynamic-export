@@ -17,7 +17,7 @@ export function getLimiters({
     sep2Instance: Sep2Instance | null;
 }): Limiters {
     return {
-        sep2: sep2Instance?.limiter ?? null,
+        csipAus: sep2Instance?.limiter ?? null,
         fixed: config.limiters.fixed
             ? new FixedLimiter({ config: config.limiters.fixed })
             : null,

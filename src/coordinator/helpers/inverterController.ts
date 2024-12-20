@@ -37,7 +37,7 @@ export type SupportedControlTypes = Extract<
 export type InverterControlTypes =
     | 'fixed'
     | 'mqtt'
-    | 'sep2'
+    | 'csipAus'
     | 'twoWayTariff'
     | 'negativeFeedIn';
 
