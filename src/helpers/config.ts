@@ -178,10 +178,12 @@ A longer time will smooth out load changes but may result in overshoot.`,
             )
             .optional()
             .default(5),
-        controlFrequencyMinimumSeconds: z
+        intervalSeconds: z
             .number()
             .min(0)
-            .describe(`The number of seconds between control commands`)
+            .describe(
+                `The minimum number of seconds between control commands, subject to the latency of the control loop.`,
+            )
             .optional()
             .default(1),
     }),

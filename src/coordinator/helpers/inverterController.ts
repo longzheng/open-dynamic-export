@@ -94,7 +94,7 @@ export class InverterController {
     // we don't want to rely on the latest readings to make decisions since it will lead to oscillating control values
     // we take a time weighted average of the last few seconds to smooth out the control values
     private secondsToSample: number;
-    private controlFrequencyMinimumSeconds: number;
+    private intervalSeconds: number;
 
     constructor({
         config,
@@ -109,8 +109,7 @@ export class InverterController {
     }) {
         this.publish = new Publish({ config });
         this.secondsToSample = config.inverterControl.sampleSeconds;
-        this.controlFrequencyMinimumSeconds =
-            config.inverterControl.controlFrequencyMinimumSeconds;
+        this.intervalSeconds = config.inverterControl.intervalSeconds;
         this.limiters = limiters;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.onControl = onControl;
@@ -234,10 +233,7 @@ export class InverterController {
 
             writeLatency({ field: 'applyControlLoop', duration });
 
-            const delay = Math.max(
-                this.controlFrequencyMinimumSeconds * 1000 - duration,
-                0,
-            );
+            const delay = Math.max(this.intervalSeconds * 1000 - duration, 0);
 
             setTimeout(() => {
                 void this.applyControlLoop();
