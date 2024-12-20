@@ -18,6 +18,7 @@ To configure a MQTT meter connection, add the following property to `config.json
         "username": "user", // (string) optional: the MQTT broker username
         "password": "password", // (string) optional: the MQTT broker password
         "topic": "site" // (string) required: the MQTT topic to read
+        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 }
@@ -147,7 +148,8 @@ To configure a SMA inverter with meter connection, add the following property to
             "port": 502 // (number) required: the Modbus TCP port of the inverter
         },
         "unitId": 240 // (number) required: the SunSpec unit ID of the meter
-        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption)
+        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption),
+        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 }
@@ -175,7 +177,8 @@ To configure a SunSpec meter connection over TCP, add the following property to 
             "port": 502 // (number) required: the Modbus TCP port of the inverter
         },
         "unitId": 240 // (number) required: the SunSpec unit ID of the meter
-        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption)
+        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption),
+        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 }
@@ -208,7 +211,8 @@ Sites with a Tesla Powerwall 2 can use the Backup Gateway 2's meter and local AP
     "meter": {
         "type": "powerwall2", // (string) required: the type of meter
         "ip": "192.168.1.68", // (string) required: the IP address of the Powerwall 2 Gateway
-        "password": "ABCDE" // (string) required: the password to access the Powerwall 2 API (the last 5 characters of the password sticker)
+        "password": "ABCDE" // (string) required: the password to access the Powerwall 2 API (the last 5 characters of the password sticker),
+        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 ```

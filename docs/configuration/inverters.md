@@ -23,7 +23,8 @@ To configure a SMA inverter connection, add the following property to `config.js
                 "ip": "192.168.1.6", // (string) required: the IP address of the inverter
                 "port": 502 // (number) required: the Modbus TCP port of the inverter
             },
-            "unitId": 1 // (number) required: the Modbus unit ID of the inverter
+            "unitId": 1 // (number) required: the Modbus unit ID of the inverter,
+            "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
         }
     ],
     ...
@@ -50,7 +51,8 @@ To configure a SunSpec inverter connection over TCP, add the following property 
                 "ip": "192.168.1.6", // (string) required: the IP address of the inverter
                 "port": 502 // (number) required: the Modbus TCP port of the inverter
             },
-            "unitId": 1 // (number) required: the Modbus unit ID of the inverter
+            "unitId": 1 // (number) required: the Modbus unit ID of the inverter,
+            "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
         }
     ],
     ...

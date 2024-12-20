@@ -26,14 +26,14 @@ The inverter control loop will attempt to aggregate and average a window of meas
 
 ## Frequency
 
-The inverter control loop will attempt to control the inverter with a rate limit to prevent over-correcting and leading to osscilations. The `config.json` option `inverterControl.controlFrequencyMinimumSeconds` can be used to adjust the frequency in seconds.
+The inverter control loop will attempt to control the inverter with a rate limit to prevent over-correcting and leading to osscilations. The `config.json` option `inverterControl.intervalSeconds` can be used to adjust the frequency in seconds.
 
 The rate limit will be influenced by the latency of sending commands to the inverter (e.g. over WiFi) and the inverter's response time, so the frequency configuration is a minimum and not a guaranteed rate.
 
 ```js
 {
     "inverterControl": {
-        "controlFrequencyMinimumSeconds": 5 // (number) optional: the frequency in seconds to control the inverter
+        "intervalSeconds": 5 // (number) optional: the frequency in seconds to control the inverter
     },
     ...
 }
