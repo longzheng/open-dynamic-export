@@ -16,7 +16,7 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     }) {
         super({
             name: 'powerwall2',
-            pollingIntervalMs: 200,
+            pollingIntervalMs: powerwall2Config.pollingIntervalMs,
         });
 
         this.client = getPowerwall2Client({

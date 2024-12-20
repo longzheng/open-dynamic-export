@@ -40,7 +40,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
     }) {
         super({
             name: 'SmaInverterDataPoller',
-            pollingIntervalMs: 200,
+            pollingIntervalMs: smaInverterConfig.pollingIntervalMs,
             applyControl,
             inverterIndex,
         });

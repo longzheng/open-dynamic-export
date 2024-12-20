@@ -24,7 +24,10 @@ export class SunSpecMeterSiteSamplePoller extends SiteSamplePollerBase {
         sunspecMeterConfig: SunSpecMeterConfig;
         invertersPoller: InvertersPoller;
     }) {
-        super({ name: 'sunspec', pollingIntervalMs: 200 });
+        super({
+            name: 'sunspec',
+            pollingIntervalMs: sunspecMeterConfig.pollingIntervalMs,
+        });
 
         this.meterConnection = new MeterSunSpecConnection(sunspecMeterConfig);
         this.location = sunspecMeterConfig.location;

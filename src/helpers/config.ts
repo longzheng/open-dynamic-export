@@ -32,6 +32,13 @@ const modbusSchema = z.object({
         .max(255)
         .default(1)
         .describe('The unit/slave ID of the Modbus device. Defaults to 1.'),
+    pollingIntervalMs: z
+        .number()
+        .optional()
+        .describe(
+            'The minimum number of seconds between polling, subject to the latency of the polling loop.',
+        )
+        .default(200),
 });
 
 export type ModbusSchema = z.infer<typeof modbusSchema>;
@@ -171,10 +178,12 @@ A longer time will smooth out load changes but may result in overshoot.`,
             )
             .optional()
             .default(5),
-        controlFrequencyMinimumSeconds: z
+        intervalSeconds: z
             .number()
             .min(0)
-            .describe(`The number of seconds between control commands`)
+            .describe(
+                `The minimum number of seconds between control commands, subject to the latency of the control loop.`,
+            )
             .optional()
             .default(1),
     }),
@@ -213,6 +222,13 @@ A longer time will smooth out load changes but may result in overshoot.`,
                     .optional()
                     .describe('Request timeout in seconds')
                     .default(2),
+                pollingIntervalMs: z
+                    .number()
+                    .optional()
+                    .describe(
+                        'The minimum number of seconds between polling, subject to the latency of the polling loop.',
+                    )
+                    .default(200),
             })
             .describe('Powerwall 2 meter configuration'),
         z
@@ -234,6 +250,13 @@ A longer time will smooth out load changes but may result in overshoot.`,
                 topic: z
                     .string()
                     .describe('The topic to pull meter readings from'),
+                pollingIntervalMs: z
+                    .number()
+                    .optional()
+                    .describe(
+                        'The minimum number of seconds between polling, subject to the latency of the polling loop.',
+                    )
+                    .default(200),
             })
             .describe('MQTT meter configuration'),
     ]),

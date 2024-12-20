@@ -15,7 +15,7 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
     }) {
         super({
             name: 'mqtt',
-            pollingIntervalMs: 200,
+            pollingIntervalMs: mqttConfig.pollingIntervalMs,
         });
 
         this.client = mqtt.connect(mqttConfig.host, {
