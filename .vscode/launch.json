@@ -23,7 +23,7 @@
         {
             "type": "node",
             "request": "attach",
-            "name": "Docker: Build and attach to Node",
+            "name": "Docker: Build debug and attach to Node",
             "port": 9229,
             "continueOnAttach": true,
             "remoteRoot": "/app",
