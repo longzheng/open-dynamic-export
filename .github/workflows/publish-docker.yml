@@ -43,6 +43,9 @@ jobs:
         with:
           context: .
           push: true
+          # TODO: add linux/arm/v7 once a workaround is found for https://github.com/docker/build-push-action/issues/1071
+          # without downgrading NodeJS
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
