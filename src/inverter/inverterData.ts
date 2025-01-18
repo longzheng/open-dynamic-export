@@ -6,6 +6,13 @@ import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
 
 export const inverterDataSchema = z.object({
     inverter: z.object({
+        /**
+         * Positive values = inverter export (produce) power
+         *
+         * Negative values = inverter import (consume) power
+         *
+         * Value is total (net across all phases) measurement
+         */
         realPower: z.number(),
         reactivePower: z.number(),
         voltagePhaseA: z.number().nullable(),
