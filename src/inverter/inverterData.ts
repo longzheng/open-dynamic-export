@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DERTyp } from '../connections/sunspec/models/nameplate.js';
-import { ConnectStatusValue } from '../sep2/models/connectStatus.js';
+import { connectStatusValueSchema } from '../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
 import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
 
@@ -26,7 +26,7 @@ export const inverterDataSchema = z.object({
     }),
     status: z.object({
         operationalModeStatus: z.nativeEnum(OperationalModeStatusValue),
-        genConnectStatus: z.nativeEnum(ConnectStatusValue),
+        genConnectStatus: connectStatusValueSchema,
     }),
 });
 

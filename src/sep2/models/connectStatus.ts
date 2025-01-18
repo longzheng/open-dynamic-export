@@ -16,7 +16,8 @@ export enum ConnectStatusValue {
     Fault = 1 << 4,
 }
 
-const connectStatusValueSchema = zodBitwiseEnumSchema(ConnectStatusValue);
+export const connectStatusValueSchema =
+    zodBitwiseEnumSchema(ConnectStatusValue);
 
 export const connectStatusSchema = z.object({
     dateTime: z.coerce.date(),
