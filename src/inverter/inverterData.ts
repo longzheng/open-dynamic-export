@@ -1,30 +1,35 @@
-import { type DERTyp } from '../connections/sunspec/models/nameplate.js';
-import { type ConnectStatusValue } from '../sep2/models/connectStatus.js';
-import { type OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
+import { z } from 'zod';
+import { DERTyp } from '../connections/sunspec/models/nameplate.js';
+import { ConnectStatusValue } from '../sep2/models/connectStatus.js';
+import { OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
+import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
 
-export type InverterData = {
-    date: Date;
-    inverter: {
-        realPower: number;
-        reactivePower: number;
-        voltagePhaseA: number | null;
-        voltagePhaseB: number | null;
-        voltagePhaseC: number | null;
-        frequency: number;
-    };
-    nameplate: {
-        type: DERTyp;
-        maxW: number;
-        maxVA: number;
-        maxVar: number;
-    };
-    settings: {
-        maxW: number;
-        maxVA: number | null;
-        maxVar: number | null;
-    };
-    status: {
-        operationalModeStatus: OperationalModeStatusValue;
-        genConnectStatus: ConnectStatusValue;
-    };
-};
+export const inverterDataSchema = z.object({
+    inverter: z.object({
+        realPower: z.number(),
+        reactivePower: z.number(),
+        voltagePhaseA: z.number().nullable(),
+        voltagePhaseB: z.number().nullable(),
+        voltagePhaseC: z.number().nullable(),
+        frequency: z.number(),
+    }),
+    nameplate: z.object({
+        type: z.nativeEnum(DERTyp),
+        maxW: z.number(),
+        maxVA: z.number(),
+        maxVar: z.number(),
+    }),
+    settings: z.object({
+        maxW: z.number(),
+        maxVA: z.number().nullable(),
+        maxVar: z.number().nullable(),
+    }),
+    status: z.object({
+        operationalModeStatus: z.nativeEnum(OperationalModeStatusValue),
+        genConnectStatus: z.nativeEnum(ConnectStatusValue),
+    }),
+});
+
+export type InverterDataBase = z.infer<typeof inverterDataSchema>;
+
+export type InverterData = SampleBase & InverterDataBase;
