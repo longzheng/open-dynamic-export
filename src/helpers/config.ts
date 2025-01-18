@@ -163,6 +163,36 @@ export const configSchema = z.object({
                     })
                     .merge(modbusSchema)
                     .describe('SMA inverter configuration'),
+                z
+                    .object({
+                        type: z.literal('mqtt'),
+                        host: z
+                            .string()
+                            .describe(
+                                'The host of the MQTT broker, including "mqtt://"',
+                            ),
+                        username: z
+                            .string()
+                            .optional()
+                            .describe('The username for the MQTT broker'),
+                        password: z
+                            .string()
+                            .optional()
+                            .describe('The password for the MQTT broker'),
+                        topic: z
+                            .string()
+                            .describe(
+                                'The topic to pull inverter readings from',
+                            ),
+                        pollingIntervalMs: z
+                            .number()
+                            .optional()
+                            .describe(
+                                'The minimum number of seconds between polling, subject to the latency of the polling loop.',
+                            )
+                            .default(200),
+                    })
+                    .describe('MQTT inverter configuration'),
             ]),
         )
         .describe('Inverter configuration'),

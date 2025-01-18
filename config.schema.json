@@ -270,6 +270,43 @@
                 ],
                 "additionalProperties": false,
                 "description": "SMA inverter configuration"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "mqtt"
+                  },
+                  "host": {
+                    "type": "string",
+                    "description": "The host of the MQTT broker, including \"mqtt://\""
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "The username for the MQTT broker"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The password for the MQTT broker"
+                  },
+                  "topic": {
+                    "type": "string",
+                    "description": "The topic to pull inverter readings from"
+                  },
+                  "pollingIntervalMs": {
+                    "type": "number",
+                    "description": "The minimum number of seconds between polling, subject to the latency of the polling loop.",
+                    "default": 200
+                  }
+                },
+                "required": [
+                  "type",
+                  "host",
+                  "topic"
+                ],
+                "additionalProperties": false,
+                "description": "MQTT inverter configuration"
               }
             ]
           },
