@@ -4,6 +4,12 @@ Optionally configure the active limits to be published to an external system.
 
 [[toc]]
 
+## REST API/OpenAPI
+
+The active limits (and other metrics and configurations) can be accessed from the `http://<host>:3000/coordinator/status` "coordinator status" REST API.
+
+You can access the API documentation/OpenAPI schema at `http://<host>:3000/docs`. The server port can be configured in the `.env` `SERVER_PORT`.
+
 ## MQTT
 
 Write active limits to a MQTT topic.
