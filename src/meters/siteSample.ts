@@ -9,9 +9,9 @@ import { z } from 'zod';
 // aligns with the CSIP-AUS requirements for site sample
 export const siteSampleDataSchema = z.object({
     /**
-     * Positive values = site import power
+     * Positive values = site import (consume) power
      *
-     * Negative values = site export power
+     * Negative values = site export (produce) power
      */
     realPower: z.union([
         perPhaseNetMeasurementSchema,
