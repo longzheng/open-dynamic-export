@@ -15,6 +15,8 @@ import {
 import { parseDerControlListXml } from '../models/derControlList.js';
 import { derControlSchema } from '../models/derControl.js';
 import { z } from 'zod';
+import { type Logger } from 'pino';
+import { pinoLogger } from '../../helpers/logger.js';
 
 export const derProgramListDataSchema = z.array(
     z.object({
@@ -33,11 +35,15 @@ export class DerProgramListHelper extends EventEmitter<{
     private client: SEP2Client;
     private derProgramListPollableResource: DerProgramListPollableResource | null =
         null;
+    private logger: Logger;
 
     constructor({ client }: { client: SEP2Client }) {
         super();
 
         this.client = client;
+        this.logger = pinoLogger.child({
+            module: 'DerProgramListHelper',
+        });
     }
 
     updateHref({ href }: { href: string }) {
@@ -54,41 +60,58 @@ export class DerProgramListHelper extends EventEmitter<{
                         defaultPollPushRates.functionSetAssignmentsListPoll,
                 }).on('data', (data) => {
                     void (async () => {
-                        const result: DerProgramListData = [];
+                        // this function calls SEP2Client requests directly (without polling)
+                        // it has been observed some CSIP utility servers will randomly error consistently (and exceed the retry limit)
+                        // in this scenario the application will crash since we await DefaultDerControl and DerControlList data
+                        // however we can safely ignore these errors since the data will be requested again on the next poll of DerProgramList
+                        try {
+                            const result: DerProgramListData = [];
 
-                        for (const program of data.derPrograms) {
-                            const defaultDerControl =
-                                program.defaultDerControlLink
-                                    ? parseDefaultDERControlXml(
-                                          await this.client.get(
-                                              program.defaultDerControlLink
+                            for (const program of data.derPrograms) {
+                                const defaultDerControl =
+                                    program.defaultDerControlLink
+                                        ? parseDefaultDERControlXml(
+                                              await this.client.get(
+                                                  program.defaultDerControlLink
+                                                      .href,
+                                              ),
+                                          )
+                                        : undefined;
+
+                                const derControlList =
+                                    program.derControlListLink
+                                        ? await getListAll({
+                                              client: this.client,
+                                              url: program.derControlListLink
                                                   .href,
-                                          ),
-                                      )
-                                    : undefined;
+                                              parseXml: parseDerControlListXml,
+                                              addItems: (
+                                                  allResults,
+                                                  result,
+                                              ) => {
+                                                  allResults.derControls.push(
+                                                      ...result.derControls,
+                                                  );
+                                              },
+                                              getItems: (result) =>
+                                                  result.derControls,
+                                          })
+                                        : undefined;
 
-                            const derControlList = program.derControlListLink
-                                ? await getListAll({
-                                      client: this.client,
-                                      url: program.derControlListLink.href,
-                                      parseXml: parseDerControlListXml,
-                                      addItems: (allResults, result) => {
-                                          allResults.derControls.push(
-                                              ...result.derControls,
-                                          );
-                                      },
-                                      getItems: (result) => result.derControls,
-                                  })
-                                : undefined;
+                                result.push({
+                                    program,
+                                    defaultDerControl,
+                                    derControls: derControlList?.derControls,
+                                });
+                            }
 
-                            result.push({
-                                program,
-                                defaultDerControl,
-                                derControls: derControlList?.derControls,
-                            });
+                            this.emit('data', result);
+                        } catch (error) {
+                            this.logger.error(
+                                error,
+                                'Error processing DerProgramList data',
+                            );
                         }
-
-                        this.emit('data', result);
                     })();
                 });
         }
