@@ -244,7 +244,7 @@ export function generateDeviceCertificate({
     const lfdi = getCertificateLfdi(fingerprint);
     console.log(`Device LFDI ${lfdi}`);
 
-    const lfdiFormatted = formatStringWithDashes(lfdi);
+    const lfdiFormatted = formatLfdiWithDashes(lfdi);
     console.log(`Device LFDI formatted with dashes ${lfdiFormatted}`);
 }
 
@@ -265,6 +265,6 @@ function randomSerialNumberHex() {
     return (num >> 1n).toString();
 }
 
-function formatStringWithDashes(input: string): string {
+export function formatLfdiWithDashes(input: string): string {
     return input.replace(/(.{4})(?=.)/g, '$1-');
 }
