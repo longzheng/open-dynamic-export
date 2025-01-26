@@ -2,10 +2,10 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Powerwall2Client } from './client.js';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import loginBasicJson from '../../../tests/tesla/powerwall2/mocks/loginBasic.json';
-import metersAggregatesJson from '../../../tests/tesla/powerwall2/mocks/metersAggregates.json';
-import metersSiteSinglePhaseJson from '../../../tests/tesla/powerwall2/mocks/metersSiteSinglePhase.json';
-import metersSiteThreePhaseJson from '../../../tests/tesla/powerwall2/mocks/metersSiteThreePhase.json';
+import loginBasicJson from '../../../tests/tesla/powerwall2/mocks/loginBasic.json' assert { type: 'json' };
+import metersAggregatesJson from '../../../tests/tesla/powerwall2/mocks/metersAggregates.json' assert { type: 'json' };
+import metersSiteSinglePhaseJson from '../../../tests/tesla/powerwall2/mocks/metersSiteSinglePhase.json' assert { type: 'json' };
+import metersSiteThreePhaseJson from '../../../tests/tesla/powerwall2/mocks/metersSiteThreePhase.json' assert { type: 'json' };
 
 describe('Powerwall2Client', () => {
     const mockIp = '192.168.1.123';

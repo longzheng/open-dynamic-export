@@ -11,7 +11,7 @@ import {
 import { AmberLimiter } from './index.js';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
-import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json';
+import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json' assert { type: 'json' };
 
 describe('AmberLimiter', () => {
     const mockRestHandlers = [
