@@ -39,12 +39,13 @@ describe('DeviceCapabilityHelper', () => {
     afterAll(() => mockServer.close());
 
     beforeEach(() => {
-        // tell vitest we use mocked time
-        vi.useFakeTimers();
+        // only mock setTimeout https://github.com/vitest-dev/vitest/issues/7288
+        vi.useFakeTimers({
+            toFake: ['setTimeout'],
+        });
     });
 
     afterEach(() => {
-        // restoring date after each test run
         vi.useRealTimers();
     });
 

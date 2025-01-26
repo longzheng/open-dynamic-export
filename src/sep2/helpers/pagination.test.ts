@@ -1,3 +1,4 @@
+import { afterEach, type MockInstance } from 'vitest';
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { SEP2Client } from '../client.js';
 import { type List } from '../models/list.js';
@@ -9,6 +10,7 @@ type MockStringsList = List & {
 };
 
 let sep2Client: SEP2Client;
+let mockGetCalls: MockInstance<typeof sep2Client.get>;
 
 beforeAll(() => {
     sep2Client = new SEP2Client({
@@ -18,6 +20,14 @@ beforeAll(() => {
         key: mockKey,
         pen: '12345',
     });
+
+    mockGetCalls = vi.spyOn(sep2Client, 'get');
+});
+
+afterEach(() => {
+    // spyOn reuses mocks, the "toBeCalledTimes" is not reset
+    // https://vitest.dev/guide/migration.html#vi-spyon-reuses-mock-if-method-is-already-mocked
+    mockGetCalls.mockReset();
 });
 
 describe('getListAll', () => {
@@ -42,8 +52,7 @@ describe('getListAll', () => {
             { all: 4, results: 2, strings: ['test3', 'test4'] },
         ];
 
-        const mockGetCalls = vi
-            .spyOn(sep2Client, 'get')
+        mockGetCalls
             .mockResolvedValueOnce(mockResults[0])
             .mockResolvedValueOnce(mockResults[1]);
 
@@ -69,8 +78,7 @@ describe('getListAll', () => {
             { all: 4, results: 0, strings: [] },
         ];
 
-        const mockGetCalls = vi
-            .spyOn(sep2Client, 'get')
+        mockGetCalls
             .mockResolvedValueOnce(mockResults[0])
             .mockResolvedValueOnce(mockResults[1]);
 
@@ -95,9 +103,7 @@ describe('getListAll', () => {
             strings: [],
         };
 
-        const mockGetCalls = vi
-            .spyOn(sep2Client, 'get')
-            .mockResolvedValue(mockResult);
+        mockGetCalls.mockResolvedValue(mockResult);
 
         // Act
         const result = await getListAll({

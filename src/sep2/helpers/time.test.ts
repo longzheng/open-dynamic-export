@@ -52,8 +52,8 @@ describe('TimeHelper', () => {
         timeHandlerCount = 0;
         timeHandler2Count = 0;
 
-        // tell vitest we use mocked time
-        vi.useFakeTimers();
+        // only mock date https://github.com/vitest-dev/vitest/issues/7288
+        vi.useFakeTimers({ toFake: ['Date'] });
     });
 
     afterEach(() => {

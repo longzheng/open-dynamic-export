@@ -1,12 +1,4 @@
-import {
-    afterAll,
-    beforeAll,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    vi,
-} from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Powerwall2Client } from './client.js';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
@@ -44,9 +36,6 @@ describe('Powerwall2Client', () => {
     let power2Client: Powerwall2Client;
 
     beforeEach(() => {
-        // tell vitest we use mocked time
-        vi.useFakeTimers();
-
         power2Client = new Powerwall2Client({
             ip: mockIp,
             password: 'testpassword',

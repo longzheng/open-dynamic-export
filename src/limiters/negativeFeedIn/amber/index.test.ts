@@ -31,8 +31,10 @@ describe('AmberLimiter', () => {
     let amberControlLimit: AmberLimiter;
 
     beforeEach(() => {
-        // tell vitest we use mocked time
-        vi.useFakeTimers();
+        // only mock date https://github.com/vitest-dev/vitest/issues/7288
+        vi.useFakeTimers({
+            toFake: ['Date'],
+        });
 
         amberControlLimit = new AmberLimiter({
             apiKey: 'abc',
@@ -41,7 +43,6 @@ describe('AmberLimiter', () => {
     });
 
     afterEach(() => {
-        // restoring date after each test run
         vi.useRealTimers();
 
         // Reset handlers after each test `important for test isolation`
