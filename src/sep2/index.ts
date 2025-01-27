@@ -26,6 +26,7 @@ export type Sep2Instance = {
     derHelper: DerHelper;
     mirrorUsagePointListHelper: MirrorUsagePointListHelper;
     limiter: CsipAusLimiter;
+    destroy: () => void;
 };
 
 export function getSep2Instance({
@@ -265,5 +266,18 @@ export function getSep2Instance({
         derHelper,
         mirrorUsagePointListHelper,
         limiter,
+        destroy: () => {
+            pinoLogger.info('Destroying SEP2 instance');
+
+            timeHelper.destroy();
+            endDeviceListHelper.destroy();
+            registrationHelper.destroy();
+            derListHelper.destroy();
+            derHelper.destroy();
+            functionSetAssignmentsListHelper.destroy();
+            mirrorUsagePointListHelper.destroy();
+            limiter.destroy();
+            derControlsHelper.destroy();
+        },
     };
 }

@@ -96,6 +96,9 @@ export class InverterController {
     private secondsToSample: number;
     private intervalSeconds: number;
 
+    private controlLimitsLoopTimer: NodeJS.Timeout | null = null;
+    private applyControlLoopTimer: NodeJS.Timeout | null = null;
+
     constructor({
         config,
         limiters,
@@ -196,7 +199,7 @@ export class InverterController {
         // update at most every 1 second
         const delay = Math.max(1000 - duration, 0);
 
-        setTimeout(() => {
+        this.controlLimitsLoopTimer = setTimeout(() => {
             void this.updateControlLimitsLoop();
         }, delay);
     }
@@ -235,7 +238,7 @@ export class InverterController {
 
             const delay = Math.max(this.intervalSeconds * 1000 - duration, 0);
 
-            setTimeout(() => {
+            this.applyControlLoopTimer = setTimeout(() => {
                 void this.applyControlLoop();
             }, delay);
         }
@@ -360,6 +363,16 @@ export class InverterController {
         })();
 
         return rampedInverterConfiguration;
+    }
+
+    public destroy() {
+        if (this.controlLimitsLoopTimer) {
+            clearTimeout(this.controlLimitsLoopTimer);
+        }
+
+        if (this.applyControlLoopTimer) {
+            clearTimeout(this.applyControlLoopTimer);
+        }
     }
 }
 

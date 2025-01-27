@@ -81,6 +81,16 @@ export function createCoordinator(): Coordinator {
             logger.info('Destroying coordinator');
 
             siteSamplePoller.destroy();
+            invertersPoller.destroy();
+            inverterController.destroy();
+            sep2Instance?.sep2Client.destroy();
+            sep2Instance?.derHelper.destroy();
+            sep2Instance?.mirrorUsagePointListHelper.destroy();
+            limiters.csipAus?.destroy();
+            limiters.fixed?.destroy();
+            limiters.negativeFeedIn?.destroy();
+            limiters.twoWayTariff?.destroy();
+            limiters.mqtt?.destroy();
         },
     };
 }
