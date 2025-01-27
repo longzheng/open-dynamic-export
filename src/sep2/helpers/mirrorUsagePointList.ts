@@ -59,6 +59,8 @@ export class MirrorUsagePointListHelper {
 
     public destroy() {
         this.mirrorUsagePointListPollableResource?.destroy();
+        this.mirrorUsagePointSite?.destroy();
+        this.mirrorUsagePointDer?.destroy();
     }
 
     public addDerSample(derSample: DerSample) {

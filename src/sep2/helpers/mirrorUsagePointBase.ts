@@ -53,9 +53,11 @@ export abstract class MirrorUsagePointHelperBase<
     protected abstract logger: Logger;
     private mirrorMeterReadingsBuffer: CappedArrayStack<MirrorMeterReading> =
         new CappedArrayStack({ limit: 1000 });
+    private abortController: AbortController;
 
     constructor({ client }: { client: SEP2Client }) {
         this.client = client;
+        this.abortController = new AbortController();
     }
 
     public async updateMirrorUsagePointList({
@@ -101,6 +103,14 @@ export abstract class MirrorUsagePointHelperBase<
 
     public addSample(sample: Sample) {
         this.samples.push(sample);
+    }
+
+    public destroy() {
+        this.abortController.abort();
+
+        if (this.mirrorMeterReadingPostTimer) {
+            clearTimeout(this.mirrorMeterReadingPostTimer);
+        }
     }
 
     protected abstract getReadingFromSamples(samples: Sample[]): Reading;
@@ -210,10 +220,18 @@ export abstract class MirrorUsagePointHelperBase<
             );
         }
 
+        if (this.abortController.signal.aborted) {
+            return;
+        }
+
         this.queueMirrorMeterReadingPost();
     }
 
     private queueMirrorMeterReadingPost() {
+        if (this.abortController.signal.aborted) {
+            return;
+        }
+
         if (this.mirrorMeterReadingPostTimer) {
             clearTimeout(this.mirrorMeterReadingPostTimer);
         }
