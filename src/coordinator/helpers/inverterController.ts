@@ -115,11 +115,11 @@ export class InverterController {
         this.intervalSeconds = config.inverterControl.intervalSeconds;
         this.limiters = limiters;
         this.logger = pinoLogger.child({ module: 'InverterController' });
+        this.abortController = new AbortController();
         this.onControl = onControl;
 
         this.updateControlLimitsLoop();
         void this.applyControlLoop();
-        this.abortController = new AbortController();
     }
 
     updateDerSample(derSample: DerSample) {
