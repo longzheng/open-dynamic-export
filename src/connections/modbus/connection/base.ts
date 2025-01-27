@@ -30,7 +30,7 @@ export class ModbusConnection {
         this.client.on('close', () => {
             this.state = { type: 'disconnected' };
 
-            this.logger.error(`Modbus client closed`);
+            this.logger.info(`Modbus client closed`);
         });
 
         // This is never observed to be triggered
