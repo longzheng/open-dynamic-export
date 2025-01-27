@@ -216,10 +216,6 @@ export class InverterController {
             } else {
                 await this.onControl(inverterConfiguration);
 
-                if (this.abortController.signal.aborted) {
-                    return;
-                }
-
                 this.logger.info(
                     {
                         activeInverterControlLimit:
@@ -234,18 +230,26 @@ export class InverterController {
         } catch (error) {
             this.logger.error(error, 'Failed to set inverter control values');
         } finally {
-            const end = performance.now();
-            const duration = end - start;
+            if (!this.abortController.signal.aborted) {
+                const end = performance.now();
+                const duration = end - start;
 
-            this.logger.trace({ duration }, 'Inverter control loop duration');
+                this.logger.trace(
+                    { duration },
+                    'Inverter control loop duration',
+                );
 
-            writeLatency({ field: 'applyControlLoop', duration });
+                writeLatency({ field: 'applyControlLoop', duration });
 
-            const delay = Math.max(this.intervalSeconds * 1000 - duration, 0);
+                const delay = Math.max(
+                    this.intervalSeconds * 1000 - duration,
+                    0,
+                );
 
-            this.applyControlLoopTimer = setTimeout(() => {
-                void this.applyControlLoop();
-            }, delay);
+                this.applyControlLoopTimer = setTimeout(() => {
+                    void this.applyControlLoop();
+                }, delay);
+            }
         }
     }
 

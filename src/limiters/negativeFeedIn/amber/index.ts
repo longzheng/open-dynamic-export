@@ -21,6 +21,8 @@ export class AmberLimiter implements LimiterType {
     private siteId: string | null = null;
     private feedInIntervals: Interval[] = [];
     private logger: Logger;
+    private pricePollTimer: NodeJS.Timeout | null = null;
+    private abortController: AbortController;
 
     constructor({
         apiKey,
@@ -36,6 +38,7 @@ export class AmberLimiter implements LimiterType {
             },
         });
         this.logger = pinoLogger.child({ inverter: 'AmberControlLimit' });
+        this.abortController = new AbortController();
 
         void (async () => {
             this.siteId = siteId ?? (await this.getSiteId());
@@ -158,13 +161,15 @@ export class AmberLimiter implements LimiterType {
         } catch (error) {
             this.logger.error(error, 'Failed to poll Amber API');
         } finally {
-            setTimeout(
-                () => {
-                    void this.poll();
-                },
-                // poll every 15 minutes
-                15 * 60 * 1000,
-            );
+            if (!this.abortController.signal.aborted) {
+                this.pricePollTimer = setTimeout(
+                    () => {
+                        void this.poll();
+                    },
+                    // poll every 15 minutes
+                    15 * 60 * 1000,
+                );
+            }
         }
     }
 
@@ -182,5 +187,13 @@ export class AmberLimiter implements LimiterType {
         writeAmberPrice(currentPrice);
 
         return currentPrice;
+    }
+
+    public destroy() {
+        this.abortController.abort();
+
+        if (this.pricePollTimer) {
+            clearTimeout(this.pricePollTimer);
+        }
     }
 }

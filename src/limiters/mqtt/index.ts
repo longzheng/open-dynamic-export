@@ -55,6 +55,10 @@ export class MqttLimiter implements LimiterType {
 
         return limit;
     }
+
+    destroy(): void {
+        this.client.end();
+    }
 }
 
 const mqttSchema = z.object({

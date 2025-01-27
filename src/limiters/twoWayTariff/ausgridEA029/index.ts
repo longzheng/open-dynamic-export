@@ -53,6 +53,10 @@ export class AusgridEA029Limiter implements LimiterType {
 
         return limit;
     }
+
+    destroy(): void {
+        // no op
+    }
 }
 
 // Customers are charged 1.2 cents/kWh for the electricity they export above a free threshold during the peak export period (10am to 3pm).

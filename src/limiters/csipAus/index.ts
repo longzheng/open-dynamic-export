@@ -205,4 +205,8 @@ export class CsipAusLimiter implements LimiterType {
 
         return limit;
     }
+
+    destroy(): void {
+        // no op
+    }
 }

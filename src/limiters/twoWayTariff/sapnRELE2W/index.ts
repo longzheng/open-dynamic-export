@@ -52,6 +52,10 @@ export class SapnRELE2WLimiter implements LimiterType {
 
         return limit;
     }
+
+    destroy(): void {
+        // no op
+    }
 }
 
 // The pricing signals and structure are designed to encourage self consumption rather than export during the Solar Sponge window of 10am – 4pm.
