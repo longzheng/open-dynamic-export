@@ -75,6 +75,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
                 attempts: 3,
                 functionName: 'getInverterData',
                 delayMilliseconds: 100,
+                abortController: this.abortController,
             }),
         );
 

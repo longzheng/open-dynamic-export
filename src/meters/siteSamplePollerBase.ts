@@ -65,6 +65,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
                 attempts: 3,
                 functionName: 'getSiteSample',
                 delayMilliseconds: 100,
+                abortController: this.abortController,
             }),
         );
 

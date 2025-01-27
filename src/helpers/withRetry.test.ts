@@ -85,4 +85,20 @@ describe('withRetry', () => {
         expect(fn).toHaveBeenCalledTimes(2);
         expect(pinoLogger.warn).toHaveBeenCalledTimes(1);
     });
+
+    it('should throw error when operation is aborted', async () => {
+        const abortController = new AbortController();
+        const mockFn = vi.fn().mockRejectedValue(new Error('Test error'));
+
+        const retryPromise = withRetry(mockFn, {
+            attempts: 3,
+            functionName: 'mockFn',
+            delayMilliseconds: 10,
+            abortController,
+        });
+
+        abortController.abort();
+
+        await expect(retryPromise).rejects.toThrow('Operation was aborted');
+    });
 });
