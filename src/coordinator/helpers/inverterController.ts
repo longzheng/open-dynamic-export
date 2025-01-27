@@ -95,9 +95,9 @@ export class InverterController {
     // we take a time weighted average of the last few seconds to smooth out the control values
     private secondsToSample: number;
     private intervalSeconds: number;
-
     private controlLimitsLoopTimer: NodeJS.Timeout | null = null;
     private applyControlLoopTimer: NodeJS.Timeout | null = null;
+    private abortController: AbortController;
 
     constructor({
         config,
@@ -119,6 +119,7 @@ export class InverterController {
 
         this.updateControlLimitsLoop();
         void this.applyControlLoop();
+        this.abortController = new AbortController();
     }
 
     updateDerSample(derSample: DerSample) {
@@ -214,6 +215,10 @@ export class InverterController {
                 this.logger.warn('Inverter configuration is not calculated');
             } else {
                 await this.onControl(inverterConfiguration);
+
+                if (this.abortController.signal.aborted) {
+                    return;
+                }
 
                 this.logger.info(
                     {
@@ -366,6 +371,8 @@ export class InverterController {
     }
 
     public destroy() {
+        this.abortController.abort();
+
         if (this.controlLimitsLoopTimer) {
             clearTimeout(this.controlLimitsLoopTimer);
         }

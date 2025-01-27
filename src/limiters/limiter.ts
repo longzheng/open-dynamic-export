@@ -2,4 +2,5 @@ import { type InverterControlLimit } from '../coordinator/helpers/inverterContro
 
 export type LimiterType = {
     getInverterControlLimit(): InverterControlLimit;
+    destroy(): void;
 };

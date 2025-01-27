@@ -21,6 +21,8 @@ import { objectToXml } from './helpers/xml.js';
 import { generateConnectionPointResponse } from './models/connectionPoint.js';
 import { RegistrationHelper } from './helpers/registration.js';
 
+const logger = pinoLogger.child({ module: 'sep2Instance' });
+
 export type Sep2Instance = {
     sep2Client: SEP2Client;
     derHelper: DerHelper;
@@ -88,7 +90,7 @@ export function getSep2Instance({
     const derControlsHelper = new DerControlsHelper({
         client: sep2Client,
     }).on('data', (data) => {
-        pinoLogger.debug(data, 'DER controls data changed');
+        logger.debug(data, 'DER controls data changed');
 
         limiter.updateSep2ControlsData(data);
 
@@ -101,10 +103,7 @@ export function getSep2Instance({
 
     endDeviceListHelper.on('data', (endDeviceList) => {
         void (async () => {
-            pinoLogger.debug(
-                { endDeviceList },
-                'Received SEP2 end device list',
-            );
+            logger.debug({ endDeviceList }, 'Received SEP2 end device list');
 
             const endDevice = await getOrCreateEndDevice({ endDeviceList });
 
@@ -139,7 +138,7 @@ export function getSep2Instance({
     });
 
     derListHelper.on('data', (derList) => {
-        pinoLogger.debug({ derList }, 'Received SEP2 end device DER list');
+        logger.debug({ derList }, 'Received SEP2 end device DER list');
 
         if (derList.ders.length !== 1) {
             throw new Error(
@@ -158,7 +157,7 @@ export function getSep2Instance({
     functionSetAssignmentsListHelper.on(
         'data',
         (functionSetAssignmentsList) => {
-            pinoLogger.debug(
+            logger.debug(
                 { functionSetAssignmentsList },
                 'Received SEP2 function set assignments list',
             );
@@ -167,13 +166,10 @@ export function getSep2Instance({
         },
     );
 
-    pinoLogger.info('Discovering SEP2');
+    logger.info('Discovering SEP2');
 
     sep2Client.discover().on('data', (deviceCapability) => {
-        pinoLogger.debug(
-            { deviceCapability },
-            'Received SEP2 device capability',
-        );
+        logger.debug({ deviceCapability }, 'Received SEP2 device capability');
 
         timeHelper.updateHref({
             href: deviceCapability.timeLink.href,
@@ -267,7 +263,7 @@ export function getSep2Instance({
         mirrorUsagePointListHelper,
         limiter,
         destroy: () => {
-            pinoLogger.info('Destroying SEP2 instance');
+            logger.info('Destroying SEP2 instance');
 
             timeHelper.destroy();
             endDeviceListHelper.destroy();
