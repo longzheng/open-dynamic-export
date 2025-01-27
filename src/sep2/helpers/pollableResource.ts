@@ -12,6 +12,7 @@ export abstract class PollableResource<
     private url: string;
     private defaultPollRateSeconds: number;
     private pollTimerId: NodeJS.Timeout | null = null;
+    private abortController: AbortController;
 
     constructor({
         client,
@@ -27,6 +28,7 @@ export abstract class PollableResource<
         this.client = client;
         this.url = url;
         this.defaultPollRateSeconds = defaultPollRateSeconds;
+        this.abortController = new AbortController();
 
         void this.poll();
     }
@@ -55,6 +57,10 @@ export abstract class PollableResource<
             }
         })();
 
+        if (this.abortController.signal.aborted) {
+            return;
+        }
+
         if (response) {
             this.emit('data', response);
         }
@@ -68,6 +74,8 @@ export abstract class PollableResource<
     }
 
     public destroy() {
+        this.abortController.abort();
+
         if (this.pollTimerId) {
             clearTimeout(this.pollTimerId);
         }
