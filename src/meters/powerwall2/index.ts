@@ -31,7 +31,9 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     override async getSiteSample(): Promise<SiteSample> {
         const start = performance.now();
 
-        const metersSiteData = await this.client.getMetersSite();
+        const metersSiteData = await this.client.getMetersSite({
+            signal: this.abortController.signal,
+        });
 
         const end = performance.now();
         const duration = end - start;

@@ -21,6 +21,8 @@ export class AmberLimiter implements LimiterType {
     private siteId: string | null = null;
     private feedInIntervals: Interval[] = [];
     private logger: Logger;
+    private pricePollTimer: NodeJS.Timeout | null = null;
+    private abortController: AbortController;
 
     constructor({
         apiKey,
@@ -36,6 +38,7 @@ export class AmberLimiter implements LimiterType {
             },
         });
         this.logger = pinoLogger.child({ inverter: 'AmberControlLimit' });
+        this.abortController = new AbortController();
 
         void (async () => {
             this.siteId = siteId ?? (await this.getSiteId());
@@ -97,7 +100,13 @@ export class AmberLimiter implements LimiterType {
                         next: 2 * 2,
                     },
                 },
-                signal: AbortSignal.timeout(10_000),
+                signal: AbortSignal.any([
+                    (AbortSignal.timeout(
+                        // timeout after 10 seconds
+                        10_000,
+                    ),
+                    this.abortController.signal),
+                ]),
             },
         );
 
@@ -124,7 +133,15 @@ export class AmberLimiter implements LimiterType {
     }
 
     private async getSiteId(): Promise<string> {
-        const { data, error } = await this.client.GET('/sites');
+        const { data, error } = await this.client.GET('/sites', {
+            signal: AbortSignal.any([
+                (AbortSignal.timeout(
+                    // timeout after 10 seconds
+                    10_000,
+                ),
+                this.abortController.signal),
+            ]),
+        });
 
         // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -158,13 +175,15 @@ export class AmberLimiter implements LimiterType {
         } catch (error) {
             this.logger.error(error, 'Failed to poll Amber API');
         } finally {
-            setTimeout(
-                () => {
-                    void this.poll();
-                },
-                // poll every 15 minutes
-                15 * 60 * 1000,
-            );
+            if (!this.abortController.signal.aborted) {
+                this.pricePollTimer = setTimeout(
+                    () => {
+                        void this.poll();
+                    },
+                    // poll every 15 minutes
+                    15 * 60 * 1000,
+                );
+            }
         }
     }
 
@@ -182,5 +201,13 @@ export class AmberLimiter implements LimiterType {
         writeAmberPrice(currentPrice);
 
         return currentPrice;
+    }
+
+    public destroy() {
+        this.abortController.abort();
+
+        if (this.pricePollTimer) {
+            clearTimeout(this.pricePollTimer);
+        }
     }
 }

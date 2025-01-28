@@ -47,19 +47,25 @@ describe('Powerwall2Client', () => {
     afterAll(() => mockServer.close());
 
     it('can get meter aggregates', async () => {
-        const result = await power2Client.getMeterAggregates();
+        const result = await power2Client.getMeterAggregates({
+            signal: AbortSignal.timeout(1000),
+        });
 
         expect(result.site.frequency).toBe(50);
     });
 
     it('can get state of energy', async () => {
-        const result = await power2Client.getSoe();
+        const result = await power2Client.getSoe({
+            signal: AbortSignal.timeout(1000),
+        });
 
         expect(result.percentage).toBe(80.87499075192977);
     });
 
     it('can get meter site for three phase', async () => {
-        const result = await power2Client.getMetersSite();
+        const result = await power2Client.getMetersSite({
+            signal: AbortSignal.timeout(1000),
+        });
 
         expect(result[0]?.Cached_readings.reactive_power_a).toBe(-770);
         expect(result[0]?.Cached_readings.reactive_power_b).toBe(-440);
@@ -72,7 +78,9 @@ describe('Powerwall2Client', () => {
             }),
         );
 
-        const result = await power2Client.getMetersSite();
+        const result = await power2Client.getMetersSite({
+            signal: AbortSignal.timeout(1000),
+        });
 
         expect(result[0]?.Cached_readings.reactive_power_a).toBe(-600);
         expect(result[0]?.Cached_readings.reactive_power_b).toBe(undefined);

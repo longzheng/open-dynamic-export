@@ -33,7 +33,7 @@ export class MirrorUsagePointListHelper {
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.mirrorUsagePointListPollableResource?.destroy();
 
             this.mirrorUsagePointListPollableResource =
                 new MirrorUsagePointListPollableResource({
@@ -59,6 +59,8 @@ export class MirrorUsagePointListHelper {
 
     public destroy() {
         this.mirrorUsagePointListPollableResource?.destroy();
+        this.mirrorUsagePointSite?.destroy();
+        this.mirrorUsagePointDer?.destroy();
     }
 
     public addDerSample(derSample: DerSample) {
@@ -71,10 +73,19 @@ export class MirrorUsagePointListHelper {
 }
 
 class MirrorUsagePointListPollableResource extends PollableResource<MirrorUsagePointList> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
         return getListAll({
             client,
             url,
+            options: { signal },
             parseXml: parseMirrorUsagePointListXml,
             addItems: (allResults, result) => {
                 allResults.mirrorUsagePoints.push(...result.mirrorUsagePoints);

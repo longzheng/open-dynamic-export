@@ -95,6 +95,9 @@ export class InverterController {
     // we take a time weighted average of the last few seconds to smooth out the control values
     private secondsToSample: number;
     private intervalSeconds: number;
+    private controlLimitsLoopTimer: NodeJS.Timeout | null = null;
+    private applyControlLoopTimer: NodeJS.Timeout | null = null;
+    private abortController: AbortController;
 
     constructor({
         config,
@@ -112,6 +115,7 @@ export class InverterController {
         this.intervalSeconds = config.inverterControl.intervalSeconds;
         this.limiters = limiters;
         this.logger = pinoLogger.child({ module: 'InverterController' });
+        this.abortController = new AbortController();
         this.onControl = onControl;
 
         this.updateControlLimitsLoop();
@@ -196,7 +200,7 @@ export class InverterController {
         // update at most every 1 second
         const delay = Math.max(1000 - duration, 0);
 
-        setTimeout(() => {
+        this.controlLimitsLoopTimer = setTimeout(() => {
             void this.updateControlLimitsLoop();
         }, delay);
     }
@@ -226,18 +230,26 @@ export class InverterController {
         } catch (error) {
             this.logger.error(error, 'Failed to set inverter control values');
         } finally {
-            const end = performance.now();
-            const duration = end - start;
+            if (!this.abortController.signal.aborted) {
+                const end = performance.now();
+                const duration = end - start;
 
-            this.logger.trace({ duration }, 'Inverter control loop duration');
+                this.logger.trace(
+                    { duration },
+                    'Inverter control loop duration',
+                );
 
-            writeLatency({ field: 'applyControlLoop', duration });
+                writeLatency({ field: 'applyControlLoop', duration });
 
-            const delay = Math.max(this.intervalSeconds * 1000 - duration, 0);
+                const delay = Math.max(
+                    this.intervalSeconds * 1000 - duration,
+                    0,
+                );
 
-            setTimeout(() => {
-                void this.applyControlLoop();
-            }, delay);
+                this.applyControlLoopTimer = setTimeout(() => {
+                    void this.applyControlLoop();
+                }, delay);
+            }
         }
     }
 
@@ -360,6 +372,18 @@ export class InverterController {
         })();
 
         return rampedInverterConfiguration;
+    }
+
+    public destroy() {
+        this.abortController.abort();
+
+        if (this.controlLimitsLoopTimer) {
+            clearTimeout(this.controlLimitsLoopTimer);
+        }
+
+        if (this.applyControlLoopTimer) {
+            clearTimeout(this.applyControlLoopTimer);
+        }
     }
 }
 

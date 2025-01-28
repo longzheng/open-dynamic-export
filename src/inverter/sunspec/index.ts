@@ -29,6 +29,7 @@ import { type NameplateModel } from '../../connections/sunspec/models/nameplate.
 import { type SettingsModel } from '../../connections/sunspec/models/settings.js';
 import { type StatusModel } from '../../connections/sunspec/models/status.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
+import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
@@ -63,23 +64,27 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     override async getInverterData(): Promise<InverterData> {
         const start = performance.now();
 
-        const inverterModel = await this.inverterConnection.getInverterModel();
-
-        const nameplateModel =
-            await this.inverterConnection.getNameplateModel();
-
-        const settingsModel = await this.inverterConnection.getSettingsModel();
-
-        const statusModel = await this.inverterConnection.getStatusModel();
-
-        const controlsModel = await this.inverterConnection.getControlsModel();
-
         const models = {
-            inverter: inverterModel,
-            nameplate: nameplateModel,
-            settings: settingsModel,
-            status: statusModel,
-            controls: controlsModel,
+            inverter: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.inverterConnection.getInverterModel(),
+            }),
+            nameplate: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.inverterConnection.getNameplateModel(),
+            }),
+            settings: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.inverterConnection.getSettingsModel(),
+            }),
+            status: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.inverterConnection.getStatusModel(),
+            }),
+            controls: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.inverterConnection.getControlsModel(),
+            }),
         };
 
         const end = performance.now();

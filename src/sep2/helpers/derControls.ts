@@ -135,6 +135,10 @@ export class DerControlsHelper extends EventEmitter<{
 
         this.cachedControlsData = activeOrScheduledControls;
     }
+
+    destroy() {
+        // no op
+    }
 }
 
 function getDefaultDerControl(

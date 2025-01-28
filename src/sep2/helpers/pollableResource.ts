@@ -12,6 +12,7 @@ export abstract class PollableResource<
     private url: string;
     private defaultPollRateSeconds: number;
     private pollTimerId: NodeJS.Timeout | null = null;
+    private abortController: AbortController;
 
     constructor({
         client,
@@ -27,16 +28,15 @@ export abstract class PollableResource<
         this.client = client;
         this.url = url;
         this.defaultPollRateSeconds = defaultPollRateSeconds;
+        this.abortController = new AbortController();
 
         void this.poll();
     }
 
-    abstract get({
-        client,
-        url,
-    }: {
+    abstract get(params: {
         client: SEP2Client;
         url: string;
+        signal: AbortSignal;
     }): Promise<ResponseType>;
 
     public async poll() {
@@ -47,13 +47,21 @@ export abstract class PollableResource<
 
         const response = await (async () => {
             try {
-                return await this.get({ client: this.client, url: this.url });
+                return await this.get({
+                    client: this.client,
+                    url: this.url,
+                    signal: this.abortController.signal,
+                });
             } catch (error) {
                 pinoLogger.error(error, 'Failed to poll resource');
 
                 return null;
             }
         })();
+
+        if (this.abortController.signal.aborted) {
+            return;
+        }
 
         if (response) {
             this.emit('data', response);
@@ -68,6 +76,8 @@ export abstract class PollableResource<
     }
 
     public destroy() {
+        this.abortController.abort();
+
         if (this.pollTimerId) {
             clearTimeout(this.pollTimerId);
         }

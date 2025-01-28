@@ -11,7 +11,6 @@ type MockResponse = {
 
 const sep2Client = new SEP2Client({
     host: 'http://example.com',
-    dcapUri: '/dcap',
     cert: mockCert,
     key: mockKey,
     pen: '12345',
@@ -59,8 +58,6 @@ describe('PollableResource', () => {
         await vi.advanceTimersByTimeAsync(10 * 1000);
         expect(dataHandler).toHaveBeenCalledTimes(2);
         expect(dataHandler).toHaveBeenCalledWith(mockResponse);
-
-        vi.useRealTimers();
     });
 
     it('should fallback to default poll rate if response does not contain poll rate', async () => {
@@ -94,8 +91,6 @@ describe('PollableResource', () => {
         await vi.advanceTimersByTimeAsync(5 * 1000);
         expect(dataHandler).toHaveBeenCalledTimes(2);
         expect(dataHandler).toHaveBeenCalledWith(mockResponse);
-
-        vi.useRealTimers();
     });
 
     it('should adapt to changing poll rates', async () => {
@@ -141,7 +136,40 @@ describe('PollableResource', () => {
         await vi.advanceTimersByTimeAsync(2 * 1000);
         expect(dataHandler).toHaveBeenCalledTimes(3);
         expect(dataHandler).toHaveBeenCalledWith(mockResponse);
+    });
 
-        vi.useRealTimers();
+    it('should cancel poll timer when destroy is called during a running poll', async () => {
+        const mockResponse: MockResponse = {
+            hello: 'world',
+            pollRate: 10,
+        };
+
+        class MockPollableResource extends PollableResource<MockResponse> {
+            async get(): Promise<MockResponse> {
+                // delay to simulate a slow get
+                await new Promise((resolve) => setTimeout(resolve, 10_000));
+
+                return mockResponse;
+            }
+        }
+
+        const pollableResource = new MockPollableResource({
+            client: sep2Client,
+            url: 'http://example.com',
+            defaultPollRateSeconds: 5,
+        });
+
+        const dataHandler = vi.fn();
+        pollableResource.on('data', dataHandler);
+
+        // Immediately destroy while get is pending
+        pollableResource.destroy();
+
+        await vi.advanceTimersByTimeAsync(0);
+        expect(dataHandler).toHaveBeenCalledTimes(0);
+
+        // Advance time to ensure no further polls
+        await vi.advanceTimersByTimeAsync(30_000);
+        expect(dataHandler).toHaveBeenCalledTimes(0);
     });
 });

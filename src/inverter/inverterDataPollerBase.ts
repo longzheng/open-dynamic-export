@@ -17,6 +17,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
     protected applyControl: boolean;
     protected readonly inverterIndex: number;
     private inverterPollerName: string;
+    protected readonly abortController: AbortController;
 
     constructor({
         name,
@@ -41,9 +42,12 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
         this.applyControl = applyControl;
         this.inverterIndex = inverterIndex;
         this.inverterPollerName = name;
+        this.abortController = new AbortController();
     }
 
     public destroy() {
+        this.abortController.abort();
+
         if (this.pollingTimer) {
             clearTimeout(this.pollingTimer);
         }
@@ -71,8 +75,13 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
                 attempts: 3,
                 functionName: 'getInverterData',
                 delayMilliseconds: 100,
+                abortController: this.abortController,
             }),
         );
+
+        if (this.abortController.signal.aborted) {
+            return;
+        }
 
         this.inverterDataCache = inverterData;
 

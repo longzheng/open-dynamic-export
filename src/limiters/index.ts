@@ -43,3 +43,9 @@ export function getLimiters({
             : null,
     };
 }
+
+export function destroyLimiters(limiters: Limiters): void {
+    Object.values(limiters).forEach((limiter) => {
+        limiter?.destroy();
+    });
+}

@@ -1,9 +1,11 @@
+import { type AxiosRequestConfig } from 'axios';
 import { type SEP2Client } from '../client.js';
 import { type List } from '../models/list.js';
 
 export interface PaginationOptions<T extends List> {
     client: SEP2Client;
     url: string;
+    options?: Omit<AxiosRequestConfig<never>, 'params'>;
     parseXml: (xml: unknown) => T;
     addItems: (allResults: T, result: T) => void;
     getItems: (result: T) => unknown[];
@@ -13,6 +15,7 @@ export interface PaginationOptions<T extends List> {
 export async function getListAll<T extends List>({
     client,
     url,
+    options,
     parseXml,
     addItems,
     getItems,
@@ -23,6 +26,7 @@ export async function getListAll<T extends List>({
     for await (const result of getListPageGenerator({
         client,
         url,
+        options,
         limit,
         parseXml,
         getItemsLength: () => {
@@ -59,6 +63,7 @@ export async function getListAll<T extends List>({
 async function* getListPageGenerator<T extends List>({
     client,
     url,
+    options,
     limit,
     parseXml,
     getItemsLength,
@@ -70,8 +75,11 @@ async function* getListPageGenerator<T extends List>({
 
     for (;;) {
         const xml = await client.get(url, {
-            s: startIndex.toString(),
-            l: limit.toString(),
+            ...options,
+            params: {
+                s: startIndex.toString(),
+                l: limit.toString(),
+            },
         });
 
         const result = parseXml(xml);

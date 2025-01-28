@@ -24,7 +24,7 @@ export class RegistrationHelper extends EventEmitter<{
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.registrationPollableResource?.destroy();
 
             this.registrationPollableResource =
                 new RegistrationPollableResource({
@@ -46,8 +46,16 @@ export class RegistrationHelper extends EventEmitter<{
 }
 
 class RegistrationPollableResource extends PollableResource<Registration> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
-        const xml = await client.get(url);
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
+        const xml = await client.get(url, { signal });
 
         return parseRegistrationXml(xml);
     }

@@ -34,7 +34,7 @@ export class DerHelper {
     private lastSentDerCapability: DERCapability | null = null;
     private lastSentDerSettings: DERSettings | null = null;
     private lastSentDerStatus: DERStatus | null = null;
-    private pollTimer: NodeJS.Timeout | null = null;
+    private scheduledDerStatusTimer: NodeJS.Timeout | null = null;
     private rampRateHelper: RampRateHelper;
 
     constructor({
@@ -54,10 +54,10 @@ export class DerHelper {
         this.logger.debug({ config }, 'Updated DerHelper with config');
         this.config = config;
 
-        if (!this.pollTimer) {
-            this.pollTimer = setTimeout(
+        if (!this.scheduledDerStatusTimer) {
+            this.scheduledDerStatusTimer = setTimeout(
                 () => {
-                    void this.poll();
+                    void this.scheduledDerStatus();
                 },
                 this.config.pollRate
                     ? this.config.pollRate * 1000
@@ -119,7 +119,7 @@ export class DerHelper {
         }
     }
 
-    private async poll() {
+    private async scheduledDerStatus() {
         try {
             if (!this.lastSentDerStatus) {
                 throw new Error('DER status has not been cached');
@@ -244,6 +244,12 @@ export class DerHelper {
         last: DERCapability | null,
     ) {
         return deepEqual(current, last);
+    }
+
+    public destroy() {
+        if (this.scheduledDerStatusTimer) {
+            clearTimeout(this.scheduledDerStatusTimer);
+        }
     }
 }
 

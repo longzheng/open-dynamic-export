@@ -53,9 +53,11 @@ export abstract class MirrorUsagePointHelperBase<
     protected abstract logger: Logger;
     private mirrorMeterReadingsBuffer: CappedArrayStack<MirrorMeterReading> =
         new CappedArrayStack({ limit: 1000 });
+    private abortController: AbortController;
 
     constructor({ client }: { client: SEP2Client }) {
         this.client = client;
+        this.abortController = new AbortController();
     }
 
     public async updateMirrorUsagePointList({
@@ -101,6 +103,14 @@ export abstract class MirrorUsagePointHelperBase<
 
     public addSample(sample: Sample) {
         this.samples.push(sample);
+    }
+
+    public destroy() {
+        this.abortController.abort();
+
+        if (this.mirrorMeterReadingPostTimer) {
+            clearTimeout(this.mirrorMeterReadingPostTimer);
+        }
     }
 
     protected abstract getReadingFromSamples(samples: Sample[]): Reading;
@@ -259,6 +269,9 @@ export abstract class MirrorUsagePointHelperBase<
         const response = await this.client.post(
             this.mirrorUsagePointListHref,
             xml,
+            {
+                signal: this.abortController.signal,
+            },
         );
 
         const locationHeader = response.headers['location'] as
@@ -269,7 +282,11 @@ export abstract class MirrorUsagePointHelperBase<
             throw new Error('Missing location header');
         }
 
-        return parseMirrorUsagePointXml(await this.client.get(locationHeader));
+        return parseMirrorUsagePointXml(
+            await this.client.get(locationHeader, {
+                signal: this.abortController.signal,
+            }),
+        );
     }
 
     private async sendReadings(readings: MirrorMeterReading[]): Promise<{
@@ -326,6 +343,7 @@ export abstract class MirrorUsagePointHelperBase<
                         return isNetworkError(error) || isRetryableError(error);
                     },
                 },
+                signal: this.abortController.signal,
             },
         );
 

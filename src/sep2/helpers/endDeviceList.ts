@@ -26,7 +26,7 @@ export class EndDeviceListHelper extends EventEmitter<{
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.endDeviceListPollableResource?.destroy();
 
             this.endDeviceListPollableResource =
                 new EndDeviceListPollableResource({
@@ -52,10 +52,19 @@ export class EndDeviceListHelper extends EventEmitter<{
 }
 
 class EndDeviceListPollableResource extends PollableResource<EndDeviceList> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
         return getListAll({
             client,
             url,
+            options: { signal },
             parseXml: parseEndDeviceListXml,
             addItems: (allResults, result) => {
                 allResults.endDevices.push(...result.endDevices);

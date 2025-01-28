@@ -15,7 +15,6 @@ let mockGetCalls: MockInstance<typeof sep2Client.get>;
 beforeAll(() => {
     sep2Client = new SEP2Client({
         host: 'http://example.com',
-        dcapUri: '/dcap',
         cert: mockCert,
         key: mockKey,
         pen: '12345',
@@ -69,6 +68,12 @@ describe('getListAll', () => {
         expect(result.strings.length).toBe(4);
         expect(result.strings).toEqual(['test1', 'test2', 'test3', 'test4']);
         expect(mockGetCalls).toBeCalledTimes(2);
+        expect(mockGetCalls).nthCalledWith(1, '/mockUrl', {
+            params: { s: '0', l: '10' },
+        });
+        expect(mockGetCalls).nthCalledWith(2, '/mockUrl', {
+            params: { s: '10', l: '10' },
+        });
     });
 
     it('should throw an error if there are more items than returned', async () => {

@@ -14,14 +14,12 @@ import {
 import { type RoleFlagsType } from './models/roleFlagsType.js';
 import { numberToHex } from '../helpers/number.js';
 import { createHash } from 'node:crypto';
-import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
 import axiosRetry, { exponentialDelay } from 'axios-retry';
 
 const USER_AGENT = 'open-dynamic-export';
 
 export class SEP2Client {
     private readonly host: string;
-    private readonly dcapUri: string;
     public readonly pen: string;
     public readonly lfdi: string;
     public readonly sfdi: string;
@@ -29,19 +27,16 @@ export class SEP2Client {
 
     constructor({
         host,
-        dcapUri,
         cert,
         key,
         pen,
     }: {
         host: string;
-        dcapUri: string;
         cert: string;
         key: string;
         pen: string;
     }) {
         this.host = host;
-        this.dcapUri = dcapUri;
         this.pen = pen.padStart(8, '0');
 
         const certificateFingerprint = getCertificateFingerprint(cert);
@@ -77,11 +72,12 @@ export class SEP2Client {
         this.axiosInstance = axiosClient;
     }
 
-    async get(link: string, params?: Record<string, string>): Promise<unknown> {
+    async get(
+        link: string,
+        options?: AxiosRequestConfig<never>,
+    ): Promise<unknown> {
         const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.get<string>(url, {
-            params,
-        });
+        const response = await this.axiosInstance.get<string>(url, options);
 
         return await parseStringPromise(response.data);
     }
@@ -105,13 +101,6 @@ export class SEP2Client {
         const response = await this.axiosInstance.put(url, data, options);
 
         return response;
-    }
-
-    public discover() {
-        return new DeviceCapabilityHelper({
-            client: this,
-            href: this.dcapUri,
-        });
     }
 
     // From the SEP2 Client Handbook

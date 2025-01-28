@@ -18,6 +18,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
     private pollingTimer: NodeJS.Timeout | null = null;
     private siteSampleCache: SiteSample | null = null;
     private meterPollerName: string;
+    protected readonly abortController: AbortController;
 
     constructor({
         name,
@@ -35,9 +36,12 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
             meterPollerName: name,
         });
         this.meterPollerName = name;
+        this.abortController = new AbortController();
     }
 
     public destroy() {
+        this.abortController.abort();
+
         if (this.pollingTimer) {
             clearTimeout(this.pollingTimer);
         }
@@ -61,8 +65,13 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
                 attempts: 3,
                 functionName: 'getSiteSample',
                 delayMilliseconds: 100,
+                abortController: this.abortController,
             }),
         );
+
+        if (this.abortController.signal.aborted) {
+            return;
+        }
 
         const end = performance.now();
         const duration = end - start;

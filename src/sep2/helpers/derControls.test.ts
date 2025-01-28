@@ -15,7 +15,6 @@ import { CurrentStatus } from '../models/currentStatus.js';
 
 const sep2Client = new SEP2Client({
     host: 'http://example.com',
-    dcapUri: '/dcap',
     cert: mockCert,
     key: mockKey,
     pen: '12345',

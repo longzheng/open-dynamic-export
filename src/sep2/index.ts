@@ -20,12 +20,16 @@ import {
 import { objectToXml } from './helpers/xml.js';
 import { generateConnectionPointResponse } from './models/connectionPoint.js';
 import { RegistrationHelper } from './helpers/registration.js';
+import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
+
+const logger = pinoLogger.child({ module: 'sep2Instance' });
 
 export type Sep2Instance = {
     sep2Client: SEP2Client;
     derHelper: DerHelper;
     mirrorUsagePointListHelper: MirrorUsagePointListHelper;
     limiter: CsipAusLimiter;
+    destroy: () => void;
 };
 
 export function getSep2Instance({
@@ -39,11 +43,12 @@ export function getSep2Instance({
         return null;
     }
 
+    const abortController = new AbortController();
+
     const sep2Certificate = getSep2Certificate();
 
     const sep2Client = new SEP2Client({
         host: config.limiters.csipAus.host,
-        dcapUri: config.limiters.csipAus.dcapUri,
         cert: sep2Certificate.cert,
         key: sep2Certificate.key,
         pen: env.SEP2_PEN,
@@ -87,7 +92,7 @@ export function getSep2Instance({
     const derControlsHelper = new DerControlsHelper({
         client: sep2Client,
     }).on('data', (data) => {
-        pinoLogger.debug(data, 'DER controls data changed');
+        logger.debug(data, 'DER controls data changed');
 
         limiter.updateSep2ControlsData(data);
 
@@ -100,10 +105,7 @@ export function getSep2Instance({
 
     endDeviceListHelper.on('data', (endDeviceList) => {
         void (async () => {
-            pinoLogger.debug(
-                { endDeviceList },
-                'Received SEP2 end device list',
-            );
+            logger.debug({ endDeviceList }, 'Received SEP2 end device list');
 
             const endDevice = await getOrCreateEndDevice({ endDeviceList });
 
@@ -138,7 +140,7 @@ export function getSep2Instance({
     });
 
     derListHelper.on('data', (derList) => {
-        pinoLogger.debug({ derList }, 'Received SEP2 end device DER list');
+        logger.debug({ derList }, 'Received SEP2 end device DER list');
 
         if (derList.ders.length !== 1) {
             throw new Error(
@@ -157,7 +159,7 @@ export function getSep2Instance({
     functionSetAssignmentsListHelper.on(
         'data',
         (functionSetAssignmentsList) => {
-            pinoLogger.debug(
+            logger.debug(
                 { functionSetAssignmentsList },
                 'Received SEP2 function set assignments list',
             );
@@ -166,13 +168,13 @@ export function getSep2Instance({
         },
     );
 
-    pinoLogger.info('Discovering SEP2');
+    logger.info('Discovering SEP2');
 
-    sep2Client.discover().on('data', (deviceCapability) => {
-        pinoLogger.debug(
-            { deviceCapability },
-            'Received SEP2 device capability',
-        );
+    const deviceCapabilityHelper = new DeviceCapabilityHelper({
+        client: sep2Client,
+        href: config.limiters.csipAus.dcapUri,
+    }).on('data', (deviceCapability) => {
+        logger.debug({ deviceCapability }, 'Received SEP2 device capability');
 
         timeHelper.updateHref({
             href: deviceCapability.timeLink.href,
@@ -236,7 +238,11 @@ export function getSep2Instance({
             throw new Error('Missing location header');
         }
 
-        return parseEndDeviceXml(await sep2Client.get(locationHeader));
+        return parseEndDeviceXml(
+            await sep2Client.get(locationHeader, {
+                signal: abortController.signal,
+            }),
+        );
     }
 
     async function putConnectionPointId({
@@ -265,5 +271,19 @@ export function getSep2Instance({
         derHelper,
         mirrorUsagePointListHelper,
         limiter,
+        destroy: () => {
+            logger.info('Destroying SEP2 instance');
+            abortController.abort();
+            deviceCapabilityHelper.destroy();
+            timeHelper.destroy();
+            endDeviceListHelper.destroy();
+            registrationHelper.destroy();
+            derListHelper.destroy();
+            derHelper.destroy();
+            functionSetAssignmentsListHelper.destroy();
+            mirrorUsagePointListHelper.destroy();
+            limiter.destroy();
+            derControlsHelper.destroy();
+        },
     };
 }

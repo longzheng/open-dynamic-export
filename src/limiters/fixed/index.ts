@@ -27,4 +27,8 @@ export class FixedLimiter implements LimiterType {
 
         return limit;
     }
+
+    destroy(): void {
+        // no op
+    }
 }

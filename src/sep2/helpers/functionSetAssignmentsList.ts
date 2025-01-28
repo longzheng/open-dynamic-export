@@ -103,7 +103,7 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.functionSetAssignmentsListPollableResource?.destroy();
 
             this.functionSetAssignmentsListPollableResource =
                 new FunctionSetAssignmentsListPollableResource({
@@ -208,6 +208,10 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
 
     public destroy() {
         this.functionSetAssignmentsListPollableResource?.destroy();
+
+        for (const functionSetAssignments of this.dataByFunctionSetAssignmentsMrid.values()) {
+            functionSetAssignments.derProgramListHelper.destroy();
+        }
     }
 
     private cacheAndEmitData() {
@@ -228,10 +232,19 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
 }
 
 class FunctionSetAssignmentsListPollableResource extends PollableResource<FunctionSetAssignmentsList> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
         return getListAll({
             client,
             url,
+            options: { signal },
             parseXml: parseFunctionSetAssignmentsListXml,
             addItems: (allResults, result) => {
                 allResults.functionSetAssignments.push(

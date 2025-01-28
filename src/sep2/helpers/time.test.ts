@@ -18,7 +18,6 @@ import { setupServer } from 'msw/node';
 describe('TimeHelper', () => {
     const sep2Client = new SEP2Client({
         host: 'http://example.com',
-        dcapUri: '/dcap',
         cert: mockCert,
         key: mockKey,
         pen: '12345',
@@ -110,8 +109,6 @@ describe('TimeHelper', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const destroySpy = vi.spyOn(time, 'destroy' as any);
 
         time.updateHref({
             href: '/api/v2/tm',
@@ -123,7 +120,6 @@ describe('TimeHelper', () => {
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalled());
         expect(timeHandlerCount).toBe(1);
-        expect(destroySpy).toHaveBeenCalledOnce();
         expect(assertTimeSpy).toHaveBeenCalledOnce();
 
         time.updateHref({
@@ -131,7 +127,6 @@ describe('TimeHelper', () => {
         });
 
         expect(timeHandlerCount).toBe(1);
-        expect(destroySpy).toHaveBeenCalledOnce();
         expect(assertTimeSpy).toHaveBeenCalledOnce();
     });
 
@@ -140,8 +135,6 @@ describe('TimeHelper', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const destroySpy = vi.spyOn(time, 'destroy' as any);
 
         time.updateHref({
             href: '/api/v2/tm',
@@ -153,7 +146,6 @@ describe('TimeHelper', () => {
 
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalled());
         expect(timeHandlerCount).toBe(1);
-        expect(destroySpy).toHaveBeenCalledTimes(1);
         expect(assertTimeSpy).toHaveBeenCalledOnce();
 
         time.updateHref({
@@ -163,7 +155,6 @@ describe('TimeHelper', () => {
         await vi.waitFor(() => expect(assertTimeSpy).toHaveBeenCalledTimes(2));
         expect(timeHandlerCount).toBe(1);
         expect(timeHandler2Count).toBe(1);
-        expect(destroySpy).toHaveBeenCalledTimes(2);
         expect(assertTimeSpy).toHaveBeenCalledTimes(2);
     });
 });

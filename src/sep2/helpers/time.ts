@@ -13,7 +13,6 @@ export class TimeHelper {
 
     constructor({ client }: { client: SEP2Client }) {
         this.client = client;
-
         this.logger = pinoLogger.child({ module: 'TimeHelper' });
     }
 
@@ -21,7 +20,7 @@ export class TimeHelper {
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.timePollableResource?.destroy();
 
             this.timePollableResource = new TimePollableResource({
                 client: this.client,
@@ -52,14 +51,24 @@ export class TimeHelper {
         );
     }
 
-    private destroy() {
+    public destroy() {
         this.timePollableResource?.destroy();
     }
 }
 
 class TimePollableResource extends PollableResource<Time> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
-        const xml = await client.get(url);
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
+        const xml = await client.get(url, {
+            signal,
+        });
 
         return parseTimeXml(xml);
     }

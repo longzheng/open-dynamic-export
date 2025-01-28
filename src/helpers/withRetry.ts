@@ -6,18 +6,28 @@ export async function withRetry<T>(
         attempts,
         functionName,
         delayMilliseconds,
+        abortController,
     }: {
         attempts: number;
         functionName: string;
         delayMilliseconds?: number;
+        abortController?: AbortController;
     },
 ): Promise<T> {
     for (let attempt = 1; attempt <= attempts; attempt++) {
         try {
             const result = await fn();
 
+            if (abortController?.signal.aborted) {
+                throw new Error('Operation was aborted');
+            }
+
             return result;
         } catch (error) {
+            if (abortController?.signal.aborted) {
+                throw new Error('Operation was aborted');
+            }
+
             pinoLogger.warn(
                 error,
                 `${functionName} withRetry attempt ${attempt} of ${attempts} failed`,
