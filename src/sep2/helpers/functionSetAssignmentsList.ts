@@ -208,6 +208,10 @@ export class FunctionSetAssignmentsListHelper extends EventEmitter<{
 
     public destroy() {
         this.functionSetAssignmentsListPollableResource?.destroy();
+
+        for (const functionSetAssignments of this.dataByFunctionSetAssignmentsMrid.values()) {
+            functionSetAssignments.derProgramListHelper.destroy();
+        }
     }
 
     private cacheAndEmitData() {
