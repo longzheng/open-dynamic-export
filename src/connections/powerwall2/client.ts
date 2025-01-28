@@ -1,6 +1,6 @@
 import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
-import { type AxiosInstance } from 'axios';
+import { type AxiosRequestConfig, type AxiosInstance } from 'axios';
 import * as https from 'node:https';
 import axios, { AxiosError } from 'axios';
 import {
@@ -42,24 +42,24 @@ export class Powerwall2Client {
         void this.getToken();
     }
 
-    public async getMeterAggregates() {
-        const response = await this.get('/api/meters/aggregates');
+    public async getMeterAggregates({ signal }: { signal: AbortSignal }) {
+        const response = await this.get('/api/meters/aggregates', { signal });
 
         const data = meterAggregatesSchema.parse(response);
 
         return data;
     }
 
-    public async getSoe() {
-        const response = await this.get('/api/system_status/soe');
+    public async getSoe({ signal }: { signal: AbortSignal }) {
+        const response = await this.get('/api/system_status/soe', { signal });
 
         const data = systemStatusSoeSchema.parse(response);
 
         return data;
     }
 
-    public async getMetersSite() {
-        const response = await this.get('/api/meters/site');
+    public async getMetersSite({ signal }: { signal: AbortSignal }) {
+        const response = await this.get('/api/meters/site', { signal });
 
         const data = metersSiteSchema.parse(response);
 
@@ -107,11 +107,11 @@ export class Powerwall2Client {
 
     private async get(
         url: string,
-        params?: Record<string, string>,
+        options?: Omit<AxiosRequestConfig<never>, 'headers'>,
     ): Promise<unknown> {
         try {
             const response = await this.axiosInstance.get<string>(url, {
-                params,
+                ...options,
                 headers: {
                     Cookie: `AuthCookie=${await this.getToken()}`,
                 },
@@ -130,7 +130,7 @@ export class Powerwall2Client {
                     this.token = { type: 'none' };
                     await this.getToken();
 
-                    return this.get(url, params);
+                    return this.get(url, options);
                 }
 
                 throw error;

@@ -220,18 +220,10 @@ export abstract class MirrorUsagePointHelperBase<
             );
         }
 
-        if (this.abortController.signal.aborted) {
-            return;
-        }
-
         this.queueMirrorMeterReadingPost();
     }
 
     private queueMirrorMeterReadingPost() {
-        if (this.abortController.signal.aborted) {
-            return;
-        }
-
         if (this.mirrorMeterReadingPostTimer) {
             clearTimeout(this.mirrorMeterReadingPostTimer);
         }
@@ -277,6 +269,9 @@ export abstract class MirrorUsagePointHelperBase<
         const response = await this.client.post(
             this.mirrorUsagePointListHref,
             xml,
+            {
+                signal: this.abortController.signal,
+            },
         );
 
         const locationHeader = response.headers['location'] as
@@ -287,7 +282,11 @@ export abstract class MirrorUsagePointHelperBase<
             throw new Error('Missing location header');
         }
 
-        return parseMirrorUsagePointXml(await this.client.get(locationHeader));
+        return parseMirrorUsagePointXml(
+            await this.client.get(locationHeader, {
+                signal: this.abortController.signal,
+            }),
+        );
     }
 
     private async sendReadings(readings: MirrorMeterReading[]): Promise<{
@@ -344,6 +343,7 @@ export abstract class MirrorUsagePointHelperBase<
                         return isNetworkError(error) || isRetryableError(error);
                     },
                 },
+                signal: this.abortController.signal,
             },
         );
 

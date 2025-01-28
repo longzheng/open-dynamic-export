@@ -100,7 +100,13 @@ export class AmberLimiter implements LimiterType {
                         next: 2 * 2,
                     },
                 },
-                signal: AbortSignal.timeout(10_000),
+                signal: AbortSignal.any([
+                    (AbortSignal.timeout(
+                        // timeout after 10 seconds
+                        10_000,
+                    ),
+                    this.abortController.signal),
+                ]),
             },
         );
 
@@ -127,7 +133,15 @@ export class AmberLimiter implements LimiterType {
     }
 
     private async getSiteId(): Promise<string> {
-        const { data, error } = await this.client.GET('/sites');
+        const { data, error } = await this.client.GET('/sites', {
+            signal: AbortSignal.any([
+                (AbortSignal.timeout(
+                    // timeout after 10 seconds
+                    10_000,
+                ),
+                this.abortController.signal),
+            ]),
+        });
 
         // Amber API docs don't have error types defined
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

@@ -18,7 +18,7 @@ export abstract class SiteSamplePollerBase extends EventEmitter<{
     private pollingTimer: NodeJS.Timeout | null = null;
     private siteSampleCache: SiteSample | null = null;
     private meterPollerName: string;
-    private abortController: AbortController;
+    protected readonly abortController: AbortController;
 
     constructor({
         name,

@@ -25,8 +25,16 @@ export class DeviceCapabilityHelper extends EventEmitter<{
 }
 
 class DeviceCapabilityPollableResource extends PollableResource<DeviceCapability> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
-        const xml = await client.get(url);
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
+        const xml = await client.get(url, { signal });
 
         return parseDeviceCapabilityXml(xml);
     }

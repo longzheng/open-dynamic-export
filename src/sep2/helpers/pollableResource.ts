@@ -33,12 +33,10 @@ export abstract class PollableResource<
         void this.poll();
     }
 
-    abstract get({
-        client,
-        url,
-    }: {
+    abstract get(params: {
         client: SEP2Client;
         url: string;
+        signal: AbortSignal;
     }): Promise<ResponseType>;
 
     public async poll() {
@@ -49,7 +47,11 @@ export abstract class PollableResource<
 
         const response = await (async () => {
             try {
-                return await this.get({ client: this.client, url: this.url });
+                return await this.get({
+                    client: this.client,
+                    url: this.url,
+                    signal: this.abortController.signal,
+                });
             } catch (error) {
                 pinoLogger.error(error, 'Failed to poll resource');
 

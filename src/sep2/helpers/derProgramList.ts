@@ -36,6 +36,7 @@ export class DerProgramListHelper extends EventEmitter<{
     private derProgramListPollableResource: DerProgramListPollableResource | null =
         null;
     private logger: Logger;
+    private abortController: AbortController;
 
     constructor({ client }: { client: SEP2Client }) {
         super();
@@ -44,13 +45,14 @@ export class DerProgramListHelper extends EventEmitter<{
         this.logger = pinoLogger.child({
             module: 'DerProgramListHelper',
         });
+        this.abortController = new AbortController();
     }
 
     updateHref({ href }: { href: string }) {
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.derProgramListPollableResource?.destroy();
 
             this.derProgramListPollableResource =
                 new DerProgramListPollableResource({
@@ -74,6 +76,11 @@ export class DerProgramListHelper extends EventEmitter<{
                                               await this.client.get(
                                                   program.defaultDerControlLink
                                                       .href,
+                                                  {
+                                                      signal: this
+                                                          .abortController
+                                                          .signal,
+                                                  },
                                               ),
                                           )
                                         : undefined;
@@ -84,6 +91,10 @@ export class DerProgramListHelper extends EventEmitter<{
                                               client: this.client,
                                               url: program.derControlListLink
                                                   .href,
+                                              options: {
+                                                  signal: this.abortController
+                                                      .signal,
+                                              },
                                               parseXml: parseDerControlListXml,
                                               addItems: (
                                                   allResults,
@@ -120,15 +131,25 @@ export class DerProgramListHelper extends EventEmitter<{
     }
 
     public destroy() {
+        this.abortController.abort();
         this.derProgramListPollableResource?.destroy();
     }
 }
 
 class DerProgramListPollableResource extends PollableResource<DERProgramList> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
         return getListAll({
             client,
             url,
+            options: { signal },
             parseXml: parseDerProgramListXml,
             addItems: (allResults, result) => {
                 allResults.derPrograms.push(...result.derPrograms);

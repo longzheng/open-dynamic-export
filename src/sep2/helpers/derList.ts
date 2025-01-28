@@ -22,7 +22,7 @@ export class DerListHelper extends EventEmitter<{
         if (this.href !== href) {
             this.href = href;
 
-            this.destroy();
+            this.derListPollableResource?.destroy();
 
             this.derListPollableResource = new DerListPollableResource({
                 client: this.client,
@@ -42,10 +42,19 @@ export class DerListHelper extends EventEmitter<{
 }
 
 class DerListPollableResource extends PollableResource<DERList> {
-    async get({ client, url }: { client: SEP2Client; url: string }) {
+    async get({
+        client,
+        url,
+        signal,
+    }: {
+        client: SEP2Client;
+        url: string;
+        signal: AbortSignal;
+    }) {
         return getListAll({
             client,
             url,
+            options: { signal },
             parseXml: parseDerListXml,
             addItems: (allResults, result) => {
                 allResults.ders.push(...result.ders);

@@ -42,6 +42,8 @@ export function getSep2Instance({
         return null;
     }
 
+    const abortController = new AbortController();
+
     const sep2Certificate = getSep2Certificate();
 
     const sep2Client = new SEP2Client({
@@ -233,7 +235,11 @@ export function getSep2Instance({
             throw new Error('Missing location header');
         }
 
-        return parseEndDeviceXml(await sep2Client.get(locationHeader));
+        return parseEndDeviceXml(
+            await sep2Client.get(locationHeader, {
+                signal: abortController.signal,
+            }),
+        );
     }
 
     async function putConnectionPointId({
@@ -264,7 +270,7 @@ export function getSep2Instance({
         limiter,
         destroy: () => {
             logger.info('Destroying SEP2 instance');
-
+            abortController.abort();
             timeHelper.destroy();
             endDeviceListHelper.destroy();
             registrationHelper.destroy();
