@@ -70,8 +70,10 @@ async function* getListPageGenerator<T extends List>({
 
     for (;;) {
         const xml = await client.get(url, {
-            s: startIndex.toString(),
-            l: limit.toString(),
+            params: {
+                s: startIndex.toString(),
+                l: limit.toString(),
+            },
         });
 
         const result = parseXml(xml);

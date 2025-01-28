@@ -77,11 +77,12 @@ export class SEP2Client {
         this.axiosInstance = axiosClient;
     }
 
-    async get(link: string, params?: Record<string, string>): Promise<unknown> {
+    async get(
+        link: string,
+        options?: AxiosRequestConfig<never>,
+    ): Promise<unknown> {
         const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.get<string>(url, {
-            params,
-        });
+        const response = await this.axiosInstance.get<string>(url, options);
 
         return await parseStringPromise(response.data);
     }
