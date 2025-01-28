@@ -79,12 +79,10 @@ export function createCoordinator(): Coordinator {
         limiters,
         destroy: () => {
             logger.info('Destroying coordinator');
-
+            sep2Instance?.destroy();
             siteSamplePoller.destroy();
             invertersPoller.destroy();
             inverterController.destroy();
-            sep2Instance?.derHelper.destroy();
-            sep2Instance?.mirrorUsagePointListHelper.destroy();
             destroyLimiters(limiters);
         },
     };

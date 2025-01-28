@@ -20,6 +20,7 @@ import {
 import { objectToXml } from './helpers/xml.js';
 import { generateConnectionPointResponse } from './models/connectionPoint.js';
 import { RegistrationHelper } from './helpers/registration.js';
+import { DeviceCapabilityHelper } from './helpers/deviceCapability.js';
 
 const logger = pinoLogger.child({ module: 'sep2Instance' });
 
@@ -48,7 +49,6 @@ export function getSep2Instance({
 
     const sep2Client = new SEP2Client({
         host: config.limiters.csipAus.host,
-        dcapUri: config.limiters.csipAus.dcapUri,
         cert: sep2Certificate.cert,
         key: sep2Certificate.key,
         pen: env.SEP2_PEN,
@@ -170,7 +170,10 @@ export function getSep2Instance({
 
     logger.info('Discovering SEP2');
 
-    sep2Client.discover().on('data', (deviceCapability) => {
+    const deviceCapabilityHelper = new DeviceCapabilityHelper({
+        client: sep2Client,
+        href: config.limiters.csipAus.dcapUri,
+    }).on('data', (deviceCapability) => {
         logger.debug({ deviceCapability }, 'Received SEP2 device capability');
 
         timeHelper.updateHref({
@@ -271,6 +274,7 @@ export function getSep2Instance({
         destroy: () => {
             logger.info('Destroying SEP2 instance');
             abortController.abort();
+            deviceCapabilityHelper.destroy();
             timeHelper.destroy();
             endDeviceListHelper.destroy();
             registrationHelper.destroy();

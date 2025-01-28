@@ -9,18 +9,25 @@ import {
 export class DeviceCapabilityHelper extends EventEmitter<{
     data: [DeviceCapability];
 }> {
+    private deviceCapabilityPollableResource: DeviceCapabilityPollableResource | null =
+        null;
+
     constructor({ client, href }: { client: SEP2Client; href: string }) {
         super();
 
-        const resource = new DeviceCapabilityPollableResource({
-            client,
-            url: href,
-            defaultPollRateSeconds: defaultPollPushRates.deviceCapabilityPoll,
-        });
+        this.deviceCapabilityPollableResource =
+            new DeviceCapabilityPollableResource({
+                client,
+                url: href,
+                defaultPollRateSeconds:
+                    defaultPollPushRates.deviceCapabilityPoll,
+            }).on('data', (data) => {
+                this.emit('data', data);
+            });
+    }
 
-        resource.on('data', (data) => {
-            this.emit('data', data);
-        });
+    destroy() {
+        this.deviceCapabilityPollableResource?.destroy();
     }
 }
 
