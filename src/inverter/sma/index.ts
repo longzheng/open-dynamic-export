@@ -21,6 +21,7 @@ import { type SmaCore1Nameplate } from '../../connections/modbus/models/sma/core
 import { type SmaCore1Operation } from '../../connections/modbus/models/sma/core1/operation.js';
 import { SmaCore1OperationGriSwStt } from '../../connections/modbus/models/sma/core1/operation.js';
 import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
+import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
 export class SmaInverterDataPoller extends InverterDataPollerBase {
     private smaConnection: SmaConnection;
@@ -53,23 +54,27 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
     override async getInverterData(): Promise<InverterData> {
         const start = performance.now();
 
-        const gridMsModel = await this.smaConnection.getGridMsModel();
-
-        const nameplateModel = await this.smaConnection.getNameplateModel();
-
-        const inverterModel = await this.smaConnection.getInverterModel();
-
-        const operationModel = await this.smaConnection.getOperationModel();
-
-        const inverterControlsModel =
-            await this.smaConnection.getInverterControlModel();
-
         const models: InverterModels = {
-            inverter: inverterModel,
-            nameplate: nameplateModel,
-            operation: operationModel,
-            gridMs: gridMsModel,
-            inverterControl: inverterControlsModel,
+            inverter: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.smaConnection.getInverterModel(),
+            }),
+            nameplate: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.smaConnection.getNameplateModel(),
+            }),
+            operation: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.smaConnection.getOperationModel(),
+            }),
+            gridMs: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.smaConnection.getGridMsModel(),
+            }),
+            inverterControl: await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.smaConnection.getInverterControlModel(),
+            }),
         };
 
         const end = performance.now();
@@ -77,7 +82,7 @@ export class SmaInverterDataPoller extends InverterDataPollerBase {
 
         this.logger.trace({ duration, models }, 'Got inverter data');
 
-        this.cachedControlsModel = inverterControlsModel;
+        this.cachedControlsModel = models.inverterControl;
 
         const inverterData = generateInverterData(models);
 

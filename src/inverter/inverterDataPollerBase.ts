@@ -17,7 +17,7 @@ export abstract class InverterDataPollerBase extends EventEmitter<{
     protected applyControl: boolean;
     protected readonly inverterIndex: number;
     private inverterPollerName: string;
-    private abortController: AbortController;
+    protected readonly abortController: AbortController;
 
     constructor({
         name,

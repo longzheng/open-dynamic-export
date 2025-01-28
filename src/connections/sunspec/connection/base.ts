@@ -171,6 +171,6 @@ export abstract class SunSpecConnection {
     }
 
     public onDestroy(): void {
-        this.modbusConnection.close();
+        this.modbusConnection.destroy();
     }
 }

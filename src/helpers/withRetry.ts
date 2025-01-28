@@ -18,6 +18,10 @@ export async function withRetry<T>(
         try {
             const result = await fn();
 
+            if (abortController?.signal.aborted) {
+                throw new Error('Operation was aborted');
+            }
+
             return result;
         } catch (error) {
             if (abortController?.signal.aborted) {

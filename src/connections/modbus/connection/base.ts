@@ -15,7 +15,7 @@ export class ModbusConnection {
     private readonly mutex = new Mutex();
 
     private state:
-        | { type: 'connected' }
+        | { type: 'connected'; abortController: AbortController }
         | { type: 'connecting'; connectPromise: Promise<void> }
         | { type: 'disconnected' } = { type: 'disconnected' };
 
@@ -56,12 +56,17 @@ export class ModbusConnection {
                     try {
                         this.logger.info(`Modbus client connecting`);
 
+                        const abortController = new AbortController();
+
                         switch (this.config.type) {
                             case 'tcp':
                                 await this.client.connectTCP(this.config.ip, {
                                     port: this.config.port,
                                     // timeout for connection
                                     timeout: connectionTimeoutMs,
+                                    socketOpts: {
+                                        signal: abortController.signal,
+                                    },
                                 });
                                 break;
                             case 'rtu':
@@ -79,7 +84,7 @@ export class ModbusConnection {
 
                         this.logger.info(`Modbus client connected`);
 
-                        this.state = { type: 'connected' };
+                        this.state = { type: 'connected', abortController };
                     } catch (error) {
                         this.logger.error(
                             error,
@@ -149,7 +154,11 @@ export class ModbusConnection {
         });
     }
 
-    close() {
+    destroy() {
+        if (this.state.type === 'connected') {
+            this.state.abortController.abort();
+        }
+
         this.client.close(() => {});
     }
 }
