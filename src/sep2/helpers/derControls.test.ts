@@ -35,7 +35,7 @@ beforeAll(() => mockServer.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => mockServer.close());
 
 describe('DerControlsHelper', () => {
-    it('should respond to new DERControls', async () => {
+    it('should respond to new DERControls', () => {
         const derControlsHelper = new DerControlsHelper({
             client: sep2Client,
         });
@@ -46,7 +46,7 @@ describe('DerControlsHelper', () => {
             'respondDerControl',
         );
 
-        await derControlsHelper.updateFsaData([
+        derControlsHelper.updateFsaData([
             {
                 functionSetAssignments: generateMockFunctionSetAssignments({}),
                 derProgramList: [

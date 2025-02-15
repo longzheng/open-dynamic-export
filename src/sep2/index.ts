@@ -164,7 +164,7 @@ export function getSep2Instance({
                 'Received SEP2 function set assignments list',
             );
 
-            void derControlsHelper.updateFsaData(functionSetAssignmentsList);
+            derControlsHelper.updateFsaData(functionSetAssignmentsList);
         },
     );
 
