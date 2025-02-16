@@ -46,7 +46,7 @@ export class DerControlsHelper extends EventEmitter<{
         });
     }
 
-    async updateFsaData(fsaData: FunctionSetAssignmentsListData) {
+    updateFsaData(fsaData: FunctionSetAssignmentsListData) {
         const now = new Date();
 
         // assumptions
@@ -82,7 +82,7 @@ export class DerControlsHelper extends EventEmitter<{
 
         for (const controlData of newControlsData) {
             // always send event received responses for new events
-            await this.derControlResponseHelper.respondDerControl({
+            void this.derControlResponseHelper.respondDerControl({
                 mRID: controlData.control.mRID,
                 replyToHref: controlData.control.replyToHref,
                 responseRequired: controlData.control.responseRequired,
@@ -106,7 +106,7 @@ export class DerControlsHelper extends EventEmitter<{
                 // seconds. This Status.type SHALL NOT be used with “regular” Events, only with specializations of RandomizableEvent.
                 case CurrentStatus.Cancelled:
                 case CurrentStatus.CancelledWithRandomization: {
-                    await this.derControlResponseHelper.respondDerControl({
+                    void this.derControlResponseHelper.respondDerControl({
                         mRID: controlData.control.mRID,
                         replyToHref: controlData.control.replyToHref,
                         responseRequired: controlData.control.responseRequired,

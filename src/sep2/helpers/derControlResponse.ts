@@ -7,6 +7,7 @@ import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import deepEqual from 'fast-deep-equal';
 import { ResponseStatus } from '../models/responseStatus.js';
+import { type AxiosRequestConfig } from 'axios';
 
 type HistoryKey = {
     mRID: string;
@@ -33,11 +34,13 @@ export class DerControlResponseHelper {
         replyToHref,
         mRID,
         status,
+        requestConfig,
     }: {
         responseRequired: ResponseRequiredType;
         replyToHref: string | undefined;
         mRID: string;
         status: ResponseStatus;
+        requestConfig?: AxiosRequestConfig;
     }) {
         // if the DERControl does not require any response, we do not respond
         if (responseRequired === (0 as ResponseRequiredType)) {
@@ -86,9 +89,17 @@ export class DerControlResponseHelper {
         const xml = objectToXml(response);
 
         try {
-            await this.client.post(replyToHref, xml);
+            await this.client.post(replyToHref, xml, requestConfig);
         } catch (error) {
-            this.logger.error(error, 'Failed to send DERControl response');
+            this.logger.error(
+                {
+                    error,
+                    mRID,
+                    status,
+                    response,
+                },
+                'Failed to send DERControl response',
+            );
         }
     }
 }

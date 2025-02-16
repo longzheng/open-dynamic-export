@@ -135,15 +135,13 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         if (
             this.activeControlSchedule?.mRID !== newActiveControlSchedule?.mRID
         ) {
-            void this.handleActiveControlScheduleChange(
-                newActiveControlSchedule,
-            );
+            this.handleActiveControlScheduleChange(newActiveControlSchedule);
         }
 
         return this.getCurrentControlBaseValue();
     }
 
-    private async handleActiveControlScheduleChange(
+    private handleActiveControlScheduleChange(
         newActiveControlSchedule: RandomizedControlSchedule | null,
     ) {
         const now = new Date();
@@ -164,7 +162,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                     'Active control schedule completed',
                 );
 
-                await this.derControlResponseHelper.respondDerControl({
+                void this.derControlResponseHelper.respondDerControl({
                     mRID: this.activeControlSchedule.mRID,
                     replyToHref: this.activeControlSchedule.replyToHref,
                     responseRequired:
@@ -194,11 +192,23 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 'Active control schedule started',
             );
 
-            await this.derControlResponseHelper.respondDerControl({
+            void this.derControlResponseHelper.respondDerControl({
                 mRID: newActiveControlSchedule.mRID,
                 replyToHref: newActiveControlSchedule.replyToHref,
                 responseRequired: newActiveControlSchedule.responseRequired,
                 status: ResponseStatus.EventStarted,
+                requestConfig: {
+                    // recommendation from Energex to retry infinitely until the event ends
+                    'axios-retry': {
+                        retries: Infinity,
+                        retryCondition: () => {
+                            return (
+                                new Date() <=
+                                newActiveControlSchedule.effectiveEndExclusive
+                            );
+                        },
+                    },
+                },
             });
         } else {
             this.logger.info(
