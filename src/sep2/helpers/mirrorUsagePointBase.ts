@@ -70,35 +70,47 @@ export abstract class MirrorUsagePointHelperBase<
         this.mirrorUsagePointListHref = mirrorUsagePointListHref;
 
         if (!this.mirrorUsagePoint) {
-            // set up MirrorUsagePoint with MirrorMeterReading definitions
-            // MirrorUsasgePoint must require at least one MirrorMeterReading definition
-            // we define the MirrorMeterReading.ReadingType defintion upfront because they won't change
-            // we also want to set this up early so we know the correct postRate (set by the server)
-            this.mirrorUsagePoint = await this.postMirrorUsagePoint({
-                mirrorUsagePoint: {
-                    mRID: this.client.generateUsagePointMrid(this.roleFlags),
-                    description: this.description,
-                    roleFlags: this.roleFlags,
-                    serviceCategoryKind: ServiceKind.Electricity,
-                    status: UsagePointBaseStatus.On,
-                    deviceLFDI: this.client.lfdi,
-                    mirrorMeterReading:
-                        this.getMirrorMeterReadingsWithReadingType(),
-                },
-            });
+            await this.initMirrorUsagePoint();
         }
 
-        const mirrorUsagePoint = mirrorUsagePoints.find(
-            (mup) => mup.mRID === this.mirrorUsagePoint!.mRID,
-        );
+        const currentMirrorUsagePoint = this.mirrorUsagePoint;
 
-        // the server may change the PostRate of the MirrorUsagePoint
-        // update the post rate from polled MirrorUsagePointList data
-        if (mirrorUsagePoint) {
-            this.mirrorUsagePoint.postRate = mirrorUsagePoint.postRate;
+        if (currentMirrorUsagePoint) {
+            const serverMirrorUsagePoint = mirrorUsagePoints.find(
+                (mup) => mup.mRID === currentMirrorUsagePoint.mRID,
+            );
+
+            // the server may change the PostRate of the MirrorUsagePoint
+            // update the post rate from polled MirrorUsagePointList data
+            if (serverMirrorUsagePoint) {
+                currentMirrorUsagePoint.postRate =
+                    serverMirrorUsagePoint.postRate;
+            }
         }
 
         this.queueMirrorMeterReadingPost();
+    }
+
+    private async initMirrorUsagePoint() {
+        const mirrorUsagePoint: MirrorUsagePoint = {
+            mRID: this.client.generateUsagePointMrid(this.roleFlags),
+            description: this.description,
+            roleFlags: this.roleFlags,
+            serviceCategoryKind: ServiceKind.Electricity,
+            status: UsagePointBaseStatus.On,
+            deviceLFDI: this.client.lfdi,
+            mirrorMeterReading: this.getMirrorMeterReadingsWithReadingType(),
+        };
+
+        this.logger.debug({ mirrorUsagePoint }, 'Creating MirrorUsagePoint');
+
+        // set up MirrorUsagePoint with MirrorMeterReading definitions
+        // MirrorUsagePoint must require at least one MirrorMeterReading definition
+        // we define the MirrorMeterReading.ReadingType definition upfront because they won't change
+        // we also want to set this up early so we know the correct postRate (set by the server)
+        this.mirrorUsagePoint = await this.postMirrorUsagePoint({
+            mirrorUsagePoint,
+        });
     }
 
     public addSample(sample: Sample) {
@@ -310,6 +322,12 @@ export abstract class MirrorUsagePointHelperBase<
                     );
                     failCount++;
                     this.mirrorMeterReadingsBuffer.push(reading);
+
+                    // Energex has indicated that a MUP might get deleted
+                    // "We won’t delete the MUP generally – but when we do a server reset everything in the DB can get reset and so all end points mappings should be considered ephemeral.
+                    // (Although no need to check every time – only if you get an error)"
+                    // on an error, try re-create the MUP as a precaution
+                    await this.initMirrorUsagePoint();
                 }
             }),
         );
