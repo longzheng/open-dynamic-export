@@ -91,7 +91,15 @@ export class DerControlResponseHelper {
         try {
             await this.client.post(replyToHref, xml, requestConfig);
         } catch (error) {
-            this.logger.error(error, 'Failed to send DERControl response');
+            this.logger.error(
+                {
+                    error,
+                    mRID,
+                    status,
+                    response,
+                },
+                'Failed to send DERControl response',
+            );
         }
     }
 }
