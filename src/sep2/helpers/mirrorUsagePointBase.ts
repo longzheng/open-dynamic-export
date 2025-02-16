@@ -129,7 +129,7 @@ export abstract class MirrorUsagePointHelperBase<
 
     protected abstract getReadingMrid(key: MirrorMeterReadingKeys): string;
 
-    protected abstract getReadingDefintions(): Record<
+    protected abstract getReadingDefinitions(): Record<
         MirrorMeterReadingKeys,
         MirrorMeterReadingDefinitions
     >;
@@ -187,7 +187,7 @@ export abstract class MirrorUsagePointHelperBase<
                 reading,
             });
 
-            const mirrorMeterReadingDefinitions = this.getReadingDefintions();
+            const mirrorMeterReadingDefinitions = this.getReadingDefinitions();
 
             const readings = objectEntriesWithType(mirrorMeterReadings)
                 .map(([key, value]): MirrorMeterReading | null => {
@@ -249,7 +249,7 @@ export abstract class MirrorUsagePointHelperBase<
         MirrorMeterReading,
         'Reading'
     >[] {
-        return objectEntriesWithType(this.getReadingDefintions()).map(
+        return objectEntriesWithType(this.getReadingDefinitions()).map(
             ([key, readingDefinition]): Omit<MirrorMeterReading, 'Reading'> => {
                 return {
                     mRID: this.getReadingMrid(key),

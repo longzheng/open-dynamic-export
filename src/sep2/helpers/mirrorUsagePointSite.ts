@@ -528,7 +528,7 @@ export class MirrorUsagePointSiteHelper extends MirrorUsagePointHelperBase<
         return this.mirrorMeterReadingMrids[key];
     }
 
-    protected override getReadingDefintions(): Record<
+    protected override getReadingDefinitions(): Record<
         SiteMirrorMeterReadingKeys,
         MirrorMeterReadingDefinitions
     > {
