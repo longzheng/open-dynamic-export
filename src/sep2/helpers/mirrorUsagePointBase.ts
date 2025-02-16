@@ -327,6 +327,10 @@ export abstract class MirrorUsagePointHelperBase<
                     // "We won’t delete the MUP generally – but when we do a server reset everything in the DB can get reset and so all end points mappings should be considered ephemeral.
                     // (Although no need to check every time – only if you get an error)"
                     // on an error, try re-create the MUP as a precaution
+                    this.logger.debug(
+                        { existingMirrorUsagePoint: this.mirrorUsagePoint },
+                        'Re-creating MirrorUsagePoint due to MirrorMeterReading error',
+                    );
                     await this.initMirrorUsagePoint();
                 }
             }),
