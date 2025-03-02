@@ -51,6 +51,8 @@ export const pinoLogger = pino({
                     size: '10MB',
                     // maximum all logs
                     maxSize: '1G',
+                    // use immutable files (disables GZIP of old logs)
+                    immutable: true,
                 },
             },
             {
@@ -63,6 +65,8 @@ export const pinoLogger = pino({
                     size: '10MB',
                     // maximum all logs
                     maxSize: '100MB',
+                    // use immutable files (disables GZIP of old logs)
+                    immutable: true,
                 },
             },
             {
