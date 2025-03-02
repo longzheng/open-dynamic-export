@@ -108,9 +108,14 @@ export abstract class MirrorUsagePointHelperBase<
         // MirrorUsagePoint must require at least one MirrorMeterReading definition
         // we define the MirrorMeterReading.ReadingType definition upfront because they won't change
         // we also want to set this up early so we know the correct postRate (set by the server)
-        this.mirrorUsagePoint = await this.postMirrorUsagePoint({
-            mirrorUsagePoint,
-        });
+        // ignore errors creating MirrorUsagePoint as it'll try again when we post MirrorMeterReadings
+        try {
+            this.mirrorUsagePoint = await this.postMirrorUsagePoint({
+                mirrorUsagePoint,
+            });
+        } catch (error) {
+            this.logger.debug(error, 'Failed to create MirrorUsagePoint');
+        }
     }
 
     public addSample(sample: Sample) {
@@ -308,33 +313,31 @@ export abstract class MirrorUsagePointHelperBase<
         let successCount = 0;
         let failCount = 0;
 
-        await Promise.all(
-            readings.map(async (reading) => {
-                try {
-                    await this.postMirrorMeterReading({
-                        mirrorMeterReading: reading,
-                    });
-                    successCount++;
-                } catch (error) {
-                    this.logger.debug(
-                        error,
-                        'Failed to post MirrorMeterReading',
-                    );
-                    failCount++;
-                    this.mirrorMeterReadingsBuffer.push(reading);
+        for (const reading of readings) {
+            try {
+                await this.postMirrorMeterReading({
+                    mirrorMeterReading: reading,
+                });
+                successCount++;
+            } catch (error) {
+                this.logger.debug(error, 'Failed to post MirrorMeterReading');
+                failCount++;
+                this.mirrorMeterReadingsBuffer.push(reading);
 
-                    // Energex has indicated that a MUP might get deleted
-                    // "We won’t delete the MUP generally – but when we do a server reset everything in the DB can get reset and so all end points mappings should be considered ephemeral.
-                    // (Although no need to check every time – only if you get an error)"
-                    // on an error, try re-create the MUP as a precaution
-                    this.logger.debug(
-                        { existingMirrorUsagePoint: this.mirrorUsagePoint },
-                        'Re-creating MirrorUsagePoint due to MirrorMeterReading error',
-                    );
-                    await this.initMirrorUsagePoint();
+                // clear any existing MirrorUsagePoint as we don't want to post to it (assume it's no longer valid)
+                if (this.mirrorUsagePoint) {
+                    this.mirrorUsagePoint = null;
                 }
-            }),
-        );
+
+                // Energex indicated that a MUP might get deleted; try re-create the MUP as a precaution
+                this.logger.debug(
+                    { existingMirrorUsagePoint: this.mirrorUsagePoint },
+                    'Re-creating MirrorUsagePoint due to MirrorMeterReading error',
+                );
+
+                await this.initMirrorUsagePoint();
+            }
+        }
 
         return {
             successCount,
