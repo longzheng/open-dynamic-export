@@ -52,7 +52,7 @@ export abstract class SunSpecConnection {
 
                         return modelAddressById;
                     } catch (error) {
-                        this.logger.error(
+                        this.logger.debug(
                             error,
                             `SunSpec Modbus client error caching model addresses`,
                         );
