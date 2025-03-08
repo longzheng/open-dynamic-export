@@ -4,7 +4,7 @@ import { pinoLogger } from './logger.js';
 
 vi.mock('./logger', () => ({
     pinoLogger: {
-        warn: vi.fn(),
+        debug: vi.fn(),
     },
 }));
 
@@ -29,7 +29,7 @@ describe('withRetry', () => {
 
         expect(result).toBe('success');
         expect(fn).toHaveBeenCalledTimes(1);
-        expect(pinoLogger.warn).toHaveBeenCalledTimes(0);
+        expect(pinoLogger.debug).toHaveBeenCalledTimes(0);
     });
 
     it('should retry and succeed on second attempt', async () => {
@@ -45,7 +45,7 @@ describe('withRetry', () => {
 
         expect(result).toBe('success');
         expect(fn).toHaveBeenCalledTimes(2);
-        expect(pinoLogger.warn).toHaveBeenCalledTimes(1);
+        expect(pinoLogger.debug).toHaveBeenCalledTimes(1);
     });
 
     it('should retry and fail after max attempts', async () => {
@@ -56,7 +56,7 @@ describe('withRetry', () => {
         ).rejects.toThrow('fail');
 
         expect(fn).toHaveBeenCalledTimes(3);
-        expect(pinoLogger.warn).toHaveBeenCalledTimes(3);
+        expect(pinoLogger.debug).toHaveBeenCalledTimes(3);
     });
 
     it('should wait for delay between retries', async () => {
@@ -83,7 +83,7 @@ describe('withRetry', () => {
         await vi.advanceTimersByTimeAsync(delayMilliseconds);
         expect(result).toBe('success');
         expect(fn).toHaveBeenCalledTimes(2);
-        expect(pinoLogger.warn).toHaveBeenCalledTimes(1);
+        expect(pinoLogger.debug).toHaveBeenCalledTimes(1);
     });
 
     it('should throw error when operation is aborted', async () => {
