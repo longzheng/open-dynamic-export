@@ -28,7 +28,7 @@ export async function withRetry<T>(
                 throw new Error('Operation was aborted');
             }
 
-            pinoLogger.warn(
+            pinoLogger.debug(
                 error,
                 `${functionName} withRetry attempt ${attempt} of ${attempts} failed`,
             );
