@@ -13,8 +13,7 @@ export const readingColors: Record<ReadingLocation, string> = {
 export default {
     content: [
         './index.html',
-        './src/routes/**/*.{js,ts,jsx,tsx,mdx}',
-        './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/ui/**/*.{js,ts,jsx,tsx,mdx}',
         './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
     ],
     theme: {
