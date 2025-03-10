@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import z from 'zod';
 import { safeParseIntString } from './number.js';
 import { pinoLogger } from './logger.js';
+import { z } from 'zod';
 
 const envSchema = z.object({
     TZ: z.string(),

@@ -17,9 +17,8 @@ app.use(
 app.use(json());
 app.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
 
-app.get('/', (_req, res) => {
-    res.redirect('/docs');
-});
+// eslint-disable-next-line import-x/no-named-as-default-member
+app.use(express.static('dist/ui'));
 
 app.get('/docs/swagger.json', (_req, res) => {
     res.json(swaggerJson);

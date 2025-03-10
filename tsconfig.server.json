@@ -1,0 +1,27 @@
+{
+    "extends": "@tsconfig/strictest/tsconfig.json",
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "outDir": "dist",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true,
+        // too strict with third-party lib type definitions
+        "exactOptionalPropertyTypes": false,
+        // prevent unreachable code being auto deleted
+        "allowUnreachableCode": true,
+        // allow unused during dev
+        "noUnusedLocals": false,
+        "experimentalDecorators": true
+    },
+    "include": [
+        "src/",
+        "scripts/",
+        "tests/",
+    ],
+    "exclude": ["src/ui/", "dist/"]
+}
