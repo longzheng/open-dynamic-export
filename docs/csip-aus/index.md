@@ -48,6 +48,7 @@ Unfortunately due to different regional requirements, some DNSPs also require CS
 |-------|-------------------------------|----------------------------|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | SA    | South Australia Power Network | Accepts SAPN certification | :white_check_mark: | :x: Requires CEC listing                                                                                                                                                                          |
 | QLD   | Energex<br>Ergon Energy       | Accepts SAPN certification | :white_check_mark: | :white_check_mark: Does not require CEC listing,  [separate complaint providers list](https://www.energex.com.au/__data/assets/pdf_file/0005/1097744/Dynamic-Connections-Compliant-Providers.pdf) |
+| VIC | CitiPower<br>PowerCor<br>United<br>Jemena<br>Ausnet | ? | :x: | :x: Requires CEC listing |
 
 
 ## Device certificate
