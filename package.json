@@ -8,8 +8,8 @@
     "build:debug": "npm run routes:generate && tsc -p tsconfig.server.debug.json",
     "lint": "tsc --noEmit && npx eslint . && npm run generate:config-json-schema",
     "test": "vitest",
-    "start": "node dist/src/app.js",
-    "dev": "concurrently \"npm run routes:generate\" \"tsx src/app.ts\" \"vite\"",
+    "start": "NODE_ENV=production node dist/src/app.js",
+    "dev": "concurrently \"npm run routes:generate\" \"tsx src/app.ts\"",
     "routes:generate": "tsoa spec-and-routes && kubb generate",
     "debug:sunspec-discovery": "tsx scripts/debugSunspecDiscovery.ts",
     "cert:device-request": "tsx scripts/certDeviceRequest.ts",
@@ -118,6 +118,7 @@
     "tailwindcss": "3.4.13",
     "tsoa": "^6.6.0",
     "tsx": "^4.19.2",
+    "vite-express": "^0.20.0",
     "xml2js": "^0.6.2",
     "zod": "^3.24.2"
   }

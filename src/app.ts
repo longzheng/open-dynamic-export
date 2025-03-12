@@ -3,6 +3,7 @@ import cors from 'cors';
 import { RegisterRoutes } from '../dist/routes.js';
 import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import redoc from 'redoc-express';
+import ViteExpress from 'vite-express';
 
 const port = 3000;
 
@@ -39,6 +40,6 @@ app.get(
 
 RegisterRoutes(app);
 
-app.listen(port, () =>
+ViteExpress.listen(app, port, () =>
     console.log(`Server listening at http://localhost:${port}`),
 );

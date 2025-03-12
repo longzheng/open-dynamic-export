@@ -1,10 +1,10 @@
 import { NextUIProvider } from '@nextui-org/system';
 import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { IntlProvider } from 'react-intl';
 
 import { Navbar } from '@/components/navbar';
+import { lazy, Suspense } from 'react';
 
 const queryClient = new QueryClient();
 
@@ -14,6 +14,7 @@ export const Route = createRootRoute({
 
 function RootRoute() {
     const router = useRouter();
+    console.log(import.meta.env);
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -26,7 +27,9 @@ function RootRoute() {
                         <Navbar />
                         <main className="container mx-auto max-w-7xl grow px-6 pt-4">
                             <Outlet />
-                            <TanStackRouterDevtools />
+                            <Suspense>
+                                <TanStackRouterDevtools />
+                            </Suspense>
                         </main>
                     </div>
                 </IntlProvider>
@@ -34,3 +37,12 @@ function RootRoute() {
         </QueryClientProvider>
     );
 }
+
+// lazy load tanstack router devtools only in development
+const TanStackRouterDevtools = import.meta.env.DEV
+    ? lazy(() =>
+          import(`@tanstack/router-devtools`).then((res) => ({
+              default: res.TanStackRouterDevtools,
+          })),
+      )
+    : () => null;
