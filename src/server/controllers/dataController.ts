@@ -8,7 +8,7 @@ import {
 } from '../services/dataService.js';
 
 @Tags('data')
-@Route('data')
+@Route('api/data')
 export class DataController extends Controller {
     @Get('siteRealPower')
     @OperationId('siteRealPower')

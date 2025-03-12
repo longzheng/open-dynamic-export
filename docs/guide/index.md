@@ -60,8 +60,8 @@ The system supports one site meter to measure the site's load and export metrics
 TZ=Australia/Melbourne # System timezone
 SERVER_PORT=3000 # API server port
 CONFIG_DIR=./config # Directory to store configuration files
-SEP2_CERT_FILE=sapn_cert.pem # CSIP-AUS/SEP2 certificate file path (in the config directory)
-SEP2_KEY_FILE=sapn_key.pem # CSIP-AUS/SEP2 key file path (in the config directory)
+SEP2_CERT_FILE=cert.pem # CSIP-AUS/SEP2 certificate file path (in the config directory)
+SEP2_KEY_FILE=key.pem # CSIP-AUS/SEP2 key file path (in the config directory)
 SEP2_PEN=62223 # CSIP-AUS/SEP2 Provider Private Enterprise Number (does not need to be changed)
 # INFLUXDB_USERNAME=admin # Optional InfluxDB username, enable to log data to InfluxDB
 # INFLUXDB_PASSWORD=password # Optional InfluxDB password, enable to log data to InfluxDB
@@ -70,6 +70,7 @@ SEP2_PEN=62223 # CSIP-AUS/SEP2 Provider Private Enterprise Number (does not need
 # INFLUXDB_BUCKET=data # Optional InfluxDB bucket, enable to log data to InfluxDB
 # INFLUXDB_PORT=8086 # Optional InfluxDB port, enable to log data to InfluxDB
 # LOGLEVEL=debug # Optional log level (valid values: trace, debug. default: debug)
+VITE_API_URL_BASE=/ # UI base URL for the API
 ```
 
 3. In the `/config` folder, make a copy of the `config.example.json` file and rename it to `config.json`. Update it with the relevant values, see the "Configuration" section for more details.
@@ -90,3 +91,8 @@ You can run the Node project directly with the Node.js runtime.
 1. Run `docker compose up -d` to use from the Docker Hub image (optionally run `docker compose up -d --build` to build the image from the source code)
 
 2. Optionally uncomment the `influxdb` service in the `docker-compose.yml` file to enable logging to InfluxDB
+
+### Web UI
+You can view the dashboard at `http://localhost:3000` (or the server port you specified in the `.env` file).
+
+![Dashboard UI](/dashboard.png)

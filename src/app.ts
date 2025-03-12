@@ -3,6 +3,7 @@ import cors from 'cors';
 import { RegisterRoutes } from '../dist/routes.js';
 import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import redoc from 'redoc-express';
+import ViteExpress from 'vite-express';
 
 const port = 3000;
 
@@ -17,20 +18,21 @@ app.use(
 app.use(json());
 app.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
 
-app.get('/', (_req, res) => {
-    res.redirect('/docs');
+app.get('/api', (_req, res) => {
+    // redirect to docs
+    res.redirect('/api/docs');
 });
 
-app.get('/docs/swagger.json', (_req, res) => {
+app.get('/api/docs/swagger.json', (_req, res) => {
     res.json(swaggerJson);
 });
 
 app.get(
-    '/docs',
+    '/api/docs',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     redoc.default({
         title: 'API Documentation',
-        specUrl: '/docs/swagger.json',
+        specUrl: '/api/docs/swagger.json',
         redocOptions: {
             expandDefaultResponse: true,
             expandResponses: '200',
@@ -40,6 +42,6 @@ app.get(
 
 RegisterRoutes(app);
 
-app.listen(port, () =>
+ViteExpress.listen(app, port, () =>
     console.log(`Server listening at http://localhost:${port}`),
 );
