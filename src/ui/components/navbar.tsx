@@ -31,11 +31,14 @@ export const Navbar = () => {
                 </NavbarBrand>
                 <div className="ml-2 hidden justify-start gap-4 sm:flex">
                     {siteConfig.navItems.map((item) => {
-                        const isActive = !!matchRoute({ to: item.href });
+                        const isActive =
+                            item.type === 'route' &&
+                            !!matchRoute({ to: item.href });
 
                         return (
                             <NavbarItem key={item.href} isActive={isActive}>
                                 <Link
+                                    isExternal={item.type === 'link'}
                                     className={clsx(
                                         isActive ? null : 'opacity-70',
                                     )}
@@ -57,11 +60,14 @@ export const Navbar = () => {
             <NavbarMenu className="dark">
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item, index) => {
-                        const isActive = !!matchRoute({ to: item.href });
+                        const isActive =
+                            item.type === 'route' &&
+                            !!matchRoute({ to: item.href });
 
                         return (
                             <NavbarMenuItem key={`${item.label}-${index}`}>
                                 <Link
+                                    isExternal={item.type === 'link'}
                                     className={clsx(
                                         isActive ? null : 'opacity-70',
                                     )}

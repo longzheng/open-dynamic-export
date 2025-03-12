@@ -17,7 +17,7 @@ type SunspecData = {
         return: Awaited<ReturnType<SunspecDataClient>>;
     };
 };
-export const sunspecDataQueryKey = () => [{ url: "/sunspec/data" }] as const;
+export const sunspecDataQueryKey = () => [{ url: "/api/sunspec/data" }] as const;
 export type SunspecDataQueryKey = ReturnType<typeof sunspecDataQueryKey>;
 export function sunspecDataQueryOptions(options: SunspecData["client"]["parameters"] = {}) {
     const queryKey = sunspecDataQueryKey();
@@ -26,7 +26,7 @@ export function sunspecDataQueryOptions(options: SunspecData["client"]["paramete
         queryFn: async () => {
             const res = await client<SunspecData["data"], SunspecData["error"]>({
                 method: "get",
-                url: `/sunspec/data`,
+                url: `/api/sunspec/data`,
                 ...options
             });
             return res;
@@ -34,7 +34,7 @@ export function sunspecDataQueryOptions(options: SunspecData["client"]["paramete
     });
 }
 /**
- * @link /sunspec/data
+ * @link /api/sunspec/data
  */
 export function useSunspecData<TData = SunspecData["response"], TQueryData = SunspecData["response"], TQueryKey extends QueryKey = SunspecDataQueryKey>(options: {
     query?: Partial<QueryObserverOptions<SunspecData["response"], SunspecData["error"], TData, TQueryData, TQueryKey>>;
@@ -54,7 +54,7 @@ export function useSunspecData<TData = SunspecData["response"], TQueryData = Sun
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const sunspecDataSuspenseQueryKey = () => [{ url: "/sunspec/data" }] as const;
+export const sunspecDataSuspenseQueryKey = () => [{ url: "/api/sunspec/data" }] as const;
 export type SunspecDataSuspenseQueryKey = ReturnType<typeof sunspecDataSuspenseQueryKey>;
 export function sunspecDataSuspenseQueryOptions(options: SunspecData["client"]["parameters"] = {}) {
     const queryKey = sunspecDataSuspenseQueryKey();
@@ -63,7 +63,7 @@ export function sunspecDataSuspenseQueryOptions(options: SunspecData["client"]["
         queryFn: async () => {
             const res = await client<SunspecData["data"], SunspecData["error"]>({
                 method: "get",
-                url: `/sunspec/data`,
+                url: `/api/sunspec/data`,
                 ...options
             });
             return res;
@@ -71,7 +71,7 @@ export function sunspecDataSuspenseQueryOptions(options: SunspecData["client"]["
     });
 }
 /**
- * @link /sunspec/data
+ * @link /api/sunspec/data
  */
 export function useSunspecDataSuspense<TData = SunspecData["response"], TQueryKey extends QueryKey = SunspecDataSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<SunspecData["response"], SunspecData["error"], TData, TQueryKey>>;
@@ -106,7 +106,7 @@ type SiteRealPower = {
         return: Awaited<ReturnType<SiteRealPowerClient>>;
     };
 };
-export const siteRealPowerQueryKey = () => [{ url: "/data/siteRealPower" }] as const;
+export const siteRealPowerQueryKey = () => [{ url: "/api/data/siteRealPower" }] as const;
 export type SiteRealPowerQueryKey = ReturnType<typeof siteRealPowerQueryKey>;
 export function siteRealPowerQueryOptions(options: SiteRealPower["client"]["parameters"] = {}) {
     const queryKey = siteRealPowerQueryKey();
@@ -115,7 +115,7 @@ export function siteRealPowerQueryOptions(options: SiteRealPower["client"]["para
         queryFn: async () => {
             const res = await client<SiteRealPower["data"], SiteRealPower["error"]>({
                 method: "get",
-                url: `/data/siteRealPower`,
+                url: `/api/data/siteRealPower`,
                 ...options
             });
             return res;
@@ -123,7 +123,7 @@ export function siteRealPowerQueryOptions(options: SiteRealPower["client"]["para
     });
 }
 /**
- * @link /data/siteRealPower
+ * @link /api/data/siteRealPower
  */
 export function useSiteRealPower<TData = SiteRealPower["response"], TQueryData = SiteRealPower["response"], TQueryKey extends QueryKey = SiteRealPowerQueryKey>(options: {
     query?: Partial<QueryObserverOptions<SiteRealPower["response"], SiteRealPower["error"], TData, TQueryData, TQueryKey>>;
@@ -143,7 +143,7 @@ export function useSiteRealPower<TData = SiteRealPower["response"], TQueryData =
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const siteRealPowerSuspenseQueryKey = () => [{ url: "/data/siteRealPower" }] as const;
+export const siteRealPowerSuspenseQueryKey = () => [{ url: "/api/data/siteRealPower" }] as const;
 export type SiteRealPowerSuspenseQueryKey = ReturnType<typeof siteRealPowerSuspenseQueryKey>;
 export function siteRealPowerSuspenseQueryOptions(options: SiteRealPower["client"]["parameters"] = {}) {
     const queryKey = siteRealPowerSuspenseQueryKey();
@@ -152,7 +152,7 @@ export function siteRealPowerSuspenseQueryOptions(options: SiteRealPower["client
         queryFn: async () => {
             const res = await client<SiteRealPower["data"], SiteRealPower["error"]>({
                 method: "get",
-                url: `/data/siteRealPower`,
+                url: `/api/data/siteRealPower`,
                 ...options
             });
             return res;
@@ -160,7 +160,7 @@ export function siteRealPowerSuspenseQueryOptions(options: SiteRealPower["client
     });
 }
 /**
- * @link /data/siteRealPower
+ * @link /api/data/siteRealPower
  */
 export function useSiteRealPowerSuspense<TData = SiteRealPower["response"], TQueryKey extends QueryKey = SiteRealPowerSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<SiteRealPower["response"], SiteRealPower["error"], TData, TQueryKey>>;
@@ -195,7 +195,7 @@ type ExportLimit = {
         return: Awaited<ReturnType<ExportLimitClient>>;
     };
 };
-export const exportLimitQueryKey = () => [{ url: "/data/exportLimit" }] as const;
+export const exportLimitQueryKey = () => [{ url: "/api/data/exportLimit" }] as const;
 export type ExportLimitQueryKey = ReturnType<typeof exportLimitQueryKey>;
 export function exportLimitQueryOptions(options: ExportLimit["client"]["parameters"] = {}) {
     const queryKey = exportLimitQueryKey();
@@ -204,7 +204,7 @@ export function exportLimitQueryOptions(options: ExportLimit["client"]["paramete
         queryFn: async () => {
             const res = await client<ExportLimit["data"], ExportLimit["error"]>({
                 method: "get",
-                url: `/data/exportLimit`,
+                url: `/api/data/exportLimit`,
                 ...options
             });
             return res;
@@ -212,7 +212,7 @@ export function exportLimitQueryOptions(options: ExportLimit["client"]["paramete
     });
 }
 /**
- * @link /data/exportLimit
+ * @link /api/data/exportLimit
  */
 export function useExportLimit<TData = ExportLimit["response"], TQueryData = ExportLimit["response"], TQueryKey extends QueryKey = ExportLimitQueryKey>(options: {
     query?: Partial<QueryObserverOptions<ExportLimit["response"], ExportLimit["error"], TData, TQueryData, TQueryKey>>;
@@ -232,7 +232,7 @@ export function useExportLimit<TData = ExportLimit["response"], TQueryData = Exp
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const exportLimitSuspenseQueryKey = () => [{ url: "/data/exportLimit" }] as const;
+export const exportLimitSuspenseQueryKey = () => [{ url: "/api/data/exportLimit" }] as const;
 export type ExportLimitSuspenseQueryKey = ReturnType<typeof exportLimitSuspenseQueryKey>;
 export function exportLimitSuspenseQueryOptions(options: ExportLimit["client"]["parameters"] = {}) {
     const queryKey = exportLimitSuspenseQueryKey();
@@ -241,7 +241,7 @@ export function exportLimitSuspenseQueryOptions(options: ExportLimit["client"]["
         queryFn: async () => {
             const res = await client<ExportLimit["data"], ExportLimit["error"]>({
                 method: "get",
-                url: `/data/exportLimit`,
+                url: `/api/data/exportLimit`,
                 ...options
             });
             return res;
@@ -249,7 +249,7 @@ export function exportLimitSuspenseQueryOptions(options: ExportLimit["client"]["
     });
 }
 /**
- * @link /data/exportLimit
+ * @link /api/data/exportLimit
  */
 export function useExportLimitSuspense<TData = ExportLimit["response"], TQueryKey extends QueryKey = ExportLimitSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<ExportLimit["response"], ExportLimit["error"], TData, TQueryKey>>;
@@ -284,7 +284,7 @@ type GenerationLimit = {
         return: Awaited<ReturnType<GenerationLimitClient>>;
     };
 };
-export const generationLimitQueryKey = () => [{ url: "/data/generationLimit" }] as const;
+export const generationLimitQueryKey = () => [{ url: "/api/data/generationLimit" }] as const;
 export type GenerationLimitQueryKey = ReturnType<typeof generationLimitQueryKey>;
 export function generationLimitQueryOptions(options: GenerationLimit["client"]["parameters"] = {}) {
     const queryKey = generationLimitQueryKey();
@@ -293,7 +293,7 @@ export function generationLimitQueryOptions(options: GenerationLimit["client"]["
         queryFn: async () => {
             const res = await client<GenerationLimit["data"], GenerationLimit["error"]>({
                 method: "get",
-                url: `/data/generationLimit`,
+                url: `/api/data/generationLimit`,
                 ...options
             });
             return res;
@@ -301,7 +301,7 @@ export function generationLimitQueryOptions(options: GenerationLimit["client"]["
     });
 }
 /**
- * @link /data/generationLimit
+ * @link /api/data/generationLimit
  */
 export function useGenerationLimit<TData = GenerationLimit["response"], TQueryData = GenerationLimit["response"], TQueryKey extends QueryKey = GenerationLimitQueryKey>(options: {
     query?: Partial<QueryObserverOptions<GenerationLimit["response"], GenerationLimit["error"], TData, TQueryData, TQueryKey>>;
@@ -321,7 +321,7 @@ export function useGenerationLimit<TData = GenerationLimit["response"], TQueryDa
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const generationLimitSuspenseQueryKey = () => [{ url: "/data/generationLimit" }] as const;
+export const generationLimitSuspenseQueryKey = () => [{ url: "/api/data/generationLimit" }] as const;
 export type GenerationLimitSuspenseQueryKey = ReturnType<typeof generationLimitSuspenseQueryKey>;
 export function generationLimitSuspenseQueryOptions(options: GenerationLimit["client"]["parameters"] = {}) {
     const queryKey = generationLimitSuspenseQueryKey();
@@ -330,7 +330,7 @@ export function generationLimitSuspenseQueryOptions(options: GenerationLimit["cl
         queryFn: async () => {
             const res = await client<GenerationLimit["data"], GenerationLimit["error"]>({
                 method: "get",
-                url: `/data/generationLimit`,
+                url: `/api/data/generationLimit`,
                 ...options
             });
             return res;
@@ -338,7 +338,7 @@ export function generationLimitSuspenseQueryOptions(options: GenerationLimit["cl
     });
 }
 /**
- * @link /data/generationLimit
+ * @link /api/data/generationLimit
  */
 export function useGenerationLimitSuspense<TData = GenerationLimit["response"], TQueryKey extends QueryKey = GenerationLimitSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<GenerationLimit["response"], GenerationLimit["error"], TData, TQueryKey>>;
@@ -373,7 +373,7 @@ type Connection = {
         return: Awaited<ReturnType<ConnectionClient>>;
     };
 };
-export const connectionQueryKey = () => [{ url: "/data/connection" }] as const;
+export const connectionQueryKey = () => [{ url: "/api/data/connection" }] as const;
 export type ConnectionQueryKey = ReturnType<typeof connectionQueryKey>;
 export function connectionQueryOptions(options: Connection["client"]["parameters"] = {}) {
     const queryKey = connectionQueryKey();
@@ -382,7 +382,7 @@ export function connectionQueryOptions(options: Connection["client"]["parameters
         queryFn: async () => {
             const res = await client<Connection["data"], Connection["error"]>({
                 method: "get",
-                url: `/data/connection`,
+                url: `/api/data/connection`,
                 ...options
             });
             return res;
@@ -390,7 +390,7 @@ export function connectionQueryOptions(options: Connection["client"]["parameters
     });
 }
 /**
- * @link /data/connection
+ * @link /api/data/connection
  */
 export function useConnection<TData = Connection["response"], TQueryData = Connection["response"], TQueryKey extends QueryKey = ConnectionQueryKey>(options: {
     query?: Partial<QueryObserverOptions<Connection["response"], Connection["error"], TData, TQueryData, TQueryKey>>;
@@ -410,7 +410,7 @@ export function useConnection<TData = Connection["response"], TQueryData = Conne
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const connectionSuspenseQueryKey = () => [{ url: "/data/connection" }] as const;
+export const connectionSuspenseQueryKey = () => [{ url: "/api/data/connection" }] as const;
 export type ConnectionSuspenseQueryKey = ReturnType<typeof connectionSuspenseQueryKey>;
 export function connectionSuspenseQueryOptions(options: Connection["client"]["parameters"] = {}) {
     const queryKey = connectionSuspenseQueryKey();
@@ -419,7 +419,7 @@ export function connectionSuspenseQueryOptions(options: Connection["client"]["pa
         queryFn: async () => {
             const res = await client<Connection["data"], Connection["error"]>({
                 method: "get",
-                url: `/data/connection`,
+                url: `/api/data/connection`,
                 ...options
             });
             return res;
@@ -427,7 +427,7 @@ export function connectionSuspenseQueryOptions(options: Connection["client"]["pa
     });
 }
 /**
- * @link /data/connection
+ * @link /api/data/connection
  */
 export function useConnectionSuspense<TData = Connection["response"], TQueryKey extends QueryKey = ConnectionSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<Connection["response"], Connection["error"], TData, TQueryKey>>;
@@ -462,7 +462,7 @@ type Energize = {
         return: Awaited<ReturnType<EnergizeClient>>;
     };
 };
-export const energizeQueryKey = () => [{ url: "/data/energize" }] as const;
+export const energizeQueryKey = () => [{ url: "/api/data/energize" }] as const;
 export type EnergizeQueryKey = ReturnType<typeof energizeQueryKey>;
 export function energizeQueryOptions(options: Energize["client"]["parameters"] = {}) {
     const queryKey = energizeQueryKey();
@@ -471,7 +471,7 @@ export function energizeQueryOptions(options: Energize["client"]["parameters"] =
         queryFn: async () => {
             const res = await client<Energize["data"], Energize["error"]>({
                 method: "get",
-                url: `/data/energize`,
+                url: `/api/data/energize`,
                 ...options
             });
             return res;
@@ -479,7 +479,7 @@ export function energizeQueryOptions(options: Energize["client"]["parameters"] =
     });
 }
 /**
- * @link /data/energize
+ * @link /api/data/energize
  */
 export function useEnergize<TData = Energize["response"], TQueryData = Energize["response"], TQueryKey extends QueryKey = EnergizeQueryKey>(options: {
     query?: Partial<QueryObserverOptions<Energize["response"], Energize["error"], TData, TQueryData, TQueryKey>>;
@@ -499,7 +499,7 @@ export function useEnergize<TData = Energize["response"], TQueryData = Energize[
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const energizeSuspenseQueryKey = () => [{ url: "/data/energize" }] as const;
+export const energizeSuspenseQueryKey = () => [{ url: "/api/data/energize" }] as const;
 export type EnergizeSuspenseQueryKey = ReturnType<typeof energizeSuspenseQueryKey>;
 export function energizeSuspenseQueryOptions(options: Energize["client"]["parameters"] = {}) {
     const queryKey = energizeSuspenseQueryKey();
@@ -508,7 +508,7 @@ export function energizeSuspenseQueryOptions(options: Energize["client"]["parame
         queryFn: async () => {
             const res = await client<Energize["data"], Energize["error"]>({
                 method: "get",
-                url: `/data/energize`,
+                url: `/api/data/energize`,
                 ...options
             });
             return res;
@@ -516,7 +516,7 @@ export function energizeSuspenseQueryOptions(options: Energize["client"]["parame
     });
 }
 /**
- * @link /data/energize
+ * @link /api/data/energize
  */
 export function useEnergizeSuspense<TData = Energize["response"], TQueryKey extends QueryKey = EnergizeSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<Energize["response"], Energize["error"], TData, TQueryKey>>;
@@ -551,7 +551,7 @@ type CsipAusStatus = {
         return: Awaited<ReturnType<CsipAusStatusClient>>;
     };
 };
-export const csipAusStatusQueryKey = () => [{ url: "/csipAus/id" }] as const;
+export const csipAusStatusQueryKey = () => [{ url: "/api/csipAus/id" }] as const;
 export type CsipAusStatusQueryKey = ReturnType<typeof csipAusStatusQueryKey>;
 export function csipAusStatusQueryOptions(options: CsipAusStatus["client"]["parameters"] = {}) {
     const queryKey = csipAusStatusQueryKey();
@@ -560,7 +560,7 @@ export function csipAusStatusQueryOptions(options: CsipAusStatus["client"]["para
         queryFn: async () => {
             const res = await client<CsipAusStatus["data"], CsipAusStatus["error"]>({
                 method: "get",
-                url: `/csipAus/id`,
+                url: `/api/csipAus/id`,
                 ...options
             });
             return res;
@@ -569,7 +569,7 @@ export function csipAusStatusQueryOptions(options: CsipAusStatus["client"]["para
 }
 /**
  * @description Get CSIP-AUS device certificate LFID and SFDI
- * @link /csipAus/id
+ * @link /api/csipAus/id
  */
 export function useCsipAusStatus<TData = CsipAusStatus["response"], TQueryData = CsipAusStatus["response"], TQueryKey extends QueryKey = CsipAusStatusQueryKey>(options: {
     query?: Partial<QueryObserverOptions<CsipAusStatus["response"], CsipAusStatus["error"], TData, TQueryData, TQueryKey>>;
@@ -589,7 +589,7 @@ export function useCsipAusStatus<TData = CsipAusStatus["response"], TQueryData =
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const csipAusStatusSuspenseQueryKey = () => [{ url: "/csipAus/id" }] as const;
+export const csipAusStatusSuspenseQueryKey = () => [{ url: "/api/csipAus/id" }] as const;
 export type CsipAusStatusSuspenseQueryKey = ReturnType<typeof csipAusStatusSuspenseQueryKey>;
 export function csipAusStatusSuspenseQueryOptions(options: CsipAusStatus["client"]["parameters"] = {}) {
     const queryKey = csipAusStatusSuspenseQueryKey();
@@ -598,7 +598,7 @@ export function csipAusStatusSuspenseQueryOptions(options: CsipAusStatus["client
         queryFn: async () => {
             const res = await client<CsipAusStatus["data"], CsipAusStatus["error"]>({
                 method: "get",
-                url: `/csipAus/id`,
+                url: `/api/csipAus/id`,
                 ...options
             });
             return res;
@@ -607,7 +607,7 @@ export function csipAusStatusSuspenseQueryOptions(options: CsipAusStatus["client
 }
 /**
  * @description Get CSIP-AUS device certificate LFID and SFDI
- * @link /csipAus/id
+ * @link /api/csipAus/id
  */
 export function useCsipAusStatusSuspense<TData = CsipAusStatus["response"], TQueryKey extends QueryKey = CsipAusStatusSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<CsipAusStatus["response"], CsipAusStatus["error"], TData, TQueryKey>>;
@@ -642,7 +642,7 @@ type ExportLimitSchedule = {
         return: Awaited<ReturnType<ExportLimitScheduleClient>>;
     };
 };
-export const exportLimitScheduleQueryKey = () => [{ url: "/csipAus/exportLimitSchedule" }] as const;
+export const exportLimitScheduleQueryKey = () => [{ url: "/api/csipAus/exportLimitSchedule" }] as const;
 export type ExportLimitScheduleQueryKey = ReturnType<typeof exportLimitScheduleQueryKey>;
 export function exportLimitScheduleQueryOptions(options: ExportLimitSchedule["client"]["parameters"] = {}) {
     const queryKey = exportLimitScheduleQueryKey();
@@ -651,7 +651,7 @@ export function exportLimitScheduleQueryOptions(options: ExportLimitSchedule["cl
         queryFn: async () => {
             const res = await client<ExportLimitSchedule["data"], ExportLimitSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/exportLimitSchedule`,
+                url: `/api/csipAus/exportLimitSchedule`,
                 ...options
             });
             return res;
@@ -659,7 +659,7 @@ export function exportLimitScheduleQueryOptions(options: ExportLimitSchedule["cl
     });
 }
 /**
- * @link /csipAus/exportLimitSchedule
+ * @link /api/csipAus/exportLimitSchedule
  */
 export function useExportLimitSchedule<TData = ExportLimitSchedule["response"], TQueryData = ExportLimitSchedule["response"], TQueryKey extends QueryKey = ExportLimitScheduleQueryKey>(options: {
     query?: Partial<QueryObserverOptions<ExportLimitSchedule["response"], ExportLimitSchedule["error"], TData, TQueryData, TQueryKey>>;
@@ -679,7 +679,7 @@ export function useExportLimitSchedule<TData = ExportLimitSchedule["response"], 
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const exportLimitScheduleSuspenseQueryKey = () => [{ url: "/csipAus/exportLimitSchedule" }] as const;
+export const exportLimitScheduleSuspenseQueryKey = () => [{ url: "/api/csipAus/exportLimitSchedule" }] as const;
 export type ExportLimitScheduleSuspenseQueryKey = ReturnType<typeof exportLimitScheduleSuspenseQueryKey>;
 export function exportLimitScheduleSuspenseQueryOptions(options: ExportLimitSchedule["client"]["parameters"] = {}) {
     const queryKey = exportLimitScheduleSuspenseQueryKey();
@@ -688,7 +688,7 @@ export function exportLimitScheduleSuspenseQueryOptions(options: ExportLimitSche
         queryFn: async () => {
             const res = await client<ExportLimitSchedule["data"], ExportLimitSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/exportLimitSchedule`,
+                url: `/api/csipAus/exportLimitSchedule`,
                 ...options
             });
             return res;
@@ -696,7 +696,7 @@ export function exportLimitScheduleSuspenseQueryOptions(options: ExportLimitSche
     });
 }
 /**
- * @link /csipAus/exportLimitSchedule
+ * @link /api/csipAus/exportLimitSchedule
  */
 export function useExportLimitScheduleSuspense<TData = ExportLimitSchedule["response"], TQueryKey extends QueryKey = ExportLimitScheduleSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<ExportLimitSchedule["response"], ExportLimitSchedule["error"], TData, TQueryKey>>;
@@ -731,7 +731,7 @@ type GenerationLimitSchedule = {
         return: Awaited<ReturnType<GenerationLimitScheduleClient>>;
     };
 };
-export const generationLimitScheduleQueryKey = () => [{ url: "/csipAus/generationLimitSchedule" }] as const;
+export const generationLimitScheduleQueryKey = () => [{ url: "/api/csipAus/generationLimitSchedule" }] as const;
 export type GenerationLimitScheduleQueryKey = ReturnType<typeof generationLimitScheduleQueryKey>;
 export function generationLimitScheduleQueryOptions(options: GenerationLimitSchedule["client"]["parameters"] = {}) {
     const queryKey = generationLimitScheduleQueryKey();
@@ -740,7 +740,7 @@ export function generationLimitScheduleQueryOptions(options: GenerationLimitSche
         queryFn: async () => {
             const res = await client<GenerationLimitSchedule["data"], GenerationLimitSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/generationLimitSchedule`,
+                url: `/api/csipAus/generationLimitSchedule`,
                 ...options
             });
             return res;
@@ -748,7 +748,7 @@ export function generationLimitScheduleQueryOptions(options: GenerationLimitSche
     });
 }
 /**
- * @link /csipAus/generationLimitSchedule
+ * @link /api/csipAus/generationLimitSchedule
  */
 export function useGenerationLimitSchedule<TData = GenerationLimitSchedule["response"], TQueryData = GenerationLimitSchedule["response"], TQueryKey extends QueryKey = GenerationLimitScheduleQueryKey>(options: {
     query?: Partial<QueryObserverOptions<GenerationLimitSchedule["response"], GenerationLimitSchedule["error"], TData, TQueryData, TQueryKey>>;
@@ -768,7 +768,7 @@ export function useGenerationLimitSchedule<TData = GenerationLimitSchedule["resp
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const generationLimitScheduleSuspenseQueryKey = () => [{ url: "/csipAus/generationLimitSchedule" }] as const;
+export const generationLimitScheduleSuspenseQueryKey = () => [{ url: "/api/csipAus/generationLimitSchedule" }] as const;
 export type GenerationLimitScheduleSuspenseQueryKey = ReturnType<typeof generationLimitScheduleSuspenseQueryKey>;
 export function generationLimitScheduleSuspenseQueryOptions(options: GenerationLimitSchedule["client"]["parameters"] = {}) {
     const queryKey = generationLimitScheduleSuspenseQueryKey();
@@ -777,7 +777,7 @@ export function generationLimitScheduleSuspenseQueryOptions(options: GenerationL
         queryFn: async () => {
             const res = await client<GenerationLimitSchedule["data"], GenerationLimitSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/generationLimitSchedule`,
+                url: `/api/csipAus/generationLimitSchedule`,
                 ...options
             });
             return res;
@@ -785,7 +785,7 @@ export function generationLimitScheduleSuspenseQueryOptions(options: GenerationL
     });
 }
 /**
- * @link /csipAus/generationLimitSchedule
+ * @link /api/csipAus/generationLimitSchedule
  */
 export function useGenerationLimitScheduleSuspense<TData = GenerationLimitSchedule["response"], TQueryKey extends QueryKey = GenerationLimitScheduleSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<GenerationLimitSchedule["response"], GenerationLimitSchedule["error"], TData, TQueryKey>>;
@@ -820,7 +820,7 @@ type ConnectionSchedule = {
         return: Awaited<ReturnType<ConnectionScheduleClient>>;
     };
 };
-export const connectionScheduleQueryKey = () => [{ url: "/csipAus/connectionSchedule" }] as const;
+export const connectionScheduleQueryKey = () => [{ url: "/api/csipAus/connectionSchedule" }] as const;
 export type ConnectionScheduleQueryKey = ReturnType<typeof connectionScheduleQueryKey>;
 export function connectionScheduleQueryOptions(options: ConnectionSchedule["client"]["parameters"] = {}) {
     const queryKey = connectionScheduleQueryKey();
@@ -829,7 +829,7 @@ export function connectionScheduleQueryOptions(options: ConnectionSchedule["clie
         queryFn: async () => {
             const res = await client<ConnectionSchedule["data"], ConnectionSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/connectionSchedule`,
+                url: `/api/csipAus/connectionSchedule`,
                 ...options
             });
             return res;
@@ -837,7 +837,7 @@ export function connectionScheduleQueryOptions(options: ConnectionSchedule["clie
     });
 }
 /**
- * @link /csipAus/connectionSchedule
+ * @link /api/csipAus/connectionSchedule
  */
 export function useConnectionSchedule<TData = ConnectionSchedule["response"], TQueryData = ConnectionSchedule["response"], TQueryKey extends QueryKey = ConnectionScheduleQueryKey>(options: {
     query?: Partial<QueryObserverOptions<ConnectionSchedule["response"], ConnectionSchedule["error"], TData, TQueryData, TQueryKey>>;
@@ -857,7 +857,7 @@ export function useConnectionSchedule<TData = ConnectionSchedule["response"], TQ
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const connectionScheduleSuspenseQueryKey = () => [{ url: "/csipAus/connectionSchedule" }] as const;
+export const connectionScheduleSuspenseQueryKey = () => [{ url: "/api/csipAus/connectionSchedule" }] as const;
 export type ConnectionScheduleSuspenseQueryKey = ReturnType<typeof connectionScheduleSuspenseQueryKey>;
 export function connectionScheduleSuspenseQueryOptions(options: ConnectionSchedule["client"]["parameters"] = {}) {
     const queryKey = connectionScheduleSuspenseQueryKey();
@@ -866,7 +866,7 @@ export function connectionScheduleSuspenseQueryOptions(options: ConnectionSchedu
         queryFn: async () => {
             const res = await client<ConnectionSchedule["data"], ConnectionSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/connectionSchedule`,
+                url: `/api/csipAus/connectionSchedule`,
                 ...options
             });
             return res;
@@ -874,7 +874,7 @@ export function connectionScheduleSuspenseQueryOptions(options: ConnectionSchedu
     });
 }
 /**
- * @link /csipAus/connectionSchedule
+ * @link /api/csipAus/connectionSchedule
  */
 export function useConnectionScheduleSuspense<TData = ConnectionSchedule["response"], TQueryKey extends QueryKey = ConnectionScheduleSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<ConnectionSchedule["response"], ConnectionSchedule["error"], TData, TQueryKey>>;
@@ -909,7 +909,7 @@ type EnergizeSchedule = {
         return: Awaited<ReturnType<EnergizeScheduleClient>>;
     };
 };
-export const energizeScheduleQueryKey = () => [{ url: "/csipAus/energizeSchedule" }] as const;
+export const energizeScheduleQueryKey = () => [{ url: "/api/csipAus/energizeSchedule" }] as const;
 export type EnergizeScheduleQueryKey = ReturnType<typeof energizeScheduleQueryKey>;
 export function energizeScheduleQueryOptions(options: EnergizeSchedule["client"]["parameters"] = {}) {
     const queryKey = energizeScheduleQueryKey();
@@ -918,7 +918,7 @@ export function energizeScheduleQueryOptions(options: EnergizeSchedule["client"]
         queryFn: async () => {
             const res = await client<EnergizeSchedule["data"], EnergizeSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/energizeSchedule`,
+                url: `/api/csipAus/energizeSchedule`,
                 ...options
             });
             return res;
@@ -926,7 +926,7 @@ export function energizeScheduleQueryOptions(options: EnergizeSchedule["client"]
     });
 }
 /**
- * @link /csipAus/energizeSchedule
+ * @link /api/csipAus/energizeSchedule
  */
 export function useEnergizeSchedule<TData = EnergizeSchedule["response"], TQueryData = EnergizeSchedule["response"], TQueryKey extends QueryKey = EnergizeScheduleQueryKey>(options: {
     query?: Partial<QueryObserverOptions<EnergizeSchedule["response"], EnergizeSchedule["error"], TData, TQueryData, TQueryKey>>;
@@ -946,7 +946,7 @@ export function useEnergizeSchedule<TData = EnergizeSchedule["response"], TQuery
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const energizeScheduleSuspenseQueryKey = () => [{ url: "/csipAus/energizeSchedule" }] as const;
+export const energizeScheduleSuspenseQueryKey = () => [{ url: "/api/csipAus/energizeSchedule" }] as const;
 export type EnergizeScheduleSuspenseQueryKey = ReturnType<typeof energizeScheduleSuspenseQueryKey>;
 export function energizeScheduleSuspenseQueryOptions(options: EnergizeSchedule["client"]["parameters"] = {}) {
     const queryKey = energizeScheduleSuspenseQueryKey();
@@ -955,7 +955,7 @@ export function energizeScheduleSuspenseQueryOptions(options: EnergizeSchedule["
         queryFn: async () => {
             const res = await client<EnergizeSchedule["data"], EnergizeSchedule["error"]>({
                 method: "get",
-                url: `/csipAus/energizeSchedule`,
+                url: `/api/csipAus/energizeSchedule`,
                 ...options
             });
             return res;
@@ -963,7 +963,7 @@ export function energizeScheduleSuspenseQueryOptions(options: EnergizeSchedule["
     });
 }
 /**
- * @link /csipAus/energizeSchedule
+ * @link /api/csipAus/energizeSchedule
  */
 export function useEnergizeScheduleSuspense<TData = EnergizeSchedule["response"], TQueryKey extends QueryKey = EnergizeScheduleSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<EnergizeSchedule["response"], EnergizeSchedule["error"], TData, TQueryKey>>;
@@ -999,7 +999,7 @@ type CoordinatorStart = {
     };
 };
 /**
- * @link /coordinator/start
+ * @link /api/coordinator/start
  */
 export function useCoordinatorStart(options: {
     mutation?: UseMutationOptions<CoordinatorStart["response"], CoordinatorStart["error"], CoordinatorStart["request"]>;
@@ -1010,7 +1010,7 @@ export function useCoordinatorStart(options: {
         mutationFn: async () => {
             const res = await client<CoordinatorStart["data"], CoordinatorStart["error"], CoordinatorStart["request"]>({
                 method: "post",
-                url: `/coordinator/start`,
+                url: `/api/coordinator/start`,
                 ...clientOptions
             });
             return res;
@@ -1033,7 +1033,7 @@ type CoordinatorStatus = {
         return: Awaited<ReturnType<CoordinatorStatusClient>>;
     };
 };
-export const coordinatorStatusQueryKey = () => [{ url: "/coordinator/status" }] as const;
+export const coordinatorStatusQueryKey = () => [{ url: "/api/coordinator/status" }] as const;
 export type CoordinatorStatusQueryKey = ReturnType<typeof coordinatorStatusQueryKey>;
 export function coordinatorStatusQueryOptions(options: CoordinatorStatus["client"]["parameters"] = {}) {
     const queryKey = coordinatorStatusQueryKey();
@@ -1042,7 +1042,7 @@ export function coordinatorStatusQueryOptions(options: CoordinatorStatus["client
         queryFn: async () => {
             const res = await client<CoordinatorStatus["data"], CoordinatorStatus["error"]>({
                 method: "get",
-                url: `/coordinator/status`,
+                url: `/api/coordinator/status`,
                 ...options
             });
             return res;
@@ -1050,7 +1050,7 @@ export function coordinatorStatusQueryOptions(options: CoordinatorStatus["client
     });
 }
 /**
- * @link /coordinator/status
+ * @link /api/coordinator/status
  */
 export function useCoordinatorStatus<TData = CoordinatorStatus["response"], TQueryData = CoordinatorStatus["response"], TQueryKey extends QueryKey = CoordinatorStatusQueryKey>(options: {
     query?: Partial<QueryObserverOptions<CoordinatorStatus["response"], CoordinatorStatus["error"], TData, TQueryData, TQueryKey>>;
@@ -1070,7 +1070,7 @@ export function useCoordinatorStatus<TData = CoordinatorStatus["response"], TQue
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const coordinatorStatusSuspenseQueryKey = () => [{ url: "/coordinator/status" }] as const;
+export const coordinatorStatusSuspenseQueryKey = () => [{ url: "/api/coordinator/status" }] as const;
 export type CoordinatorStatusSuspenseQueryKey = ReturnType<typeof coordinatorStatusSuspenseQueryKey>;
 export function coordinatorStatusSuspenseQueryOptions(options: CoordinatorStatus["client"]["parameters"] = {}) {
     const queryKey = coordinatorStatusSuspenseQueryKey();
@@ -1079,7 +1079,7 @@ export function coordinatorStatusSuspenseQueryOptions(options: CoordinatorStatus
         queryFn: async () => {
             const res = await client<CoordinatorStatus["data"], CoordinatorStatus["error"]>({
                 method: "get",
-                url: `/coordinator/status`,
+                url: `/api/coordinator/status`,
                 ...options
             });
             return res;
@@ -1087,7 +1087,7 @@ export function coordinatorStatusSuspenseQueryOptions(options: CoordinatorStatus
     });
 }
 /**
- * @link /coordinator/status
+ * @link /api/coordinator/status
  */
 export function useCoordinatorStatusSuspense<TData = CoordinatorStatus["response"], TQueryKey extends QueryKey = CoordinatorStatusSuspenseQueryKey>(options: {
     query?: Partial<UseSuspenseQueryOptions<CoordinatorStatus["response"], CoordinatorStatus["error"], TData, TQueryKey>>;
@@ -1123,7 +1123,7 @@ type CoordinatorStop = {
     };
 };
 /**
- * @link /coordinator/stop
+ * @link /api/coordinator/stop
  */
 export function useCoordinatorStop(options: {
     mutation?: UseMutationOptions<CoordinatorStop["response"], CoordinatorStop["error"], CoordinatorStop["request"]>;
@@ -1134,7 +1134,7 @@ export function useCoordinatorStop(options: {
         mutationFn: async () => {
             const res = await client<CoordinatorStop["data"], CoordinatorStop["error"], CoordinatorStop["request"]>({
                 method: "post",
-                url: `/coordinator/stop`,
+                url: `/api/coordinator/stop`,
                 ...clientOptions
             });
             return res;

@@ -5,7 +5,7 @@ import {
 } from '../services/csipAusService.js';
 
 @Tags('csipAus')
-@Route('csipAus')
+@Route('api/csipAus')
 export class CsipAusController extends Controller {
     /**
      * Get CSIP-AUS device certificate LFID and SFDI

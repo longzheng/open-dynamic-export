@@ -18,19 +18,21 @@ app.use(
 app.use(json());
 app.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
 
-// eslint-disable-next-line import-x/no-named-as-default-member
-app.use(express.static('dist/ui'));
+app.get('/api', (_req, res) => {
+    // redirect to docs
+    res.redirect('/api/docs');
+});
 
-app.get('/docs/swagger.json', (_req, res) => {
+app.get('/api/docs/swagger.json', (_req, res) => {
     res.json(swaggerJson);
 });
 
 app.get(
-    '/docs',
+    '/api/docs',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     redoc.default({
         title: 'API Documentation',
-        specUrl: '/docs/swagger.json',
+        specUrl: '/api/docs/swagger.json',
         redocOptions: {
             expandDefaultResponse: true,
             expandResponses: '200',

@@ -2,7 +2,7 @@ import { Controller, Get, OperationId, Post, Route, Tags } from 'tsoa';
 import { coordinatorService } from '../services/coordinatorService.js';
 
 @Tags('coordinator')
-@Route('coordinator')
+@Route('api/coordinator')
 export class CoordinatorController extends Controller {
     @Post('start')
     @OperationId('coordinatorStart')

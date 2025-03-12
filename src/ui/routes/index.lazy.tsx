@@ -598,14 +598,6 @@ function Index() {
                     }
                 />
             </section>
-            <div className="mb-6">
-                <h2 className={clsx(title({}))}>Control</h2>
-            </div>
-            <section className="grid grid-cols-4 gap-4">
-                {coordinatorStatus.inverterConfiguration ? (
-                    <>{coordinatorStatus.inverterConfiguration.type}</>
-                ) : null}
-            </section>
         </div>
     );
 }

@@ -9,7 +9,7 @@
     "lint": "tsc --noEmit && npx eslint . && npm run generate:config-json-schema",
     "test": "vitest",
     "start": "NODE_ENV=production node dist/src/app.js",
-    "dev": "concurrently \"npm run routes:generate\" \"tsx src/app.ts\"",
+    "dev": "npm run routes:generate && tsx src/app.ts",
     "routes:generate": "tsoa spec-and-routes && kubb generate",
     "debug:sunspec-discovery": "tsx scripts/debugSunspecDiscovery.ts",
     "cert:device-request": "tsx scripts/certDeviceRequest.ts",
