@@ -90,3 +90,8 @@ You can run the Node project directly with the Node.js runtime.
 1. Run `docker compose up -d` to use from the Docker Hub image (optionally run `docker compose up -d --build` to build the image from the source code)
 
 2. Optionally uncomment the `influxdb` service in the `docker-compose.yml` file to enable logging to InfluxDB
+
+### Web UI
+You can view the dashboard at `http://localhost:3000` (or the server port you specified in the `.env` file).
+
+![Dashboard UI](/dashboard.png)

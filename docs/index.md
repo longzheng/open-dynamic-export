@@ -25,19 +25,11 @@ features:
     details: Curtail export based on fixed schedules or dynamic pricing
 ---
 
-## Hardware package and dashboard
-
 <div class="img-dashboard">
 
-![Dashboard UI](./dashboard.png)
+![Dashboard UI](/dashboard.png)
 
 </div>
-
-If you're a home owner or electrician interested in a plug and play hardware package with an integrated dashboard user interface, contact support@opendynamicexport.com
-
-## OEM/commercial integrations
-
-For cloud integrations with OEM inverter devices, more advanced load management or commercial use cases, contact support@opendynamicexport.com
 
 <style>
 :root {
@@ -55,21 +47,8 @@ For cloud integrations with OEM inverter devices, more advanced load management 
 .img-dashboard {
     img {
       max-width: min(600px, 100%);
-      margin: 0 auto;
+      margin: 3em auto;
     }
   }
-
-@media (min-width: 1100px) {
-  .img-dashboard {
-    float: right;
-    position: relative;
-    z-index: 1;
-    top: -110px;
-
-    img {
-      width: 500px;
-    }
-  }
-}
 
 </style>
