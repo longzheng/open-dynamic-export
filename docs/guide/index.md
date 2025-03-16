@@ -70,7 +70,6 @@ SEP2_PEN=62223 # CSIP-AUS/SEP2 Provider Private Enterprise Number (does not need
 # INFLUXDB_BUCKET=data # Optional InfluxDB bucket, enable to log data to InfluxDB
 # INFLUXDB_PORT=8086 # Optional InfluxDB port, enable to log data to InfluxDB
 # LOGLEVEL=debug # Optional log level (valid values: trace, debug. default: debug)
-VITE_API_URL_BASE=/ # UI base URL for the API
 ```
 
 3. In the `/config` folder, make a copy of the `config.example.json` file and rename it to `config.json`. Update it with the relevant values, see the "Configuration" section for more details.

@@ -14,7 +14,6 @@ export const Route = createRootRoute({
 
 function RootRoute() {
     const router = useRouter();
-    console.log(import.meta.env);
 
     return (
         <QueryClientProvider client={queryClient}>

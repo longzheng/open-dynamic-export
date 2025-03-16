@@ -7,7 +7,7 @@ import {
 
 import axios from 'axios';
 
-const AXIOS_BASE: string = `${import.meta.env.VITE_API_URL_BASE}`;
+const AXIOS_BASE: string = `/`;
 
 declare const AXIOS_HEADERS: string;
 

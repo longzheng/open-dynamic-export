@@ -42,6 +42,16 @@ app.get(
 
 RegisterRoutes(app);
 
+// the docker image will not contain `vite.config.ts`
+// specify the outDir inline
+ViteExpress.config({
+    inlineViteConfig: {
+        build: {
+            outDir: './dist/ui',
+        },
+    },
+});
+
 ViteExpress.listen(app, port, () =>
     console.log(`Server listening at http://localhost:${port}`),
 );
