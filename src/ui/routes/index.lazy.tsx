@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
+import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
 import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { FormattedNumber } from 'react-intl';
@@ -453,7 +453,7 @@ function Index() {
             <div className="mb-6">
                 <h2 className={clsx(title({}))}>Limits</h2>
             </div>
-            <section className="grid grid-cols-4 gap-4">
+            <section className="grid gap-4 lg:grid-cols-4">
                 <LimitCard
                     body={
                         <p className="flex gap-1">
@@ -527,6 +527,44 @@ function Index() {
                         <p className="flex gap-1">
                             {coordinatorStatus.controlLimits &&
                             coordinatorStatus.controlLimits
+                                .activeInverterControlLimit.opModExpLimW !==
+                                undefined ? (
+                                <>
+                                    <FormattedNumber
+                                        maximumFractionDigits={0}
+                                        value={
+                                            coordinatorStatus.controlLimits
+                                                .activeInverterControlLimit
+                                                .opModExpLimW.value
+                                        }
+                                    />
+                                    <span className="opacity-30">w</span>
+                                </>
+                            ) : (
+                                '-'
+                            )}
+                        </p>
+                    }
+                    heading="Export limit"
+                    limit={
+                        coordinatorStatus.controlLimits !== null &&
+                        coordinatorStatus.controlLimits
+                            .activeInverterControlLimit.opModExpLimW !==
+                            undefined
+                    }
+                    source={
+                        coordinatorStatus.controlLimits
+                            ? coordinatorStatus.controlLimits
+                                  .activeInverterControlLimit.opModExpLimW
+                                  ?.source
+                            : undefined
+                    }
+                />
+                <LimitCard
+                    body={
+                        <p className="flex gap-1">
+                            {coordinatorStatus.controlLimits &&
+                            coordinatorStatus.controlLimits
                                 .activeInverterControlLimit.opModGenLimW ? (
                                 <>
                                     <FormattedNumber
@@ -564,7 +602,7 @@ function Index() {
                         <p className="flex gap-1">
                             {coordinatorStatus.controlLimits &&
                             coordinatorStatus.controlLimits
-                                .activeInverterControlLimit.opModExpLimW !==
+                                .activeInverterControlLimit.opModImpLimW !==
                                 undefined ? (
                                 <>
                                     <FormattedNumber
@@ -572,7 +610,7 @@ function Index() {
                                         value={
                                             coordinatorStatus.controlLimits
                                                 .activeInverterControlLimit
-                                                .opModExpLimW.value
+                                                .opModImpLimW.value
                                         }
                                     />
                                     <span className="opacity-30">w</span>
@@ -582,17 +620,55 @@ function Index() {
                             )}
                         </p>
                     }
-                    heading="Export limit"
+                    heading="Import limit"
                     limit={
                         coordinatorStatus.controlLimits !== null &&
                         coordinatorStatus.controlLimits
-                            .activeInverterControlLimit.opModExpLimW !==
+                            .activeInverterControlLimit.opModImpLimW !==
                             undefined
                     }
                     source={
                         coordinatorStatus.controlLimits
                             ? coordinatorStatus.controlLimits
-                                  .activeInverterControlLimit.opModExpLimW
+                                  .activeInverterControlLimit.opModImpLimW
+                                  ?.source
+                            : undefined
+                    }
+                />
+                <LimitCard
+                    body={
+                        <p className="flex gap-1">
+                            {coordinatorStatus.controlLimits &&
+                            coordinatorStatus.controlLimits
+                                .activeInverterControlLimit.opModLoadLimW !==
+                                undefined ? (
+                                <>
+                                    <FormattedNumber
+                                        maximumFractionDigits={0}
+                                        value={
+                                            coordinatorStatus.controlLimits
+                                                .activeInverterControlLimit
+                                                .opModLoadLimW.value
+                                        }
+                                    />
+                                    <span className="opacity-30">w</span>
+                                </>
+                            ) : (
+                                '-'
+                            )}
+                        </p>
+                    }
+                    heading="Load limit"
+                    limit={
+                        coordinatorStatus.controlLimits !== null &&
+                        coordinatorStatus.controlLimits
+                            .activeInverterControlLimit.opModLoadLimW !==
+                            undefined
+                    }
+                    source={
+                        coordinatorStatus.controlLimits
+                            ? coordinatorStatus.controlLimits
+                                  .activeInverterControlLimit.opModLoadLimW
                                   ?.source
                             : undefined
                     }
@@ -642,7 +718,7 @@ function LimitCard({
                             case 'negativeFeedIn':
                                 return 'Negative feed-in';
                             case 'csipAus':
-                                return 'Utility dynamic export';
+                                return 'Utility dynamic connection';
                             case 'twoWayTariff':
                                 return 'Two-way tariff';
                             case undefined:
