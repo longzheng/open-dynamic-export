@@ -3695,6 +3695,98 @@ export type SiteRealPowerQuery = {
  /**
  * @description Ok
 */
+export type DerRealPower200 = {
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    type: string;
+    /**
+     * @type string
+    */
+    phase: string;
+}[];
+/**
+ * @description Ok
+*/
+export type DerRealPowerQueryResponse = {
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    type: string;
+    /**
+     * @type string
+    */
+    phase: string;
+}[];
+export type DerRealPowerQuery = {
+    Response: DerRealPowerQueryResponse;
+};
+
+ /**
+ * @description Ok
+*/
+export type LoadRealPower200 = {
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    type: string;
+    /**
+     * @type string
+    */
+    phase: string;
+}[];
+/**
+ * @description Ok
+*/
+export type LoadRealPowerQueryResponse = {
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    type: string;
+    /**
+     * @type string
+    */
+    phase: string;
+}[];
+export type LoadRealPowerQuery = {
+    Response: LoadRealPowerQueryResponse;
+};
+
+ /**
+ * @description Ok
+*/
 export type ExportLimit200 = {
     /**
      * @type string

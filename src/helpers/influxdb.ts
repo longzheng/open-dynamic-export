@@ -705,6 +705,48 @@ from(bucket: "data")
     );
 }
 
+export function queryDERRealPower() {
+    if (!influxDB) {
+        throw new Error("InfluxDB isn't available");
+    }
+
+    return influxDB.queryApi.collectRows<{
+        phase: string;
+        type: string;
+        _time: string;
+        _value: number | null;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "sample")
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "der")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+`,
+    );
+}
+
+export function queryLoadRealPower() {
+    if (!influxDB) {
+        throw new Error("InfluxDB isn't available");
+    }
+
+    return influxDB.queryApi.collectRows<{
+        phase: string;
+        type: string;
+        _time: string;
+        _value: number | null;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -1h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "sample")
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "load")
+  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+`,
+    );
+}
+
 export function queryExportLimit() {
     if (!influxDB) {
         throw new Error("InfluxDB isn't available");

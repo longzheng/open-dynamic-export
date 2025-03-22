@@ -1,6 +1,6 @@
 import client from "../client.ts";
 import { useQuery, queryOptions, useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import type { SunspecDataQueryResponse, SiteRealPowerQueryResponse, ExportLimitQueryResponse, GenerationLimitQueryResponse, ConnectionQueryResponse, EnergizeQueryResponse, CsipAusStatusQueryResponse, ExportLimitScheduleQueryResponse, GenerationLimitScheduleQueryResponse, ConnectionScheduleQueryResponse, EnergizeScheduleQueryResponse, CoordinatorStartMutationResponse, CoordinatorStatusQueryResponse, CoordinatorStopMutationResponse } from "./types";
+import type { SunspecDataQueryResponse, SiteRealPowerQueryResponse, DerRealPowerQueryResponse, LoadRealPowerQueryResponse, ExportLimitQueryResponse, GenerationLimitQueryResponse, ConnectionQueryResponse, EnergizeQueryResponse, CsipAusStatusQueryResponse, ExportLimitScheduleQueryResponse, GenerationLimitScheduleQueryResponse, ConnectionScheduleQueryResponse, EnergizeScheduleQueryResponse, CoordinatorStartMutationResponse, CoordinatorStatusQueryResponse, CoordinatorStopMutationResponse } from "./types";
 import type { QueryObserverOptions, UseQueryResult, QueryKey, UseSuspenseQueryOptions, UseSuspenseQueryResult, UseMutationOptions } from "@tanstack/react-query";
 
  type SunspecDataClient = typeof client<SunspecDataQueryResponse, Error, never>;
@@ -175,6 +175,184 @@ export function useSiteRealPowerSuspense<TData = SiteRealPower["response"], TQue
         queryKey,
         ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
     }) as UseSuspenseQueryResult<TData, SiteRealPower["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+
+ type DerRealPowerClient = typeof client<DerRealPowerQueryResponse, Error, never>;
+type DerRealPower = {
+    data: DerRealPowerQueryResponse;
+    error: Error;
+    request: never;
+    pathParams: never;
+    queryParams: never;
+    headerParams: never;
+    response: Awaited<ReturnType<DerRealPowerClient>>;
+    client: {
+        parameters: Partial<Parameters<DerRealPowerClient>[0]>;
+        return: Awaited<ReturnType<DerRealPowerClient>>;
+    };
+};
+export const derRealPowerQueryKey = () => [{ url: "/api/data/derRealPower" }] as const;
+export type DerRealPowerQueryKey = ReturnType<typeof derRealPowerQueryKey>;
+export function derRealPowerQueryOptions(options: DerRealPower["client"]["parameters"] = {}) {
+    const queryKey = derRealPowerQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<DerRealPower["data"], DerRealPower["error"]>({
+                method: "get",
+                url: `/api/data/derRealPower`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/derRealPower
+ */
+export function useDerRealPower<TData = DerRealPower["response"], TQueryData = DerRealPower["response"], TQueryKey extends QueryKey = DerRealPowerQueryKey>(options: {
+    query?: Partial<QueryObserverOptions<DerRealPower["response"], DerRealPower["error"], TData, TQueryData, TQueryKey>>;
+    client?: DerRealPower["client"]["parameters"];
+} = {}): UseQueryResult<TData, DerRealPower["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? derRealPowerQueryKey();
+    const query = useQuery({
+        ...derRealPowerQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
+    }) as UseQueryResult<TData, DerRealPower["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+export const derRealPowerSuspenseQueryKey = () => [{ url: "/api/data/derRealPower" }] as const;
+export type DerRealPowerSuspenseQueryKey = ReturnType<typeof derRealPowerSuspenseQueryKey>;
+export function derRealPowerSuspenseQueryOptions(options: DerRealPower["client"]["parameters"] = {}) {
+    const queryKey = derRealPowerSuspenseQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<DerRealPower["data"], DerRealPower["error"]>({
+                method: "get",
+                url: `/api/data/derRealPower`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/derRealPower
+ */
+export function useDerRealPowerSuspense<TData = DerRealPower["response"], TQueryKey extends QueryKey = DerRealPowerSuspenseQueryKey>(options: {
+    query?: Partial<UseSuspenseQueryOptions<DerRealPower["response"], DerRealPower["error"], TData, TQueryKey>>;
+    client?: DerRealPower["client"]["parameters"];
+} = {}): UseSuspenseQueryResult<TData, DerRealPower["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? derRealPowerSuspenseQueryKey();
+    const query = useSuspenseQuery({
+        ...derRealPowerSuspenseQueryOptions(clientOptions) as unknown as UseSuspenseQueryOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
+    }) as UseSuspenseQueryResult<TData, DerRealPower["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+
+ type LoadRealPowerClient = typeof client<LoadRealPowerQueryResponse, Error, never>;
+type LoadRealPower = {
+    data: LoadRealPowerQueryResponse;
+    error: Error;
+    request: never;
+    pathParams: never;
+    queryParams: never;
+    headerParams: never;
+    response: Awaited<ReturnType<LoadRealPowerClient>>;
+    client: {
+        parameters: Partial<Parameters<LoadRealPowerClient>[0]>;
+        return: Awaited<ReturnType<LoadRealPowerClient>>;
+    };
+};
+export const loadRealPowerQueryKey = () => [{ url: "/api/data/loadRealPower" }] as const;
+export type LoadRealPowerQueryKey = ReturnType<typeof loadRealPowerQueryKey>;
+export function loadRealPowerQueryOptions(options: LoadRealPower["client"]["parameters"] = {}) {
+    const queryKey = loadRealPowerQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<LoadRealPower["data"], LoadRealPower["error"]>({
+                method: "get",
+                url: `/api/data/loadRealPower`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/loadRealPower
+ */
+export function useLoadRealPower<TData = LoadRealPower["response"], TQueryData = LoadRealPower["response"], TQueryKey extends QueryKey = LoadRealPowerQueryKey>(options: {
+    query?: Partial<QueryObserverOptions<LoadRealPower["response"], LoadRealPower["error"], TData, TQueryData, TQueryKey>>;
+    client?: LoadRealPower["client"]["parameters"];
+} = {}): UseQueryResult<TData, LoadRealPower["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? loadRealPowerQueryKey();
+    const query = useQuery({
+        ...loadRealPowerQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
+    }) as UseQueryResult<TData, LoadRealPower["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+export const loadRealPowerSuspenseQueryKey = () => [{ url: "/api/data/loadRealPower" }] as const;
+export type LoadRealPowerSuspenseQueryKey = ReturnType<typeof loadRealPowerSuspenseQueryKey>;
+export function loadRealPowerSuspenseQueryOptions(options: LoadRealPower["client"]["parameters"] = {}) {
+    const queryKey = loadRealPowerSuspenseQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<LoadRealPower["data"], LoadRealPower["error"]>({
+                method: "get",
+                url: `/api/data/loadRealPower`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/loadRealPower
+ */
+export function useLoadRealPowerSuspense<TData = LoadRealPower["response"], TQueryKey extends QueryKey = LoadRealPowerSuspenseQueryKey>(options: {
+    query?: Partial<UseSuspenseQueryOptions<LoadRealPower["response"], LoadRealPower["error"], TData, TQueryKey>>;
+    client?: LoadRealPower["client"]["parameters"];
+} = {}): UseSuspenseQueryResult<TData, LoadRealPower["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? loadRealPowerSuspenseQueryKey();
+    const query = useSuspenseQuery({
+        ...loadRealPowerSuspenseQueryOptions(clientOptions) as unknown as UseSuspenseQueryOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
+    }) as UseSuspenseQueryResult<TData, LoadRealPower["error"]> & {
         queryKey: TQueryKey;
     };
     query.queryKey = queryKey as TQueryKey;

@@ -1,9 +1,11 @@
 import { Controller, Get, OperationId, Route, Tags } from 'tsoa';
 import {
     getConnection,
+    getDERRealPower,
     getEnergize,
     getExportLimit,
     getGenerationLimit,
+    getLoadRealPower,
     getRealPowerSite,
 } from '../services/dataService.js';
 
@@ -14,6 +16,18 @@ export class DataController extends Controller {
     @OperationId('siteRealPower')
     public siteRealPower() {
         return getRealPowerSite();
+    }
+
+    @Get('derRealPower')
+    @OperationId('derRealPower')
+    public derRealPower() {
+        return getDERRealPower();
+    }
+
+    @Get('loadRealPower')
+    @OperationId('loadRealPower')
+    public loadRealPower() {
+        return getLoadRealPower();
     }
 
     @Get('exportLimit')
