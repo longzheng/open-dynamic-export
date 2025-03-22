@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody } from '@nextui-org/card';
+import { Card, CardHeader, CardBody } from "@heroui/card";
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { type ChartData, type ChartDataset } from 'chart.js/auto';
 import Chart from 'chart.js/auto';

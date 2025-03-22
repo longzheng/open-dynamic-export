@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, CardFooter } from '@nextui-org/card';
+import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { FormattedNumber } from 'react-intl';
