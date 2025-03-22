@@ -3,7 +3,7 @@ import { type ChartData } from 'chart.js/auto';
 import { Chart } from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
 import { useEffect, useMemo, useRef } from 'react';
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Card, CardBody, CardHeader } from '@heroui/card';
 
 import { readingColors } from '../../../tailwind.config';
 

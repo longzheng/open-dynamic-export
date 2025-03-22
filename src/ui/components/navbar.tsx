@@ -1,4 +1,4 @@
-import { Link } from "@heroui/link";
+import { Link } from '@heroui/link';
 import {
     Navbar as NextUINavbar,
     NavbarBrand,
@@ -7,7 +7,7 @@ import {
     NavbarMenu,
     NavbarMenuItem,
     NavbarMenuToggle,
-} from "@heroui/navbar";
+} from '@heroui/navbar';
 import { clsx } from 'clsx';
 import { useMatchRoute } from '@tanstack/react-router';
 

@@ -1,4 +1,4 @@
-import { HeroUIProvider } from "@heroui/system";
+import { HeroUIProvider } from '@heroui/system';
 import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { IntlProvider } from 'react-intl';

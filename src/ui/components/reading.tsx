@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
+import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
 import { useNavigate } from '@tanstack/react-router';
 import { type IconType } from 'react-icons/lib';
 import { TbCircuitVoltmeter, TbPlug, TbSquareLetterQ } from 'react-icons/tb';

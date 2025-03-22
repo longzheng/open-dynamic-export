@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run routes:generate && tsc -p tsconfig.server.json && vite build",
     "build:debug": "npm run routes:generate && tsc -p tsconfig.server.debug.json",
-    "lint": "tsc --noEmit && npx eslint . && npm run generate:config-json-schema",
+    "lint": "tsc --noEmit && eslint . && npm run generate:config-json-schema",
     "test": "vitest",
     "start": "NODE_ENV=production node dist/src/app.js",
     "dev": "npm run routes:generate && tsx src/app.ts",

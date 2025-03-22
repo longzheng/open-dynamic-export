@@ -1,6 +1,6 @@
 import { type Config } from 'tailwindcss';
 
-import { heroui } from "@heroui/theme";
+import { heroui } from '@heroui/theme';
 
 import { type ReadingLocation } from '@/components/reading';
 
@@ -14,7 +14,7 @@ export default {
     content: [
         './index.html',
         './src/ui/**/*.{js,ts,jsx,tsx,mdx}',
-        "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
+        './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}',
     ],
     theme: {
         extend: {
