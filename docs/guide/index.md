@@ -56,22 +56,6 @@ The system supports one site meter to measure the site's load and export metrics
 
 2. Copy `.env.example` and rename it to `.env` and change the values to suit your environment
 
-```yaml
-TZ=Australia/Melbourne # System timezone
-SERVER_PORT=3000 # API server port
-CONFIG_DIR=./config # Directory to store configuration files
-SEP2_CERT_FILE=cert.pem # CSIP-AUS/SEP2 certificate file path (in the config directory)
-SEP2_KEY_FILE=key.pem # CSIP-AUS/SEP2 key file path (in the config directory)
-SEP2_PEN=62223 # CSIP-AUS/SEP2 Provider Private Enterprise Number (does not need to be changed)
-# INFLUXDB_USERNAME=admin # Optional InfluxDB username, enable to log data to InfluxDB
-# INFLUXDB_PASSWORD=password # Optional InfluxDB password, enable to log data to InfluxDB
-# INFLUXDB_ADMIN_TOKEN=super-secret-auth-token # Optional InfluxDB admin token, enable to log data to InfluxDB
-# INFLUXDB_ORG=open-dynamic-export # Optional InfluxDB organisation, enable to log data to InfluxDB
-# INFLUXDB_BUCKET=data # Optional InfluxDB bucket, enable to log data to InfluxDB
-# INFLUXDB_PORT=8086 # Optional InfluxDB port, enable to log data to InfluxDB
-# LOGLEVEL=debug # Optional log level (valid values: trace, debug. default: debug)
-```
-
 3. In the `/config` folder, make a copy of the `config.example.json` file and rename it to `config.json`. Update it with the relevant values, see the "Configuration" section for more details.
 
 Use Node or Docker to run the project.

@@ -17,6 +17,7 @@ import { env } from './env.js';
 const influxDB = (() => {
     const org = env.INFLUXDB_ORG;
     const bucket = env.INFLUXDB_BUCKET;
+    const host = env.INFLUXDB_HOST;
     const port = env.INFLUXDB_PORT;
     const token = env.INFLUXDB_ADMIN_TOKEN;
 
@@ -25,7 +26,7 @@ const influxDB = (() => {
     }
 
     const db = new InfluxDB({
-        url: `http://influxdb:${port}`,
+        url: `http://${host}:${port}`,
         token,
         writeOptions: {
             flushInterval: 5_000,
