@@ -194,7 +194,7 @@ export function BooleanLimitChart({
             .filter(
                 (d) =>
                     d._measurement === 'controlLimit' &&
-                    d.name === 'fixed' &&
+                    d.name === 'csipAus' &&
                     new Date(d._time) >= timeConfig.minTime,
             )
             .reduce<{ start_time: string; end_time: string; value: boolean }[]>(
@@ -340,13 +340,32 @@ export function BooleanLimitChart({
             return;
         }
 
-        if (!chartRef.current.data.datasets.length) {
-            chartRef.current.data = chartData;
-        } else {
-            // update each dataset data directly
-            for (let i = 0; i < chartData.datasets.length; i++) {
-                chartRef.current.data.datasets[i] = chartData.datasets[i];
-            }
+        // Update or create datasets as needed
+        while (
+            chartRef.current.data.datasets.length < chartData.datasets.length
+        ) {
+            // Create a properly typed empty dataset
+            chartRef.current.data.datasets.push({
+                data: [],
+                label: '',
+                borderWidth: 0,
+                backgroundColor: 'rgba(0,0,0,0)',
+                parsing: {
+                    xAxisKey: 'datetime',
+                    yAxisKey: 'value',
+                },
+            });
+        }
+
+        // Trim excess datasets
+        chartRef.current.data.datasets.length = chartData.datasets.length;
+
+        // Update each dataset's properties
+        for (let i = 0; i < chartData.datasets.length; i++) {
+            Object.assign(
+                chartRef.current.data.datasets[i],
+                chartData.datasets[i],
+            );
         }
 
         // Update options
