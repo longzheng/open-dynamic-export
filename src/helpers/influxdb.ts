@@ -21,7 +21,7 @@ const influxDB = (() => {
     const port = env.INFLUXDB_PORT;
     const token = env.INFLUXDB_ADMIN_TOKEN;
 
-    if (!org || !bucket || !port || !token) {
+    if (!org || !bucket || !host || !port || !token) {
         return null;
     }
 

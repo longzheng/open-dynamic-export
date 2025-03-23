@@ -10,7 +10,7 @@ const envSchema = z.object({
     SEP2_CERT_FILE: z.string(),
     SEP2_KEY_FILE: z.string(),
     SEP2_PEN: z.string(),
-    INFLUXDB_HOST: z.string(),
+    INFLUXDB_HOST: z.string().optional(),
     INFLUXDB_PORT: z.string().transform(safeParseIntString).optional(),
     INFLUXDB_USERNAME: z.string().optional(),
     INFLUXDB_PASSWORD: z.string().optional(),
