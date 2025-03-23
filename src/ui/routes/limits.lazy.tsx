@@ -1,6 +1,12 @@
 import { Card, CardHeader, CardBody } from '@heroui/card';
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { type ChartData, type ChartDataset } from 'chart.js/auto';
+import {
+    type ChartData,
+    type ChartDataset,
+    type ChartOptions,
+    type Scale,
+    type CoreScaleOptions,
+} from 'chart.js';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
 import { type AnnotationPluginOptions } from 'chartjs-plugin-annotation';
@@ -48,14 +54,6 @@ function getAnnotations(): AnnotationPluginOptions {
                     content: 'Now',
                     display: true,
                 },
-            },
-            future: {
-                type: 'box',
-                xMin: new Date().getTime(),
-                display: (ctx) => ctx.chart.isDatasetVisible(3),
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderWidth: 0,
-                z: -10,
             },
         },
     };
@@ -660,6 +658,19 @@ function ExportLimit() {
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart<'line', ChartDataType> | null>(null);
+
+    // Memoize time-related values
+    const timeConfig = useMemo(() => {
+        const historyHours = 24;
+        const futureHours = 24;
+        const now = new Date();
+        return {
+            now,
+            minTime: new Date(now.getTime() - historyHours * 60 * 60 * 1000),
+            maxTime: new Date(now.getTime() + futureHours * 60 * 60 * 1000),
+        };
+    }, []);
+
     const { data: exportLimitData } = useExportLimit({
         query: { refetchInterval: 1000 },
     });
@@ -667,19 +678,165 @@ function ExportLimit() {
         query: { refetchInterval: 1000 },
     });
 
-    const chartData = useMemo((): ChartData<'line', ChartDataType> => {
+    // Format schedules for table display
+    const futureSchedules = useMemo(() => {
+        if (!exportLimitScheduleData) return [];
+
+        return exportLimitScheduleData
+            .filter(
+                (d) =>
+                    new Date(d.startInclusive).getTime() > new Date().getTime(),
+            )
+            .map((d) => ({
+                start: new Date(d.startInclusive),
+                end: new Date(d.endExclusive),
+                limit: d.derControlBase.opModExpLimW
+                    ? d.derControlBase.opModExpLimW.value *
+                      10 ** d.derControlBase.opModExpLimW.multiplier
+                    : null,
+                // Format dates as strings for display
+                startFormatted: new Date(d.startInclusive).toLocaleTimeString(
+                    'en',
+                    {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                    },
+                ),
+                endFormatted: new Date(d.endExclusive).toLocaleTimeString(
+                    'en',
+                    {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                    },
+                ),
+            }))
+            .sort((a, b) => a.start.getTime() - b.start.getTime());
+    }, [exportLimitScheduleData]);
+
+    // Memoize chart options with proper typing
+    const chartOptions = useMemo(
+        (): ChartOptions<'line'> => ({
+            animation: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 10,
+                    left: 10,
+                },
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'hour',
+                        displayFormats: {
+                            hour: 'HH:mm',
+                        },
+                    },
+                    min: timeConfig.minTime.getTime(),
+                    max: timeConfig.maxTime.getTime(),
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        tickColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    ticks: {
+                        font: {
+                            family: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                            size: 11,
+                        },
+                        color: 'rgba(255, 255, 255, 0.6)',
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: (context: { tick: { value: number } }) => {
+                            if (context.tick.value === 0) {
+                                return 'rgba(255, 255, 255, 0.1)';
+                            }
+                            return context.tick.value > 0
+                                ? 'rgba(255, 100, 100, 0.05)'
+                                : 'rgba(100, 255, 100, 0.05)';
+                        },
+                        tickColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    ticks: {
+                        font: {
+                            family: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                            size: 11,
+                        },
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        callback(
+                            this: Scale<CoreScaleOptions>,
+                            tickValue: number | string,
+                        ) {
+                            return `${tickValue} W`;
+                        },
+                    },
+                },
+            },
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            family: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                            size: 12,
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        color: 'rgba(255, 255, 255, 0.8)',
+                    },
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 13,
+                    },
+                    bodyFont: {
+                        size: 12,
+                    },
+                    padding: 12,
+                    cornerRadius: 4,
+                    displayColors: true,
+                    callbacks: {
+                        label(tooltipItem: {
+                            dataset: { label?: string };
+                            parsed: { y: number };
+                        }) {
+                            return ` ${tooltipItem.dataset.label || ''}: ${tooltipItem.parsed.y} W`;
+                        },
+                    },
+                },
+                annotation: getAnnotations(),
+            },
+        }),
+        [timeConfig],
+    );
+
+    const chartData = useMemo(() => {
         if (!exportLimitData) {
             return { datasets: [] };
         }
 
         const datasets: ChartDataset<'line', ChartDataType>[] = [
             {
-                label: 'Applied limit',
+                label: 'Currently applied limit',
                 data: exportLimitData
                     .filter(
                         (d) =>
                             d._measurement === 'controlLimit' &&
-                            d.name === 'sep2',
+                            d.name === 'csipAus' &&
+                            new Date(d._time) >= timeConfig.minTime,
                     )
                     .map((d) => ({
                         datetime: new Date(d._time).getTime(),
@@ -690,11 +847,12 @@ function ExportLimit() {
                     target: 'origin',
                 },
                 pointStyle: false,
-                backgroundColor: 'rgba(58, 146, 83, 0.53)',
+                backgroundColor: 'rgba(58, 146, 83, 0.15)', // More subtle fill
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
+                order: 1, // Draw on top
             },
             {
                 label: 'Active control',
@@ -702,7 +860,8 @@ function ExportLimit() {
                     .filter(
                         (d) =>
                             d._measurement === 'controlScheduler' &&
-                            d.control === 'active',
+                            d.control === 'active' &&
+                            new Date(d._time) >= timeConfig.minTime,
                     )
                     .map((d) => ({
                         datetime: new Date(d._time).getTime(),
@@ -710,11 +869,13 @@ function ExportLimit() {
                     })),
                 borderWidth: 2,
                 pointStyle: false,
-                borderColor: '#ff6464',
+                borderColor: 'rgba(255, 100, 100, 0.8)', // Softer red
+                tension: 0.3, // Smooth line
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
+                order: 2,
             },
             {
                 label: 'Default control',
@@ -722,7 +883,8 @@ function ExportLimit() {
                     .filter(
                         (d) =>
                             d._measurement === 'controlScheduler' &&
-                            d.control === 'default',
+                            d.control === 'default' &&
+                            new Date(d._time) >= timeConfig.minTime,
                     )
                     .map((d) => ({
                         datetime: new Date(d._time).getTime(),
@@ -730,11 +892,13 @@ function ExportLimit() {
                     })),
                 borderWidth: 2,
                 pointStyle: false,
-                borderColor: '#6464ff',
+                borderColor: 'rgba(100, 100, 255, 0.6)', // Softer blue
+                tension: 0.3, // Smooth line
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
+                order: 3,
             },
         ];
 
@@ -742,14 +906,12 @@ function ExportLimit() {
 
         if (exportLimitScheduleData) {
             datasets.push({
-                label: 'Schedule',
+                label: 'Future schedule',
                 data: exportLimitScheduleData
-                    // TODO: make the chart time range fixed, show in the future
-                    // currently limited to the next 2 hours
                     .filter(
                         (d) =>
-                            new Date(d.endExclusive).getTime() <
-                            new Date().getTime() + 1000 * 60 * 60 * 2,
+                            new Date(d.endExclusive).getTime() <=
+                            timeConfig.maxTime.getTime(),
                     )
                     .map((d) => {
                         const points: ChartDataType = [];
@@ -757,41 +919,33 @@ function ExportLimit() {
                         const end = new Date(d.endExclusive).getTime();
 
                         if (lastEnd && start !== lastEnd) {
-                            points.push(
-                                ...[
-                                    {
-                                        datetime: lastEnd,
-                                        value: null,
-                                    },
-                                ],
-                            );
+                            points.push({
+                                datetime: lastEnd,
+                                value: null,
+                            });
                         }
 
                         lastEnd = end;
 
                         points.push(
-                            ...[
-                                {
-                                    // start
-                                    datetime: start,
-                                    value: d.derControlBase.opModExpLimW
-                                        ? d.derControlBase.opModExpLimW.value *
-                                          10 **
-                                              d.derControlBase.opModExpLimW
-                                                  .multiplier
-                                        : null,
-                                },
-                                {
-                                    // end
-                                    datetime: end,
-                                    value: d.derControlBase.opModExpLimW
-                                        ? d.derControlBase.opModExpLimW.value *
-                                          10 **
-                                              d.derControlBase.opModExpLimW
-                                                  .multiplier
-                                        : null,
-                                },
-                            ],
+                            {
+                                datetime: start,
+                                value: d.derControlBase.opModExpLimW
+                                    ? d.derControlBase.opModExpLimW.value *
+                                      10 **
+                                          d.derControlBase.opModExpLimW
+                                              .multiplier
+                                    : null,
+                            },
+                            {
+                                datetime: end,
+                                value: d.derControlBase.opModExpLimW
+                                    ? d.derControlBase.opModExpLimW.value *
+                                      10 **
+                                          d.derControlBase.opModExpLimW
+                                              .multiplier
+                                    : null,
+                            },
                         );
 
                         return points;
@@ -805,11 +959,12 @@ function ExportLimit() {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
+                order: 4,
             });
         }
 
         return { datasets };
-    }, [exportLimitData, exportLimitScheduleData]);
+    }, [exportLimitData, exportLimitScheduleData, timeConfig]);
 
     useEffect(() => {
         if (!canvasRef.current) {
@@ -822,45 +977,9 @@ function ExportLimit() {
                 {
                     type: 'line',
                     data: chartData,
-                    options: {
-                        animation: false,
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'minute',
-                                },
-                                // adapters: {
-                                //     date: {
-                                //         locale: 'en',
-                                //     },
-                                // },
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: (context) => {
-                                        if (context.tick.value > 0) {
-                                            return 'rgba(255,100, 100, 0.1)';
-                                        } else {
-                                            return 'rgba(100, 255, 100, 0.1)';
-                                        }
-                                    },
-                                },
-                            },
-                        },
-                        maintainAspectRatio: false,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index',
-                        },
-                        plugins: {
-                            annotation: getAnnotations(),
-                        },
-                    },
+                    options: chartOptions,
                 },
             );
-
             return;
         }
 
@@ -872,24 +991,63 @@ function ExportLimit() {
                 chartRef.current.data.datasets[i].data =
                     chartData.datasets[i].data;
             }
-
-            if (chartRef.current.options.plugins) {
-                chartRef.current.options.plugins.annotation = getAnnotations();
-            }
         }
 
+        // Update options
+        chartRef.current.options = chartOptions;
         chartRef.current.update();
-    }, [chartData]);
+    }, [chartData, chartOptions]);
 
     return (
         <Card>
-            <CardHeader>
-                <h1>Export limit</h1>
+            <CardHeader className="border-b border-gray-700/40">
+                <h1 className="text-xl font-semibold text-gray-100">
+                    Export limit
+                </h1>
             </CardHeader>
-            <CardBody>
+            <CardBody className="p-6">
                 <div className="relative h-[500px]">
                     <canvas ref={canvasRef} />
                 </div>
+
+                {futureSchedules.length > 0 && (
+                    <div className="mt-6">
+                        <h2 className="mb-3 text-lg font-semibold">
+                            Future Schedules
+                        </h2>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-gray-700/40 text-left">
+                                        <th className="pb-2">Start Time</th>
+                                        <th className="pb-2">End Time</th>
+                                        <th className="pb-2">Export Limit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {futureSchedules.map((schedule, index) => (
+                                        <tr
+                                            key={index}
+                                            className="border-b border-gray-700/20"
+                                        >
+                                            <td className="py-2">
+                                                {schedule.startFormatted}
+                                            </td>
+                                            <td className="py-2">
+                                                {schedule.endFormatted}
+                                            </td>
+                                            <td className="py-2">
+                                                {schedule.limit !== null
+                                                    ? `${schedule.limit.toLocaleString()} W`
+                                                    : 'No limit'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
             </CardBody>
         </Card>
     );
@@ -919,7 +1077,7 @@ function GenerationLimit() {
                     .filter(
                         (d) =>
                             d._measurement === 'controlLimit' &&
-                            d.name === 'sep2',
+                            d.name === 'csipAus',
                     )
                     .map((d) => ({
                         datetime: new Date(d._time).getTime(),
