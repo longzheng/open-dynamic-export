@@ -17,7 +17,7 @@ export const siteConfig = {
         },
         {
             type: 'route',
-            label: 'Limits',
+            label: 'CSIP Limits',
             href: '/limits',
         },
         {
