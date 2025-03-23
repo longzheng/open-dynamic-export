@@ -794,6 +794,7 @@ function ExportLimit() {
                         },
                         padding: 15,
                         usePointStyle: true,
+                        pointStyle: 'circle',
                         color: 'rgba(255, 255, 255, 0.8)',
                     },
                 },
@@ -830,7 +831,7 @@ function ExportLimit() {
 
         const datasets: ChartDataset<'line', ChartDataType>[] = [
             {
-                label: 'Currently applied limit',
+                label: 'Applied limit',
                 data: exportLimitData
                     .filter(
                         (d) =>
@@ -847,7 +848,7 @@ function ExportLimit() {
                     target: 'origin',
                 },
                 pointStyle: false,
-                backgroundColor: 'rgba(58, 146, 83, 0.15)', // More subtle fill
+                backgroundColor: 'rgba(21, 128, 61, 0.15)', // Light green background
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
@@ -869,7 +870,8 @@ function ExportLimit() {
                     })),
                 borderWidth: 2,
                 pointStyle: false,
-                borderColor: 'rgba(255, 100, 100, 0.8)', // Softer red
+                borderColor: 'rgba(21, 128, 61, 0.8)', // Solid green line
+                backgroundColor: 'rgba(21, 128, 61, 0.8)',
                 tension: 0.3, // Smooth line
                 parsing: {
                     xAxisKey: 'datetime',
@@ -892,7 +894,8 @@ function ExportLimit() {
                     })),
                 borderWidth: 2,
                 pointStyle: false,
-                borderColor: 'rgba(100, 100, 255, 0.6)', // Softer blue
+                borderColor: 'rgba(156, 163, 175, 0.6)', // Light grey color
+                backgroundColor: 'rgba(156, 163, 175, 0.6)',
                 tension: 0.3, // Smooth line
                 parsing: {
                     xAxisKey: 'datetime',
@@ -953,7 +956,7 @@ function ExportLimit() {
                     .flatMap((d) => d),
                 borderWidth: 2,
                 pointStyle: 'circle',
-                borderColor: '#ff6464',
+                borderColor: 'rgba(103, 232, 249, 0.8)', // Light cyan color
                 borderDash: [3, 3],
                 parsing: {
                     xAxisKey: 'datetime',
@@ -1128,7 +1131,8 @@ function GenerationLimit() {
                     })),
                 borderWidth: 2,
                 pointStyle: false,
-                borderColor: '#6464ff',
+                borderColor: 'rgba(156, 163, 175, 0.6)', // Light grey color
+                backgroundColor: 'rgba(156, 163, 175, 0.6)',
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
@@ -1198,7 +1202,7 @@ function GenerationLimit() {
                 borderWidth: 2,
                 pointStyle: 'circle',
                 borderDash: [3, 3],
-                borderColor: '#ff6464',
+                borderColor: 'rgba(103, 232, 249, 0.8)', // Light cyan color
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
