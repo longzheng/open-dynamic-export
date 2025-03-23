@@ -1,10 +1,9 @@
-import { type DerControlBase } from '@/gen/types';
+import { type DerControlBase } from '../gen/types';
 import { Card, CardHeader, CardBody } from '@heroui/card';
 import {
     type ChartDataset,
     type ChartOptions,
-    type Scale,
-    type CoreScaleOptions,
+    type TooltipItem,
 } from 'chart.js';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
@@ -32,11 +31,10 @@ function getAnnotations(): AnnotationPluginOptions {
     };
 }
 
-export type PowerLimitChartProps = {
+export type BooleanLimitChartProps = {
     title: string;
     limitData: {
-        control: string;
-        _value: number;
+        _value: boolean;
         _time: string;
         _measurement: string;
         name: string;
@@ -46,19 +44,20 @@ export type PowerLimitChartProps = {
         endExclusive: string;
         derControlBase: DerControlBase;
     }[];
-    scheduleKey:
-        | 'opModExpLimW'
-        | 'opModGenLimW'
-        | 'opModImpLimW'
-        | 'opModLoadLimW';
+    scheduleKey: 'opModConnect' | 'opModEnergize';
 };
 
-export function PowerLimitChart({
+export function BooleanLimitChart({
     title,
     limitData,
     scheduleData,
     scheduleKey,
-}: PowerLimitChartProps) {
+}: BooleanLimitChartProps) {
+    type ChartDataType = { datetime: number[]; value: boolean | null }[];
+
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const chartRef = useRef<Chart<'bar', ChartDataType> | null>(null);
+
     // Add state for current time
     const [now, setNow] = useState(() => new Date());
 
@@ -70,11 +69,6 @@ export function PowerLimitChart({
 
         return () => clearInterval(interval);
     }, []);
-
-    type ChartDataType = { datetime: number; value: number | null }[];
-
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const chartRef = useRef<Chart<'line', ChartDataType> | null>(null);
 
     // Memoize time-related values
     const timeConfig = useMemo(() => {
@@ -97,10 +91,7 @@ export function PowerLimitChart({
             .map((d) => ({
                 start: new Date(d.startInclusive),
                 end: new Date(d.endExclusive),
-                limit: d.derControlBase[scheduleKey]
-                    ? d.derControlBase[scheduleKey].value *
-                      10 ** d.derControlBase[scheduleKey].multiplier
-                    : null,
+                value: d.derControlBase[scheduleKey] ?? null,
                 startFormatted: new Date(d.startInclusive).toLocaleTimeString(
                     'en',
                     {
@@ -121,18 +112,10 @@ export function PowerLimitChart({
             .sort((a, b) => a.start.getTime() - b.start.getTime());
     }, [scheduleData, scheduleKey]);
 
-    // Memoize chart options with proper typing
     const chartOptions = useMemo(
-        (): ChartOptions<'line'> => ({
+        (): ChartOptions<'bar'> => ({
+            indexAxis: 'y',
             animation: false,
-            layout: {
-                padding: {
-                    top: 20,
-                    right: 20,
-                    bottom: 10,
-                    left: 10,
-                },
-            },
             scales: {
                 x: {
                     type: 'time',
@@ -157,38 +140,16 @@ export function PowerLimitChart({
                     },
                 },
                 y: {
-                    beginAtZero: true,
+                    stacked: true,
                     grid: {
-                        color: (context: { tick: { value: number } }) => {
-                            if (context.tick.value === 0) {
-                                return 'rgba(255, 255, 255, 0.1)';
-                            }
-                            return context.tick.value > 0
-                                ? 'rgba(255, 100, 100, 0.05)'
-                                : 'rgba(100, 255, 100, 0.05)';
-                        },
-                        tickColor: 'rgba(255, 255, 255, 0.1)',
+                        display: false,
                     },
                     ticks: {
-                        font: {
-                            family: '-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                            size: 11,
-                        },
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        callback(
-                            this: Scale<CoreScaleOptions>,
-                            tickValue: number | string,
-                        ) {
-                            return `${tickValue} W`;
-                        },
+                        display: false,
                     },
                 },
             },
             maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
             plugins: {
                 legend: {
                     display: true,
@@ -216,13 +177,8 @@ export function PowerLimitChart({
                     cornerRadius: 4,
                     displayColors: true,
                     callbacks: {
-                        label(tooltipItem: {
-                            dataset: { label?: string };
-                            parsed: { y: number };
-                        }) {
-                            return ` ${tooltipItem.dataset.label || ''}: ${
-                                tooltipItem.parsed.y
-                            } W`;
+                        label(item: TooltipItem<'bar'>) {
+                            return `${item.dataset.label || ''}: ${item.parsed.y === 1 ? 'Allowed' : 'Not allowed'}`;
                         },
                     },
                 },
@@ -233,135 +189,136 @@ export function PowerLimitChart({
     );
 
     const chartData = useMemo(() => {
-        const datasets: ChartDataset<'line', ChartDataType>[] = [
+        // Group consecutive values
+        const groupedLimitData = limitData
+            .filter(
+                (d) =>
+                    d._measurement === 'controlLimit' &&
+                    d.name === 'fixed' &&
+                    new Date(d._time) >= timeConfig.minTime,
+            )
+            .reduce<{ start_time: string; end_time: string; value: boolean }[]>(
+                (acc, curr) => {
+                    if (acc.length === 0) {
+                        acc.push({
+                            start_time: curr._time,
+                            end_time: curr._time,
+                            value: curr._value,
+                        });
+                    } else {
+                        const lastGroup = acc[acc.length - 1];
+                        if (curr._value === lastGroup.value) {
+                            lastGroup.end_time = curr._time;
+                        } else {
+                            acc.push({
+                                start_time: curr._time,
+                                end_time: curr._time,
+                                value: curr._value,
+                            });
+                        }
+                    }
+                    return acc;
+                },
+                [],
+            );
+
+        const datasets: ChartDataset<'bar', ChartDataType>[] = [
             {
-                label: 'Applied limit',
-                data: limitData
-                    .filter(
-                        (d) =>
-                            d._measurement === 'controlLimit' &&
-                            d.name === 'csipAus' &&
-                            new Date(d._time) >= timeConfig.minTime,
-                    )
+                label: 'Not allowed',
+                data: groupedLimitData
+                    .filter((d) => !d.value)
                     .map((d) => ({
-                        datetime: new Date(d._time).getTime(),
-                        value: d._value,
+                        datetime: [
+                            new Date(d.start_time).getTime(),
+                            new Date(d.end_time).getTime(),
+                        ],
+                        value: d.value,
                     })),
                 borderWidth: 0,
-                fill: {
-                    target: 'origin',
-                },
-                pointStyle: false,
-                backgroundColor: 'rgba(21, 128, 61, 0.15)', // Light green background
+                backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
-                order: 1, // Draw on top
+                order: 1,
             },
             {
-                label: 'Active control',
-                data: limitData
-                    .filter(
-                        (d) =>
-                            d._measurement === 'controlScheduler' &&
-                            d.control === 'active' &&
-                            new Date(d._time) >= timeConfig.minTime,
-                    )
+                label: 'Allowed',
+                data: groupedLimitData
+                    .filter((d) => d.value)
                     .map((d) => ({
-                        datetime: new Date(d._time).getTime(),
-                        value: d._value,
+                        datetime: [
+                            new Date(d.start_time).getTime(),
+                            new Date(d.end_time).getTime(),
+                        ],
+                        value: d.value,
                     })),
-                borderWidth: 2,
-                pointStyle: false,
-                borderColor: 'rgba(21, 128, 61, 0.8)', // Solid green line
-                backgroundColor: 'rgba(21, 128, 61, 0.8)',
-                tension: 0.3, // Smooth line
+                borderWidth: 0,
+                backgroundColor: 'rgba(34, 197, 94, 0.8)', // Green
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
                 order: 2,
             },
-            {
-                label: 'Default control',
-                data: limitData
+        ];
+
+        // Add schedule data
+        const falseSchedules = scheduleData.filter(
+            (d) => d.derControlBase[scheduleKey] === false,
+        );
+        if (falseSchedules.length > 0) {
+            datasets.push({
+                label: 'Future schedule (Not allowed)',
+                data: falseSchedules
                     .filter(
                         (d) =>
-                            d._measurement === 'controlScheduler' &&
-                            d.control === 'default' &&
-                            new Date(d._time) >= timeConfig.minTime,
+                            new Date(d.endExclusive).getTime() <=
+                            timeConfig.maxTime.getTime(),
                     )
                     .map((d) => ({
-                        datetime: new Date(d._time).getTime(),
-                        value: d._value,
+                        datetime: [
+                            new Date(d.startInclusive).getTime(),
+                            new Date(d.endExclusive).getTime(),
+                        ],
+                        value: false,
                     })),
-                borderWidth: 2,
-                pointStyle: false,
-                borderColor: 'rgba(156, 163, 175, 0.6)', // Light grey color
-                backgroundColor: 'rgba(156, 163, 175, 0.6)',
-                tension: 0.3, // Smooth line
+                backgroundColor: 'rgba(239, 68, 68, 0.3)', // Light red
                 parsing: {
                     xAxisKey: 'datetime',
                     yAxisKey: 'value',
                 },
                 order: 3,
-            },
-        ];
+            });
+        }
 
-        let lastEnd: number | null = null;
-
-        datasets.push({
-            label: 'Future schedule',
-            data: scheduleData
-                .filter(
-                    (d) =>
-                        new Date(d.endExclusive).getTime() <=
-                        timeConfig.maxTime.getTime(),
-                )
-                .map((d) => {
-                    const points: ChartDataType = [];
-                    const start = new Date(d.startInclusive).getTime();
-                    const end = new Date(d.endExclusive).getTime();
-
-                    if (lastEnd && start !== lastEnd) {
-                        points.push({
-                            datetime: lastEnd,
-                            value: null,
-                        });
-                    }
-
-                    lastEnd = end;
-
-                    points.push({
-                        datetime: start,
-                        value: d.derControlBase[scheduleKey]
-                            ? d.derControlBase[scheduleKey].value *
-                              10 ** d.derControlBase[scheduleKey].multiplier
-                            : null,
-                    });
-
-                    points.push({
-                        datetime: end,
-                        value: d.derControlBase[scheduleKey]
-                            ? d.derControlBase[scheduleKey].value *
-                              10 ** d.derControlBase[scheduleKey].multiplier
-                            : null,
-                    });
-
-                    return points;
-                })
-                .flatMap((d) => d),
-            borderWidth: 2,
-            pointStyle: 'circle',
-            borderColor: 'rgba(103, 232, 249, 0.8)', // Light cyan color
-            borderDash: [3, 3],
-            parsing: {
-                xAxisKey: 'datetime',
-                yAxisKey: 'value',
-            },
-            order: 4,
-        });
+        const trueSchedules = scheduleData.filter(
+            (d) => d.derControlBase[scheduleKey] === true,
+        );
+        if (trueSchedules.length > 0) {
+            datasets.push({
+                label: 'Future schedule (Allowed)',
+                data: trueSchedules
+                    .filter(
+                        (d) =>
+                            new Date(d.endExclusive).getTime() <=
+                            timeConfig.maxTime.getTime(),
+                    )
+                    .map((d) => ({
+                        datetime: [
+                            new Date(d.startInclusive).getTime(),
+                            new Date(d.endExclusive).getTime(),
+                        ],
+                        value: true,
+                    })),
+                backgroundColor: 'rgba(34, 197, 94, 0.3)', // Light green
+                parsing: {
+                    xAxisKey: 'datetime',
+                    yAxisKey: 'value',
+                },
+                order: 4,
+            });
+        }
 
         return { datasets };
     }, [limitData, scheduleData, timeConfig, scheduleKey]);
@@ -372,10 +329,10 @@ export function PowerLimitChart({
         }
 
         if (chartRef.current === null) {
-            chartRef.current = new Chart<'line', ChartDataType>(
+            chartRef.current = new Chart<'bar', ChartDataType>(
                 canvasRef.current,
                 {
-                    type: 'line',
+                    type: 'bar',
                     data: chartData,
                     options: chartOptions,
                 },
@@ -388,8 +345,7 @@ export function PowerLimitChart({
         } else {
             // update each dataset data directly
             for (let i = 0; i < chartData.datasets.length; i++) {
-                chartRef.current.data.datasets[i].data =
-                    chartData.datasets[i].data;
+                chartRef.current.data.datasets[i] = chartData.datasets[i];
             }
         }
 
@@ -404,7 +360,7 @@ export function PowerLimitChart({
                 <h1 className="text-xl font-semibold text-gray-100">{title}</h1>
             </CardHeader>
             <CardBody className="p-6">
-                <div className="relative h-[500px]">
+                <div className="relative h-[100px]">
                     <canvas ref={canvasRef} />
                 </div>
 
@@ -419,7 +375,7 @@ export function PowerLimitChart({
                                     <tr className="border-b border-gray-700/40 text-left">
                                         <th className="pb-2">Start Time</th>
                                         <th className="pb-2">End Time</th>
-                                        <th className="pb-2">{title}</th>
+                                        <th className="pb-2">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -435,9 +391,9 @@ export function PowerLimitChart({
                                                 {schedule.endFormatted}
                                             </td>
                                             <td className="py-2">
-                                                {schedule.limit !== null
-                                                    ? `${schedule.limit.toLocaleString()} W`
-                                                    : 'No limit'}
+                                                {schedule.value
+                                                    ? 'Allowed'
+                                                    : 'Not allowed'}
                                             </td>
                                         </tr>
                                     ))}
