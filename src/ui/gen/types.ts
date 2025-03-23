@@ -3895,6 +3895,114 @@ export type GenerationLimitQuery = {
  /**
  * @description Ok
 */
+export type ImportLimit200 = {
+    /**
+     * @type string
+    */
+    control: string;
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    _measurement: string;
+    /**
+     * @type string
+    */
+    name: string;
+}[];
+/**
+ * @description Ok
+*/
+export type ImportLimitQueryResponse = {
+    /**
+     * @type string
+    */
+    control: string;
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    _measurement: string;
+    /**
+     * @type string
+    */
+    name: string;
+}[];
+export type ImportLimitQuery = {
+    Response: ImportLimitQueryResponse;
+};
+
+ /**
+ * @description Ok
+*/
+export type LoadLimit200 = {
+    /**
+     * @type string
+    */
+    control: string;
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    _measurement: string;
+    /**
+     * @type string
+    */
+    name: string;
+}[];
+/**
+ * @description Ok
+*/
+export type LoadLimitQueryResponse = {
+    /**
+     * @type string
+    */
+    control: string;
+    /**
+     * @type number, double
+    */
+    _value: number;
+    /**
+     * @type string
+    */
+    _time: string;
+    /**
+     * @type string
+    */
+    _measurement: string;
+    /**
+     * @type string
+    */
+    name: string;
+}[];
+export type LoadLimitQuery = {
+    Response: LoadLimitQueryResponse;
+};
+
+ /**
+ * @description Ok
+*/
 export type Connection200 = {
     /**
      * @type boolean
@@ -4018,6 +4126,30 @@ export type GenerationLimitSchedule200 = RandomizedControlSchedule[];
 export type GenerationLimitScheduleQueryResponse = RandomizedControlSchedule[];
 export type GenerationLimitScheduleQuery = {
     Response: GenerationLimitScheduleQueryResponse;
+};
+
+ /**
+ * @description Ok
+*/
+export type ImportLimitSchedule200 = RandomizedControlSchedule[];
+/**
+ * @description Ok
+*/
+export type ImportLimitScheduleQueryResponse = RandomizedControlSchedule[];
+export type ImportLimitScheduleQuery = {
+    Response: ImportLimitScheduleQueryResponse;
+};
+
+ /**
+ * @description Ok
+*/
+export type LoadLimitSchedule200 = RandomizedControlSchedule[];
+/**
+ * @description Ok
+*/
+export type LoadLimitScheduleQueryResponse = RandomizedControlSchedule[];
+export type LoadLimitScheduleQuery = {
+    Response: LoadLimitScheduleQueryResponse;
 };
 
  /**
