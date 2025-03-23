@@ -698,9 +698,9 @@ export function queryRealPowerSite() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "sample")
-  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "site")
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "site" and r["phase"] == "net")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
 `,
     );
@@ -719,9 +719,9 @@ export function queryDERRealPower() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "sample")
-  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "der")
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "der" and r["phase"] == "net")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
 `,
     );
@@ -740,9 +740,9 @@ export function queryLoadRealPower() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "sample")
-  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "load")
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "load" and r["phase"] == "net")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
 `,
     );
@@ -762,7 +762,7 @@ export function queryExportLimit() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModExpLimW")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
@@ -784,7 +784,7 @@ export function queryGenerationLimit() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModGenLimW")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
@@ -805,7 +805,7 @@ export function queryConnection() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModConnect")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
@@ -827,7 +827,7 @@ export function queryEnergize() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModEnergize")
   |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
