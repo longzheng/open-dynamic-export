@@ -656,10 +656,10 @@ function EnergizeLimit() {
 
 function ExportLimit() {
     const { data: exportLimitData } = useExportLimit({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
     const { data: exportLimitScheduleData } = useExportLimitSchedule({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     return (
@@ -674,10 +674,10 @@ function ExportLimit() {
 
 function GenerationLimit() {
     const { data: generationLimitData } = useGenerationLimit({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
     const { data: generationLimitScheduleData } = useGenerationLimitSchedule({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     return (
@@ -692,10 +692,10 @@ function GenerationLimit() {
 
 function ImportLimit() {
     const { data: importLimitData } = useImportLimit({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
     const { data: importLimitScheduleData } = useImportLimitSchedule({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     return (
@@ -710,10 +710,10 @@ function ImportLimit() {
 
 function LoadLimit() {
     const { data: loadLimitData } = useLoadLimit({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
     const { data: loadLimitScheduleData } = useLoadLimitSchedule({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     return (
