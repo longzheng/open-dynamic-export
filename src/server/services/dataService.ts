@@ -6,6 +6,8 @@ import {
     queryRealPowerSite,
     queryDERRealPower,
     queryLoadRealPower,
+    queryImportLimit,
+    queryLoadLimit,
 } from '../../helpers/influxdb.js';
 
 export function getRealPowerSite() {
@@ -26,6 +28,14 @@ export function getExportLimit() {
 
 export function getGenerationLimit() {
     return queryGenerationLimit();
+}
+
+export function getImportLimit() {
+    return queryImportLimit();
+}
+
+export function getLoadLimit() {
+    return queryLoadLimit();
 }
 
 export function getConnection() {

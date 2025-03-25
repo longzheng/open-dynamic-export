@@ -28,6 +28,18 @@ export class CsipAusController extends Controller {
         return getCsipLimitSchedule('opModGenLimW');
     }
 
+    @Get('importLimitSchedule')
+    @OperationId('importLimitSchedule')
+    public importLimitSchedule() {
+        return getCsipLimitSchedule('opModImpLimW');
+    }
+
+    @Get('loadLimitSchedule')
+    @OperationId('loadLimitSchedule')
+    public loadLimitSchedule() {
+        return getCsipLimitSchedule('opModLoadLimW');
+    }
+
     @Get('connectionSchedule')
     @OperationId('connectionSchedule')
     public connectionSchedule() {

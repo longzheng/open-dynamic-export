@@ -1,6 +1,6 @@
 import client from "../client.ts";
 import { useQuery, queryOptions, useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import type { SunspecDataQueryResponse, SiteRealPowerQueryResponse, DerRealPowerQueryResponse, LoadRealPowerQueryResponse, ExportLimitQueryResponse, GenerationLimitQueryResponse, ConnectionQueryResponse, EnergizeQueryResponse, CsipAusStatusQueryResponse, ExportLimitScheduleQueryResponse, GenerationLimitScheduleQueryResponse, ConnectionScheduleQueryResponse, EnergizeScheduleQueryResponse, CoordinatorStartMutationResponse, CoordinatorStatusQueryResponse, CoordinatorStopMutationResponse } from "./types";
+import type { SunspecDataQueryResponse, SiteRealPowerQueryResponse, DerRealPowerQueryResponse, LoadRealPowerQueryResponse, ExportLimitQueryResponse, GenerationLimitQueryResponse, ImportLimitQueryResponse, LoadLimitQueryResponse, ConnectionQueryResponse, EnergizeQueryResponse, CsipAusStatusQueryResponse, ExportLimitScheduleQueryResponse, GenerationLimitScheduleQueryResponse, ImportLimitScheduleQueryResponse, LoadLimitScheduleQueryResponse, ConnectionScheduleQueryResponse, EnergizeScheduleQueryResponse, CoordinatorStartMutationResponse, CoordinatorStatusQueryResponse, CoordinatorStopMutationResponse } from "./types";
 import type { QueryObserverOptions, UseQueryResult, QueryKey, UseSuspenseQueryOptions, UseSuspenseQueryResult, UseMutationOptions } from "@tanstack/react-query";
 
  type SunspecDataClient = typeof client<SunspecDataQueryResponse, Error, never>;
@@ -537,6 +537,184 @@ export function useGenerationLimitSuspense<TData = GenerationLimit["response"], 
     return query;
 }
 
+ type ImportLimitClient = typeof client<ImportLimitQueryResponse, Error, never>;
+type ImportLimit = {
+    data: ImportLimitQueryResponse;
+    error: Error;
+    request: never;
+    pathParams: never;
+    queryParams: never;
+    headerParams: never;
+    response: Awaited<ReturnType<ImportLimitClient>>;
+    client: {
+        parameters: Partial<Parameters<ImportLimitClient>[0]>;
+        return: Awaited<ReturnType<ImportLimitClient>>;
+    };
+};
+export const importLimitQueryKey = () => [{ url: "/api/data/importLimit" }] as const;
+export type ImportLimitQueryKey = ReturnType<typeof importLimitQueryKey>;
+export function importLimitQueryOptions(options: ImportLimit["client"]["parameters"] = {}) {
+    const queryKey = importLimitQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<ImportLimit["data"], ImportLimit["error"]>({
+                method: "get",
+                url: `/api/data/importLimit`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/importLimit
+ */
+export function useImportLimit<TData = ImportLimit["response"], TQueryData = ImportLimit["response"], TQueryKey extends QueryKey = ImportLimitQueryKey>(options: {
+    query?: Partial<QueryObserverOptions<ImportLimit["response"], ImportLimit["error"], TData, TQueryData, TQueryKey>>;
+    client?: ImportLimit["client"]["parameters"];
+} = {}): UseQueryResult<TData, ImportLimit["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? importLimitQueryKey();
+    const query = useQuery({
+        ...importLimitQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
+    }) as UseQueryResult<TData, ImportLimit["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+export const importLimitSuspenseQueryKey = () => [{ url: "/api/data/importLimit" }] as const;
+export type ImportLimitSuspenseQueryKey = ReturnType<typeof importLimitSuspenseQueryKey>;
+export function importLimitSuspenseQueryOptions(options: ImportLimit["client"]["parameters"] = {}) {
+    const queryKey = importLimitSuspenseQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<ImportLimit["data"], ImportLimit["error"]>({
+                method: "get",
+                url: `/api/data/importLimit`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/importLimit
+ */
+export function useImportLimitSuspense<TData = ImportLimit["response"], TQueryKey extends QueryKey = ImportLimitSuspenseQueryKey>(options: {
+    query?: Partial<UseSuspenseQueryOptions<ImportLimit["response"], ImportLimit["error"], TData, TQueryKey>>;
+    client?: ImportLimit["client"]["parameters"];
+} = {}): UseSuspenseQueryResult<TData, ImportLimit["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? importLimitSuspenseQueryKey();
+    const query = useSuspenseQuery({
+        ...importLimitSuspenseQueryOptions(clientOptions) as unknown as UseSuspenseQueryOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
+    }) as UseSuspenseQueryResult<TData, ImportLimit["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+
+ type LoadLimitClient = typeof client<LoadLimitQueryResponse, Error, never>;
+type LoadLimit = {
+    data: LoadLimitQueryResponse;
+    error: Error;
+    request: never;
+    pathParams: never;
+    queryParams: never;
+    headerParams: never;
+    response: Awaited<ReturnType<LoadLimitClient>>;
+    client: {
+        parameters: Partial<Parameters<LoadLimitClient>[0]>;
+        return: Awaited<ReturnType<LoadLimitClient>>;
+    };
+};
+export const loadLimitQueryKey = () => [{ url: "/api/data/loadLimit" }] as const;
+export type LoadLimitQueryKey = ReturnType<typeof loadLimitQueryKey>;
+export function loadLimitQueryOptions(options: LoadLimit["client"]["parameters"] = {}) {
+    const queryKey = loadLimitQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<LoadLimit["data"], LoadLimit["error"]>({
+                method: "get",
+                url: `/api/data/loadLimit`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/loadLimit
+ */
+export function useLoadLimit<TData = LoadLimit["response"], TQueryData = LoadLimit["response"], TQueryKey extends QueryKey = LoadLimitQueryKey>(options: {
+    query?: Partial<QueryObserverOptions<LoadLimit["response"], LoadLimit["error"], TData, TQueryData, TQueryKey>>;
+    client?: LoadLimit["client"]["parameters"];
+} = {}): UseQueryResult<TData, LoadLimit["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? loadLimitQueryKey();
+    const query = useQuery({
+        ...loadLimitQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
+    }) as UseQueryResult<TData, LoadLimit["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+export const loadLimitSuspenseQueryKey = () => [{ url: "/api/data/loadLimit" }] as const;
+export type LoadLimitSuspenseQueryKey = ReturnType<typeof loadLimitSuspenseQueryKey>;
+export function loadLimitSuspenseQueryOptions(options: LoadLimit["client"]["parameters"] = {}) {
+    const queryKey = loadLimitSuspenseQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<LoadLimit["data"], LoadLimit["error"]>({
+                method: "get",
+                url: `/api/data/loadLimit`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/data/loadLimit
+ */
+export function useLoadLimitSuspense<TData = LoadLimit["response"], TQueryKey extends QueryKey = LoadLimitSuspenseQueryKey>(options: {
+    query?: Partial<UseSuspenseQueryOptions<LoadLimit["response"], LoadLimit["error"], TData, TQueryKey>>;
+    client?: LoadLimit["client"]["parameters"];
+} = {}): UseSuspenseQueryResult<TData, LoadLimit["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? loadLimitSuspenseQueryKey();
+    const query = useSuspenseQuery({
+        ...loadLimitSuspenseQueryOptions(clientOptions) as unknown as UseSuspenseQueryOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
+    }) as UseSuspenseQueryResult<TData, LoadLimit["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+
  type ConnectionClient = typeof client<ConnectionQueryResponse, Error, never>;
 type Connection = {
     data: ConnectionQueryResponse;
@@ -978,6 +1156,184 @@ export function useGenerationLimitScheduleSuspense<TData = GenerationLimitSchedu
         queryKey,
         ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
     }) as UseSuspenseQueryResult<TData, GenerationLimitSchedule["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+
+ type ImportLimitScheduleClient = typeof client<ImportLimitScheduleQueryResponse, Error, never>;
+type ImportLimitSchedule = {
+    data: ImportLimitScheduleQueryResponse;
+    error: Error;
+    request: never;
+    pathParams: never;
+    queryParams: never;
+    headerParams: never;
+    response: Awaited<ReturnType<ImportLimitScheduleClient>>;
+    client: {
+        parameters: Partial<Parameters<ImportLimitScheduleClient>[0]>;
+        return: Awaited<ReturnType<ImportLimitScheduleClient>>;
+    };
+};
+export const importLimitScheduleQueryKey = () => [{ url: "/api/csipAus/importLimitSchedule" }] as const;
+export type ImportLimitScheduleQueryKey = ReturnType<typeof importLimitScheduleQueryKey>;
+export function importLimitScheduleQueryOptions(options: ImportLimitSchedule["client"]["parameters"] = {}) {
+    const queryKey = importLimitScheduleQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<ImportLimitSchedule["data"], ImportLimitSchedule["error"]>({
+                method: "get",
+                url: `/api/csipAus/importLimitSchedule`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/csipAus/importLimitSchedule
+ */
+export function useImportLimitSchedule<TData = ImportLimitSchedule["response"], TQueryData = ImportLimitSchedule["response"], TQueryKey extends QueryKey = ImportLimitScheduleQueryKey>(options: {
+    query?: Partial<QueryObserverOptions<ImportLimitSchedule["response"], ImportLimitSchedule["error"], TData, TQueryData, TQueryKey>>;
+    client?: ImportLimitSchedule["client"]["parameters"];
+} = {}): UseQueryResult<TData, ImportLimitSchedule["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? importLimitScheduleQueryKey();
+    const query = useQuery({
+        ...importLimitScheduleQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
+    }) as UseQueryResult<TData, ImportLimitSchedule["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+export const importLimitScheduleSuspenseQueryKey = () => [{ url: "/api/csipAus/importLimitSchedule" }] as const;
+export type ImportLimitScheduleSuspenseQueryKey = ReturnType<typeof importLimitScheduleSuspenseQueryKey>;
+export function importLimitScheduleSuspenseQueryOptions(options: ImportLimitSchedule["client"]["parameters"] = {}) {
+    const queryKey = importLimitScheduleSuspenseQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<ImportLimitSchedule["data"], ImportLimitSchedule["error"]>({
+                method: "get",
+                url: `/api/csipAus/importLimitSchedule`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/csipAus/importLimitSchedule
+ */
+export function useImportLimitScheduleSuspense<TData = ImportLimitSchedule["response"], TQueryKey extends QueryKey = ImportLimitScheduleSuspenseQueryKey>(options: {
+    query?: Partial<UseSuspenseQueryOptions<ImportLimitSchedule["response"], ImportLimitSchedule["error"], TData, TQueryKey>>;
+    client?: ImportLimitSchedule["client"]["parameters"];
+} = {}): UseSuspenseQueryResult<TData, ImportLimitSchedule["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? importLimitScheduleSuspenseQueryKey();
+    const query = useSuspenseQuery({
+        ...importLimitScheduleSuspenseQueryOptions(clientOptions) as unknown as UseSuspenseQueryOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
+    }) as UseSuspenseQueryResult<TData, ImportLimitSchedule["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+
+ type LoadLimitScheduleClient = typeof client<LoadLimitScheduleQueryResponse, Error, never>;
+type LoadLimitSchedule = {
+    data: LoadLimitScheduleQueryResponse;
+    error: Error;
+    request: never;
+    pathParams: never;
+    queryParams: never;
+    headerParams: never;
+    response: Awaited<ReturnType<LoadLimitScheduleClient>>;
+    client: {
+        parameters: Partial<Parameters<LoadLimitScheduleClient>[0]>;
+        return: Awaited<ReturnType<LoadLimitScheduleClient>>;
+    };
+};
+export const loadLimitScheduleQueryKey = () => [{ url: "/api/csipAus/loadLimitSchedule" }] as const;
+export type LoadLimitScheduleQueryKey = ReturnType<typeof loadLimitScheduleQueryKey>;
+export function loadLimitScheduleQueryOptions(options: LoadLimitSchedule["client"]["parameters"] = {}) {
+    const queryKey = loadLimitScheduleQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<LoadLimitSchedule["data"], LoadLimitSchedule["error"]>({
+                method: "get",
+                url: `/api/csipAus/loadLimitSchedule`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/csipAus/loadLimitSchedule
+ */
+export function useLoadLimitSchedule<TData = LoadLimitSchedule["response"], TQueryData = LoadLimitSchedule["response"], TQueryKey extends QueryKey = LoadLimitScheduleQueryKey>(options: {
+    query?: Partial<QueryObserverOptions<LoadLimitSchedule["response"], LoadLimitSchedule["error"], TData, TQueryData, TQueryKey>>;
+    client?: LoadLimitSchedule["client"]["parameters"];
+} = {}): UseQueryResult<TData, LoadLimitSchedule["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? loadLimitScheduleQueryKey();
+    const query = useQuery({
+        ...loadLimitScheduleQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
+    }) as UseQueryResult<TData, LoadLimitSchedule["error"]> & {
+        queryKey: TQueryKey;
+    };
+    query.queryKey = queryKey as TQueryKey;
+    return query;
+}
+export const loadLimitScheduleSuspenseQueryKey = () => [{ url: "/api/csipAus/loadLimitSchedule" }] as const;
+export type LoadLimitScheduleSuspenseQueryKey = ReturnType<typeof loadLimitScheduleSuspenseQueryKey>;
+export function loadLimitScheduleSuspenseQueryOptions(options: LoadLimitSchedule["client"]["parameters"] = {}) {
+    const queryKey = loadLimitScheduleSuspenseQueryKey();
+    return queryOptions({
+        queryKey,
+        queryFn: async () => {
+            const res = await client<LoadLimitSchedule["data"], LoadLimitSchedule["error"]>({
+                method: "get",
+                url: `/api/csipAus/loadLimitSchedule`,
+                ...options
+            });
+            return res;
+        },
+    });
+}
+/**
+ * @link /api/csipAus/loadLimitSchedule
+ */
+export function useLoadLimitScheduleSuspense<TData = LoadLimitSchedule["response"], TQueryKey extends QueryKey = LoadLimitScheduleSuspenseQueryKey>(options: {
+    query?: Partial<UseSuspenseQueryOptions<LoadLimitSchedule["response"], LoadLimitSchedule["error"], TData, TQueryKey>>;
+    client?: LoadLimitSchedule["client"]["parameters"];
+} = {}): UseSuspenseQueryResult<TData, LoadLimitSchedule["error"]> & {
+    queryKey: TQueryKey;
+} {
+    const { query: queryOptions, client: clientOptions = {} } = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? loadLimitScheduleSuspenseQueryKey();
+    const query = useSuspenseQuery({
+        ...loadLimitScheduleSuspenseQueryOptions(clientOptions) as unknown as UseSuspenseQueryOptions,
+        queryKey,
+        ...queryOptions as unknown as Omit<UseSuspenseQueryOptions, "queryKey">
+    }) as UseSuspenseQueryResult<TData, LoadLimitSchedule["error"]> & {
         queryKey: TQueryKey;
     };
     query.queryKey = queryKey as TQueryKey;

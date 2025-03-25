@@ -125,7 +125,7 @@ function RealPower() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart | null>(null);
     const { data } = useSiteRealPower<PowerData[]>({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     const chartData = useMemo(
@@ -191,7 +191,7 @@ function DERPower() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart | null>(null);
     const { data } = useDerRealPower<PowerData[]>({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     const chartData = useMemo(
@@ -257,7 +257,7 @@ function LoadPower() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart | null>(null);
     const { data } = useLoadRealPower<PowerData[]>({
-        query: { refetchInterval: 1000 },
+        query: { refetchInterval: 10_000 },
     });
 
     const chartData = useMemo(

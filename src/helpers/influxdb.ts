@@ -640,6 +640,14 @@ export function writeControlLimit({ limit }: { limit: InverterControlLimit }) {
         point.floatField('opModGenLimW', limit.opModGenLimW);
     }
 
+    if (limit.opModImpLimW !== undefined) {
+        point.floatField('opModImpLimW', limit.opModImpLimW);
+    }
+
+    if (limit.opModLoadLimW !== undefined) {
+        point.floatField('opModLoadLimW', limit.opModLoadLimW);
+    }
+
     influxDB.writeApi.writePoint(point);
 }
 
@@ -683,6 +691,22 @@ export function writeActiveControlLimit({
                 .floatField('opModGenLimW', limit.opModGenLimW.value),
         );
     }
+
+    if (limit.opModImpLimW !== undefined) {
+        influxDB.writeApi.writePoint(
+            new Point('activeControlLimit')
+                .tag('name', limit.opModImpLimW.source)
+                .floatField('opModImpLimW', limit.opModImpLimW.value),
+        );
+    }
+
+    if (limit.opModLoadLimW !== undefined) {
+        influxDB.writeApi.writePoint(
+            new Point('activeControlLimit')
+                .tag('name', limit.opModLoadLimW.source)
+                .floatField('opModLoadLimW', limit.opModLoadLimW.value),
+        );
+    }
 }
 
 export function queryRealPowerSite() {
@@ -698,10 +722,10 @@ export function queryRealPowerSite() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "sample")
-  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "site")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "site" and r["phase"] == "net")
+  |> aggregateWindow(every: 1m, fn: last, createEmpty: true)
 `,
     );
 }
@@ -719,10 +743,10 @@ export function queryDERRealPower() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "sample")
-  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "der")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "der" and r["phase"] == "net")
+  |> aggregateWindow(every: 1m, fn: last, createEmpty: true)
 `,
     );
 }
@@ -740,10 +764,10 @@ export function queryLoadRealPower() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "sample")
-  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "load")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> filter(fn: (r) => r["_field"] == "realPower" and r["type"] == "load" and r["phase"] == "net")
+  |> aggregateWindow(every: 1m, fn: last, createEmpty: true)
 `,
     );
 }
@@ -762,10 +786,10 @@ export function queryExportLimit() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModExpLimW")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> aggregateWindow(every: 5m, fn: last, createEmpty: true)
 `,
     );
 }
@@ -784,10 +808,54 @@ export function queryGenerationLimit() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModGenLimW")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> aggregateWindow(every: 5m, fn: last, createEmpty: true)
+`,
+    );
+}
+
+export function queryImportLimit() {
+    if (!influxDB) {
+        throw new Error("InfluxDB isn't available");
+    }
+
+    return influxDB.queryApi.collectRows<{
+        name: string;
+        _measurement: string;
+        _time: string;
+        _value: number | null;
+        control: string;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -24h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
+  |> filter(fn: (r) => r["_field"] == "opModImpLimW")
+  |> aggregateWindow(every: 5m, fn: last, createEmpty: true)
+`,
+    );
+}
+
+export function queryLoadLimit() {
+    if (!influxDB) {
+        throw new Error("InfluxDB isn't available");
+    }
+
+    return influxDB.queryApi.collectRows<{
+        name: string;
+        _measurement: string;
+        _time: string;
+        _value: number | null;
+        control: string;
+    }>(
+        `
+from(bucket: "data")
+  |> range(start: -24h, stop: now())
+  |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
+  |> filter(fn: (r) => r["_field"] == "opModLoadLimW")
+  |> aggregateWindow(every: 5m, fn: last, createEmpty: true)
 `,
     );
 }
@@ -805,10 +873,10 @@ export function queryConnection() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModConnect")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> aggregateWindow(every: 5m, fn: last, createEmpty: true)
   |> yield(name: "last")
 `,
     );
@@ -827,10 +895,10 @@ export function queryEnergize() {
     }>(
         `
 from(bucket: "data")
-  |> range(start: -1h, stop: now())
+  |> range(start: -24h, stop: now())
   |> filter(fn: (r) => r["_measurement"] == "controlScheduler" or r["_measurement"] == "controlLimit")
   |> filter(fn: (r) => r["_field"] == "opModEnergize")
-  |> aggregateWindow(every: 5s, fn: last, createEmpty: true)
+  |> aggregateWindow(every: 5m, fn: last, createEmpty: true)
   |> yield(name: "last")
 `,
     );
