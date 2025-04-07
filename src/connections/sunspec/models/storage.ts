@@ -26,7 +26,7 @@ export type StorageModel = {
      * Model identifier
      */
     ID: 124;
-    
+
     /**
      * Model Length
      *
@@ -178,7 +178,7 @@ export type StorageModel = {
      * ChaState_SF
      *
      * Scale factor for available energy percent.
-     */   
+     */
     ChaState_SF: number;
 
     /**
@@ -298,17 +298,17 @@ export const storageModel = modbusModelFactory<
          * For OutWRte and InWRte:
 
            valid range -100.00% - +100.00%
-           
+
            Please note that this register has a scale factor in Register InOutWRte_SF, so for InOutWRte_SF = -2 the valid range
            in raw values is from -10000 to 10000.
-           
+
            Please be aware that setting an invalid power window WILL RESULT IN a modbus exception 3 (ILLEGAL DATA VALUE).
            Invalid power windows are all windows where condition:
            ((StorCtl_Mod == 3) AND ((-1) * InWRtg > OutWRtg))
            evaluates to true.
            This can happen for example if two negative values are written into InWRtg and OutWRtg and both limits are activated
            by StorCtl_Mod = 3.
-           
+
            */
         OutWRte: {
             start: 12,
