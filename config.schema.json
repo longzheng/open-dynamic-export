@@ -4,7 +4,7 @@
     "config": {
       "type": "object",
       "properties": {
-        "limiters": {
+        "setpoints": {
           "type": "object",
           "properties": {
             "csipAus": {
@@ -154,7 +154,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Limiters configuration"
+          "description": "Setpoints configuration"
         },
         "inverters": {
           "type": "array",
@@ -509,7 +509,7 @@
         }
       },
       "required": [
-        "limiters",
+        "setpoints",
         "inverters",
         "inverterControl",
         "meter"
