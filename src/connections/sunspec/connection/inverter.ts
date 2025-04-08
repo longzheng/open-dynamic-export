@@ -12,8 +12,8 @@ import { settingsModel } from '../models/settings.js';
 import { type StatusModel } from '../models/status.js';
 import { statusModel } from '../models/status.js';
 import {
-  type StorageModel,
-  type StorageModelWrite,
+    type StorageModel,
+    type StorageModelWrite,
 } from '../models/storage.js';
 import { storageModel } from '../models/storage.js';
 import { SunSpecConnection } from './base.js';
