@@ -11,6 +11,8 @@ import { type SettingsModel } from '../models/settings.js';
 import { settingsModel } from '../models/settings.js';
 import { type StatusModel } from '../models/status.js';
 import { statusModel } from '../models/status.js';
+import { type StorageModel } from '../models/storage.js';
+import { storageModel } from '../models/storage.js';
 import { SunSpecConnection } from './base.js';
 
 export class InverterSunSpecConnection extends SunSpecConnection {
@@ -27,6 +29,10 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     // the controls model will be under our control so we can cache it
     // we will merge the "default values" with the override values
     private controlsModelCache: ControlsModel | null = null;
+
+    // the storage model will be under our control so we can cache it
+    // we will merge the "default values" with the override values
+    private storageModelCache: StorageModel | null = null;
 
     async getInverterModel() {
         const modelAddressById = await this.getModelAddressById();
@@ -162,6 +168,47 @@ export class InverterSunSpecConnection extends SunSpecConnection {
         }
 
         return await controlsModel.write({
+            modbusConnection: this.modbusConnection,
+            address,
+            unitId: this.unitId,
+            values,
+        });
+    }
+
+    async getStorageModel() {
+        if (this.storageModelCache) {
+            return this.storageModelCache;
+        }
+
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(124);
+
+        if (!address) {
+            throw new Error('No SunSpec storage model address');
+        }
+
+        const data = await storageModel.read({
+            modbusConnection: this.modbusConnection,
+            address,
+            unitId: this.unitId,
+        });
+
+        this.storageModelCache = data;
+
+        return data;
+    }
+
+    async writeStorageModel(values: StorageModelWrite) {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(124);
+
+        if (!address) {
+            throw new Error('No SunSpec storage model address');
+        }
+
+        return await storageModel.write({
             modbusConnection: this.modbusConnection,
             address,
             unitId: this.unitId,
