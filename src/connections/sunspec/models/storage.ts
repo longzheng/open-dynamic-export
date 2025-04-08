@@ -1,13 +1,13 @@
 import {
+    int16NullableToRegisters,
+    registersToId,
+    registersToInt16Nullable,
     registersToUint16,
     registersToSunssf,
-    uint16ToRegisters,
-    registersToUint16Nullable,
-    uint16NullableToRegisters,
-    registersToInt16Nullable,
-    int16NullableToRegisters,
     registersToSunssfNullable,
-    registersToId,
+    registersToUint16Nullable,
+    uint16ToRegisters,
+    uint16NullableToRegisters,
 } from '../../modbus/helpers/converters.js';
 import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
@@ -46,14 +46,14 @@ export type StorageModel = {
      *
      * Setpoint for maximum charging rate. Default is MaxChaRte.
      */
-    WChaGra: number | null;
+    WChaGra: number;
 
     /**
      * WDisChaGra
      *
      * Setpoint for maximum discharging rate. Default is MaxDisChaRte.
      */
-    WDisChaGra: number | null;
+    WDisChaGra: number;
 
     /**
      * Storctl_Mod
@@ -74,14 +74,14 @@ export type StorageModel = {
      *
      * Setpoint for minimum reserve for storage as a percentage of the nominal maximum storage.
      */
-    MinRsvPct: number;
+    MinRsvPct: number | null;
 
     /**
      * ChaState
      *
      * Currently available energy as a percent of the capacity rating.
      */
-    ChaState: number;
+    ChaState: number | null;
 
     /**
      * StorAval
@@ -102,7 +102,7 @@ export type StorageModel = {
      *
      * Charge status of storage device. Enumerated value.
      */
-    ChaSt: ChaSt;
+    ChaSt: ChaSt | null;
 
     /**
      * OutWRte
@@ -144,21 +144,21 @@ export type StorageModel = {
      *
      * Charge grid setpoint.
      */
-    ChaGriSet: ChaGriSet;
+    ChaGriSet: ChaGriSet | null;
 
     /**
      * WChaMax_SF
      *
      * Scale factor for maximum charge.
      */
-    WChaMax_SF: number | null;
+    WChaMax_SF: number;
 
     /**
      * WChaDisChaGra_SF
      *
      * Scale factor for maximum charge and discharge rate.
      */
-    WChaDisChaGra_SF: number | null;
+    WChaDisChaGra_SF: number;
 
     /**
      * VAChaMax_SF
@@ -172,14 +172,14 @@ export type StorageModel = {
      *
      * Scale factor for minimum reserve percentage.
      */
-    MinRsvPct_SF: number;
+    MinRsvPct_SF: number | null;
 
     /**
      * ChaState_SF
      *
      * Scale factor for available energy percent.
      */
-    ChaState_SF: number;
+    ChaState_SF: number | null;
 
     /**
      * StorAval_SF
@@ -200,7 +200,7 @@ export type StorageModel = {
      *
      * Scale factor for percent charge/discharge rate.
      */
-    InOutWRte_SF: number;
+    InOutWRte_SF: number | null;
 };
 
 // NOTE: based on SunSpec model docs
@@ -246,14 +246,14 @@ export const storageModel = modbusModelFactory<
         WChaGra: {
             start: 3,
             end: 4,
-            readConverter: registersToUint16Nullable,
-            writeConverter: uint16NullableToRegisters,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         WDisChaGra: {
             start: 4,
             end: 5,
-            readConverter: registersToUint16Nullable,
-            writeConverter: uint16NullableToRegisters,
+            readConverter: registersToUint16,
+            writeConverter: uint16ToRegisters,
         },
         StorCtl_Mod: {
             start: 5,
@@ -270,13 +270,13 @@ export const storageModel = modbusModelFactory<
         MinRsvPct: {
             start: 7,
             end: 8,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         ChaState: {
             start: 8,
             end: 9,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         StorAval: {
             start: 9,
@@ -291,7 +291,7 @@ export const storageModel = modbusModelFactory<
         ChaSt: {
             start: 11,
             end: 12,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
         /*
          * Additional detail from Fronius doc Gen24_Primo_Symo_Inverter_Register_Map_Float_storage_ROW.xlsx:
@@ -343,18 +343,18 @@ export const storageModel = modbusModelFactory<
         ChaGriSet: {
             start: 17,
             end: 18,
-            readConverter: registersToUint16,
-            writeConverter: uint16ToRegisters,
+            readConverter: registersToUint16Nullable,
+            writeConverter: uint16NullableToRegisters,
         },
         WChaMax_SF: {
             start: 18,
             end: 19,
-            readConverter: registersToSunssfNullable,
+            readConverter: registersToSunssf,
         },
         WChaDisChaGra_SF: {
             start: 19,
             end: 20,
-            readConverter: registersToSunssfNullable,
+            readConverter: registersToSunssf,
         },
         VAChaMax_SF: {
             start: 20,
@@ -364,12 +364,12 @@ export const storageModel = modbusModelFactory<
         MinRsvPct_SF: {
             start: 21,
             end: 22,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         ChaState_SF: {
             start: 22,
             end: 23,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
         StorAval_SF: {
             start: 23,
@@ -384,7 +384,7 @@ export const storageModel = modbusModelFactory<
         InOutWRte_SF: {
             start: 25,
             end: 26,
-            readConverter: registersToSunssf,
+            readConverter: registersToSunssfNullable,
         },
     },
 });
