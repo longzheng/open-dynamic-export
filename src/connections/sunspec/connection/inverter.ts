@@ -29,8 +29,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     // practically we only need the value when the inverter connection state changes which does not happen often
     private statusModelCache: { cache: StatusModel; date: Date } | null = null;
 
-    // the controls model will be under our control so we can cache it
-    // we will merge the "default values" with the override values
+    // this software expects to solely control the inverter
+    // cache the controls model once permanently to avoid unnecessary reads
+    // note: if any other software also writes to the controls model for properties we don't care about, we will overwrite them
     private controlsModelCache: ControlsModel | null = null;
 
     // the storage model will be under our control so we can cache it
