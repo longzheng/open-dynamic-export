@@ -5,7 +5,7 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
 } from '../../sep2/helpers/cert.js';
-import { type CsipAusLimiter } from '../../limiters/csipAus/index.js';
+import { type CsipAusSetpoint } from '../../setpoints/csipAus/index.js';
 import { type ResponseRequiredType } from '../../sep2/models/responseRequired.js';
 import { coordinatorService } from './coordinatorService.js';
 import { type SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
@@ -30,15 +30,15 @@ export function getCertificateIds(): CertificateIds {
 export function getCsipLimitSchedule(
     type: SupportedControlTypes,
 ): RandomizedControlSchedule[] {
-    const csipAusLimiter = coordinatorService.getLimiters().csipAus;
+    const csipAusSetpoint = coordinatorService.getSetpoints().csipAus;
 
-    if (!csipAusLimiter) {
-        throw new Error('CSIP-AUS limiter is not running');
+    if (!csipAusSetpoint) {
+        throw new Error('CSIP-AUS setpoint is not running');
     }
 
-    const csipAusLimiterClass = csipAusLimiter as CsipAusLimiter;
+    const csipAusSetpointClass = csipAusSetpoint as CsipAusSetpoint;
 
-    return csipAusLimiterClass
+    return csipAusSetpointClass
         .getSchedulerByControlType()
         [type].getControlSchedules();
 }

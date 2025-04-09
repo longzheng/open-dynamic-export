@@ -1,8 +1,8 @@
-# Limiters
+# Setpoints
 
-One or more limiters can be configured to set the operating envelope of the site. 
+One or more setpoints can be configured to set the operating envelope of the site. 
 
-All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive value of each control type at any one time.
+All setpoints are restrictive, that is a combination of multiple setpoints will evaluate all setpoints and enforce the most prohibitive value of each control type at any one time.
 
 [[toc]]
 
@@ -23,16 +23,16 @@ The software supports 6 control modes mapped to the CSIP-AUS Dynamic Operating E
 
 ## CSIP-AUS dynamic connection
 
-Apply dynamic limits from an Australian energy utility CSIP-AUS server.
+Apply dynamic limits from an Australian energy utility CSIP-AUS server using a setpoint.
 
 > [!IMPORTANT]
 > This CSIP-AUS client cannot run without device certificates (and manufacturer certificates). See the [CSIP-AUS section](/csip-aus) for more information.
 
-To use the CSIP-AUS limiter, add following property to `config.json`
+To use the CSIP-AUS provided limits as a setpoint, add following property to `config.json`
 
 ```js
 {
-    "limiters": {
+    "setpoints": {
         "csipAus": {
             "host": "https://sep2-test.energyq.com.au", // (string) required: the CSIP-AUS server host
             "dcapUri": "/api/v2/dcap", // (string) required: the device capability discovery URI
@@ -43,13 +43,15 @@ To use the CSIP-AUS limiter, add following property to `config.json`
 }
 ```
 
+The `nmi` is not required for Energex/Ergon Energy/Energy Queensland.
+
 ## Fixed limit
 
-To set fixed limits (such as for fixed export limits), add the following property to `config.json`
+To use a setpoint to specify fixed limits (such as for fixed export limits), add the following property to `config.json`
 
 ```js
 {
-    "limiters": {
+    "setpoints": {
         "fixed": {
             "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
             "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
@@ -64,14 +66,14 @@ To set fixed limits (such as for fixed export limits), add the following propert
 
 ## MQTT
 
-To set limits based on a MQTT topic, add the following property to `config.json`
+To specify setpoint limits based on a MQTT topic, add the following property to `config.json`
 
 ```js
 {
-    "limiters": {
+    "setpoints": {
         "mqtt": {
             "host": "mqtt://192.168.1.123",
-            "topic": "limits"
+            "topic": "setpoints"
         }
     }
     ...
@@ -103,12 +105,12 @@ For example
 
 ## Negative feed-in
 
-To set a zero export limit based on negative feed-in, add the following property to `config.json`
+To set a zero export limit setpoint based on negative feed-in, add the following property to `config.json`
 
 For Amber Electric:
 ```js
 {
-    "limiters": {
+    "setpoints": {
         "negativeFeedIn": {
             "type": "amber", // (string) required: the source of the negative feed-in data
             "apiKey": "asdf", // (string) required: the Amber API key
@@ -121,12 +123,12 @@ For Amber Electric:
 
 ## Two-way tariffs
 
-To set a zero export limit based on two-way tariffs, add the following property to `config.json`
+To set a zero export limit setpoint based on two-way tariffs, add the following property to `config.json`
 
 For [Ausgrid solar tariff](https://www.ausgrid.com.au/Connections/Solar-and-batteries/Solar-tariffs) EA029:
 ```js
 {
-    "limiters": {
+    "setpoints": {
         "twoWayTariff": {
             "type": "ausgridEA029"
         }
@@ -138,7 +140,7 @@ For [Ausgrid solar tariff](https://www.ausgrid.com.au/Connections/Solar-and-batt
 For [SAPN RELE2W](https://www.sapowernetworks.com.au/public/download.jsp?id=328119) tariff:
 ```js
 {
-    "limiters": {
+    "setpoints": {
         "twoWayTariff": {
             "type": "sapnRELE2W"
         }

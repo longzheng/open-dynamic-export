@@ -18,7 +18,7 @@ export default tseslint.config(
         ignores: [
             'dist/',
             'logs/',
-            'src/limiters/negativeFeedIn/amber/api.d.ts',
+            'src/setpoints/negativeFeedIn/amber/api.d.ts',
             'src/ui/gen/',
             'docs/.vitepress/cache',
             'docs/.vitepress/dist',
