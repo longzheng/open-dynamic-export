@@ -34,8 +34,9 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     // note: if any other software also writes to the controls model for properties we don't care about, we will overwrite them
     private controlsModelCache: ControlsModel | null = null;
 
-    // the storage model will be under our control so we can cache it
-    // we will merge the "default values" with the override values
+    // this software expects to solely control the inverter
+    // cache the storage model once permanently to avoid unnecessary reads
+    // note: if any other software also writes to the storage model for properties we don't care about, we will overwrite them
     private storageModelCache: StorageModel | null = null;
 
     async getInverterModel() {
