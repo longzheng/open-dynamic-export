@@ -1878,7 +1878,7 @@ export type CoordinatorResponse = ({
          * @type object
         */
         activeInverterControlLimit: ActiveInverterControlLimit;
-        controlLimitsByLimiter: ControlLimitsByLimiter;
+        controlLimitsBySetpoint: ControlLimitsBySetpoint;
     } | null;
     /**
      * @type number, double
