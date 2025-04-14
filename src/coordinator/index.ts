@@ -11,8 +11,8 @@ import { getSep2Instance } from '../sep2/index.js';
 import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
 import { type SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
 import { InvertersPoller } from './helpers/inverterSample.js';
-import { destroyLimiters, type Limiters } from '../limiters/index.js';
-import { getLimiters } from '../limiters/index.js';
+import { destroySetpoints, type Setpoints } from '../setpoints/index.js';
+import { getSetpoints } from '../setpoints/index.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 
@@ -20,7 +20,7 @@ export type Coordinator = {
     inverterController: InverterController;
     invertersPoller: InvertersPoller;
     siteSamplePoller: SiteSamplePollerBase;
-    limiters: Limiters;
+    setpoints: Setpoints;
     destroy: () => void;
 };
 
@@ -41,14 +41,14 @@ export function createCoordinator(): Coordinator {
         rampRateHelper,
     });
 
-    const limiters = getLimiters({
+    const setpoints = getSetpoints({
         config,
         sep2Instance,
     });
 
     const inverterController = new InverterController({
         config,
-        limiters,
+        setpoints,
         onControl: (InverterController) =>
             invertersPoller.onControl(InverterController),
     });
@@ -76,14 +76,14 @@ export function createCoordinator(): Coordinator {
         inverterController,
         invertersPoller,
         siteSamplePoller,
-        limiters,
+        setpoints,
         destroy: () => {
             logger.info('Destroying coordinator');
             sep2Instance?.destroy();
             siteSamplePoller.destroy();
             invertersPoller.destroy();
             inverterController.destroy();
-            destroyLimiters(limiters);
+            destroySetpoints(setpoints);  
         },
     };
 }

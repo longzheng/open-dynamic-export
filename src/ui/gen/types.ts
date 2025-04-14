@@ -1745,7 +1745,7 @@ export type RecordCsipAusOrFixedOrNegativeFeedInOrTwoWayTariffOrMqttInverterCont
     mqtt: InverterControlLimit;
 };
 
- export type ControlLimitsByLimiter = RecordCsipAusOrFixedOrNegativeFeedInOrTwoWayTariffOrMqttInverterControlLimitOrNull;
+ export type ControlLimitsBySetpoint = RecordCsipAusOrFixedOrNegativeFeedInOrTwoWayTariffOrMqttInverterControlLimitOrNull;
 
  export type ActiveInverterControlLimit = {
     /**

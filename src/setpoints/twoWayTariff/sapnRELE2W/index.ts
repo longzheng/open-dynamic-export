@@ -1,15 +1,15 @@
 import { type Logger } from 'pino';
 import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import { type LimiterType } from '../../limiter.js';
+import { type SetpointType } from '../../setpoint.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { pinoLogger } from '../../../helpers/logger.js';
 
 // https://www.sapowernetworks.com.au/public/download.jsp?id=328119
-export class SapnRELE2WLimiter implements LimiterType {
+export class SapnRELE2WSetpoint implements SetpointType {
     private logger: Logger;
 
     constructor() {
-        this.logger = pinoLogger.child({ module: 'SapnRELE2WLimiter' });
+        this.logger = pinoLogger.child({ module: 'SapnRELE2WSetpoint' });
     }
 
     getInverterControlLimit(): InverterControlLimit {
@@ -19,7 +19,7 @@ export class SapnRELE2WLimiter implements LimiterType {
         // validate the user is configured for the SA timezone
         if (timezoneOffset !== -570 && timezoneOffset !== -630) {
             throw new Error(
-                `Two-way tariff limiter requires the timezone to be set to SA, current timezoneOffset ${timezoneOffset}`,
+                `Two-way tariff setpoint requires the timezone to be set to SA, current timezoneOffset ${timezoneOffset}`,
             );
         }
 
