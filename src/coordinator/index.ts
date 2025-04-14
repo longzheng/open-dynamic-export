@@ -83,7 +83,7 @@ export function createCoordinator(): Coordinator {
             siteSamplePoller.destroy();
             invertersPoller.destroy();
             inverterController.destroy();
-            destroySetpoints(setpoints);  
+            destroySetpoints(setpoints);
         },
     };
 }

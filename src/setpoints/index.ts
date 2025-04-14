@@ -45,7 +45,7 @@ export function getSetpoints({
 }
 
 export function destroySetpoints(setpoints: Setpoints): void {
-    Object.values(setpoints).forEach((limiter) => {
+    Object.values(setpoints).forEach((setpoint) => {
         setpoint?.destroy();
     });
 }
