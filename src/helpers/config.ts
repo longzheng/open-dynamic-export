@@ -44,7 +44,7 @@ const modbusSchema = z.object({
 export type ModbusSchema = z.infer<typeof modbusSchema>;
 
 export const configSchema = z.object({
-    limiters: z
+    setpoints: z
         .object({
             csipAus: z
                 .object({
@@ -146,7 +146,7 @@ export const configSchema = z.object({
                 .optional()
                 .describe('If defined, limit by MQTT'),
         })
-        .describe('Limiters configuration'),
+        .describe('Setpoints configuration'),
     inverters: z
         .array(
             z.union([
@@ -317,7 +317,7 @@ A longer time will smooth out load changes but may result in overshoot.`,
 
 export type Config = z.infer<typeof configSchema>;
 
-export type LimiterKeys = keyof Config['limiters'];
+export type SetpointKeys = keyof Config['setpoints'];
 
 export function getConfigPath() {
     return `${env.CONFIG_DIR}/config.json`;

@@ -20,7 +20,7 @@ type CoordinatorResponse =
           siteSample: SiteSample | null;
           loadWatts: number | null;
           controlLimits: {
-              controlLimitsByLimiter: ControlLimitsByLimiter;
+              controlLimitsBySetpoint: ControlLimitsBySetpoint;
               activeInverterControlLimit: ActiveInverterControlLimit;
           } | null;
           inverterConfiguration: InverterConfiguration | null;
@@ -74,12 +74,12 @@ class CoordinatorService {
         this.coordinator = null;
     }
 
-    public getLimiters() {
+    public getSetpoints() {
         if (!this.coordinator) {
             throw new Error('Coordinator is not running');
         }
 
-        return this.coordinator.limiters;
+        return this.coordinator.setpoints;
     }
 }
 
@@ -171,7 +171,7 @@ type SiteSample = {
     frequency: number | null;
 };
 
-type ControlLimitsByLimiter = Record<
+type ControlLimitsBySetpoint = Record<
     'csipAus' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
     InverterControlLimit | null
 >;

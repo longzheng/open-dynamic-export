@@ -16,7 +16,7 @@
     "cert:device-generate": "tsx scripts/certDeviceGenerate.ts",
     "cert:lfdi": "tsx scripts/certLfdi.ts",
     "generate:config-json-schema": "tsx scripts/generateConfigJsonSchema.ts",
-    "generate:amber-api": "openapi-typescript https://raw.githubusercontent.com/amberelectric/public-api/main/swagger.json -o ./src/limiters/negativeFeedIn/amber/api.d.ts",
+    "generate:amber-api": "openapi-typescript https://raw.githubusercontent.com/amberelectric/public-api/main/swagger.json -o ./src/setpoints/negativeFeedIn/amber/api.d.ts",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
