@@ -10,12 +10,12 @@ import {
     writeLoadWatts,
 } from '../../helpers/influxdb.js';
 import { type SiteSample } from '../../meters/siteSample.js';
-import { type Limiters } from '../../limiters/index.js';
+import { type Setpoints } from '../../setpoints/index.js';
 import {
     objectEntriesWithType,
     objectFromEntriesWithType,
 } from '../../helpers/object.js';
-import { type Config, type LimiterKeys } from '../../helpers/config.js';
+import { type Config, type SetpointKeys } from '../../helpers/config.js';
 import { cappedChange } from '../../helpers/math.js';
 import { type DerSample } from './derSample.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
@@ -74,11 +74,11 @@ export class InverterController {
     private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 100 });
     private cachedSiteSample = new CappedArrayStack<SiteSample>({ limit: 100 });
     private logger: Logger;
-    private limiters: Limiters;
+    private setpoints: Setpoints;
     private loadWattsCache: number | null = null;
     private controlLimitsCache: {
-        controlLimitsByLimiter: Record<
-            LimiterKeys,
+        controlLimitsBySetpoint: Record<
+            SetpointKeys,
             InverterControlLimit | null
         >;
         activeInverterControlLimit: ActiveInverterControlLimit;
@@ -101,11 +101,11 @@ export class InverterController {
 
     constructor({
         config,
-        limiters,
+        setpoints,
         onControl,
     }: {
         config: Config;
-        limiters: Limiters;
+        setpoints: Setpoints;
         onControl: (
             inverterConfiguration: InverterConfiguration,
         ) => Promise<void>;
@@ -113,7 +113,7 @@ export class InverterController {
         this.publish = new Publish({ config });
         this.secondsToSample = config.inverterControl.sampleSeconds;
         this.intervalSeconds = config.inverterControl.intervalSeconds;
-        this.limiters = limiters;
+        this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
         this.onControl = onControl;
@@ -165,15 +165,15 @@ export class InverterController {
     private updateControlLimitsLoop() {
         const start = performance.now();
 
-        const controlLimitsByLimiter = objectFromEntriesWithType(
-            objectEntriesWithType(this.limiters).map(([key, limiter]) => [
+        const controlLimitsBySetpoint = objectFromEntriesWithType(
+            objectEntriesWithType(this.setpoints).map(([key, setpoint]) => [
                 key,
-                limiter?.getInverterControlLimit() ?? null,
+                setpoint?.getInverterControlLimit() ?? null,
             ]),
         );
 
         const activeInverterControlLimit = getActiveInverterControlLimit(
-            Object.values(controlLimitsByLimiter),
+            Object.values(controlLimitsBySetpoint),
         );
 
         writeActiveControlLimit({ limit: activeInverterControlLimit });
@@ -183,7 +183,7 @@ export class InverterController {
         });
 
         this.controlLimitsCache = {
-            controlLimitsByLimiter,
+            controlLimitsBySetpoint,
             activeInverterControlLimit,
         };
 

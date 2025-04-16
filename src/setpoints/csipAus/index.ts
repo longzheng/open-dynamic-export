@@ -8,12 +8,12 @@ import { type SEP2Client } from '../../sep2/client.js';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { type DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
-import { type LimiterType } from '../limiter.js';
+import { type SetpointType } from '../setpoint.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
 
-export class CsipAusLimiter implements LimiterType {
+export class CsipAusSetpoint implements SetpointType {
     private schedulerByControlType: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
     };

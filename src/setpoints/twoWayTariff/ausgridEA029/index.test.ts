@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AusgridEA029Limiter } from './index.js';
+import { AusgridEA029Setpoint } from './index.js';
 
-describe('AusgridEA029Limiter', () => {
-    let ausgridEA029Limiter: AusgridEA029Limiter;
+describe('AusgridEA029Setpoint', () => {
+    let ausgridEA029Setpoint: AusgridEA029Setpoint;
 
     beforeEach(() => {
         // tell vitest we use mocked time
         vi.useFakeTimers();
 
-        ausgridEA029Limiter = new AusgridEA029Limiter();
+        ausgridEA029Setpoint = new AusgridEA029Setpoint();
     });
 
     afterEach(() => {
@@ -20,7 +20,7 @@ describe('AusgridEA029Limiter', () => {
         process.env.TZ = 'Australia/Sydney';
         vi.setSystemTime(new Date('2024-01-01T10:30:00'));
 
-        const result = ausgridEA029Limiter.getInverterControlLimit();
+        const result = ausgridEA029Setpoint.getInverterControlLimit();
 
         expect(result).toEqual({
             source: 'twoWayTariff',
@@ -37,7 +37,7 @@ describe('AusgridEA029Limiter', () => {
         process.env.TZ = 'Australia/Sydney';
         vi.setSystemTime(new Date('2024-01-01T08:00:00'));
 
-        const result = ausgridEA029Limiter.getInverterControlLimit();
+        const result = ausgridEA029Setpoint.getInverterControlLimit();
 
         expect(result).toEqual({
             source: 'twoWayTariff',
@@ -54,8 +54,8 @@ describe('AusgridEA029Limiter', () => {
         process.env.TZ = 'Australia/Perth';
         vi.setSystemTime(new Date('2024-01-01T08:00:00'));
 
-        expect(() => ausgridEA029Limiter.getInverterControlLimit()).toThrow(
-            'Two-way tariff limiter requires the timezone to be set to NSW',
+        expect(() => ausgridEA029Setpoint.getInverterControlLimit()).toThrow(
+            'Two-way tariff setpoint requires the timezone to be set to NSW',
         );
     });
 });

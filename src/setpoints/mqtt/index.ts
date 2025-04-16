@@ -1,21 +1,21 @@
 import mqtt from 'mqtt';
 import { type InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import { type LimiterType } from '../limiter.js';
+import { type SetpointType } from '../setpoint.js';
 import { type Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { z } from 'zod';
 import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
 
-type MqttLimiterConfig = NonNullable<Config['limiters']['mqtt']>;
+type MqttSetpointConfig = NonNullable<Config['setpoints']['mqtt']>;
 
-export class MqttLimiter implements LimiterType {
+export class MqttSetpoint implements SetpointType {
     private client: mqtt.MqttClient;
     private cachedMessage: z.infer<typeof mqttSchema> | null = null;
     private logger: Logger;
 
-    constructor({ config }: { config: MqttLimiterConfig }) {
-        this.logger = pinoLogger.child({ module: 'MqttLimiter' });
+    constructor({ config }: { config: MqttSetpointConfig }) {
+        this.logger = pinoLogger.child({ module: 'MqttSetpoint' });
 
         this.client = mqtt.connect(config.host, {
             username: config.username,

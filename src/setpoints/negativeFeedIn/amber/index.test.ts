@@ -8,12 +8,12 @@ import {
     it,
     vi,
 } from 'vitest';
-import { AmberLimiter } from './index.js';
+import { AmberSetpoint } from './index.js';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
 import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json' assert { type: 'json' };
 
-describe('AmberLimiter', () => {
+describe('AmberSetpoint', () => {
     const mockRestHandlers = [
         http.get('https://api.amber.com.au/v1/sites/*/prices/current', () => {
             return HttpResponse.json(sitePricesJson);
@@ -28,7 +28,7 @@ describe('AmberLimiter', () => {
     //  Close server after all tests
     afterAll(() => mockServer.close());
 
-    let amberControlLimit: AmberLimiter;
+    let amberControlLimit: AmberSetpoint;
 
     beforeEach(() => {
         // only mock date https://github.com/vitest-dev/vitest/issues/7288
@@ -36,7 +36,7 @@ describe('AmberLimiter', () => {
             toFake: ['Date'],
         });
 
-        amberControlLimit = new AmberLimiter({
+        amberControlLimit = new AmberSetpoint({
             apiKey: 'abc',
             siteId: '12345',
         });

@@ -20,7 +20,7 @@ type CoordinatorResponse =
           siteSample: SiteSample | null;
           loadWatts: number | null;
           controlLimits: {
-              controlLimitsBySetpoint: ControlLimitsByLimiter;
+              controlLimitsBySetpoint: ControlLimitsBySetpoint;
               activeInverterControlLimit: ActiveInverterControlLimit;
           } | null;
           inverterConfiguration: InverterConfiguration | null;

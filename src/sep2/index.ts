@@ -3,7 +3,7 @@ import { type Config } from '../helpers/config.js';
 import { env } from '../helpers/env.js';
 import { pinoLogger } from '../helpers/logger.js';
 import { SEP2Client } from './client.js';
-import { CsipAusLimiter } from '../limiters/csipAus/index.js';
+import { CsipAusSetpoint } from '../setpoints/csipAus/index.js';
 import { DerHelper } from './helpers/der.js';
 import { DerControlsHelper } from './helpers/derControls.js';
 import { DerListHelper } from './helpers/derList.js';
@@ -28,7 +28,7 @@ export type Sep2Instance = {
     sep2Client: SEP2Client;
     derHelper: DerHelper;
     mirrorUsagePointListHelper: MirrorUsagePointListHelper;
-    limiter: CsipAusLimiter;
+    setpoint: CsipAusSetpoint;
     destroy: () => void;
 };
 
@@ -39,7 +39,7 @@ export function getSep2Instance({
     config: Config;
     rampRateHelper: RampRateHelper;
 }): Sep2Instance | null {
-    if (!config.limiters.csipAus) {
+    if (!config.setpoints.csipAus) {
         return null;
     }
 
@@ -48,7 +48,7 @@ export function getSep2Instance({
     const sep2Certificate = getSep2Certificate();
 
     const sep2Client = new SEP2Client({
-        host: config.limiters.csipAus.host,
+        host: config.setpoints.csipAus.host,
         cert: sep2Certificate.cert,
         key: sep2Certificate.key,
         pen: env.SEP2_PEN,
@@ -84,7 +84,7 @@ export function getSep2Instance({
         client: sep2Client,
     });
 
-    const limiter = new CsipAusLimiter({
+    const setpoint = new CsipAusSetpoint({
         client: sep2Client,
         rampRateHelper,
     });
@@ -94,7 +94,7 @@ export function getSep2Instance({
     }).on('data', (data) => {
         logger.debug(data, 'DER controls data changed');
 
-        limiter.updateSep2ControlsData(data);
+        setpoint.updateSep2ControlsData(data);
 
         rampRateHelper.setDefaultDERControlRampRate(
             data.fallbackControl.type === 'default'
@@ -172,7 +172,7 @@ export function getSep2Instance({
 
     const deviceCapabilityHelper = new DeviceCapabilityHelper({
         client: sep2Client,
-        href: config.limiters.csipAus.dcapUri,
+        href: config.setpoints.csipAus.dcapUri,
     }).on('data', (deviceCapability) => {
         logger.debug({ deviceCapability }, 'Received SEP2 device capability');
 
@@ -250,7 +250,7 @@ export function getSep2Instance({
     }: {
         connectionPointHref: string;
     }) {
-        const nmi = config.limiters.csipAus?.nmi;
+        const nmi = config.setpoints.csipAus?.nmi;
 
         if (!nmi) {
             throw new Error(
@@ -270,7 +270,7 @@ export function getSep2Instance({
         sep2Client,
         derHelper,
         mirrorUsagePointListHelper,
-        limiter,
+        setpoint,
         destroy: () => {
             logger.info('Destroying SEP2 instance');
             abortController.abort();
@@ -282,7 +282,7 @@ export function getSep2Instance({
             derHelper.destroy();
             functionSetAssignmentsListHelper.destroy();
             mirrorUsagePointListHelper.destroy();
-            limiter.destroy();
+            setpoint.destroy();
             derControlsHelper.destroy();
         },
     };
