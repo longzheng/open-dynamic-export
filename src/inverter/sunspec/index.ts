@@ -33,7 +33,6 @@ import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
-    private cachedControlsModel: ControlsModel | null = null;
 
     constructor({
         sunspecInverterConfig,
@@ -92,8 +91,6 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
         this.logger.trace({ duration, models }, 'Got inverter data');
 
-        this.cachedControlsModel = models.controls;
-
         const inverterData = generateInverterData(models);
 
         return inverterData;
@@ -106,14 +103,12 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     override async onControl(
         inverterConfiguration: InverterConfiguration,
     ): Promise<void> {
-        if (!this.cachedControlsModel) {
-            return;
-        }
+        const controlsModel = await this.inverterConnection.getControlsModel();
 
         const writeControlsModel =
             generateControlsModelWriteFromInverterConfiguration({
                 inverterConfiguration,
-                controlsModel: this.cachedControlsModel,
+                controlsModel,
             });
 
         if (this.applyControl) {
