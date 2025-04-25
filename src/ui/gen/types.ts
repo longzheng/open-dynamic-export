@@ -1201,7 +1201,7 @@ export type MpptEvt = (typeof mpptEvt)[keyof typeof mpptEvt];
     */
     DCA: number | null;
     /**
-     * @description IDStr\n\nInput ID Sting
+     * @description IDStr\n\nInput ID String
      * @type string
     */
     IDStr: string | null;
