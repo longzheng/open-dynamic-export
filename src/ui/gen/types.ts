@@ -1120,6 +1120,98 @@ export type StActCtl = (typeof stActCtl)[keyof typeof stActCtl];
 } as const;
 export type RtSt = (typeof rtSt)[keyof typeof rtSt];
 
+ export const dcSt = {
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 10
+} as const;
+export type DcSt = (typeof dcSt)[keyof typeof dcSt];
+
+ export const mpptEvt = {
+    "1": 1,
+    "2": 2,
+    "4": 4,
+    "8": 8,
+    "16": 16,
+    "32": 32,
+    "64": 64,
+    "128": 128,
+    "256": 256,
+    "512": 512,
+    "1024": 1024,
+    "2048": 2048,
+    "4096": 4096,
+    "8192": 8192,
+    "16384": 16384,
+    "32768": 32768,
+    "65536": 65536,
+    "131072": 131072,
+    "262144": 262144,
+    "524288": 524288,
+    "1048576": 1048576,
+    "2097152": 2097152,
+    "4194304": 4194304
+} as const;
+export type MpptEvt = (typeof mpptEvt)[keyof typeof mpptEvt];
+
+ export type MpptModuleModel = {
+    /**
+     * @description DCEvt\n\nModule Events
+    */
+    DcEvt: MpptEvt | null;
+    /**
+     * @description DCSt\n\nOperating State
+    */
+    DCSt: DcSt | null;
+    /**
+     * @description Tmp\n\nTemperature
+     * @type number, double
+    */
+    Tmp: number | null;
+    /**
+     * @description Tms\n\nTimestamp
+     * @type number, double
+    */
+    Tms: number | null;
+    /**
+     * @description DCWH\n\nLifetime Energy
+     * @type number, double
+    */
+    DCWH: number | null;
+    /**
+     * @description DCW\n\nDC Power
+     * @type number, double
+    */
+    DCW: number | null;
+    /**
+     * @description DCV\n\nDC Voltage
+     * @type number, double
+    */
+    DCV: number | null;
+    /**
+     * @description DCA\n\nDC Current
+     * @type number, double
+    */
+    DCA: number | null;
+    /**
+     * @description IDStr\n\nInput ID String
+     * @type string
+    */
+    IDStr: string | null;
+    /**
+     * @description ID\n\nInput ID
+     * @type number, double
+    */
+    ID: number | null;
+};
+
  export type CertificateIds = {
     /**
      * @type string
@@ -1910,6 +2002,10 @@ export const inverterPhases3 = {
     "threePhase": "threePhase"
 } as const;
 export type InverterPhases3 = (typeof inverterPhases3)[keyof typeof inverterPhases3];
+export const mpptId = {
+    "160": 160
+} as const;
+export type MpptId = (typeof mpptId)[keyof typeof mpptId];
 export const statusId = {
     "122": 122
 } as const;
@@ -2350,6 +2446,51 @@ export type SunspecData200 = {
         /**
          * @type object
         */
+        mppt: {
+            /**
+             * @type number, double
+            */
+            TmsPer: number;
+            /**
+             * @type number, double
+            */
+            N: number;
+            /**
+             * @type number
+            */
+            Evt: MpptEvt;
+            /**
+             * @type number, double
+            */
+            DCWH_SF: number;
+            /**
+             * @type number, double
+            */
+            DCW_SF: number;
+            /**
+             * @type number, double
+            */
+            DCV_SF: number;
+            /**
+             * @type number, double
+            */
+            DCA_SF: number;
+            /**
+             * @type number, double
+            */
+            L: number;
+            /**
+             * @type number
+            */
+            ID: MpptId;
+            /**
+             * @type array
+            */
+            modules: MpptModuleModel[];
+        };
+        /**
+         * @type object
+        */
         status: {
             /**
              * @type number, double
@@ -2782,6 +2923,10 @@ export const inverterPhases6 = {
     "threePhase": "threePhase"
 } as const;
 export type InverterPhases6 = (typeof inverterPhases6)[keyof typeof inverterPhases6];
+export const mpptId2 = {
+    "160": 160
+} as const;
+export type MpptId2 = (typeof mpptId2)[keyof typeof mpptId2];
 export const statusId2 = {
     "122": 122
 } as const;
@@ -3219,6 +3364,51 @@ export type SunspecDataQueryResponse = {
      * @type array
     */
     invertersData: {
+        /**
+         * @type object
+        */
+        mppt: {
+            /**
+             * @type number, double
+            */
+            TmsPer: number;
+            /**
+             * @type number, double
+            */
+            N: number;
+            /**
+             * @type number
+            */
+            Evt: MpptEvt;
+            /**
+             * @type number, double
+            */
+            DCWH_SF: number;
+            /**
+             * @type number, double
+            */
+            DCW_SF: number;
+            /**
+             * @type number, double
+            */
+            DCV_SF: number;
+            /**
+             * @type number, double
+            */
+            DCA_SF: number;
+            /**
+             * @type number, double
+            */
+            L: number;
+            /**
+             * @type number
+            */
+            ID: MpptId2;
+            /**
+             * @type array
+            */
+            modules: MpptModuleModel[];
+        };
         /**
          * @type object
         */

@@ -24,6 +24,7 @@ export async function getSunSpecData() {
                 settings: await inverter.getSettingsModel(),
                 status: await inverter.getStatusModel(),
                 controls: await inverter.getControlsModel(),
+                mppt: await inverter.getMpptModel(),
             };
         }),
     );
@@ -61,6 +62,7 @@ export async function getSunSpecData() {
                 ActVArhQ3: inverterData.status.ActVArhQ3.toString(),
                 ActVArhQ4: inverterData.status.ActVArhQ4.toString(),
             },
+            mppt: inverterData.mppt,
         })),
         inverterMetrics: invertersData.map((inverterData) => ({
             inverter: getInverterMetrics(inverterData.inverter),
