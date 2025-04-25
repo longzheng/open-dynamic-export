@@ -63,7 +63,7 @@ export type MpptModel = {
      *
      * Global Events
      */
-    Evt: Evt;
+    Evt: MpptEvt | null;
 
     /**
      * N
@@ -81,7 +81,7 @@ export type MpptModel = {
 };
 
 // Multiple MPPT modules, based on the N register
-export type MpptModelModule = {
+export type MpptModuleModel = {
     /**
      * ID
      *
@@ -143,15 +143,15 @@ export type MpptModelModule = {
      *
      * Operating State
      */
-    DCSt: DcSt;
+    DCSt: DcSt | null;
 
     /**
      * DCEvt
      *
      * Module Events
      */
-    DcEvt: Evt;
-}
+    DcEvt: MpptEvt | null;
+};
 
 export const mpptModel = modbusModelFactory<MpptModel>({
     name: 'mppt',
@@ -194,8 +194,7 @@ export const mpptModel = modbusModelFactory<MpptModel>({
         N: {
             start: 8,
             end: 9,
-            // TODOLATER: dedicated converter for type "count"?
-            readConverter: registersToInt16,
+            readConverter: registersToUint16Nullable,
         },
         TmsPer: {
             start: 9,
@@ -206,14 +205,13 @@ export const mpptModel = modbusModelFactory<MpptModel>({
 });
 
 // Multiple MPPT modules, based on the N register
-export const mpptModelModule = modbusModelFactory<MpptModelModule>({
+export const mpptModuleModel = modbusModelFactory<MpptModuleModel>({
     name: 'mppt.module',
     mapping: {
         ID: {
             start: 0,
             end: 1,
-            // TODO: starts at 11, but is then +20 for each module. how do we want to represent this?
-            readConverter: (value) => registersToId(value, -1),
+            readConverter: registersToUint16Nullable,
         },
         IDStr: {
             start: 1,
@@ -253,9 +251,9 @@ export const mpptModelModule = modbusModelFactory<MpptModelModule>({
         DCSt: {
             start: 17,
             end: 18,
-            readConverter: registersToUint16,
+            readConverter: registersToUint16Nullable,
         },
-        DCEvt: {
+        DcEvt: {
             start: 18,
             end: 20,
             readConverter: registersToUint32Nullable,
@@ -268,7 +266,7 @@ export const mpptModelModule = modbusModelFactory<MpptModelModule>({
  *
  * Bitmask values representing the global events + module specific events
  */
-export enum Evt {
+export enum MpptEvt {
     GROUND_FAULT = 1 << 0,
     INPUT_OVER_VOLTAGE = 1 << 1,
     RESERVED_2 = 1 << 2,

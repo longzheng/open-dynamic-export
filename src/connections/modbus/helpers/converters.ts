@@ -215,6 +215,13 @@ export function registersToAcc32(registers: number[]) {
     return ((registers[0]! << 16) + (registers[1]! & 0xffff)) >>> 0;
 }
 
+export function registersToAcc32Nullable(registers: number[]) {
+    if (registers.every((register) => register === 0xffff)) {
+        return null;
+    }
+    return registersToAcc32(registers);
+}
+
 export function registersToAcc64BigInt(registers: number[]): bigint {
     if (registers.length !== 4) {
         throw new Error('Invalid register length');

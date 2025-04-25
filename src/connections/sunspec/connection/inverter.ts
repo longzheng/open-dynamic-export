@@ -17,6 +17,8 @@ import {
 } from '../models/storage.js';
 import { storageModel } from '../models/storage.js';
 import { SunSpecConnection } from './base.js';
+import { mpptModuleModel, type MpptModuleModel } from '../models/mppt.js';
+import { mpptModel } from '../models/mppt.js';
 
 export class InverterSunSpecConnection extends SunSpecConnection {
     // the nameplate model should never change so we can cache it
@@ -178,6 +180,43 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             unitId: this.unitId,
             values,
         });
+    }
+
+    async getMpptModel() {
+        const modelAddressById = await this.getModelAddressById();
+
+        const address = modelAddressById.get(160);
+
+        if (!address) {
+            throw new Error('No SunSpec mppt model address');
+        }
+
+        const data = await mpptModel.read({
+            modbusConnection: this.modbusConnection,
+            address,
+            unitId: this.unitId,
+        });
+
+        const modulesData: MpptModuleModel[] = [];
+
+        if (data.N) {
+            for (let i = 0; i < data.N; i++) {
+                const moduleData = await mpptModuleModel.read({
+                    modbusConnection: this.modbusConnection,
+                    address: {
+                        start: address.start + 10 + i * 20,
+                        length: 20,
+                    },
+                    unitId: this.unitId,
+                });
+                modulesData.push(moduleData);
+            }
+        }
+
+        return {
+            ...data,
+            modules: modulesData,
+        };
     }
 
     async getStorageModel() {
