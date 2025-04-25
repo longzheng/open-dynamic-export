@@ -1,7 +1,7 @@
 import { type Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
 import { type paths } from './api.js';
-import { type LimiterType } from '../../limiter.js';
+import { type SetpointType } from '../../setpoint.js';
 import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import { type Logger } from 'pino';
 import { pinoLogger } from '../../../helpers/logger.js';
@@ -16,7 +16,7 @@ type Interval = {
     price: number;
 };
 
-export class AmberLimiter implements LimiterType {
+export class AmberSetpoint implements SetpointType {
     private client: Client<paths>;
     private siteId: string | null = null;
     private feedInIntervals: Interval[] = [];

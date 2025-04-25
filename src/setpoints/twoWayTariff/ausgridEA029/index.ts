@@ -1,16 +1,16 @@
 import { type Logger } from 'pino';
 import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import { type LimiterType } from '../../limiter.js';
+import { type SetpointType } from '../../setpoint.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { pinoLogger } from '../../../helpers/logger.js';
 
 // https://www.ausgrid.com.au/Connections/Solar-and-batteries/Solar-tariffs
 // https://www.ausgrid.com.au/-/media/Documents/Tariff/Solar-Factsheet-two-way-pricing-for-grid-exports.pdf?rev=2cef76fd13444c80b26df4c1a3213833
-export class AusgridEA029Limiter implements LimiterType {
+export class AusgridEA029Setpoint implements SetpointType {
     private logger: Logger;
 
     constructor() {
-        this.logger = pinoLogger.child({ module: 'AusgridEA029Limiter' });
+        this.logger = pinoLogger.child({ module: 'AusgridEA029Setpoint' });
     }
 
     getInverterControlLimit(): InverterControlLimit {
@@ -20,7 +20,7 @@ export class AusgridEA029Limiter implements LimiterType {
         // validate the user is configured for the NSW timezone
         if (timezoneOffset !== -600 && timezoneOffset !== -660) {
             throw new Error(
-                `Two-way tariff limiter requires the timezone to be set to NSW, current timezoneOffset ${timezoneOffset}`,
+                `Two-way tariff setpoint requires the timezone to be set to NSW, current timezoneOffset ${timezoneOffset}`,
             );
         }
 

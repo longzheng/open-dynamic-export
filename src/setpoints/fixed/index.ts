@@ -1,14 +1,14 @@
 import { type InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import { type LimiterType } from '../limiter.js';
+import { type SetpointType } from '../setpoint.js';
 import { type Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 
-type FixedLimiterConfig = NonNullable<Config['limiters']['fixed']>;
+type FixedSetpointConfig = NonNullable<Config['setpoints']['fixed']>;
 
-export class FixedLimiter implements LimiterType {
-    private config: FixedLimiterConfig;
+export class FixedSetpoint implements SetpointType {
+    private config: FixedSetpointConfig;
 
-    constructor({ config }: { config: FixedLimiterConfig }) {
+    constructor({ config }: { config: FixedSetpointConfig }) {
         this.config = config;
     }
 

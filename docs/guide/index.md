@@ -24,7 +24,7 @@ flowchart LR
     ODE <--> SunSpec & Modbus & HTTP & Proprietary & MQTT
     Protocols <--> I & M
 
-    subgraph Limiters
+    subgraph Setpoints
     DC["Dynamic exports"]
     F["Fixed/zero export"]
     T["Two-way tariffs"]
@@ -41,8 +41,8 @@ flowchart LR
     end
 ```
 
-### Limiters
-The system uses one or more "limiters" to set the operating envelope of the site. All limiters are restrictive, that is a combination of multiple limiters will evaluate all limiters and enforce the most prohibitive value of each control type at any one time. [Learn more about configuring limiters](/configuration/limiters).
+### Setpoints
+The system uses one or more "setpoints" to set the operating envelope of the site. All setpoints are restrictive, that is a combination of multiple setpoints will evaluate all setpoints and enforce the most prohibitive value of each control type at any one time. [Learn more about configuring setpoints](/configuration/setpoints).
 
 ### Inverters
 The system supports one or more inverters to measure the site's generation metrics and control the power output. [Learn more about configuring inverters](/configuration/inverters).
