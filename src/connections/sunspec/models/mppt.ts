@@ -92,7 +92,7 @@ export type MpptModuleModel = {
     /**
      * IDStr
      *
-     * Input ID Sting
+     * Input ID String
      */
     IDStr: string | null;
 
