@@ -1,4 +1,3 @@
-import { type DerControlBase } from '../gen/types';
 import { Card, CardHeader, CardBody } from '@heroui/card';
 import {
     type ChartDataset,
@@ -10,6 +9,7 @@ import 'chartjs-adapter-date-fns';
 import { type AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import { type components } from '../gen/api';
 
 Chart.register(annotationPlugin);
 
@@ -42,7 +42,7 @@ export type BooleanLimitChartProps = {
     scheduleData: {
         startInclusive: string;
         endExclusive: string;
-        derControlBase: DerControlBase;
+        derControlBase: components['schemas']['DERControlBase'];
     }[];
     scheduleKey: 'opModConnect' | 'opModEnergize';
 };

@@ -1,4 +1,4 @@
-import { type DerControlBase } from '@/gen/types';
+import { type components } from '../gen/api';
 import { Card, CardHeader, CardBody } from '@heroui/card';
 import {
     type ChartDataset,
@@ -44,7 +44,7 @@ export type PowerLimitChartProps = {
     scheduleData: {
         startInclusive: string;
         endExclusive: string;
-        derControlBase: DerControlBase;
+        derControlBase: components['schemas']['DERControlBase'];
     }[];
     scheduleKey:
         | 'opModExpLimW'
