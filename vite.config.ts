@@ -11,7 +11,9 @@ export default defineConfig({
     },
     plugins: [
         TanStackRouterVite({
+            target: 'react',
             routesDirectory: './src/ui/routes',
+            generatedRouteTree: './src/ui/routeTree.gen.ts',
         }),
         react(),
         tsconfigPaths(),

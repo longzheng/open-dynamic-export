@@ -4,23 +4,28 @@ import { clsx } from 'clsx';
 import { FormattedNumber } from 'react-intl';
 
 import { title } from '@/components/primitives';
-import { useCoordinatorStatus } from '@/gen/hooks';
-import { type InverterControlTypes } from '@/gen/types';
 import {
     ReadingCard,
     ReadingPhases,
     ReadingValueContainer,
     ReadingValueUnit,
 } from '@/components/reading';
+import { $api } from '@/client';
+import { type components } from '@/gen/api';
 
 export const Route = createLazyFileRoute('/')({
     component: Index,
 });
 
 function Index() {
-    const { data: coordinatorStatus } = useCoordinatorStatus({
-        query: { refetchInterval: 1000 },
-    });
+    const { data: coordinatorStatus } = $api.useQuery(
+        'get',
+        '/api/coordinator/status',
+        undefined,
+        {
+            refetchInterval: 1_000,
+        },
+    );
 
     if (!coordinatorStatus?.running) {
         return null;
@@ -687,7 +692,7 @@ function LimitCard({
     heading: string;
     limit: boolean;
     body: React.ReactNode;
-    source: InverterControlTypes | undefined;
+    source: components['schemas']['InverterControlTypes'] | undefined;
 }) {
     const navigate = useNavigate();
 

@@ -22,7 +22,6 @@
     },
     "include": [
         "vite.config.ts",
-        "kubb.config.ts",
         "vitest.config.ts",
         "eslint.config.mjs",
         "docs/.vitepress/config.ts",

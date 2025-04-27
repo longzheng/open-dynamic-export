@@ -5,11 +5,7 @@ import 'chartjs-adapter-date-fns';
 import { useEffect, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { readingColors } from '../../../tailwind.config';
-import {
-    useDerRealPower,
-    useLoadRealPower,
-    useSiteRealPower,
-} from '@/gen/hooks';
+import { $api } from '@/client';
 
 export const Route = createLazyFileRoute('/readings')({
     component: Readings,
@@ -124,9 +120,14 @@ const chartDataset = (
 function RealPower() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart | null>(null);
-    const { data } = useSiteRealPower<PowerData[]>({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data } = $api.useQuery(
+        'get',
+        '/api/data/siteRealPower',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     const chartData = useMemo(
         () => ({
@@ -190,8 +191,8 @@ function RealPower() {
 function DERPower() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart | null>(null);
-    const { data } = useDerRealPower<PowerData[]>({
-        query: { refetchInterval: 10_000 },
+    const { data } = $api.useQuery('get', '/api/data/derRealPower', undefined, {
+        refetchInterval: 10_000,
     });
 
     const chartData = useMemo(
@@ -256,9 +257,14 @@ function DERPower() {
 function LoadPower() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const chartRef = useRef<Chart | null>(null);
-    const { data } = useLoadRealPower<PowerData[]>({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data } = $api.useQuery(
+        'get',
+        '/api/data/loadRealPower',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     const chartData = useMemo(
         () => ({

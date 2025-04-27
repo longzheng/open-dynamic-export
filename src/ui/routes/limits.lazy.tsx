@@ -1,20 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
-import {
-    useConnection,
-    useConnectionSchedule,
-    useEnergize,
-    useEnergizeSchedule,
-    useExportLimit,
-    useExportLimitSchedule,
-    useGenerationLimit,
-    useGenerationLimitSchedule,
-    useImportLimit,
-    useImportLimitSchedule,
-    useLoadLimit,
-    useLoadLimitSchedule,
-} from '@/gen/hooks';
 import { PowerLimitChart } from '../components/PowerLimitChart';
 import { BooleanLimitChart } from '../components/BooleanLimitChart';
+import { $api } from '@/client';
 
 export const Route = createLazyFileRoute('/limits')({
     component: Limits,
@@ -34,12 +21,22 @@ function Limits() {
 }
 
 function ConnectionLimit() {
-    const { data: limitData } = useConnection({
-        query: { refetchInterval: 10_000 },
-    });
-    const { data: scheduleLimit } = useConnectionSchedule({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data: limitData } = $api.useQuery(
+        'get',
+        '/api/data/connection',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+    const { data: scheduleLimit } = $api.useQuery(
+        'get',
+        '/api/csipAus/connectionSchedule',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     return (
         <BooleanLimitChart
@@ -52,12 +49,22 @@ function ConnectionLimit() {
 }
 
 function EnergizeLimit() {
-    const { data: limitData } = useEnergize({
-        query: { refetchInterval: 10_000 },
-    });
-    const { data: scheduleLimit } = useEnergizeSchedule({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data: limitData } = $api.useQuery(
+        'get',
+        '/api/data/energize',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+    const { data: scheduleLimit } = $api.useQuery(
+        'get',
+        '/api/csipAus/energizeSchedule',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     return (
         <BooleanLimitChart
@@ -70,12 +77,22 @@ function EnergizeLimit() {
 }
 
 function ExportLimit() {
-    const { data: exportLimitData } = useExportLimit({
-        query: { refetchInterval: 10_000 },
-    });
-    const { data: exportLimitScheduleData } = useExportLimitSchedule({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data: exportLimitData } = $api.useQuery(
+        'get',
+        '/api/data/exportLimit',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+    const { data: exportLimitScheduleData } = $api.useQuery(
+        'get',
+        '/api/csipAus/exportLimitSchedule',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     return (
         <PowerLimitChart
@@ -88,12 +105,22 @@ function ExportLimit() {
 }
 
 function GenerationLimit() {
-    const { data: generationLimitData } = useGenerationLimit({
-        query: { refetchInterval: 10_000 },
-    });
-    const { data: generationLimitScheduleData } = useGenerationLimitSchedule({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data: generationLimitData } = $api.useQuery(
+        'get',
+        '/api/data/generationLimit',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+    const { data: generationLimitScheduleData } = $api.useQuery(
+        'get',
+        '/api/csipAus/generationLimitSchedule',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     return (
         <PowerLimitChart
@@ -106,12 +133,22 @@ function GenerationLimit() {
 }
 
 function ImportLimit() {
-    const { data: importLimitData } = useImportLimit({
-        query: { refetchInterval: 10_000 },
-    });
-    const { data: importLimitScheduleData } = useImportLimitSchedule({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data: importLimitData } = $api.useQuery(
+        'get',
+        '/api/data/importLimit',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+    const { data: importLimitScheduleData } = $api.useQuery(
+        'get',
+        '/api/csipAus/importLimitSchedule',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     return (
         <PowerLimitChart
@@ -124,12 +161,22 @@ function ImportLimit() {
 }
 
 function LoadLimit() {
-    const { data: loadLimitData } = useLoadLimit({
-        query: { refetchInterval: 10_000 },
-    });
-    const { data: loadLimitScheduleData } = useLoadLimitSchedule({
-        query: { refetchInterval: 10_000 },
-    });
+    const { data: loadLimitData } = $api.useQuery(
+        'get',
+        '/api/data/loadLimit',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+    const { data: loadLimitScheduleData } = $api.useQuery(
+        'get',
+        '/api/csipAus/loadLimitSchedule',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
 
     return (
         <PowerLimitChart

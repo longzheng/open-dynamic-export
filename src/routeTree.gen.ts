@@ -18,7 +18,6 @@ import { Route as rootRoute } from './ui/routes/__root'
 
 const ReadingsLazyImport = createFileRoute('/readings')()
 const LimitsLazyImport = createFileRoute('/limits')()
-const ControlLazyImport = createFileRoute('/control')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
@@ -35,12 +34,6 @@ const LimitsLazyRoute = LimitsLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./ui/routes/limits.lazy').then((d) => d.Route))
 
-const ControlLazyRoute = ControlLazyImport.update({
-  id: '/control',
-  path: '/control',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./ui/routes/control.lazy').then((d) => d.Route))
-
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
@@ -56,13 +49,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/control': {
-      id: '/control'
-      path: '/control'
-      fullPath: '/control'
-      preLoaderRoute: typeof ControlLazyImport
       parentRoute: typeof rootRoute
     }
     '/limits': {
@@ -86,14 +72,12 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
-  '/control': typeof ControlLazyRoute
   '/limits': typeof LimitsLazyRoute
   '/readings': typeof ReadingsLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
-  '/control': typeof ControlLazyRoute
   '/limits': typeof LimitsLazyRoute
   '/readings': typeof ReadingsLazyRoute
 }
@@ -101,30 +85,27 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
-  '/control': typeof ControlLazyRoute
   '/limits': typeof LimitsLazyRoute
   '/readings': typeof ReadingsLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/control' | '/limits' | '/readings'
+  fullPaths: '/' | '/limits' | '/readings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/control' | '/limits' | '/readings'
-  id: '__root__' | '/' | '/control' | '/limits' | '/readings'
+  to: '/' | '/limits' | '/readings'
+  id: '__root__' | '/' | '/limits' | '/readings'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
-  ControlLazyRoute: typeof ControlLazyRoute
   LimitsLazyRoute: typeof LimitsLazyRoute
   ReadingsLazyRoute: typeof ReadingsLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
-  ControlLazyRoute: ControlLazyRoute,
   LimitsLazyRoute: LimitsLazyRoute,
   ReadingsLazyRoute: ReadingsLazyRoute,
 }
@@ -140,16 +121,12 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/control",
         "/limits",
         "/readings"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
-    },
-    "/control": {
-      "filePath": "control.lazy.tsx"
     },
     "/limits": {
       "filePath": "limits.lazy.tsx"
