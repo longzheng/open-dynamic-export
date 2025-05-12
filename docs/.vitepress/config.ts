@@ -36,7 +36,7 @@ export default withMermaid(
                             link: '/configuration/inverter-control',
                         },
                         { text: 'Site meter', link: '/configuration/meter' },
-                        { text: 'Limiters', link: '/configuration/limiters' },
+                        { text: 'Setpoints', link: '/configuration/setpoints' },
                         { text: 'Publish', link: '/configuration/publish' },
                     ],
                 },
