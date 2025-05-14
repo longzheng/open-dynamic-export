@@ -158,6 +158,12 @@ export const configSchema = z.object({
                     .describe('SunSpec inverter configuration'),
                 z
                     .object({
+                        type: z.literal('sunspecfloat'),
+                    })
+                    .merge(modbusSchema)
+                    .describe('SunSpec float inverter configuration'),
+                z
+                    .object({
                         type: z.literal('sma'),
                         model: z.literal('core1'),
                     })
@@ -228,6 +234,17 @@ A longer time will smooth out load changes but may result in overshoot.`,
             })
             .merge(modbusSchema)
             .describe('SunSpec meter configuration'),
+        z
+            .object({
+                type: z.literal('sunspecfloat'),
+                location: z.union([
+                    z.literal('feedin'),
+                    z.literal('consumption'),
+                ]),
+            })
+            .merge(modbusSchema)
+            .describe('SunSpec float meter configuration'),
+
         z
             .object({
                 type: z.literal('sma'),

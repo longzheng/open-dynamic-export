@@ -7,6 +7,7 @@ import { type Result } from '../../helpers/result.js';
 import { type InverterDataPollerBase } from '../../inverter/inverterDataPollerBase.js';
 import { type Config } from '../../helpers/config.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
+import { SunSpecfloatInverterDataPoller } from '../../inverter/sunspecfloat/index.js';
 import { type InverterConfiguration } from './inverterController.js';
 import { type Logger } from 'pino';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
@@ -35,6 +36,13 @@ export class InvertersPoller extends EventEmitter<{
                 switch (inverterConfig.type) {
                     case 'sunspec': {
                         return new SunSpecInverterDataPoller({
+                            sunspecInverterConfig: inverterConfig,
+                            applyControl: config.inverterControl.enabled,
+                            inverterIndex: index,
+                        }).on('data', inverterOnData);
+                    }
+                    case 'sunspecfloat': {
+                        return new SunSpecfloatInverterDataPoller({
                             sunspecInverterConfig: inverterConfig,
                             applyControl: config.inverterControl.enabled,
                             inverterIndex: index,

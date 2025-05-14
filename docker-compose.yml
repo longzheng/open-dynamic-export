@@ -1,6 +1,6 @@
 services:
   open-dynamic-export:
-    image: longzhengau/open-dynamic-export:latest
+    image: antonciu/csip-dynamic-export
     build:
       context: .
       dockerfile: ./Dockerfile

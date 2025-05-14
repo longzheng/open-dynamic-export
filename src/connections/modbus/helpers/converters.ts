@@ -282,3 +282,20 @@ export function registersToUint64Nullable(registers: number[]) {
 
     return registersToUint64(registers);
 }
+
+export function registersToFloat(registers: number[]): number {
+    if (registers.length !== 2) {
+        throw new Error('Invalid register length, should be 2');
+    }
+
+    const buffer = Buffer.alloc(4);
+    if (registers[0] === undefined || registers[1] === undefined) {
+        throw new Error(
+            'Invalid register values: registers[0] or registers[1] is undefined',
+        );
+    }
+    buffer.writeUInt16BE(registers[0], 0);
+    buffer.writeUInt16BE(registers[1], 2);
+
+    return buffer.readFloatBE(0);
+}
