@@ -283,24 +283,26 @@ export function registersToUint64Nullable(registers: number[]) {
     return registersToUint64(registers);
 }
 
-export function registersToFloat(registers: number[]): number {
+export function registersToFloat32(registers: number[]): number {
     if (registers.length !== 2) {
         throw new Error('Invalid register length, should be 2');
     }
 
-    const buffer = Buffer.alloc(4);
-    if (registers[0] === undefined || registers[1] === undefined) {
-        throw new Error(
-            'Invalid register values: registers[0] or registers[1] is undefined',
-        );
-    }
+    // Combine two 16-bit registers into a 32-bit integer
+    const int32 = (registers[0]! << 16) | (registers[1]! & 0xffff);
 
-    console.debug('Writing to buffer:', {
-        register0: registers[0],
-        register1: registers[1],
-    });
-    buffer.writeUInt16BE(registers[0], 0);
-    buffer.writeUInt16BE(registers[1], 2);
+    // Create a buffer to interpret the 32-bit integer as a float
+    const buffer = Buffer.alloc(4);
+    buffer.writeUInt32BE(int32, 0);
 
     return buffer.readFloatBE(0);
+}
+
+export function registersToBitfield32(registers: number[]): number {
+    if (registers.length !== 2) {
+        throw new Error('Invalid register length, should be 2');
+    }
+
+    // Combine two 16-bit registers into a 32-bit integer
+    return (registers[0]! << 16) | (registers[1]! & 0xffff);
 }
