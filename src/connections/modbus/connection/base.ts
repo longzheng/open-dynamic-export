@@ -140,6 +140,16 @@ export class ModbusConnection {
         start: number;
         data: number[];
     }) {
+        this.logger.debug(
+            {
+                type,
+                unitId,
+                start,
+                data,
+            },
+            'Attempting to write Modbus registers',
+        );
+
         return this.mutex.runExclusive(async () => {
             await this.connect();
 

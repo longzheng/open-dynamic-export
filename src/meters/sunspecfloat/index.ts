@@ -25,7 +25,7 @@ export class SunSpecfloatMeterSiteSamplePoller extends SiteSamplePollerBase {
         invertersPoller: InvertersPoller;
     }) {
         super({
-            name: 'sunspec',
+            name: 'sunspecfloat',
             pollingIntervalMs: sunspecMeterConfig.pollingIntervalMs,
         });
 
