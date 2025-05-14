@@ -145,11 +145,6 @@ export class ModbusConnection {
 
             this.client.setID(unitId);
 
-            this.logger.debug(
-                { type, unitId, start, data },
-                `Writing registers`,
-            );
-
             switch (type) {
                 case 'holding':
                     return this.client.writeRegisters(start, data);
