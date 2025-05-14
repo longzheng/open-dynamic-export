@@ -2,7 +2,7 @@ import {
     registersToUint16,
     registersToId,
     registersToFloat32,
-    registersToUint32,
+    registersToBitfield32,
 } from '../../modbus/helpers/converters.js';
 import { modbusModelFactory } from '../../modbus/modbusModelFactory.js';
 
@@ -784,7 +784,7 @@ export const meterModelfloat = modbusModelFactory<MeterModelfloat>({
         Evt: {
             start: 124,
             end: 126,
-            readConverter: registersToUint32,
+            readConverter: registersToBitfield32,
         },
     },
 });
