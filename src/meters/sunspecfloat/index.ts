@@ -44,6 +44,8 @@ export class SunSpecfloatMeterSiteSamplePoller extends SiteSamplePollerBase {
     override async getSiteSample(): Promise<SiteSample> {
         const start = performance.now();
 
+        this.logger.trace('Failing before getting meter model data?');
+
         const meterModel = await this.meterConnection.getMeterModel();
 
         const end = performance.now();
