@@ -181,7 +181,7 @@ For example
         "frequency": 50.1
     },
     "nameplate": {
-        "type": 4,
+        "type": 4, // PV = 4
         "maxW": 5000,
         "maxVA": 5000,
         "maxVar": 5000
@@ -192,8 +192,8 @@ For example
         "maxVar": 5000
     },
     "status": {
-        "operationalModeStatus": 2,
-        "genConnectStatus": 7
+        "operationalModeStatus": 2, // OperationalModeStatusValue.OperationalMode = 2
+        "genConnectStatus": 7 // ConnectStatusValue.Connected | ConnectStatusValue.Available | ConnectStatusValue.Operating = 7
     }
 }
 ```
