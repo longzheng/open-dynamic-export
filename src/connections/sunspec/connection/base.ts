@@ -163,6 +163,7 @@ export abstract class SunSpecConnection {
             {
                 count: modelIds.length,
                 modelIds,
+                modelAddressById,
             },
             `Found SunSpec models for SunSpec Modbus client`,
         );

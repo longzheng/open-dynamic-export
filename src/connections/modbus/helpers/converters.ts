@@ -288,15 +288,13 @@ export function registersToFloat32(registers: number[]): number {
         throw new Error('Invalid register length, should be 2');
     }
 
-    const buffer = Buffer.alloc(4);
-    if (registers[0] === undefined || registers[1] === undefined) {
-        throw new Error(
-            'Invalid register values: registers[0] or registers[1] is undefined',
-        );
-    }
+    // Ensure only the lower 16 bits are used for each register
+    const high = registers[0]! & 0xffff;
+    const low = registers[1]! & 0xffff;
 
-    buffer.writeUInt16BE(registers[0], 0);
-    buffer.writeUInt16BE(registers[1], 2);
+    const buffer = Buffer.alloc(4);
+    buffer.writeUInt16BE(high, 0);
+    buffer.writeUInt16BE(low, 2);
 
     return buffer.readFloatBE(0);
 }
