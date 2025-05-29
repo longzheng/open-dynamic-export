@@ -50,6 +50,7 @@ export function getSep2Instance({
     const sep2Client = new SEP2Client({
         host: config.setpoints.csipAus.host,
         cert: sep2Certificate.cert,
+        cacert: sep2Certificate.cacert,
         key: sep2Certificate.key,
         pen: env.SEP2_PEN,
     });

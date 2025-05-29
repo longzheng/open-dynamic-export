@@ -8,6 +8,7 @@ const envSchema = z.object({
     SERVER_PORT: z.string().transform(safeParseIntString),
     CONFIG_DIR: z.string(),
     SEP2_CERT_FILE: z.string(),
+    SEP2_CACERT_FILE: z.string(),
     SEP2_KEY_FILE: z.string(),
     SEP2_PEN: z.string(),
     INFLUXDB_HOST: z.string().optional(),

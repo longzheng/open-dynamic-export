@@ -19,6 +19,7 @@ describe('TimeHelper', () => {
     const sep2Client = new SEP2Client({
         host: 'http://example.com',
         cert: mockCert,
+        cacert: mockCert,
         key: mockKey,
         pen: '12345',
     });

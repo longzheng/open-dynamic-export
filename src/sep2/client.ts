@@ -29,11 +29,13 @@ export class SEP2Client {
         host,
         cert,
         key,
+        cacert,
         pen,
     }: {
         host: string;
         cert: string;
         key: string;
+        cacert: string;
         pen: string;
     }) {
         this.host = host;
@@ -54,8 +56,7 @@ export class SEP2Client {
             httpsAgent: new https.Agent({
                 cert,
                 key,
-                // the device certificate will have the full chain
-                ca: cert,
+                ca: cacert, // Use cacert for CA
                 // the IEEE2023.5 certifiate does not have the host name as the certificate altnames
                 // bypass the server identity check
                 checkServerIdentity: () => undefined,
