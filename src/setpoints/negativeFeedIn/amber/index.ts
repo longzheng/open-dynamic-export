@@ -51,7 +51,7 @@ export class AmberSetpoint implements SetpointType {
 
         // negative price means feed-in earns money
         // positive price means feed-in costs money
-        const feedInCostsMoney = price && price > 0;
+        const feedInCostsMoney = price && price >= 0;
 
         const limit: InverterControlLimit = feedInCostsMoney
             ? {
