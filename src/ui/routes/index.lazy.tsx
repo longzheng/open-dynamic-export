@@ -726,6 +726,8 @@ function LimitCard({
                                 return 'Utility dynamic connection';
                             case 'twoWayTariff':
                                 return 'Two-way tariff';
+                            case 'batteryChargeBuffer':
+                                return 'Battery charge buffer';
                             case undefined:
                                 return '';
                         }

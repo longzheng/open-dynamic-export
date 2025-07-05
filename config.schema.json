@@ -506,6 +506,19 @@
           },
           "additionalProperties": false,
           "description": "Publish active control limits"
+        },
+        "battery": {
+          "type": "object",
+          "properties": {
+            "chargeBufferWatts": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "chargeBufferWatts"
+          ],
+          "additionalProperties": false,
+          "description": "Battery configuration"
         }
       },
       "required": [

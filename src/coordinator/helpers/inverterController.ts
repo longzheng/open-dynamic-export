@@ -39,7 +39,8 @@ export type InverterControlTypes =
     | 'mqtt'
     | 'csipAus'
     | 'twoWayTariff'
-    | 'negativeFeedIn';
+    | 'negativeFeedIn'
+    | 'batteryChargeBuffer';
 
 export type InverterControlLimit = {
     source: InverterControlTypes;
@@ -98,6 +99,7 @@ export class InverterController {
     private controlLimitsLoopTimer: NodeJS.Timeout | null = null;
     private applyControlLoopTimer: NodeJS.Timeout | null = null;
     private abortController: AbortController;
+    private batteryChargeBufferWatts: number | null = null;
 
     constructor({
         config,
@@ -113,6 +115,8 @@ export class InverterController {
         this.publish = new Publish({ config });
         this.secondsToSample = config.inverterControl.sampleSeconds;
         this.intervalSeconds = config.inverterControl.intervalSeconds;
+        this.batteryChargeBufferWatts =
+            config.battery?.chargeBufferWatts ?? null;
         this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
@@ -305,10 +309,36 @@ export class InverterController {
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
 
+        const batteryAdjustedInverterControlLimit = (() => {
+            const batteryChargeBufferWatts = this.batteryChargeBufferWatts;
+
+            if (batteryChargeBufferWatts === null) {
+                return this.controlLimitsCache.activeInverterControlLimit;
+            }
+
+            const adjustedInverterControlLimit =
+                adjustActiveInverterControlForBatteryCharging({
+                    activeInverterControlLimit:
+                        this.controlLimitsCache.activeInverterControlLimit,
+                    batteryChargeBufferWatts,
+                });
+
+            this.logger.info(
+                {
+                    activeInverterControlLimit:
+                        this.controlLimitsCache.activeInverterControlLimit,
+                    batteryChargeBufferWatts,
+                    adjustedInverterControlLimit,
+                },
+                'Adjusted active inverter control limit for battery charging',
+            );
+
+            return adjustedInverterControlLimit;
+        })();
+
         const rampedInverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
-                activeInverterControlLimit:
-                    this.controlLimitsCache.activeInverterControlLimit,
+                activeInverterControlLimit: batteryAdjustedInverterControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
                 solarWatts: averagedSolarWatts,
@@ -687,4 +717,28 @@ export function getActiveInverterControlLimit(
         opModImpLimW,
         opModLoadLimW,
     };
+}
+
+export function adjustActiveInverterControlForBatteryCharging({
+    activeInverterControlLimit,
+    batteryChargeBufferWatts,
+}: {
+    activeInverterControlLimit: ActiveInverterControlLimit;
+    batteryChargeBufferWatts: number;
+}): ActiveInverterControlLimit {
+    if (
+        activeInverterControlLimit.opModExpLimW !== undefined &&
+        activeInverterControlLimit.opModExpLimW.value < batteryChargeBufferWatts
+    ) {
+        // adjust the export limit value to the battery charge buffer watts
+        return {
+            ...activeInverterControlLimit,
+            opModExpLimW: {
+                source: 'batteryChargeBuffer',
+                value: batteryChargeBufferWatts,
+            },
+        };
+    }
+
+    return activeInverterControlLimit;
 }

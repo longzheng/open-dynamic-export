@@ -2005,7 +2005,7 @@ export interface components {
             date: string;
         };
         /** @enum {string} */
-        InverterControlTypes: "fixed" | "mqtt" | "csipAus" | "twoWayTariff" | "negativeFeedIn";
+        InverterControlTypes: "fixed" | "mqtt" | "csipAus" | "twoWayTariff" | "negativeFeedIn" | "batteryChargeBuffer";
         InverterControlLimit: {
             /** Format: double */
             opModLoadLimW?: number;
