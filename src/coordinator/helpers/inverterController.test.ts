@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { type ActiveInverterControlLimit } from './inverterController.js';
 import {
+    adjustActiveInverterControlForBatteryCharging,
     calculateTargetSolarPowerRatio,
     calculateTargetSolarWatts,
     getActiveInverterControlLimit,
@@ -234,5 +236,90 @@ describe('getActiveInverterControlLimit', () => {
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
         } satisfies typeof inverterControlLimit);
+    });
+});
+
+describe('adjustActiveInverterControlForBatteryCharging', () => {
+    it('should return the original limit if opModExpLimW is undefined', () => {
+        const activeInverterControlLimit: ActiveInverterControlLimit = {
+            opModEnergize: undefined,
+            opModConnect: undefined,
+            opModGenLimW: undefined,
+            opModExpLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
+        };
+        const result = adjustActiveInverterControlForBatteryCharging({
+            activeInverterControlLimit,
+            batteryChargeBufferWatts: 100,
+        });
+        expect(result.opModExpLimW?.value).toEqual(undefined);
+    });
+
+    it('should return the original limit if opModExpLimW is greater than the buffer', () => {
+        const activeInverterControlLimit: ActiveInverterControlLimit = {
+            opModEnergize: undefined,
+            opModConnect: undefined,
+            opModGenLimW: undefined,
+            opModExpLimW: { source: 'fixed', value: 200 },
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
+        };
+        const result = adjustActiveInverterControlForBatteryCharging({
+            activeInverterControlLimit,
+            batteryChargeBufferWatts: 100,
+        });
+        expect(result.opModExpLimW?.value).toEqual(200);
+    });
+
+    it('should return the original limit if opModExpLimW is equal to the buffer', () => {
+        const activeInverterControlLimit: ActiveInverterControlLimit = {
+            opModEnergize: undefined,
+            opModConnect: undefined,
+            opModGenLimW: undefined,
+            opModExpLimW: { source: 'fixed', value: 100 },
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
+        };
+        const result = adjustActiveInverterControlForBatteryCharging({
+            activeInverterControlLimit,
+            batteryChargeBufferWatts: 100,
+        });
+        expect(result.opModExpLimW?.value).toEqual(100);
+    });
+
+    it('should adjust the limit if opModExpLimW is less than the buffer', () => {
+        const activeInverterControlLimit: ActiveInverterControlLimit = {
+            opModEnergize: undefined,
+            opModConnect: undefined,
+            opModGenLimW: undefined,
+            opModExpLimW: { source: 'batteryChargeBuffer', value: 0 },
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
+        };
+        const result = adjustActiveInverterControlForBatteryCharging({
+            activeInverterControlLimit,
+            batteryChargeBufferWatts: 100,
+        });
+        expect(result.opModExpLimW?.value).toBe(100);
+    });
+
+    it('should not affect the other limits', () => {
+        const activeInverterControlLimit: ActiveInverterControlLimit = {
+            opModEnergize: { source: 'fixed', value: true },
+            opModConnect: { source: 'fixed', value: true },
+            opModGenLimW: { source: 'fixed', value: 1000 },
+            opModExpLimW: { source: 'fixed', value: 0 },
+            opModImpLimW: { source: 'fixed', value: 1000 },
+            opModLoadLimW: { source: 'fixed', value: 1000 },
+        };
+        const result = adjustActiveInverterControlForBatteryCharging({
+            activeInverterControlLimit,
+            batteryChargeBufferWatts: 100,
+        });
+        expect(result).toEqual({
+            ...activeInverterControlLimit,
+            opModExpLimW: { source: 'batteryChargeBuffer', value: 100 },
+        });
     });
 });

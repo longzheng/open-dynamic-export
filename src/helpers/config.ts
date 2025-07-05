@@ -313,6 +313,12 @@ A longer time will smooth out load changes but may result in overshoot.`,
         })
         .describe('Publish active control limits')
         .optional(),
+    battery: z
+        .object({
+            chargeBufferWatts: z.number(),
+        })
+        .describe('Battery configuration')
+        .optional(),
 });
 
 export type Config = z.infer<typeof configSchema>;
