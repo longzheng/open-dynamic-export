@@ -21,6 +21,19 @@ export class FixedSetpoint implements SetpointType {
             opModGenLimW: this.config.generationLimitWatts,
             opModImpLimW: this.config.importLimitWatts,
             opModLoadLimW: this.config.loadLimitWatts,
+            
+            // Battery-specific controls
+            batteryChargeRatePercent: undefined, // Will be calculated by controller
+            batteryDischargeRatePercent: undefined, // Will be calculated by controller
+            batteryStorageMode: undefined, // Will be calculated by controller
+            batteryTargetSocPercent: this.config.batterySocTargetPercent,
+            batteryImportTargetWatts: this.config.importTargetWatts,
+            batteryExportTargetWatts: this.config.exportTargetWatts,
+            batteryChargeMaxWatts: this.config.batteryChargeMaxWatts,
+            batteryDischargeMaxWatts: this.config.batteryDischargeMaxWatts,
+            batteryPriorityMode: this.config.batteryPriorityMode,
+            batteryGridChargingEnabled: this.config.batteryGridChargingEnabled,
+            batteryGridChargingMaxWatts: this.config.batteryGridChargingMaxWatts,
         };
 
         writeControlLimit({ limit });
