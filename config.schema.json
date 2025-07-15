@@ -511,7 +511,8 @@
           "type": "object",
           "properties": {
             "chargeBufferWatts": {
-              "type": "number"
+              "type": "number",
+              "description": "A minimum buffer to allow the battery to charge if export limit would otherwise have prevented the battery from charging"
             }
           },
           "required": [

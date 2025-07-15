@@ -315,7 +315,11 @@ A longer time will smooth out load changes but may result in overshoot.`,
         .optional(),
     battery: z
         .object({
-            chargeBufferWatts: z.number(),
+            chargeBufferWatts: z
+                .number()
+                .describe(
+                    'A minimum buffer to allow the battery to charge if export limit would otherwise have prevented the battery from charging',
+                ),
         })
         .describe('Battery configuration')
         .optional(),
