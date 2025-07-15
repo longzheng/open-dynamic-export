@@ -71,7 +71,7 @@ You can run the Node project directly with the Node.js runtime.
 
 ### Docker compose
 
-1. Run `docker compose up -d` to use from the Docker Hub image (optionally run `docker compose up -d --build` to build the image from the source code)
+1. Run `docker compose up -d` to use from the [Docker Hub image](https://hub.docker.com/r/longzhengau/open-dynamic-export) (optionally run `docker compose up -d --build` to build the image from the source code)
 
 2. Optionally uncomment the `influxdb` service in the `docker-compose.yml` file to enable logging to InfluxDB
 
