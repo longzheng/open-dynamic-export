@@ -38,6 +38,7 @@ export default withMermaid(
                         { text: 'Site meter', link: '/configuration/meter' },
                         { text: 'Setpoints', link: '/configuration/setpoints' },
                         { text: 'Publish', link: '/configuration/publish' },
+                        { text: 'Battery', link: '/configuration/battery' },
                     ],
                 },
                 {
