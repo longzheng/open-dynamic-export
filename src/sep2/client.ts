@@ -56,6 +56,8 @@ export class SEP2Client {
                 key,
                 // the device certificate will have the full chain
                 ca: cert,
+                // ignore certificate errors
+                rejectUnauthorized: false,
                 // the IEEE2023.5 certifiate does not have the host name as the certificate altnames
                 // bypass the server identity check
                 checkServerIdentity: () => undefined,
