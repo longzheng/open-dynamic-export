@@ -53,6 +53,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-tailwindcss": "^3.18.0",
+    "libxmljs": "^1.0.11",
     "mermaid": "^11.4.1",
     "msw": "^2.7.0",
     "openapi-typescript": "^7.6.1",
@@ -64,6 +65,7 @@
     "vitepress": "^1.6.3",
     "vitepress-plugin-mermaid": "^2.0.17",
     "vitest": "^3.0.4",
+    "xsd-validator": "^1.1.1",
     "zod-to-json-schema": "^3.24.1"
   },
   "dependencies": {

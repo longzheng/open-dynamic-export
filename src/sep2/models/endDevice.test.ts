@@ -4,6 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { type EndDevice } from './endDevice.js';
 import { generateEndDeviceResponse, parseEndDeviceXml } from './endDevice.js';
 import { objectToXml } from '../helpers/xml.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 describe('parseEndDeviceXml', () => {
     it('should parse end device DER with XML', async () => {
@@ -90,10 +91,24 @@ describe('generateEndDeviceResponse', () => {
 
         expect(xml).toBe(`<?xml version="1.0"?>
 <EndDevice xmlns="urn:ieee:std:2030.5:ns">
-    <sFDI>476530583793</sFDI>
     <lFDI>B1857F74B5DA25E82E78BE34877221CB89D55F45</lFDI>
-    <enabled>1</enabled>
+    <sFDI>476530583793</sFDI>
     <changedTime>1682464920</changedTime>
+    <enabled>1</enabled>
 </EndDevice>`);
+    });
+
+    it('should generate XSD-valid EndDevice XML', () => {
+        const response = generateEndDeviceResponse({
+            lFDI: 'B1857F74B5DA25E82E78BE34877221CB89D55F45',
+            sFDI: '476530583793',
+            changedTime: new Date(1682464920000),
+            enabled: true,
+        });
+
+        const xml = objectToXml(response);
+        const validation = validateXml(xml);
+
+        expect(validation.valid).toBe(true);
     });
 });

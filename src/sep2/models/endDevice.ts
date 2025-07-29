@@ -105,10 +105,10 @@ export function generateEndDeviceResponse({
     return {
         EndDevice: {
             $: { xmlns: xmlns._ },
-            sFDI,
             lFDI,
-            enabled: booleanToString(enabled),
+            sFDI,
             changedTime: dateToStringSeconds(changedTime),
+            enabled: booleanToString(enabled),
         },
     };
 }

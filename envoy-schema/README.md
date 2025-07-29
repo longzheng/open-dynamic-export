@@ -1,0 +1,1 @@
+Downloaded from https://github.com/bsgip/envoy-schema/tree/main/tests/xsd
