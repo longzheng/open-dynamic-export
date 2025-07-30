@@ -45,8 +45,7 @@ export function generateDerSettingsResponse({
     setMaxW,
     setMaxVar,
 }: DERSettings) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { DERSettings: any } = {
+    return {
         DERSettings: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             updatedTime: dateToStringSeconds(updatedTime),
@@ -57,18 +56,8 @@ export function generateDerSettingsResponse({
             ),
             setGradW,
             setMaxW,
+            setMaxVA,
+            setMaxVar,
         },
     };
-
-    if (setMaxVA) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERSettings.setMaxVA = setMaxVA;
-    }
-
-    if (setMaxVar) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERSettings.setMaxVar = setMaxVar;
-    }
-
-    return response;
 }

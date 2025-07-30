@@ -61,8 +61,7 @@ export function generateMirrorUsagePointResponse({
     deviceLFDI,
     mirrorMeterReading,
 }: MirrorUsagePoint) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { MirrorUsagePoint: any } = {
+    return {
         MirrorUsagePoint: {
             $: { xmlns: xmlns._ },
             mRID,
@@ -71,15 +70,9 @@ export function generateMirrorUsagePointResponse({
             serviceCategoryKind,
             status,
             deviceLFDI,
+            MirrorMeterReading: mirrorMeterReading?.map((reading) =>
+                generateMirrorMeterReadingObject(reading),
+            ),
         },
     };
-
-    if (mirrorMeterReading) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.MirrorUsagePoint.MirrorMeterReading = mirrorMeterReading.map(
-            (reading) => generateMirrorMeterReadingObject(reading),
-        );
-    }
-
-    return response;
 }

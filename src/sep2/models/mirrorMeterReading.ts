@@ -63,75 +63,51 @@ export function generateMirrorMeterReadingObject({
     Reading,
     ReadingType,
 }: MirrorMeterReading) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: Record<string, any> = {
+    return {
         mRID,
+        description,
+        lastUpdateTime: lastUpdateTime
+            ? dateToStringSeconds(lastUpdateTime)
+            : undefined,
+        nextUpdateTime: nextUpdateTime
+            ? dateToStringSeconds(nextUpdateTime)
+            : undefined,
+        version,
+        Reading: Reading
+            ? {
+                  value: Reading.value,
+                  qualityFlags: Reading.qualityFlags
+                      ? numberToHex(Reading.qualityFlags).padStart(4, '0')
+                      : undefined,
+                  timePeriod: Reading.timePeriod
+                      ? {
+                            start: dateToStringSeconds(
+                                Reading.timePeriod.start,
+                            ),
+                            duration: Reading.timePeriod.duration,
+                        }
+                      : undefined,
+              }
+            : undefined,
+        ReadingType: ReadingType
+            ? {
+                  commodity: ReadingType.commodity,
+                  kind: ReadingType.kind,
+                  dataQualifier: ReadingType.dataQualifier,
+                  flowDirection: ReadingType.flowDirection,
+                  powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
+                  uom: ReadingType.uom,
+                  intervalLength:
+                      ReadingType.intervalLength !== undefined
+                          ? ReadingType.intervalLength
+                          : undefined,
+                  // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
+                  // conditionally set phase if it's not 0
+                  phase:
+                      ReadingType.phase !== PhaseCode.NotApplicable
+                          ? ReadingType.phase
+                          : undefined,
+              }
+            : undefined,
     };
-
-    if (description) {
-        response['description'] = description;
-    }
-
-    if (lastUpdateTime) {
-        response['lastUpdateTime'] = dateToStringSeconds(lastUpdateTime);
-    }
-
-    if (nextUpdateTime) {
-        response['nextUpdateTime'] = dateToStringSeconds(nextUpdateTime);
-    }
-
-    if (version !== undefined) {
-        response['version'] = version;
-    }
-
-    if (Reading) {
-        response['Reading'] = {
-            value: Reading.value,
-        };
-
-        if (Reading.qualityFlags) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            response['Reading']['qualityFlags'] = numberToHex(
-                Reading.qualityFlags,
-            ).padStart(4, '0');
-        }
-
-        if (Reading.timePeriod) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            response['Reading']['timePeriod'] = {
-                start: dateToStringSeconds(Reading.timePeriod.start),
-                duration: Reading.timePeriod.duration,
-            };
-        }
-    }
-
-    if (ReadingType) {
-        response['ReadingType'] = {
-            commodity: ReadingType.commodity,
-            kind: ReadingType.kind,
-            dataQualifier: ReadingType.dataQualifier,
-            flowDirection: ReadingType.flowDirection,
-            powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
-            uom: ReadingType.uom,
-        };
-
-        if (ReadingType.intervalLength !== undefined) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            response['ReadingType'].intervalLength = ReadingType.intervalLength;
-        }
-
-        // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
-        // conditionally set phase if it's not 0
-        // {
-        //     "error": true,
-        //     "statusCode": "ERR-MONITOR-0000",
-        //     "statusMessage": "Unknown 0 Phase Code!"
-        //   }
-        if (ReadingType.phase !== PhaseCode.NotApplicable) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            response['ReadingType'].phase = ReadingType.phase;
-        }
-    }
-
-    return response;
 }
