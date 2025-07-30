@@ -83,7 +83,7 @@ describe('generateDerStatusResponse', () => {
     </stateOfChargeStatus>
     <storageModeStatus>
         <dateTime>1682475028</dateTime>
-        <value>2</value>
+        <value>0</value>
     </storageModeStatus>
 </DERStatus>`);
     });

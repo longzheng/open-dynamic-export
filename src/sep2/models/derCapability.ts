@@ -59,8 +59,7 @@ export function generateDerCapability({
     rtgMinPFUnderExcited,
     rtgVNom,
 }: DERCapability) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { DERCapability: any } = {
+    return {
         DERCapability: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             modesSupported: numberToHex(modesSupported).padStart(8, '0'),
@@ -71,28 +70,10 @@ export function generateDerCapability({
             rtgMaxVA,
             rtgMaxW,
             rtgMaxVar,
+            rtgMaxVarNeg,
+            rtgMinPFOverExcited,
+            rtgMinPFUnderExcited,
+            rtgVNom,
         },
     };
-
-    if (rtgMaxVarNeg) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgMaxVarNeg = rtgMaxVarNeg;
-    }
-
-    if (rtgMinPFOverExcited) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgMinPFOverExcited = rtgMinPFOverExcited;
-    }
-
-    if (rtgMinPFUnderExcited) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgMinPFUnderExcited = rtgMinPFUnderExcited;
-    }
-
-    if (rtgVNom) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgVNom = rtgVNom;
-    }
-
-    return response;
 }

@@ -26,8 +26,7 @@ export function generateDerStatusResponse({
     stateOfChargeStatus,
     storageModeStatus,
 }: DERStatus) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { DERStatus: any } = {
+    return {
         DERStatus: {
             $: { xmlns: xmlns._ },
             readingTime: dateToStringSeconds(readingTime),
@@ -39,32 +38,29 @@ export function generateDerStatusResponse({
                 dateTime: dateToStringSeconds(genConnectStatus.dateTime),
                 value: numberToHex(genConnectStatus.value).padStart(2, '0'),
             },
+            storConnectStatus: storConnectStatus
+                ? {
+                      dateTime: dateToStringSeconds(storConnectStatus.dateTime),
+                      value: numberToHex(storConnectStatus.value).padStart(
+                          2,
+                          '0',
+                      ),
+                  }
+                : undefined,
+            stateOfChargeStatus: stateOfChargeStatus
+                ? {
+                      dateTime: dateToStringSeconds(
+                          stateOfChargeStatus.dateTime,
+                      ),
+                      value: stateOfChargeStatus.value,
+                  }
+                : undefined,
+            storageModeStatus: storageModeStatus
+                ? {
+                      dateTime: dateToStringSeconds(storageModeStatus.dateTime),
+                      value: storageModeStatus.value.toString(),
+                  }
+                : undefined,
         },
     };
-
-    if (storConnectStatus) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERStatus.storConnectStatus = {
-            dateTime: dateToStringSeconds(storConnectStatus.dateTime),
-            value: numberToHex(storConnectStatus.value).padStart(2, '0'),
-        };
-    }
-
-    if (stateOfChargeStatus) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERStatus.stateOfChargeStatus = {
-            dateTime: dateToStringSeconds(stateOfChargeStatus.dateTime),
-            value: stateOfChargeStatus.value,
-        };
-    }
-
-    if (storageModeStatus) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERStatus.storageModeStatus = {
-            dateTime: dateToStringSeconds(storageModeStatus.dateTime),
-            value: operationalModeStatus.value.toString(),
-        };
-    }
-
-    return response;
 }
