@@ -66,16 +66,15 @@ export function generateMirrorMeterReadingObject({
     return {
         mRID,
         description,
+        version,
         lastUpdateTime: lastUpdateTime
             ? dateToStringSeconds(lastUpdateTime)
             : undefined,
         nextUpdateTime: nextUpdateTime
             ? dateToStringSeconds(nextUpdateTime)
             : undefined,
-        version,
         Reading: Reading
             ? {
-                  value: Reading.value,
                   qualityFlags: Reading.qualityFlags
                       ? numberToHex(Reading.qualityFlags).padStart(4, '0')
                       : undefined,
@@ -87,26 +86,27 @@ export function generateMirrorMeterReadingObject({
                             duration: Reading.timePeriod.duration,
                         }
                       : undefined,
+                  value: Reading.value,
               }
             : undefined,
         ReadingType: ReadingType
             ? {
                   commodity: ReadingType.commodity,
-                  kind: ReadingType.kind,
                   dataQualifier: ReadingType.dataQualifier,
                   flowDirection: ReadingType.flowDirection,
-                  powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
-                  uom: ReadingType.uom,
                   intervalLength:
                       ReadingType.intervalLength !== undefined
                           ? ReadingType.intervalLength
                           : undefined,
+                  kind: ReadingType.kind,
                   // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
                   // conditionally set phase if it's not 0
                   phase:
                       ReadingType.phase !== PhaseCode.NotApplicable
                           ? ReadingType.phase
                           : undefined,
+                  powerOfTenMultiplier: ReadingType.powerOfTenMultiplier,
+                  uom: ReadingType.uom,
               }
             : undefined,
     };

@@ -29,24 +29,15 @@ export function generateDerStatusResponse({
     return {
         DERStatus: {
             $: { xmlns: xmlns._ },
-            readingTime: dateToStringSeconds(readingTime),
-            operationalModeStatus: {
-                dateTime: dateToStringSeconds(operationalModeStatus.dateTime),
-                value: operationalModeStatus.value.toString(),
-            },
             genConnectStatus: {
                 dateTime: dateToStringSeconds(genConnectStatus.dateTime),
                 value: numberToHex(genConnectStatus.value).padStart(2, '0'),
             },
-            storConnectStatus: storConnectStatus
-                ? {
-                      dateTime: dateToStringSeconds(storConnectStatus.dateTime),
-                      value: numberToHex(storConnectStatus.value).padStart(
-                          2,
-                          '0',
-                      ),
-                  }
-                : undefined,
+            operationalModeStatus: {
+                dateTime: dateToStringSeconds(operationalModeStatus.dateTime),
+                value: operationalModeStatus.value.toString(),
+            },
+            readingTime: dateToStringSeconds(readingTime),
             stateOfChargeStatus: stateOfChargeStatus
                 ? {
                       dateTime: dateToStringSeconds(
@@ -59,6 +50,15 @@ export function generateDerStatusResponse({
                 ? {
                       dateTime: dateToStringSeconds(storageModeStatus.dateTime),
                       value: storageModeStatus.value.toString(),
+                  }
+                : undefined,
+            storConnectStatus: storConnectStatus
+                ? {
+                      dateTime: dateToStringSeconds(storConnectStatus.dateTime),
+                      value: numberToHex(storConnectStatus.value).padStart(
+                          2,
+                          '0',
+                      ),
                   }
                 : undefined,
         },

@@ -110,7 +110,7 @@ describe('generateMirrorUsagePointResponse', () => {
             mirrorMeterReading: [
                 {
                     mRID: 'AA00007301',
-                    description: 'Average W Reading - Phase A (Site)',
+                    description: 'Avg W Reading - Phase A (Site)',
                     lastUpdateTime: new Date(1659656880 * 1000),
                     nextUpdateTime: new Date(1659657180 * 1000),
                     version: 0,
@@ -167,44 +167,44 @@ describe('generateMirrorUsagePointResponse', () => {
     <deviceLFDI>4075DE6031E562ACF4D9EAA765A5B2ED00057269</deviceLFDI>
     <MirrorMeterReading>
         <mRID>AA00007301</mRID>
-        <description>Average W Reading - Phase A (Site)</description>
+        <description>Avg W Reading - Phase A (Site)</description>
+        <version>0</version>
         <lastUpdateTime>1659656880</lastUpdateTime>
         <nextUpdateTime>1659657180</nextUpdateTime>
-        <version>0</version>
         <Reading>
-            <value>1500</value>
             <qualityFlags>0001</qualityFlags>
+            <value>1500</value>
         </Reading>
         <ReadingType>
             <commodity>1</commodity>
-            <kind>37</kind>
             <dataQualifier>2</dataQualifier>
             <flowDirection>19</flowDirection>
+            <intervalLength>300</intervalLength>
+            <kind>37</kind>
+            <phase>128</phase>
             <powerOfTenMultiplier>0</powerOfTenMultiplier>
             <uom>38</uom>
-            <intervalLength>300</intervalLength>
-            <phase>128</phase>
         </ReadingType>
     </MirrorMeterReading>
     <MirrorMeterReading>
         <mRID>AA00007302</mRID>
         <description>Average W Reading - Phase B (Site)</description>
+        <version>0</version>
         <lastUpdateTime>1659656880</lastUpdateTime>
         <nextUpdateTime>1659657180</nextUpdateTime>
-        <version>0</version>
         <Reading>
-            <value>1500</value>
             <qualityFlags>0001</qualityFlags>
+            <value>1500</value>
         </Reading>
         <ReadingType>
             <commodity>1</commodity>
-            <kind>37</kind>
             <dataQualifier>2</dataQualifier>
             <flowDirection>19</flowDirection>
+            <intervalLength>300</intervalLength>
+            <kind>37</kind>
+            <phase>64</phase>
             <powerOfTenMultiplier>0</powerOfTenMultiplier>
             <uom>38</uom>
-            <intervalLength>300</intervalLength>
-            <phase>64</phase>
         </ReadingType>
     </MirrorMeterReading>
 </MirrorUsagePoint>`);
@@ -242,7 +242,7 @@ describe('generateMirrorUsagePointResponse', () => {
             mirrorMeterReading: [
                 {
                     mRID: 'AA00007301',
-                    description: 'Average W Reading - Phase A (Site)',
+                    description: 'Avg W Reading - Phase A (Site)',
                     lastUpdateTime: new Date(1659656880 * 1000),
                     nextUpdateTime: new Date(1659657180 * 1000),
                     version: 0,

@@ -24,15 +24,15 @@ describe('generateDerStatusResponse', () => {
 
         expect(xml).toBe(`<?xml version="1.0"?>
 <DERStatus xmlns="urn:ieee:std:2030.5:ns">
-    <readingTime>1682475028</readingTime>
-    <operationalModeStatus>
-        <dateTime>1682475028</dateTime>
-        <value>2</value>
-    </operationalModeStatus>
     <genConnectStatus>
         <dateTime>1682475028</dateTime>
         <value>01</value>
     </genConnectStatus>
+    <operationalModeStatus>
+        <dateTime>1682475028</dateTime>
+        <value>2</value>
+    </operationalModeStatus>
+    <readingTime>1682475028</readingTime>
 </DERStatus>`);
     });
 
@@ -65,19 +65,15 @@ describe('generateDerStatusResponse', () => {
 
         expect(xml).toBe(`<?xml version="1.0"?>
 <DERStatus xmlns="urn:ieee:std:2030.5:ns">
-    <readingTime>1682475028</readingTime>
-    <operationalModeStatus>
-        <dateTime>1682475028</dateTime>
-        <value>2</value>
-    </operationalModeStatus>
     <genConnectStatus>
         <dateTime>1682475028</dateTime>
         <value>01</value>
     </genConnectStatus>
-    <storConnectStatus>
+    <operationalModeStatus>
         <dateTime>1682475028</dateTime>
-        <value>01</value>
-    </storConnectStatus>
+        <value>2</value>
+    </operationalModeStatus>
+    <readingTime>1682475028</readingTime>
     <stateOfChargeStatus>
         <dateTime>1682475028</dateTime>
         <value>50</value>
@@ -86,6 +82,10 @@ describe('generateDerStatusResponse', () => {
         <dateTime>1682475028</dateTime>
         <value>0</value>
     </storageModeStatus>
+    <storConnectStatus>
+        <dateTime>1682475028</dateTime>
+        <value>01</value>
+    </storConnectStatus>
 </DERStatus>`);
     });
 

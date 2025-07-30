@@ -16,7 +16,7 @@ import { validateXml } from '../helpers/xsdValidator.js';
 it('should generate MirrorMeterReading XML', () => {
     const response = generateMirrorMeterReadingResponse({
         mRID: 'AA00007301',
-        description: 'Average W Reading - Phase A (Site)',
+        description: 'Avg W Reading - Phase A (Site)',
         lastUpdateTime: new Date(1659656880 * 1000),
         nextUpdateTime: new Date(1659657180 * 1000),
         version: 0,
@@ -45,27 +45,27 @@ it('should generate MirrorMeterReading XML', () => {
     expect(xml).toBe(`<?xml version="1.0"?>
 <MirrorMeterReading xmlns="urn:ieee:std:2030.5:ns">
     <mRID>AA00007301</mRID>
-    <description>Average W Reading - Phase A (Site)</description>
+    <description>Avg W Reading - Phase A (Site)</description>
+    <version>0</version>
     <lastUpdateTime>1659656880</lastUpdateTime>
     <nextUpdateTime>1659657180</nextUpdateTime>
-    <version>0</version>
     <Reading>
-        <value>1500</value>
         <qualityFlags>0001</qualityFlags>
         <timePeriod>
             <start>1659656880</start>
             <duration>300</duration>
         </timePeriod>
+        <value>1500</value>
     </Reading>
     <ReadingType>
         <commodity>1</commodity>
-        <kind>37</kind>
         <dataQualifier>2</dataQualifier>
         <flowDirection>19</flowDirection>
+        <intervalLength>300</intervalLength>
+        <kind>37</kind>
+        <phase>128</phase>
         <powerOfTenMultiplier>0</powerOfTenMultiplier>
         <uom>38</uom>
-        <intervalLength>300</intervalLength>
-        <phase>128</phase>
     </ReadingType>
 </MirrorMeterReading>`);
 });
@@ -73,7 +73,7 @@ it('should generate MirrorMeterReading XML', () => {
 it('should generate MirrorMeterReading object', () => {
     const response = generateMirrorMeterReadingObject({
         mRID: 'AA00007301',
-        description: 'Average W Reading - Phase A (Site)',
+        description: 'Avg W Reading - Phase A (Site)',
         lastUpdateTime: new Date(1659656880 * 1000),
         nextUpdateTime: new Date(1659657180 * 1000),
         version: 0,
@@ -98,23 +98,23 @@ it('should generate MirrorMeterReading object', () => {
     expect(xml).toBe(`<?xml version="1.0"?>
 <root>
     <mRID>AA00007301</mRID>
-    <description>Average W Reading - Phase A (Site)</description>
+    <description>Avg W Reading - Phase A (Site)</description>
+    <version>0</version>
     <lastUpdateTime>1659656880</lastUpdateTime>
     <nextUpdateTime>1659657180</nextUpdateTime>
-    <version>0</version>
     <Reading>
-        <value>1500</value>
         <qualityFlags>0001</qualityFlags>
+        <value>1500</value>
     </Reading>
     <ReadingType>
         <commodity>1</commodity>
-        <kind>37</kind>
         <dataQualifier>2</dataQualifier>
         <flowDirection>19</flowDirection>
+        <intervalLength>300</intervalLength>
+        <kind>37</kind>
+        <phase>128</phase>
         <powerOfTenMultiplier>0</powerOfTenMultiplier>
         <uom>38</uom>
-        <intervalLength>300</intervalLength>
-        <phase>128</phase>
     </ReadingType>
 </root>`);
 });
@@ -122,7 +122,7 @@ it('should generate MirrorMeterReading object', () => {
 it('should generate XSD-valid MirrorMeterReading XML', () => {
     const response = generateMirrorMeterReadingResponse({
         mRID: 'AA00007301',
-        description: 'Average W Reading - Phase A (Site)',
+        description: 'Avg W Reading - Phase A (Site)',
         lastUpdateTime: new Date(1659656880 * 1000),
         nextUpdateTime: new Date(1659657180 * 1000),
         version: 0,
