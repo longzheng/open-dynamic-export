@@ -48,16 +48,16 @@ export function generateDerSettingsResponse({
     return {
         DERSettings: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
-            updatedTime: dateToStringSeconds(updatedTime),
             modesEnabled: numberToHex(modesEnabled).padStart(8, '0'),
-            'csipaus:doeModesEnabled': numberToHex(doeModesEnabled).padStart(
-                8,
-                '0',
-            ),
             setGradW,
             setMaxW,
             setMaxVA,
             setMaxVar,
+            updatedTime: dateToStringSeconds(updatedTime),
+            'csipaus:doeModesEnabled': numberToHex(doeModesEnabled).padStart(
+                2,
+                '0',
+            ),
         },
     };
 }

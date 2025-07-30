@@ -63,17 +63,17 @@ export function generateDerCapability({
         DERCapability: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             modesSupported: numberToHex(modesSupported).padStart(8, '0'),
-            'csipaus:doeModesSupported': numberToHex(
-                doeModesSupported,
-            ).padStart(8, '0'),
-            type: type.toString(),
             rtgMaxVA,
-            rtgMaxW,
             rtgMaxVar,
             rtgMaxVarNeg,
+            rtgMaxW,
             rtgMinPFOverExcited,
             rtgMinPFUnderExcited,
             rtgVNom,
+            type: type.toString(),
+            'csipaus:doeModesSupported': numberToHex(
+                doeModesSupported,
+            ).padStart(2, '0'),
         },
     };
 }

@@ -37,9 +37,7 @@ it('should generate DERSettings XML', () => {
 
     expect(xml).toBe(`<?xml version="1.0"?>
 <DERSettings xmlns="urn:ieee:std:2030.5:ns" xmlns:csipaus="https://csipaus.org/ns">
-    <updatedTime>1682475029</updatedTime>
     <modesEnabled>00500088</modesEnabled>
-    <csipaus:doeModesEnabled>0000000F</csipaus:doeModesEnabled>
     <setGradW>1</setGradW>
     <setMaxW>
         <multiplier>3</multiplier>
@@ -53,6 +51,8 @@ it('should generate DERSettings XML', () => {
         <multiplier>3</multiplier>
         <value>2.5</value>
     </setMaxVar>
+    <updatedTime>1682475029</updatedTime>
+    <csipaus:doeModesEnabled>0F</csipaus:doeModesEnabled>
 </DERSettings>`);
 });
 
