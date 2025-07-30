@@ -132,7 +132,7 @@ describe('generateMirrorUsagePointResponse', () => {
                 },
                 {
                     mRID: 'AA00007302',
-                    description: 'Average W Reading - Phase B (Site)',
+                    description: 'Avg W Reading - Phase B (Site)',
                     lastUpdateTime: new Date(1659656880 * 1000),
                     nextUpdateTime: new Date(1659657180 * 1000),
                     version: 0,
@@ -188,7 +188,7 @@ describe('generateMirrorUsagePointResponse', () => {
     </MirrorMeterReading>
     <MirrorMeterReading>
         <mRID>AA00007302</mRID>
-        <description>Average W Reading - Phase B (Site)</description>
+        <description>Avg W Reading - Phase B (Site)</description>
         <version>0</version>
         <lastUpdateTime>1659656880</lastUpdateTime>
         <nextUpdateTime>1659657180</nextUpdateTime>

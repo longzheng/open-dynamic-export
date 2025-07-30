@@ -48,7 +48,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseAAverage: {
-        description: 'DER Average Real Power (W) - Phase A',
+        description: 'DER Avg Real Pwr (W) - Phase A',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -60,7 +60,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseBAverage: {
-        description: 'DER Average Real Power (W) - Phase B',
+        description: 'DER Avg Real Pwr (W) - Phase B',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -72,7 +72,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseCAverage: {
-        description: 'DER Average Real Power (W) - Phase C',
+        description: 'DER Avg Real Pwr (W) - Phase C',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -96,7 +96,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseAMaximum: {
-        description: 'DER Maximum Real Power (W) - Phase A',
+        description: 'DER Max Real Pwr (W) - Phase A',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -108,7 +108,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseBMaximum: {
-        description: 'DER Maximum Real Power (W) - Phase B',
+        description: 'DER Max Real Pwr (W) - Phase B',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -120,7 +120,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseCMaximum: {
-        description: 'DER Maximum Real Power (W) - Phase C',
+        description: 'DER Max Real Pwr (W) - Phase C',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -144,7 +144,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseAMinimum: {
-        description: 'DER Minimum Real Power (W) - Phase A',
+        description: 'DER Min Real Pwr (W) - Phase A',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -156,7 +156,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseBMinimum: {
-        description: 'DER Minimum Real Power (W) - Phase B',
+        description: 'DER Min Real Pwr (W) - Phase B',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -168,7 +168,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     realPowerPhaseCMinimum: {
-        description: 'DER Minimum Real Power (W) - Phase C',
+        description: 'DER Min Real Pwr (W) - Phase C',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -180,7 +180,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerNetAverage: {
-        description: 'DER Average Reactive Power (VAR) - Net',
+        description: 'DER Avg Reactive Power (VAR)',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -192,7 +192,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseAAverage: {
-        description: 'DER Average Reactive Power (VAR) - Phase A',
+        description: 'DER Avg Reactive Pwr (VAR) - A',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -204,7 +204,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseBAverage: {
-        description: 'DER Average Reactive Power (VAR) - Phase B',
+        description: 'DER Avg Reactive Pwr (VAR) - B',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -216,7 +216,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseCAverage: {
-        description: 'DER Average Reactive Power (VAR) - Phase C',
+        description: 'DER Avg Reactive Pwr (VAR) - C',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -228,7 +228,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerNetMaximum: {
-        description: 'DER Maximum Reactive Power (VAR) - Net',
+        description: 'DER Max Reactive Power (VAR)',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -240,7 +240,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseAMaximum: {
-        description: 'DER Maximum Reactive Power (VAR) - Phase A',
+        description: 'DER Max Reactive Pwr (VAR) - A',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -252,7 +252,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseBMaximum: {
-        description: 'DER Maximum Reactive Power (VAR) - Phase B',
+        description: 'DER Max Reactive Pwr (VAR) - B',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -264,7 +264,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseCMaximum: {
-        description: 'DER Maximum Reactive Power (VAR) - Phase C',
+        description: 'DER Max Reactive Pwr (VAR) - C',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -276,7 +276,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerNetMinimum: {
-        description: 'DER Minimum Reactive Power (VAR) - Net',
+        description: 'DER Min Reactive Power (VAR)',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -288,7 +288,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseAMinimum: {
-        description: 'DER Minimum Reactive Power (VAR) - Phase A',
+        description: 'DER Min Reactive Pwr (VAR) - A',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -300,7 +300,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseBMinimum: {
-        description: 'DER Minimum Reactive Power (VAR) - Phase B',
+        description: 'DER Min Reactive Pwr (VAR) - B',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -312,7 +312,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     reactivePowerPhaseCMinimum: {
-        description: 'DER Minimum Reactive Power (VAR) - Phase C',
+        description: 'DER Min Reactive Pwr (VAR) - C',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -324,7 +324,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseAAverage: {
-        description: 'DER Average Voltage (V) - Phase AN',
+        description: 'DER Avg Voltage (V) - Phase AN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -336,7 +336,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseBAverage: {
-        description: 'DER Average Voltage (V) - Phase BN',
+        description: 'DER Avg Voltage (V) - Phase BN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -348,7 +348,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseCAverage: {
-        description: 'DER Average Voltage (V) - Phase CN',
+        description: 'DER Avg Voltage (V) - Phase CN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -360,7 +360,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseAMaximum: {
-        description: 'DER Maximum Voltage (V) - Phase AN',
+        description: 'DER Max Voltage (V) - Phase AN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -372,7 +372,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseBMaximum: {
-        description: 'DER Maximum Voltage (V) - Phase BN',
+        description: 'DER Max Voltage (V) - Phase BN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -384,7 +384,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseCMaximum: {
-        description: 'DER Maximum Voltage (V) - Phase CN',
+        description: 'DER Max Voltage (V) - Phase CN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -396,7 +396,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseAMinimum: {
-        description: 'DER Minimum Voltage (V) - Phase AN',
+        description: 'DER Min Voltage (V) - Phase AN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -408,7 +408,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseBMinimum: {
-        description: 'DER Minimum Voltage (V) - Phase BN',
+        description: 'DER Min Voltage (V) - Phase BN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,
@@ -420,7 +420,7 @@ const mirrorMeterReadingDefinitions = {
         },
     },
     voltagePhaseCMinimum: {
-        description: 'DER Minimum Voltage (V) - Phase CN',
+        description: 'DER Min Voltage (V) - Phase CN',
         ReadingType: {
             commodity: CommodityType.ElectricitySecondaryMeteredValue,
             kind: KindType.Power,

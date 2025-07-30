@@ -43,10 +43,13 @@ export type MirrorMeterReading = z.infer<typeof mirrorMeterReadingSchema>;
 export function generateMirrorMeterReadingResponse(
     mirrorMeterReading: MirrorMeterReading,
 ) {
+    // Validate input against schema
+    const validatedInput = mirrorMeterReadingSchema.parse(mirrorMeterReading);
+
     const response = {
         MirrorMeterReading: {
             $: { xmlns: xmlns._ },
-            ...generateMirrorMeterReadingObject(mirrorMeterReading),
+            ...generateMirrorMeterReadingObject(validatedInput),
         },
     };
 
@@ -54,15 +57,21 @@ export function generateMirrorMeterReadingResponse(
 }
 
 // MirrorMeterReading object to be nested inside MirrorUsagePoint
-export function generateMirrorMeterReadingObject({
-    mRID,
-    description,
-    lastUpdateTime,
-    nextUpdateTime,
-    version,
-    Reading,
-    ReadingType,
-}: MirrorMeterReading) {
+export function generateMirrorMeterReadingObject(
+    mirrorMeterReading: MirrorMeterReading,
+) {
+    // Validate input against schema
+    const validatedInput = mirrorMeterReadingSchema.parse(mirrorMeterReading);
+
+    const {
+        mRID,
+        description,
+        lastUpdateTime,
+        nextUpdateTime,
+        version,
+        Reading,
+        ReadingType,
+    } = validatedInput;
     return {
         mRID,
         description,
