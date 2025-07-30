@@ -70,10 +70,10 @@ export function generateDerCapability({
             rtgMaxVA,
             rtgMaxW,
             rtgMaxVar,
-            rtgMaxVarNeg: rtgMaxVarNeg || undefined,
-            rtgMinPFOverExcited: rtgMinPFOverExcited || undefined,
-            rtgMinPFUnderExcited: rtgMinPFUnderExcited || undefined,
-            rtgVNom: rtgVNom || undefined,
+            rtgMaxVarNeg,
+            rtgMinPFOverExcited,
+            rtgMinPFUnderExcited,
+            rtgVNom,
         },
     };
 }
