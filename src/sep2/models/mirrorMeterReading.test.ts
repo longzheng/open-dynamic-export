@@ -11,6 +11,7 @@ import { DataQualifierType } from './dataQualifierType.js';
 import { FlowDirectionType } from './flowDirectionType.js';
 import { PhaseCode } from './phaseCode.js';
 import { UomType } from './uomType.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should generate MirrorMeterReading XML', () => {
     const response = generateMirrorMeterReadingResponse({
@@ -116,4 +117,33 @@ it('should generate MirrorMeterReading object', () => {
         <phase>128</phase>
     </ReadingType>
 </root>`);
+});
+
+it('should generate XSD-valid MirrorMeterReading XML', () => {
+    const response = generateMirrorMeterReadingResponse({
+        mRID: 'AA00007301',
+        description: 'Average W Reading - Phase A (Site)',
+        lastUpdateTime: new Date(1659656880 * 1000),
+        nextUpdateTime: new Date(1659657180 * 1000),
+        version: 0,
+        Reading: {
+            qualityFlags: QualityFlags.Valid,
+            value: 1500,
+        },
+        ReadingType: {
+            commodity: CommodityType.ElectricitySecondaryMeteredValue,
+            kind: KindType.Power,
+            dataQualifier: DataQualifierType.Average,
+            flowDirection: FlowDirectionType.Reverse,
+            phase: PhaseCode.PhaseA,
+            powerOfTenMultiplier: 0,
+            intervalLength: 300,
+            uom: UomType.W,
+        },
+    });
+
+    const xml = objectToXml(response);
+    const validation = validateXml(xml);
+
+    expect(validation.valid).toBe(true);
 });

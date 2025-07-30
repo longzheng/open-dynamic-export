@@ -4,6 +4,7 @@ import { generateDerCapability } from './derCapability.js';
 import { DERControlType } from './derControlType.js';
 import { DOEControlType } from './doeModesSupportedType.js';
 import { DERType } from './derType.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should generate DERCapability XML', () => {
     const response = generateDerCapability({
@@ -133,4 +134,37 @@ it('should generate DERCapability XML without optional fields', () => {
         <value>2.5</value>
     </rtgMaxVar>
 </DERCapability>`);
+});
+
+it('should generate XSD-valid DERCapability XML', () => {
+    const response = generateDerCapability({
+        modesSupported:
+            DERControlType.opModEnergize |
+            DERControlType.opModFixedW |
+            DERControlType.opModMaxLimW |
+            DERControlType.opModTargetW,
+        doeModesSupported:
+            DOEControlType.opModExpLimW |
+            DOEControlType.opModGenLimW |
+            DOEControlType.opModImpLimW |
+            DOEControlType.opModLoadLimW,
+        type: DERType.VirtualOrMixedDER,
+        rtgMaxVA: {
+            multiplier: 3,
+            value: 52.5,
+        },
+        rtgMaxW: {
+            multiplier: 3,
+            value: 50,
+        },
+        rtgMaxVar: {
+            multiplier: 3,
+            value: 2.5,
+        },
+    });
+
+    const xml = objectToXml(response);
+    const validation = validateXml(xml);
+
+    expect(validation.valid).toBe(true);
 });

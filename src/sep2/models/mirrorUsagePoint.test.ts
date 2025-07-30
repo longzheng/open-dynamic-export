@@ -16,6 +16,7 @@ import { FlowDirectionType } from './flowDirectionType.js';
 import { PhaseCode } from './phaseCode.js';
 import { UomType } from './uomType.js';
 import { UsagePointBaseStatus } from './usagePointBaseStatus.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should parse end device DER with XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -207,5 +208,66 @@ describe('generateMirrorUsagePointResponse', () => {
         </ReadingType>
     </MirrorMeterReading>
 </MirrorUsagePoint>`);
+    });
+
+    it('should generate XSD-valid MirrorUsagePoint XML', () => {
+        const response = generateMirrorUsagePointResponse({
+            mRID: '01E0F2357FF85E4B7EE6C60300057269',
+            description: 'Site Measurement',
+            roleFlags:
+                RoleFlagsType.isPremisesAggregationPoint |
+                RoleFlagsType.isMirror,
+            serviceCategoryKind: ServiceKind.Electricity,
+            status: UsagePointBaseStatus.On,
+            deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
+        });
+
+        const xml = objectToXml(response);
+        const validation = validateXml(xml);
+
+        expect(validation.valid).toBe(true);
+    });
+
+    it('should generate XSD-valid MirrorUsagePoint XML with MirrorMeterReading', () => {
+        const response = generateMirrorUsagePointResponse({
+            mRID: '01E0F2357FF85E4B7EE6C64900057269',
+            description: 'DER Measurement',
+            roleFlags:
+                RoleFlagsType.isDER |
+                RoleFlagsType.isMirror |
+                RoleFlagsType.isSubmeter,
+            serviceCategoryKind: ServiceKind.Electricity,
+            status: UsagePointBaseStatus.On,
+            deviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
+            mirrorMeterReading: [
+                {
+                    mRID: 'AA00007301',
+                    description: 'Average W Reading - Phase A (Site)',
+                    lastUpdateTime: new Date(1659656880 * 1000),
+                    nextUpdateTime: new Date(1659657180 * 1000),
+                    version: 0,
+                    Reading: {
+                        qualityFlags: QualityFlags.Valid,
+                        value: 1500,
+                    },
+                    ReadingType: {
+                        commodity:
+                            CommodityType.ElectricitySecondaryMeteredValue,
+                        kind: KindType.Power,
+                        dataQualifier: DataQualifierType.Average,
+                        flowDirection: FlowDirectionType.Reverse,
+                        phase: PhaseCode.PhaseA,
+                        powerOfTenMultiplier: 0,
+                        intervalLength: 300,
+                        uom: UomType.W,
+                    },
+                },
+            ],
+        });
+
+        const xml = objectToXml(response);
+        const validation = validateXml(xml);
+
+        expect(validation.valid).toBe(true);
     });
 });

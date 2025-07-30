@@ -4,6 +4,7 @@ import { generateDerStatusResponse } from './derStatus.js';
 import { ConnectStatusValue } from './connectStatus.js';
 import { OperationalModeStatusValue } from './operationModeStatus.js';
 import { StorageModeStatusValue } from './storageModeStatus.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 describe('generateDerStatusResponse', () => {
     it('should generate DERStatus XML', () => {
@@ -86,5 +87,24 @@ describe('generateDerStatusResponse', () => {
         <value>0</value>
     </storageModeStatus>
 </DERStatus>`);
+    });
+
+    it('should generate XSD-valid DERStatus XML', () => {
+        const response = generateDerStatusResponse({
+            readingTime: new Date(1682475028 * 1000),
+            operationalModeStatus: {
+                dateTime: new Date(1682475028 * 1000),
+                value: OperationalModeStatusValue.OperationalMode,
+            },
+            genConnectStatus: {
+                dateTime: new Date(1682475028 * 1000),
+                value: ConnectStatusValue.Connected,
+            },
+        });
+
+        const xml = objectToXml(response);
+        const validation = validateXml(xml);
+
+        expect(validation.valid).toBe(true);
     });
 });

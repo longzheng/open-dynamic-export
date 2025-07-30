@@ -3,6 +3,7 @@ import { objectToXml } from '../helpers/xml.js';
 import { DERControlType } from './derControlType.js';
 import { generateDerSettingsResponse } from './derSettings.js';
 import { DOEControlType } from './doeModesSupportedType.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should generate DERSettings XML', () => {
     const response = generateDerSettingsResponse({
@@ -53,4 +54,30 @@ it('should generate DERSettings XML', () => {
         <value>2.5</value>
     </setMaxVar>
 </DERSettings>`);
+});
+
+it('should generate XSD-valid DERSettings XML', () => {
+    const response = generateDerSettingsResponse({
+        updatedTime: new Date(1682475029 * 1000),
+        modesEnabled:
+            DERControlType.opModEnergize |
+            DERControlType.opModFixedW |
+            DERControlType.opModMaxLimW |
+            DERControlType.opModTargetW,
+        doeModesEnabled:
+            DOEControlType.opModExpLimW |
+            DOEControlType.opModGenLimW |
+            DOEControlType.opModImpLimW |
+            DOEControlType.opModLoadLimW,
+        setGradW: 1,
+        setMaxW: {
+            multiplier: 3,
+            value: 50,
+        },
+    });
+
+    const xml = objectToXml(response);
+    const validation = validateXml(xml);
+
+    expect(validation.valid).toBe(true);
 });
