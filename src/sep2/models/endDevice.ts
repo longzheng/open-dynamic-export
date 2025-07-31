@@ -56,9 +56,9 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     const changedTime = stringIntToDate(
         assertString(endDeviceObject['changedTime'][0]),
     );
-    const registrationLink = parseLinkXmlObject(
-        endDeviceObject['RegistrationLink'][0],
-    );
+    const registrationLink = endDeviceObject['RegistrationLink']
+        ? parseLinkXmlObject(endDeviceObject['RegistrationLink'][0])
+        : undefined;
     const enabled = endDeviceObject['enabled']
         ? stringToBoolean(assertString(endDeviceObject['enabled'][0]))
         : true;
