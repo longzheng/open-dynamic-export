@@ -89,10 +89,10 @@ export function generateMirrorMeterReadingObject(
                       : undefined,
                   timePeriod: Reading.timePeriod
                       ? {
+                            duration: Reading.timePeriod.duration,
                             start: dateToStringSeconds(
                                 Reading.timePeriod.start,
                             ),
-                            duration: Reading.timePeriod.duration,
                         }
                       : undefined,
                   value: Reading.value,

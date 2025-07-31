@@ -52,8 +52,8 @@ it('should generate MirrorMeterReading XML', () => {
     <Reading>
         <qualityFlags>0001</qualityFlags>
         <timePeriod>
-            <start>1659656880</start>
             <duration>300</duration>
+            <start>1659656880</start>
         </timePeriod>
         <value>1500</value>
     </Reading>

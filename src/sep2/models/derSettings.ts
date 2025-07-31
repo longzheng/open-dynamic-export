@@ -50,9 +50,22 @@ export function generateDerSettingsResponse({
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             modesEnabled: numberToHex(modesEnabled).padStart(8, '0'),
             setGradW,
-            setMaxW,
-            setMaxVA,
-            setMaxVar,
+            setMaxVA: setMaxVA
+                ? {
+                      multiplier: setMaxVA.multiplier,
+                      value: setMaxVA.value,
+                  }
+                : undefined,
+            setMaxVar: setMaxVar
+                ? {
+                      multiplier: setMaxVar.multiplier,
+                      value: setMaxVar.value,
+                  }
+                : undefined,
+            setMaxW: {
+                multiplier: setMaxW.multiplier,
+                value: setMaxW.value,
+            },
             updatedTime: dateToStringSeconds(updatedTime),
             'csipaus:doeModesEnabled': numberToHex(doeModesEnabled).padStart(
                 2,

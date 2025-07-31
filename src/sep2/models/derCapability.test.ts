@@ -168,3 +168,38 @@ it('should generate XSD-valid DERCapability XML', () => {
 
     expect(validation.valid).toBe(true);
 });
+
+it('should generate XSD-valid DERCapability XML with properties in wrong order', () => {
+    const response = generateDerCapability({
+        modesSupported:
+            DERControlType.opModEnergize |
+            DERControlType.opModFixedW |
+            DERControlType.opModMaxLimW |
+            DERControlType.opModTargetW,
+        doeModesSupported:
+            DOEControlType.opModExpLimW |
+            DOEControlType.opModGenLimW |
+            DOEControlType.opModImpLimW |
+            DOEControlType.opModLoadLimW,
+        type: DERType.VirtualOrMixedDER,
+        // Properties intentionally in reverse alphabetical order
+        rtgMaxVA: {
+            value: 52,
+            multiplier: 3,
+        },
+        rtgMaxW: {
+            value: 50,
+            multiplier: 3,
+        },
+        rtgMaxVar: {
+            value: 2,
+            multiplier: 3,
+        },
+    });
+
+    const xml = objectToXml(response);
+    const validation = validateXml(xml);
+
+    // Should still be valid because generate function enforces correct order
+    expect(validation.valid).toBe(true);
+});

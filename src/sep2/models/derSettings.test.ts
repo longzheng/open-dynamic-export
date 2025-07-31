@@ -21,7 +21,7 @@ it('should generate DERSettings XML', () => {
         setGradW: 1,
         setMaxVA: {
             multiplier: 3,
-            value: 52.5,
+            value: 52,
         },
         setMaxW: {
             multiplier: 3,
@@ -29,7 +29,7 @@ it('should generate DERSettings XML', () => {
         },
         setMaxVar: {
             multiplier: 3,
-            value: 2.5,
+            value: 2,
         },
     });
 
@@ -39,18 +39,18 @@ it('should generate DERSettings XML', () => {
 <DERSettings xmlns="urn:ieee:std:2030.5:ns" xmlns:csipaus="https://csipaus.org/ns">
     <modesEnabled>00500088</modesEnabled>
     <setGradW>1</setGradW>
+    <setMaxVA>
+        <multiplier>3</multiplier>
+        <value>52</value>
+    </setMaxVA>
+    <setMaxVar>
+        <multiplier>3</multiplier>
+        <value>2</value>
+    </setMaxVar>
     <setMaxW>
         <multiplier>3</multiplier>
         <value>50</value>
     </setMaxW>
-    <setMaxVA>
-        <multiplier>3</multiplier>
-        <value>52.5</value>
-    </setMaxVA>
-    <setMaxVar>
-        <multiplier>3</multiplier>
-        <value>2.5</value>
-    </setMaxVar>
     <updatedTime>1682475029</updatedTime>
     <csipaus:doeModesEnabled>0F</csipaus:doeModesEnabled>
 </DERSettings>`);
@@ -73,6 +73,14 @@ it('should generate XSD-valid DERSettings XML', () => {
         setMaxW: {
             multiplier: 3,
             value: 50,
+        },
+        setMaxVA: {
+            multiplier: 3,
+            value: 52,
+        },
+        setMaxVar: {
+            multiplier: 3,
+            value: 2,
         },
     });
 
