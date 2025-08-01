@@ -55,9 +55,6 @@ export function parseMirrorUsagePointXmlObject(
 export function generateMirrorUsagePointResponse(
     mirrorUsagePoint: MirrorUsagePoint,
 ) {
-    // Validate input against schema
-    const validatedInput = mirrorUsagePointSchema.parse(mirrorUsagePoint);
-
     const {
         mRID,
         description,
@@ -66,7 +63,8 @@ export function generateMirrorUsagePointResponse(
         status,
         deviceLFDI,
         mirrorMeterReading,
-    } = validatedInput;
+    } = mirrorUsagePointSchema.parse(mirrorUsagePoint);
+
     return {
         MirrorUsagePoint: {
             $: { xmlns: xmlns._ },

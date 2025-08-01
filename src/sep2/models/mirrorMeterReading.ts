@@ -61,8 +61,6 @@ export function generateMirrorMeterReadingObject(
     mirrorMeterReading: MirrorMeterReading,
 ) {
     // Validate input against schema
-    const validatedInput = mirrorMeterReadingSchema.parse(mirrorMeterReading);
-
     const {
         mRID,
         description,
@@ -71,7 +69,8 @@ export function generateMirrorMeterReadingObject(
         version,
         Reading,
         ReadingType,
-    } = validatedInput;
+    } = mirrorMeterReadingSchema.parse(mirrorMeterReading);
+
     return {
         mRID,
         description,
