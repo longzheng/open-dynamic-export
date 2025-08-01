@@ -28,11 +28,13 @@ import { InverterState } from '../../connections/sunspec/models/inverter.js';
 import { type NameplateModel } from '../../connections/sunspec/models/nameplate.js';
 import { type SettingsModel } from '../../connections/sunspec/models/settings.js';
 import { type StatusModel } from '../../connections/sunspec/models/status.js';
+import { type StorageModel } from '../../connections/sunspec/models/storage.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
+    private batteryControlEnabled: boolean;
 
     constructor({
         sunspecInverterConfig,
@@ -53,6 +55,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
             inverterIndex,
         });
 
+        this.batteryControlEnabled = sunspecInverterConfig.batteryControlEnabled ?? false;
         this.inverterConnection = new InverterSunSpecConnection(
             sunspecInverterConfig,
         );
@@ -84,6 +87,10 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                 signal: this.abortController.signal,
                 fn: () => this.inverterConnection.getControlsModel(),
             }),
+            storage: this.batteryControlEnabled ? await withAbortCheck({
+                signal: this.abortController.signal,
+                fn: () => this.inverterConnection.getStorageModel(),
+            }).catch(() => null) : null, // Gracefully handle if storage model is not available
         };
 
         const end = performance.now();
@@ -131,11 +138,13 @@ export function generateInverterData({
     nameplate,
     settings,
     status,
+    storage,
 }: {
     inverter: InverterModel;
     nameplate: NameplateModel;
     settings: SettingsModel;
     status: StatusModel;
+    storage: StorageModel | null;
 }): InverterData {
     const inverterMetrics = getInverterMetrics(inverter);
     const nameplateMetrics = getNameplateMetrics(nameplate);
@@ -178,6 +187,7 @@ export function generateInverterData({
             maxVar: settingsMetrics.VArMaxQ1,
         },
         status: generateInverterDataStatus({ status }),
+        storage: storage ? generateInverterDataStorage({ storage }) : undefined,
     };
 }
 
@@ -286,4 +296,35 @@ export function generateControlsModelWriteFromInverterConfiguration({
                 OutPFSet_Ena: OutPFSet_Ena.DISABLED,
             };
     }
+}
+
+export function generateInverterDataStorage({
+    storage,
+}: {
+    storage: StorageModel;
+}): NonNullable<InverterData['storage']> {
+    // Apply scale factors to get the actual values
+    const capacity = storage.WChaMax * Math.pow(10, storage.WChaMax_SF);
+    const maxChargeRate = storage.WChaGra * Math.pow(10, storage.WChaDisChaGra_SF);
+    const maxDischargeRate = storage.WDisChaGra * Math.pow(10, storage.WChaDisChaGra_SF);
+    const stateOfCharge = storage.ChaState !== null && storage.ChaState_SF !== null 
+        ? storage.ChaState * Math.pow(10, storage.ChaState_SF) 
+        : null;
+    const chargeRate = storage.InWRte !== null && storage.InOutWRte_SF !== null
+        ? storage.InWRte * Math.pow(10, storage.InOutWRte_SF)
+        : null;
+    const dischargeRate = storage.OutWRte !== null && storage.InOutWRte_SF !== null
+        ? storage.OutWRte * Math.pow(10, storage.InOutWRte_SF)
+        : null;
+
+    return {
+        capacity,
+        maxChargeRate,
+        maxDischargeRate,
+        stateOfCharge,
+        chargeStatus: storage.ChaSt,
+        storageMode: storage.StorCtl_Mod,
+        chargeRate,
+        dischargeRate,
+    };
 }
