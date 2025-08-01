@@ -63,17 +63,46 @@ export function generateDerCapability({
         DERCapability: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             modesSupported: numberToHex(modesSupported).padStart(8, '0'),
+            rtgMaxVA: {
+                multiplier: rtgMaxVA.multiplier,
+                value: rtgMaxVA.value,
+            },
+            rtgMaxVar: {
+                multiplier: rtgMaxVar.multiplier,
+                value: rtgMaxVar.value,
+            },
+            rtgMaxVarNeg: rtgMaxVarNeg
+                ? {
+                      multiplier: rtgMaxVarNeg.multiplier,
+                      value: rtgMaxVarNeg.value,
+                  }
+                : undefined,
+            rtgMaxW: {
+                multiplier: rtgMaxW.multiplier,
+                value: rtgMaxW.value,
+            },
+            rtgMinPFOverExcited: rtgMinPFOverExcited
+                ? {
+                      displacement: rtgMinPFOverExcited.displacement,
+                      multiplier: rtgMinPFOverExcited.multiplier,
+                  }
+                : undefined,
+            rtgMinPFUnderExcited: rtgMinPFUnderExcited
+                ? {
+                      displacement: rtgMinPFUnderExcited.displacement,
+                      multiplier: rtgMinPFUnderExcited.multiplier,
+                  }
+                : undefined,
+            rtgVNom: rtgVNom
+                ? {
+                      multiplier: rtgVNom.multiplier,
+                      value: rtgVNom.value,
+                  }
+                : undefined,
+            type: type.toString(),
             'csipaus:doeModesSupported': numberToHex(
                 doeModesSupported,
-            ).padStart(8, '0'),
-            type: type.toString(),
-            rtgMaxVA,
-            rtgMaxW,
-            rtgMaxVar,
-            rtgMaxVarNeg,
-            rtgMinPFOverExcited,
-            rtgMinPFUnderExcited,
-            rtgVNom,
+            ).padStart(2, '0'),
         },
     };
 }

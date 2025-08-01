@@ -52,15 +52,19 @@ export function parseMirrorUsagePointXmlObject(
     };
 }
 
-export function generateMirrorUsagePointResponse({
-    mRID,
-    description,
-    roleFlags,
-    serviceCategoryKind,
-    status,
-    deviceLFDI,
-    mirrorMeterReading,
-}: MirrorUsagePoint) {
+export function generateMirrorUsagePointResponse(
+    mirrorUsagePoint: MirrorUsagePoint,
+) {
+    const {
+        mRID,
+        description,
+        roleFlags,
+        serviceCategoryKind,
+        status,
+        deviceLFDI,
+        mirrorMeterReading,
+    } = mirrorUsagePointSchema.parse(mirrorUsagePoint);
+
     return {
         MirrorUsagePoint: {
             $: { xmlns: xmlns._ },

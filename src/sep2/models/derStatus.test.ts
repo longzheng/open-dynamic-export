@@ -4,6 +4,7 @@ import { generateDerStatusResponse } from './derStatus.js';
 import { ConnectStatusValue } from './connectStatus.js';
 import { OperationalModeStatusValue } from './operationModeStatus.js';
 import { StorageModeStatusValue } from './storageModeStatus.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 describe('generateDerStatusResponse', () => {
     it('should generate DERStatus XML', () => {
@@ -23,15 +24,15 @@ describe('generateDerStatusResponse', () => {
 
         expect(xml).toBe(`<?xml version="1.0"?>
 <DERStatus xmlns="urn:ieee:std:2030.5:ns">
-    <readingTime>1682475028</readingTime>
-    <operationalModeStatus>
-        <dateTime>1682475028</dateTime>
-        <value>2</value>
-    </operationalModeStatus>
     <genConnectStatus>
         <dateTime>1682475028</dateTime>
         <value>01</value>
     </genConnectStatus>
+    <operationalModeStatus>
+        <dateTime>1682475028</dateTime>
+        <value>2</value>
+    </operationalModeStatus>
+    <readingTime>1682475028</readingTime>
 </DERStatus>`);
     });
 
@@ -64,19 +65,15 @@ describe('generateDerStatusResponse', () => {
 
         expect(xml).toBe(`<?xml version="1.0"?>
 <DERStatus xmlns="urn:ieee:std:2030.5:ns">
-    <readingTime>1682475028</readingTime>
-    <operationalModeStatus>
-        <dateTime>1682475028</dateTime>
-        <value>2</value>
-    </operationalModeStatus>
     <genConnectStatus>
         <dateTime>1682475028</dateTime>
         <value>01</value>
     </genConnectStatus>
-    <storConnectStatus>
+    <operationalModeStatus>
         <dateTime>1682475028</dateTime>
-        <value>01</value>
-    </storConnectStatus>
+        <value>2</value>
+    </operationalModeStatus>
+    <readingTime>1682475028</readingTime>
     <stateOfChargeStatus>
         <dateTime>1682475028</dateTime>
         <value>50</value>
@@ -85,6 +82,29 @@ describe('generateDerStatusResponse', () => {
         <dateTime>1682475028</dateTime>
         <value>0</value>
     </storageModeStatus>
+    <storConnectStatus>
+        <dateTime>1682475028</dateTime>
+        <value>01</value>
+    </storConnectStatus>
 </DERStatus>`);
+    });
+
+    it('should generate XSD-valid DERStatus XML', () => {
+        const response = generateDerStatusResponse({
+            readingTime: new Date(1682475028 * 1000),
+            operationalModeStatus: {
+                dateTime: new Date(1682475028 * 1000),
+                value: OperationalModeStatusValue.OperationalMode,
+            },
+            genConnectStatus: {
+                dateTime: new Date(1682475028 * 1000),
+                value: ConnectStatusValue.Connected,
+            },
+        });
+
+        const xml = objectToXml(response);
+        const validation = validateXml(xml);
+
+        expect(validation.valid).toBe(true);
     });
 });

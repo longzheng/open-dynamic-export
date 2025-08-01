@@ -48,16 +48,29 @@ export function generateDerSettingsResponse({
     return {
         DERSettings: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
-            updatedTime: dateToStringSeconds(updatedTime),
             modesEnabled: numberToHex(modesEnabled).padStart(8, '0'),
+            setGradW,
+            setMaxVA: setMaxVA
+                ? {
+                      multiplier: setMaxVA.multiplier,
+                      value: setMaxVA.value,
+                  }
+                : undefined,
+            setMaxVar: setMaxVar
+                ? {
+                      multiplier: setMaxVar.multiplier,
+                      value: setMaxVar.value,
+                  }
+                : undefined,
+            setMaxW: {
+                multiplier: setMaxW.multiplier,
+                value: setMaxW.value,
+            },
+            updatedTime: dateToStringSeconds(updatedTime),
             'csipaus:doeModesEnabled': numberToHex(doeModesEnabled).padStart(
-                8,
+                2,
                 '0',
             ),
-            setGradW,
-            setMaxW,
-            setMaxVA,
-            setMaxVar,
         },
     };
 }

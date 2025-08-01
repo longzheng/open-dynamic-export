@@ -2,6 +2,7 @@ import { it, expect } from 'vitest';
 import { generateDerControlResponse } from './derControlResponse.js';
 import { objectToXml } from '../helpers/xml.js';
 import { ResponseStatus } from './responseStatus.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should generate DERControlResponse XML', () => {
     const response = generateDerControlResponse({
@@ -20,4 +21,18 @@ it('should generate DERControlResponse XML', () => {
     <status>1</status>
     <subject>DC1B27AC943B44AC87DAF7E162B6F6D4</subject>
 </DERControlResponse>`);
+});
+
+it('should generate XSD-valid DERControlResponse XML', () => {
+    const response = generateDerControlResponse({
+        createdDateTime: new Date(1682475000 * 1000),
+        endDeviceLFDI: '4075DE6031E562ACF4D9EAA765A5B2ED00057269',
+        status: ResponseStatus.EventReceived,
+        subject: 'DC1B27AC943B44AC87DAF7E162B6F6D4',
+    });
+
+    const xml = objectToXml(response);
+    const validation = validateXml(xml);
+
+    expect(validation.valid).toBe(true);
 });
