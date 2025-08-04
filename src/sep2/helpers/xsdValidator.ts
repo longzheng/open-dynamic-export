@@ -1,7 +1,13 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import { type XMLStructuredErrorData } from 'libxmljs';
-import { parseXml } from 'libxmljs';
+import { XmlDocument, XsdValidator } from 'libxml2-wasm';
+import { xmlRegisterFsInputProviders } from 'libxml2-wasm/lib/nodejs.mjs';
+import fs from 'node:fs';
+
+// allow XML include to work in Node.js environment
+// https://jameslan.github.io/libxml2-wasm/v0.5/documents/Parsing_and_Serializing.html#nodejs
+xmlRegisterFsInputProviders();
+
+// cache the XsdValidator instance to be re-used across tests
+let validator: XsdValidator | undefined;
 
 export function validateXml(xml: string):
     | {
@@ -11,47 +17,33 @@ export function validateXml(xml: string):
           valid: false;
           errors: string[];
       } {
-    const xmlParsed = parseXml(xml);
+    validator =
+        validator ??
+        XsdValidator.fromDoc(
+            XmlDocument.fromBuffer(
+                fs.readFileSync('envoy-schema/csipaus-core.xsd'),
+                {
+                    url: 'envoy-schema/csipaus-core.xsd',
+                },
+            ),
+        );
 
-    const schemaParsed = parseXml(
-        readFileSync(join(process.cwd(), 'envoy-schema/csipaus-core.xsd')),
-    );
+    try {
+        using doc = XmlDocument.fromString(xml);
+        validator.validate(doc);
 
-    // the XSD contains relative imports
-    // the validation function will trigger the imports to be resolved relative to the current working directory
-    // change working directory temporarily to the schema directory
-    const originalCwd = process.cwd();
-    const schemaDir = join(originalCwd, 'envoy-schema');
-    process.chdir(schemaDir);
-
-    const result = (xmlParsed.validate(schemaParsed) ||
-        // the validation errors are dynamically updated in the property after calling .validate()
-        xmlParsed.validationErrors) as true | XMLStructuredErrorData[];
-
-    // restore original working directory
-    process.chdir(originalCwd);
-
-    if (result === true) {
         return { valid: true };
-    } else {
-        const actualErrors = result.filter(
-            (error) => error.level && error.level > 1,
-        );
+    } catch (error) {
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
-        console.error(
-            'XSD validation errors:',
-            actualErrors.map((error) => ({
-                message: error.message,
-                line: error.line,
-            })),
-        );
-
+        console.error('XML validation error:', errorMessage);
         console.error('Generated XML:');
         console.error(xml);
 
         return {
             valid: false,
-            errors: actualErrors.map((error) => JSON.stringify(error)),
+            errors: [errorMessage],
         };
     }
 }
