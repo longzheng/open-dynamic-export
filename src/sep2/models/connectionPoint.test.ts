@@ -6,6 +6,7 @@ import {
     generateConnectionPointResponse,
     parseConnectionPointXml,
 } from './connectionPoint.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 
 describe('parseConnectionPointXml', () => {
     it('should parse connection point XML', async () => {
@@ -32,5 +33,16 @@ describe('generateConnectionPointResponse', () => {
 <csipaus:ConnectionPoint xmlns:csipaus="https://csipaus.org/ns">
     <csipaus:connectionPointId>1234567890</csipaus:connectionPointId>
 </csipaus:ConnectionPoint>`);
+    });
+
+    it('should generate XSD-valid ConnectionPoint XML', () => {
+        const response = generateConnectionPointResponse({
+            connectionPointId: '1234567890',
+        });
+
+        const xml = objectToXml(response);
+        const validation = validateXml(xml);
+
+        expect(validation.valid).toBe(true);
     });
 });
