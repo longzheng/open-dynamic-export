@@ -3,6 +3,7 @@ import { DERTyp } from '../connections/sunspec/models/nameplate.js';
 import { connectStatusValueSchema } from '../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
 import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
+import { ChaSt } from '../connections/sunspec/models/storage.js';
 
 export const inverterDataSchema = z.object({
     inverter: z.object({
@@ -35,6 +36,16 @@ export const inverterDataSchema = z.object({
         operationalModeStatus: z.nativeEnum(OperationalModeStatusValue),
         genConnectStatus: connectStatusValueSchema,
     }),
+    storage: z.object({
+        capacity: z.number(),        // WChaMax
+        maxChargeRate: z.number(),   // WChaGra
+        maxDischargeRate: z.number(), // WDisChaGra
+        stateOfCharge: z.number().nullable(), // ChaState
+        chargeStatus: z.nativeEnum(ChaSt).nullable(), // ChaSt
+        storageMode: z.number(),     // StorCtl_Mod
+        chargeRate: z.number().nullable(),    // InWRte
+        dischargeRate: z.number().nullable(), // OutWRte
+    }).optional(),
 });
 
 export type InverterDataBase = z.infer<typeof inverterDataSchema>;
