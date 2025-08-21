@@ -4,8 +4,9 @@ import { RegisterRoutes } from '../dist/routes.js';
 import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import redoc from 'redoc-express';
 import ViteExpress from 'vite-express';
+import { env } from './helpers/env.js';
 
-const port = 3000;
+const port = env.SERVER_PORT;
 
 export const app = express();
 

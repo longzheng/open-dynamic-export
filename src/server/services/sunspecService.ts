@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { getConfig } from '../../helpers/config.js';
 import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
 import { MeterSunSpecConnection } from '../../connections/sunspec/connection/meter.js';

@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { getSep2Certificate } from '../../helpers/sep2Cert.js';
 import {
     getCertificateFingerprint,

@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { configSchema } from '../src/helpers/config.js';
 import { writeFile } from 'fs/promises';
