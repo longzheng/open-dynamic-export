@@ -2062,6 +2062,9 @@ export interface components {
             /** @enum {string} */
             type: "disconnect";
         } | {
+            /** @enum {string} */
+            type: "deenergize";
+        } | {
             /** Format: double */
             targetSolarPowerRatio: number;
             /** Format: double */
