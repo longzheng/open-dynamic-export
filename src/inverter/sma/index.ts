@@ -146,10 +146,12 @@ export function generateInverterData({
     gridMs,
     operation,
 }: InverterModels): InverterData {
+    const inverterW = gridMs.TotW;
+
     return {
         date: new Date(),
         inverter: {
-            realPower: gridMs.TotW,
+            realPower: inverterW,
             reactivePower:
                 (gridMs.VAr_phsA ?? 0) +
                 (gridMs.VAr_phsB ?? 0) +
@@ -170,26 +172,33 @@ export function generateInverterData({
             maxVA: inverter.VAMaxOutRtg,
             maxVar: inverter.VArMaxQ1Rtg,
         },
-        status: generateInverterDataStatus({ operation }),
+        status: generateInverterDataStatus({
+            operation,
+            inverterW,
+        }),
     };
 }
 
 export function generateInverterDataStatus({
     operation,
+    inverterW,
 }: {
     operation: SmaCore1Operation;
+    inverterW: number;
 }): InverterData['status'] {
+    const isClosed = operation.GriSwStt === SmaCore1OperationGriSwStt.Closed;
+
     return {
-        operationalModeStatus:
-            operation.GriSwStt === SmaCore1OperationGriSwStt.Closed
-                ? OperationalModeStatusValue.OperationalMode
-                : OperationalModeStatusValue.Off,
-        genConnectStatus:
-            operation.GriSwStt === SmaCore1OperationGriSwStt.Closed
-                ? ConnectStatusValue.Available |
-                  ConnectStatusValue.Connected |
-                  ConnectStatusValue.Operating
-                : (0 as ConnectStatusValue),
+        operationalModeStatus: isClosed
+            ? OperationalModeStatusValue.OperationalMode
+            : OperationalModeStatusValue.Off,
+        genConnectStatus: isClosed
+            ? ConnectStatusValue.Available |
+              ConnectStatusValue.Connected |
+              (inverterW > 0
+                  ? ConnectStatusValue.Operating
+                  : (0 as ConnectStatusValue))
+            : (0 as ConnectStatusValue),
     };
 }
 
@@ -204,9 +213,15 @@ export function gemerateSmaCore1InverterControl2({
                 FstStop: SmaCore1InverterControlFstStop.Stop,
                 WModCfg_WCtlComCfg_WNomPrc: 0,
             };
+        case 'deenergize':
+            return {
+                FstStop: SmaCore1InverterControlFstStop.Start,
+                // effectively cap output to 0%
+                WModCfg_WCtlComCfg_WNomPrc: 0,
+            };
         case 'limit':
             return {
-                FstStop: SmaCore1InverterControlFstStop.Stop,
+                FstStop: SmaCore1InverterControlFstStop.Start,
                 // value in % with two decimal places
                 WModCfg_WCtlComCfg_WNomPrc: Math.round(
                     numberWithPow10(

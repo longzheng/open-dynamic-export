@@ -177,14 +177,19 @@ export function generateInverterData({
             maxVA: settingsMetrics.VAMax,
             maxVar: settingsMetrics.VArMaxQ1,
         },
-        status: generateInverterDataStatus({ status }),
+        status: generateInverterDataStatus({
+            status,
+            inverterW: inverterMetrics.W,
+        }),
     };
 }
 
 export function generateInverterDataStatus({
     status,
+    inverterW,
 }: {
     status: StatusModel;
+    inverterW: number;
 }): InverterData['status'] {
     const statusMetrics = getStatusMetrics(status);
 
@@ -195,13 +200,20 @@ export function generateInverterDataStatus({
         )
             ? OperationalModeStatusValue.OperationalMode
             : OperationalModeStatusValue.Off,
-        genConnectStatus: getGenConnectStatusFromPVConn(statusMetrics.PVConn),
+        genConnectStatus: getGenConnectStatusFromPVConn({
+            pvConn: statusMetrics.PVConn,
+            inverterW,
+        }),
     };
 }
 
-export function getGenConnectStatusFromPVConn(
-    pvConn: PVConn,
-): ConnectStatusValue {
+export function getGenConnectStatusFromPVConn({
+    pvConn,
+    inverterW,
+}: {
+    pvConn: PVConn;
+    inverterW: number;
+}): ConnectStatusValue {
     let result: ConnectStatusValue = 0 as ConnectStatusValue;
 
     if (enumHasValue(pvConn, PVConn.CONNECTED)) {
@@ -216,7 +228,7 @@ export function getGenConnectStatusFromPVConn(
         return result;
     }
 
-    if (enumHasValue(pvConn, PVConn.OPERATING)) {
+    if (enumHasValue(pvConn, PVConn.OPERATING) && inverterW > 0) {
         result += ConnectStatusValue.Operating;
     } else {
         return result;
@@ -250,6 +262,28 @@ export function generateControlsModelWriteFromInverterConfiguration({
                 Conn_RvrtTms: 60,
                 WMaxLim_Ena: WMaxLim_Ena.DISABLED,
                 // set value to 0 to gracefully handle re-energising and calculating target power ratio
+                WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
+                    targetSolarPowerRatio: 0,
+                    controlsModel,
+                }),
+                // revert WMaxLimtPct in 60 seconds
+                // this is a safety measure in case the SunSpec connection is lost
+                // we want to revert the inverter to the default which is assumed to be safe
+                // we assume we will write another config witin 60 seconds to reset this timeout
+                WMaxLimPct_RvrtTms: 60,
+                VArPct_Ena: VArPct_Ena.DISABLED,
+                OutPFSet_Ena: OutPFSet_Ena.DISABLED,
+            };
+        case 'deenergize':
+            return {
+                ...controlsModel,
+                Conn: Conn.CONNECT,
+                // revert Conn in 60 seconds
+                // this is a safety measure in case the SunSpec connection is lost
+                // we want to revert the inverter to the default which is assumed to be safe
+                // we assume we will write another config witin 60 seconds to reset this timeout
+                Conn_RvrtTms: 60,
+                WMaxLim_Ena: WMaxLim_Ena.ENABLED,
                 WMaxLimPct: getWMaxLimPctFromTargetSolarPowerRatio({
                     targetSolarPowerRatio: 0,
                     controlsModel,

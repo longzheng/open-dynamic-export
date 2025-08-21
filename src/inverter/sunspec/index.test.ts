@@ -4,16 +4,20 @@ import { getGenConnectStatusFromPVConn } from './index.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 
 describe('getGenConnectStatusFromPVConn', () => {
-    it('should return value if inverter is disconnected', () => {
-        const result = getGenConnectStatusFromPVConn(0 as PVConn);
+    it('should return 0 if inverter is disconnected', () => {
+        const result = getGenConnectStatusFromPVConn({
+            pvConn: 0 as PVConn,
+            inverterW: 0,
+        });
 
         expect(result).toEqual(0 as ConnectStatusValue);
     });
 
-    it('should return correct value if inverter is connected, available, operating', () => {
-        const result = getGenConnectStatusFromPVConn(
-            PVConn.CONNECTED | PVConn.AVAILABLE | PVConn.OPERATING,
-        );
+    it('should set Operating only when inverter W > 0', () => {
+        const result = getGenConnectStatusFromPVConn({
+            pvConn: PVConn.CONNECTED | PVConn.AVAILABLE | PVConn.OPERATING,
+            inverterW: 100,
+        });
 
         expect(result).toEqual(
             ConnectStatusValue.Available |
@@ -22,10 +26,22 @@ describe('getGenConnectStatusFromPVConn', () => {
         );
     });
 
-    it('should return correct value if inverter is available, operating (not connected)', () => {
-        const result = getGenConnectStatusFromPVConn(
-            PVConn.AVAILABLE | PVConn.OPERATING,
+    it('should not set Operating when inverter W = 0', () => {
+        const result = getGenConnectStatusFromPVConn({
+            pvConn: PVConn.CONNECTED | PVConn.AVAILABLE | PVConn.OPERATING,
+            inverterW: 0,
+        });
+
+        expect(result).toEqual(
+            ConnectStatusValue.Available | ConnectStatusValue.Connected,
         );
+    });
+
+    it('should return 0 if inverter is available, operating (not connected)', () => {
+        const result = getGenConnectStatusFromPVConn({
+            pvConn: PVConn.AVAILABLE | PVConn.OPERATING,
+            inverterW: 100,
+        });
 
         // this is subject to debate
         // the following is the advise from SAPN

@@ -54,6 +54,7 @@ export type InverterControlLimit = {
 
 export type InverterConfiguration =
     | { type: 'disconnect' }
+    | { type: 'deenergize' }
     | {
           type: 'limit';
           invertersCount: number;
@@ -348,6 +349,8 @@ export class InverterController {
             switch (configuration.type) {
                 case 'disconnect':
                     return configuration;
+                case 'deenergize':
+                    return configuration;
                 case 'limit': {
                     // ramp the target solar power ratio to prevent sudden changes (e.g. 0% > 100% > 0%)
                     // prevents inverter from potential hardware damage
@@ -362,7 +365,8 @@ export class InverterController {
 
                         switch (this.lastAppliedInverterConfiguration.type) {
                             case 'disconnect':
-                                // slowly ramp from 0 if previously disconnected
+                            case 'deenergize':
+                                // slowly ramp from 0 if previously disconnected/deenergized
                                 return {
                                     targetSolarWatts: 0,
                                     targetSolarPowerRatio: 0,
@@ -502,7 +506,11 @@ export function calculateInverterConfiguration({
         'calculated values',
     );
 
-    if (energize === false || connect === false) {
+    if (energize === false) {
+        return { type: 'deenergize' };
+    }
+
+    if (connect === false) {
         return { type: 'disconnect' };
     }
 
