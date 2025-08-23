@@ -1,5 +1,6 @@
 name: Deploy docs to Cloudflare Pages
-
+permissions:
+  contents: read
 on:
   workflow_dispatch:
   push:
