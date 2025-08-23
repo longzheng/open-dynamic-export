@@ -1,7 +1,6 @@
+name: Deploy docs to Cloudflare Pages
 permissions:
   contents: read
-name: Deploy docs to Cloudflare Pages
-
 on:
   workflow_dispatch:
   push:
