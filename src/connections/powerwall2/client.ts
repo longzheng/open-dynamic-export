@@ -92,7 +92,7 @@ export class Powerwall2Client {
 
                         return token;
                     } catch (error) {
-                        this.logger.error(error, "Powerwall2 login error");
+                        this.logger.error(error, 'Powerwall2 login error');
 
                         throw new Error(`Powerwall2 get token error`);
                     }
@@ -121,7 +121,7 @@ export class Powerwall2Client {
             return response.data;
         } catch (error) {
             if (error instanceof AxiosError && error.response) {
-                this.logger.error(error, 'Powerwall2 API get error')
+                this.logger.error(error, 'Powerwall2 API get error');
 
                 // permissions error
                 if (
@@ -129,13 +129,13 @@ export class Powerwall2Client {
                     error.response.status < 500 &&
                     retryCount < 1
                 ) {
-                    this.logger.info("Refreshing Powerwall2 token")
+                    this.logger.info('Refreshing Powerwall2 token');
 
                     // refresh token and retry request
                     this.token = { type: 'none' };
                     await this.getToken();
 
-                    this.logger.info("Retrying Powerwall2 API get")
+                    this.logger.info('Retrying Powerwall2 API get');
                     return this.get(url, options, retryCount + 1);
                 }
 
