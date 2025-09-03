@@ -92,7 +92,7 @@ export class Powerwall2Client {
 
                         return token;
                     } catch (error) {
-                        this.logger.error(error);
+                        this.logger.error(error, "Powerwall2 login error");
 
                         throw new Error(`Powerwall2 get token error`);
                     }
@@ -108,6 +108,7 @@ export class Powerwall2Client {
     private async get(
         url: string,
         options?: Omit<AxiosRequestConfig<never>, 'headers'>,
+        retryCount = 0,
     ): Promise<unknown> {
         try {
             const response = await this.axiosInstance.get<string>(url, {
@@ -119,18 +120,23 @@ export class Powerwall2Client {
 
             return response.data;
         } catch (error) {
-            if (error instanceof AxiosError) {
+            if (error instanceof AxiosError && error.response) {
+                this.logger.error(error, 'Powerwall2 API get error')
+
                 // permissions error
                 if (
-                    error.response &&
                     error.response.status >= 400 &&
-                    error.response.status < 500
+                    error.response.status < 500 &&
+                    retryCount < 1
                 ) {
+                    this.logger.info("Refreshing Powerwall2 token")
+
                     // refresh token and retry request
                     this.token = { type: 'none' };
                     await this.getToken();
 
-                    return this.get(url, options);
+                    this.logger.info("Retrying Powerwall2 API get")
+                    return this.get(url, options, retryCount + 1);
                 }
 
                 throw error;
