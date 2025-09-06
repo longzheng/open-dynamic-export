@@ -63,6 +63,18 @@ export class AmberSetpoint implements SetpointType {
                   opModGenLimW: undefined,
                   opModImpLimW: undefined,
                   opModLoadLimW: undefined,
+                  // Battery controls - not used in negative feed-in setpoints
+                  batteryChargeRatePercent: undefined,
+                  batteryDischargeRatePercent: undefined,
+                  batteryStorageMode: undefined,
+                  batteryTargetSocPercent: undefined,
+                  batteryImportTargetWatts: undefined,
+                  batteryExportTargetWatts: undefined,
+                  batteryChargeMaxWatts: undefined,
+                  batteryDischargeMaxWatts: undefined,
+                  batteryPriorityMode: undefined,
+                  batteryGridChargingEnabled: undefined,
+                  batteryGridChargingMaxWatts: undefined,
               }
             : {
                   source: 'negativeFeedIn',
@@ -74,6 +86,18 @@ export class AmberSetpoint implements SetpointType {
                   opModGenLimW: undefined,
                   opModImpLimW: undefined,
                   opModLoadLimW: undefined,
+                  // Battery controls - not used in negative feed-in setpoints
+                  batteryChargeRatePercent: undefined,
+                  batteryDischargeRatePercent: undefined,
+                  batteryStorageMode: undefined,
+                  batteryTargetSocPercent: undefined,
+                  batteryImportTargetWatts: undefined,
+                  batteryExportTargetWatts: undefined,
+                  batteryChargeMaxWatts: undefined,
+                  batteryDischargeMaxWatts: undefined,
+                  batteryPriorityMode: undefined,
+                  batteryGridChargingEnabled: undefined,
+                  batteryGridChargingMaxWatts: undefined,
               };
 
         writeControlLimit({ limit });

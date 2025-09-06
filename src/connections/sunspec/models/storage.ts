@@ -395,6 +395,7 @@ export const storageModel = modbusModelFactory<
  * Bitmask values representing activate hold/discharge/charge storage control mode.
  */
 export enum StorCtl_Mod {
+    OFF = 0,
     CHARGE = 1 << 0,
     DISCHARGE = 1 << 1,
 }
