@@ -3,7 +3,7 @@ import { FixedSetpoint } from './setpoints/fixed/index.js';
 import { getActiveInverterControlLimit } from './coordinator/helpers/inverterController.js';
 import { generateInverterDataStorage } from './inverter/sunspec/index.js';
 import { inverterDataSchema } from './inverter/inverterData.js';
-import { ChaSt } from './connections/sunspec/models/storage.js';
+import { ChaSt, StorCtl_Mod } from './connections/sunspec/models/storage.js';
 import { DERTyp } from './connections/sunspec/models/nameplate.js';
 import { OperationalModeStatusValue } from './sep2/models/operationModeStatus.js';
 import { ConnectStatusValue } from './sep2/models/connectStatus.js';
@@ -94,13 +94,25 @@ describe('Battery Control Integration Tests', () => {
                 WChaGra: 5000, // 5 kW max charge
                 WDisChaGra: 4000, // 4 kW max discharge
                 WChaDisChaGra_SF: 0,
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: 75, // 75% SOC
                 ChaState_SF: 0,
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
                 ChaSt: ChaSt.CHARGING,
-                StorCtl_Mod: 2, // Storage control mode
+                StorCtl_Mod: StorCtl_Mod.DISCHARGE, // Storage control mode
                 InWRte: 30, // 30% charge rate
                 OutWRte: 0, // 0% discharge rate
                 InOutWRte_SF: 0,
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             const storageData = generateInverterDataStorage({
@@ -288,13 +300,25 @@ describe('Battery Control Integration Tests', () => {
                 WChaGra: 0,
                 WDisChaGra: 0,
                 WChaDisChaGra_SF: 0,
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: null, // SOC unavailable
                 ChaState_SF: 0,
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
                 ChaSt: ChaSt.OFF,
-                StorCtl_Mod: 0,
+                StorCtl_Mod: StorCtl_Mod.OFF,
                 InWRte: null, // Rates unavailable
                 OutWRte: null,
                 InOutWRte_SF: 0,
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             const storageData = generateInverterDataStorage({

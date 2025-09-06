@@ -5,7 +5,7 @@ import {
     generateInverterDataStorage,
 } from './index.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
-import { ChaSt } from '../../connections/sunspec/models/storage.js';
+import { ChaSt, StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
 import { type StorageModel } from '../../connections/sunspec/models/storage.js';
 
 describe('getGenConnectStatusFromPVConn', () => {
@@ -70,13 +70,25 @@ describe('generateInverterDataStorage', () => {
                 WChaGra: 5000, // 5 kW charge rate
                 WDisChaGra: 4000, // 4 kW discharge rate
                 WChaDisChaGra_SF: 0, // Scale factor 0
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: 75, // 75% SOC
                 ChaState_SF: 0, // Scale factor 0
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
                 ChaSt: ChaSt.CHARGING, // Charging status
-                StorCtl_Mod: 2, // Storage control mode
+                StorCtl_Mod: StorCtl_Mod.DISCHARGE, // Storage control mode
                 InWRte: 30, // 30% charge rate
                 OutWRte: 25, // 25% discharge rate
                 InOutWRte_SF: 0, // Scale factor 0
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             const result = generateInverterDataStorage({
@@ -89,7 +101,7 @@ describe('generateInverterDataStorage', () => {
                 maxDischargeRate: 4000,
                 stateOfCharge: 75,
                 chargeStatus: ChaSt.CHARGING,
-                storageMode: 2,
+                storageMode: StorCtl_Mod.DISCHARGE,
                 chargeRate: 30,
                 dischargeRate: 25,
             });
@@ -104,13 +116,25 @@ describe('generateInverterDataStorage', () => {
                 WChaGra: 500, // 500 with SF -2 = 5 kW charge rate
                 WDisChaGra: 400, // 400 with SF -2 = 4 kW discharge rate
                 WChaDisChaGra_SF: -2, // Scale factor -2
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: 7500, // 7500 with SF -2 = 75% SOC
                 ChaState_SF: -2, // Scale factor -2
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
                 ChaSt: ChaSt.DISCHARGING,
-                StorCtl_Mod: 1,
+                StorCtl_Mod: StorCtl_Mod.CHARGE,
                 InWRte: 3000, // 3000 with SF -2 = 30% charge rate
                 OutWRte: 2500, // 2500 with SF -2 = 25% discharge rate
                 InOutWRte_SF: -2, // Scale factor -2
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             const result = generateInverterDataStorage({
@@ -123,7 +147,7 @@ describe('generateInverterDataStorage', () => {
                 maxDischargeRate: 4, // 400 * 10^(-2)
                 stateOfCharge: 75, // 7500 * 10^(-2)
                 chargeStatus: ChaSt.DISCHARGING,
-                storageMode: 1,
+                storageMode: StorCtl_Mod.CHARGE,
                 chargeRate: 30, // 3000 * 10^(-2)
                 dischargeRate: 25, // 2500 * 10^(-2)
             });
@@ -140,13 +164,25 @@ describe('generateInverterDataStorage', () => {
                 WChaGra: 5000,
                 WDisChaGra: 4000,
                 WChaDisChaGra_SF: 0,
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: null, // SOC not available
                 ChaState_SF: -2,
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
                 ChaSt: ChaSt.OFF,
-                StorCtl_Mod: 0,
+                StorCtl_Mod: StorCtl_Mod.OFF,
                 InWRte: 0,
                 OutWRte: 0,
                 InOutWRte_SF: 0,
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             const result = generateInverterDataStorage({
@@ -167,13 +203,25 @@ describe('generateInverterDataStorage', () => {
                 WChaGra: 5000,
                 WDisChaGra: 4000,
                 WChaDisChaGra_SF: 0,
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: 50,
                 ChaState_SF: 0,
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
                 ChaSt: ChaSt.OFF,
-                StorCtl_Mod: 0,
+                StorCtl_Mod: StorCtl_Mod.OFF,
                 InWRte: null, // Charge rate not available
                 OutWRte: null, // Discharge rate not available
                 InOutWRte_SF: 0,
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             const result = generateInverterDataStorage({
@@ -196,12 +244,24 @@ describe('generateInverterDataStorage', () => {
                 WChaGra: 5000,
                 WDisChaGra: 4000,
                 WChaDisChaGra_SF: 0,
+                VAChaMax: null,
+                VAChaMax_SF: null,
+                MinRsvPct: null,
+                MinRsvPct_SF: null,
                 ChaState: 50,
                 ChaState_SF: 0,
-                StorCtl_Mod: 0,
+                StorAval: null,
+                StorAval_SF: null,
+                InBatV: null,
+                InBatV_SF: null,
+                StorCtl_Mod: StorCtl_Mod.OFF,
                 InWRte: 0,
                 OutWRte: 0,
                 InOutWRte_SF: 0,
+                InOutWRte_WinTms: null,
+                InOutWRte_RvrtTms: null,
+                InOutWRte_RmpTms: null,
+                ChaGriSet: null,
             };
 
             // Test different charging states
