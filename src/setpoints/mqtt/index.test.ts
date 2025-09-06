@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { type Config } from '../../helpers/config.js';
 
 // Mock dependencies
@@ -60,7 +60,7 @@ describe('MqttSetpoint', () => {
             // Simulate connection event
             const connectHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'connect',
-            )?.[1];
+            )?.[1] as (() => void) | undefined;
             connectHandler?.();
 
             expect(mockClient.subscribe).toHaveBeenCalledWith(mqttConfig.topic);
@@ -100,7 +100,7 @@ describe('MqttSetpoint', () => {
             // Simulate message event
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 opModConnect: true,
@@ -131,7 +131,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 exportTargetWatts: 2500,
@@ -168,7 +168,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 batteryPriorityMode: 'export_first' as const,
@@ -191,7 +191,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 batteryGridChargingEnabled: false,
@@ -216,7 +216,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             // The current implementation doesn't handle JSON.parse errors
             // This test documents the current behavior - it will throw
@@ -234,7 +234,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 batterySocTargetPercent: 150, // Invalid: > 100
@@ -255,7 +255,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 exportTargetWatts: -100, // Invalid: negative
@@ -278,7 +278,7 @@ describe('MqttSetpoint', () => {
 
             const messageHandler = mockClient.on.mock.calls.find(
                 (call) => call[0] === 'message',
-            )?.[1];
+            )?.[1] as ((topic: string, message: Buffer) => void) | undefined;
 
             const testMessage = {
                 batterySocTargetPercent: 0, // Valid boundary

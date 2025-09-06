@@ -142,7 +142,7 @@ describe('generateInverterDataStorage', () => {
                 WChaDisChaGra_SF: 0,
                 ChaState: null, // SOC not available
                 ChaState_SF: -2,
-                ChaSt: ChaSt.IDLE,
+                ChaSt: ChaSt.OFF,
                 StorCtl_Mod: 0,
                 InWRte: 0,
                 OutWRte: 0,
@@ -155,7 +155,7 @@ describe('generateInverterDataStorage', () => {
 
             expect(result.stateOfCharge).toBeNull();
             expect(result.capacity).toBe(10000);
-            expect(result.chargeStatus).toBe(ChaSt.IDLE);
+            expect(result.chargeStatus).toBe(ChaSt.OFF);
         });
 
         it('should handle null charge rate values', () => {
@@ -169,7 +169,7 @@ describe('generateInverterDataStorage', () => {
                 WChaDisChaGra_SF: 0,
                 ChaState: 50,
                 ChaState_SF: 0,
-                ChaSt: ChaSt.IDLE,
+                ChaSt: ChaSt.OFF,
                 StorCtl_Mod: 0,
                 InWRte: null, // Charge rate not available
                 OutWRte: null, // Discharge rate not available
