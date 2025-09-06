@@ -38,6 +38,18 @@ export class AusgridEA029Setpoint implements SetpointType {
                       opModGenLimW: undefined,
                       opModImpLimW: undefined,
                       opModLoadLimW: undefined,
+                      // Battery controls - not used in two-way tariff setpoints
+                      batteryChargeRatePercent: undefined,
+                      batteryDischargeRatePercent: undefined,
+                      batteryStorageMode: undefined,
+                      batteryTargetSocPercent: undefined,
+                      batteryImportTargetWatts: undefined,
+                      batteryExportTargetWatts: undefined,
+                      batteryChargeMaxWatts: undefined,
+                      batteryDischargeMaxWatts: undefined,
+                      batteryPriorityMode: undefined,
+                      batteryGridChargingEnabled: undefined,
+                      batteryGridChargingMaxWatts: undefined,
                   }
                 : {
                       source: 'twoWayTariff',
@@ -47,6 +59,18 @@ export class AusgridEA029Setpoint implements SetpointType {
                       opModGenLimW: undefined,
                       opModImpLimW: undefined,
                       opModLoadLimW: undefined,
+                      // Battery controls - not used in two-way tariff setpoints
+                      batteryChargeRatePercent: undefined,
+                      batteryDischargeRatePercent: undefined,
+                      batteryStorageMode: undefined,
+                      batteryTargetSocPercent: undefined,
+                      batteryImportTargetWatts: undefined,
+                      batteryExportTargetWatts: undefined,
+                      batteryChargeMaxWatts: undefined,
+                      batteryDischargeMaxWatts: undefined,
+                      batteryPriorityMode: undefined,
+                      batteryGridChargingEnabled: undefined,
+                      batteryGridChargingMaxWatts: undefined,
                   };
 
         writeControlLimit({ limit });

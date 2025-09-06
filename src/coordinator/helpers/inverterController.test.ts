@@ -8,6 +8,21 @@ import {
     getWMaxLimPctFromTargetSolarPowerRatio,
 } from './inverterController.js';
 
+// Helper to create default battery fields for testing
+const defaultBatteryFields = {
+    batteryChargeRatePercent: undefined,
+    batteryDischargeRatePercent: undefined,
+    batteryStorageMode: undefined,
+    batteryTargetSocPercent: undefined,
+    batteryImportTargetWatts: undefined,
+    batteryExportTargetWatts: undefined,
+    batteryChargeMaxWatts: undefined,
+    batteryDischargeMaxWatts: undefined,
+    batteryPriorityMode: undefined,
+    batteryGridChargingEnabled: undefined,
+    batteryGridChargingMaxWatts: undefined,
+} as const;
+
 describe('calculateTargetSolarPowerRatio', () => {
     it('should calculate target ratio', () => {
         const targetPowerRatio = calculateTargetSolarPowerRatio({
@@ -154,6 +169,7 @@ describe('getActiveInverterControlLimit', () => {
                 opModGenLimW: 20000,
                 opModImpLimW: 10000,
                 opModLoadLimW: 5000,
+                ...defaultBatteryFields,
             },
             {
                 source: 'mqtt',
@@ -163,6 +179,7 @@ describe('getActiveInverterControlLimit', () => {
                 opModGenLimW: 5000,
                 opModImpLimW: 5000,
                 opModLoadLimW: 5000,
+                ...defaultBatteryFields,
             },
             {
                 source: 'csipAus',
@@ -172,6 +189,7 @@ describe('getActiveInverterControlLimit', () => {
                 opModGenLimW: 10000,
                 opModImpLimW: 10000,
                 opModLoadLimW: 10000,
+                ...defaultBatteryFields,
             },
         ]);
 
@@ -200,6 +218,17 @@ describe('getActiveInverterControlLimit', () => {
                 source: 'fixed',
                 value: 5000,
             },
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         } satisfies typeof inverterControlLimit);
     });
 
@@ -213,6 +242,7 @@ describe('getActiveInverterControlLimit', () => {
                 opModGenLimW: undefined,
                 opModImpLimW: undefined,
                 opModLoadLimW: undefined,
+                ...defaultBatteryFields,
             },
             {
                 source: 'mqtt',
@@ -222,6 +252,7 @@ describe('getActiveInverterControlLimit', () => {
                 opModGenLimW: undefined,
                 opModImpLimW: undefined,
                 opModLoadLimW: undefined,
+                ...defaultBatteryFields,
             },
         ]);
 
@@ -235,6 +266,17 @@ describe('getActiveInverterControlLimit', () => {
             opModGenLimW: undefined,
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         } satisfies typeof inverterControlLimit);
     });
 });
@@ -248,6 +290,17 @@ describe('adjustActiveInverterControlForBatteryCharging', () => {
             opModExpLimW: undefined,
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         };
         const result = adjustActiveInverterControlForBatteryCharging({
             activeInverterControlLimit,
@@ -264,6 +317,17 @@ describe('adjustActiveInverterControlForBatteryCharging', () => {
             opModExpLimW: { source: 'fixed', value: 200 },
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         };
         const result = adjustActiveInverterControlForBatteryCharging({
             activeInverterControlLimit,
@@ -280,6 +344,17 @@ describe('adjustActiveInverterControlForBatteryCharging', () => {
             opModExpLimW: { source: 'fixed', value: 100 },
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         };
         const result = adjustActiveInverterControlForBatteryCharging({
             activeInverterControlLimit,
@@ -296,6 +371,17 @@ describe('adjustActiveInverterControlForBatteryCharging', () => {
             opModExpLimW: { source: 'batteryChargeBuffer', value: 0 },
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         };
         const result = adjustActiveInverterControlForBatteryCharging({
             activeInverterControlLimit,
@@ -312,6 +398,17 @@ describe('adjustActiveInverterControlForBatteryCharging', () => {
             opModExpLimW: { source: 'fixed', value: 0 },
             opModImpLimW: { source: 'fixed', value: 1000 },
             opModLoadLimW: { source: 'fixed', value: 1000 },
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         };
         const result = adjustActiveInverterControlForBatteryCharging({
             activeInverterControlLimit,
