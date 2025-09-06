@@ -420,3 +420,299 @@ describe('adjustActiveInverterControlForBatteryCharging', () => {
         });
     });
 });
+
+describe('getActiveInverterControlLimit - battery control merging', () => {
+    it('should merge battery controls with most restrictive values', () => {
+        const inverterControlLimit = getActiveInverterControlLimit([
+            {
+                source: 'fixed',
+                opModConnect: true,
+                opModEnergize: true,
+                opModExpLimW: 5000,
+                opModGenLimW: 10000,
+                opModImpLimW: 8000,
+                opModLoadLimW: 6000,
+                batteryChargeRatePercent: undefined,
+                batteryDischargeRatePercent: undefined,
+                batteryStorageMode: undefined,
+                batteryTargetSocPercent: 80,
+                batteryImportTargetWatts: 3000,
+                batteryExportTargetWatts: 4000,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 4500,
+                batteryPriorityMode: 'export_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 2500,
+            },
+            {
+                source: 'mqtt',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                batteryChargeRatePercent: undefined,
+                batteryDischargeRatePercent: undefined,
+                batteryStorageMode: undefined,
+                batteryTargetSocPercent: 70, // More restrictive (lower)
+                batteryImportTargetWatts: 2000, // More restrictive (lower)
+                batteryExportTargetWatts: 3500, // More restrictive (lower)
+                batteryChargeMaxWatts: 4000, // More restrictive (lower)
+                batteryDischargeMaxWatts: 4000, // More restrictive (lower)
+                batteryPriorityMode: 'battery_first', // Takes precedence
+                batteryGridChargingEnabled: false, // More restrictive
+                batteryGridChargingMaxWatts: 3000, // Less restrictive but grid charging disabled
+            },
+        ]);
+
+        expect(inverterControlLimit.batteryTargetSocPercent?.value).toBe(70);
+        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryImportTargetWatts?.value).toBe(2000);
+        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryExportTargetWatts?.value).toBe(3500);
+        expect(inverterControlLimit.batteryExportTargetWatts?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryChargeMaxWatts?.value).toBe(4000);
+        expect(inverterControlLimit.batteryChargeMaxWatts?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryDischargeMaxWatts?.value).toBe(4000);
+        expect(inverterControlLimit.batteryDischargeMaxWatts?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'battery_first',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(
+            false,
+        );
+        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe(
+            'mqtt',
+        );
+    });
+
+    it('should prioritize battery_first over export_first priority mode', () => {
+        const inverterControlLimit = getActiveInverterControlLimit([
+            {
+                source: 'fixed',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryPriorityMode: 'export_first',
+            },
+            {
+                source: 'mqtt',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryPriorityMode: 'battery_first',
+            },
+        ]);
+
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'battery_first',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.source).toBe('mqtt');
+    });
+
+    it('should use export_first when only one source provides it', () => {
+        const inverterControlLimit = getActiveInverterControlLimit([
+            {
+                source: 'fixed',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryPriorityMode: 'export_first',
+            },
+            {
+                source: 'mqtt',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryPriorityMode: undefined,
+            },
+        ]);
+
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'export_first',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.source).toBe('fixed');
+    });
+
+    it('should prioritize false over true for grid charging enabled', () => {
+        const inverterControlLimit = getActiveInverterControlLimit([
+            {
+                source: 'fixed',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryGridChargingEnabled: true,
+            },
+            {
+                source: 'mqtt',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryGridChargingEnabled: false,
+            },
+        ]);
+
+        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(
+            false,
+        );
+        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe(
+            'mqtt',
+        );
+    });
+
+    it('should take minimum values for numeric battery limits', () => {
+        const inverterControlLimit = getActiveInverterControlLimit([
+            {
+                source: 'fixed',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryTargetSocPercent: 90,
+                batteryImportTargetWatts: 4000,
+                batteryExportTargetWatts: 5000,
+                batteryChargeMaxWatts: 6000,
+                batteryDischargeMaxWatts: 5500,
+                batteryGridChargingMaxWatts: 3000,
+            },
+            {
+                source: 'csipAus',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryTargetSocPercent: 60, // Lower (more restrictive)
+                batteryImportTargetWatts: 2500, // Lower (more restrictive)
+                batteryExportTargetWatts: 3000, // Lower (more restrictive)
+                batteryChargeMaxWatts: 4500, // Lower (more restrictive)
+                batteryDischargeMaxWatts: 4000, // Lower (more restrictive)
+                batteryGridChargingMaxWatts: 2000, // Lower (more restrictive)
+            },
+        ]);
+
+        expect(inverterControlLimit.batteryTargetSocPercent?.value).toBe(60);
+        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe(
+            'csipAus',
+        );
+        expect(inverterControlLimit.batteryImportTargetWatts?.value).toBe(2500);
+        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe(
+            'csipAus',
+        );
+        expect(inverterControlLimit.batteryExportTargetWatts?.value).toBe(3000);
+        expect(inverterControlLimit.batteryExportTargetWatts?.source).toBe(
+            'csipAus',
+        );
+        expect(inverterControlLimit.batteryChargeMaxWatts?.value).toBe(4500);
+        expect(inverterControlLimit.batteryChargeMaxWatts?.source).toBe(
+            'csipAus',
+        );
+        expect(inverterControlLimit.batteryDischargeMaxWatts?.value).toBe(4000);
+        expect(inverterControlLimit.batteryDischargeMaxWatts?.source).toBe(
+            'csipAus',
+        );
+        expect(inverterControlLimit.batteryGridChargingMaxWatts?.value).toBe(
+            2000,
+        );
+        expect(inverterControlLimit.batteryGridChargingMaxWatts?.source).toBe(
+            'csipAus',
+        );
+    });
+
+    it('should handle mixed battery configurations correctly', () => {
+        const inverterControlLimit = getActiveInverterControlLimit([
+            {
+                source: 'fixed',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryTargetSocPercent: 80,
+                batteryPriorityMode: 'export_first',
+                // Other battery fields undefined
+            },
+            {
+                source: 'mqtt',
+                opModConnect: undefined,
+                opModEnergize: undefined,
+                opModExpLimW: undefined,
+                opModGenLimW: undefined,
+                opModImpLimW: undefined,
+                opModLoadLimW: undefined,
+                ...defaultBatteryFields,
+                batteryImportTargetWatts: 2000,
+                batteryGridChargingEnabled: false,
+                // Other battery fields undefined
+            },
+        ]);
+
+        expect(inverterControlLimit.batteryTargetSocPercent?.value).toBe(80);
+        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe(
+            'fixed',
+        );
+        expect(inverterControlLimit.batteryImportTargetWatts?.value).toBe(2000);
+        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'export_first',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.source).toBe('fixed');
+        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(
+            false,
+        );
+        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe(
+            'mqtt',
+        );
+
+        // Fields not provided by any source should be undefined
+        expect(inverterControlLimit.batteryExportTargetWatts).toBeUndefined();
+        expect(inverterControlLimit.batteryChargeMaxWatts).toBeUndefined();
+        expect(inverterControlLimit.batteryDischargeMaxWatts).toBeUndefined();
+        expect(
+            inverterControlLimit.batteryGridChargingMaxWatts,
+        ).toBeUndefined();
+    });
+});
