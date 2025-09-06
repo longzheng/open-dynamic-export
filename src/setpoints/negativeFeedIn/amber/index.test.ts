@@ -65,6 +65,18 @@ describe('AmberSetpoint', () => {
             opModGenLimW: undefined,
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            // Battery controls - not used in negative feed-in setpoints
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         } satisfies typeof result);
     });
 
@@ -84,6 +96,18 @@ describe('AmberSetpoint', () => {
             opModGenLimW: undefined,
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            // Battery controls - not used in negative feed-in setpoints
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         } satisfies typeof result);
     });
 });
