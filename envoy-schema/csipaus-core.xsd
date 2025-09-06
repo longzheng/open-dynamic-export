@@ -1,0 +1,76 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    elementFormDefault="qualified"
+    xmlns="urn:ieee:std:2030.5:ns" 
+    targetNamespace="urn:ieee:std:2030.5:ns"
+    xmlns:csipaus="https://csipaus.org/ns"> 
+    <xs:import schemaLocation="csipaus-ext.xsd" namespace="https://csipaus.org/ns"/>
+    <xs:redefine schemaLocation="sep.xsd">
+      <xs:complexType name="DERControlBase">
+        <xs:complexContent>
+          <xs:extension base="DERControlBase">
+            <xs:sequence>
+              <xs:element ref="csipaus:opModImpLimW" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>This is the constraint on the imported active power at the connection point.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element ref="csipaus:opModExpLimW" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>This is the constraint on the exported active power at the connection point.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element ref="csipaus:opModGenLimW" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>This is a constraint on the maximum allowable discharge rate, in Watts, specifically for a single physical device (or aggregation of devices, excluding uncontrolled devices) such as an EV charge station.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element ref="csipaus:opModLoadLimW" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>This is a constraint on the maximum allowable charge rate, in Watts, specifically for a single physical device (or aggregation of devices, excluding uncontrolled devices) such as an EV charge station.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="DERSettings">
+        <xs:complexContent>
+          <xs:extension base="DERSettings">
+            <xs:sequence>
+              <xs:element ref="csipaus:doeModesEnabled" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>Bitmap indicating the DOE controls implemented by the device. See DOEControlType for values.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="DERCapability">
+        <xs:complexContent>
+          <xs:extension base="DERCapability">
+            <xs:sequence>
+              <xs:element ref="csipaus:doeModesSupported" minOccurs="1" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>Bitmap indicating the DOE controls enabled on the device. See DOEControlType for values.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="EndDevice">
+        <xs:complexContent>
+          <xs:extension base="EndDevice">
+            <xs:sequence>
+              <xs:element ref="csipaus:ConnectionPointLink" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                  <xs:documentation>Contains identification information related to the network location at which the EndDevice is installed.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:redefine>
+</xs:schema>

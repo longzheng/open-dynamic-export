@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { getConfig } from '../src/helpers/config.js';
 import { pinoLogger } from '../src/helpers/logger.js';
 import { getModbusConnection } from '../src/connections/modbus/connections.js';

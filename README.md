@@ -35,16 +35,33 @@ This project aims to implement dynamic export control/solar curtailment of inver
   - [x] Software-based limit ramping (`setGradW` or `rampTms`)
 - [x] Metrics logging in InfluxDB
 
-## Build
+## Install
+
+1. Clone Git repo
+
+2. Copy `.env.example` and rename it to `.env` and change the values to suit your environment
+
+3. In the `/config` folder, make a copy of the `config.example.json` file and rename it to `config.json`. Update it with the relevant values, see the "Configuration" section for more details.
+
+Use Node or Docker to run the project.
+
+### Node
+You can run the Node project directly with the Node.js runtime.
+
+1. Install dependencies with `npm install`
+
+2. Build the project with `npm run build`
+
+3. Run the project with `npm start`
+
 ### Docker compose
 
-1. Clone repo
+1. Run `docker compose up -d` to use from the [Docker Hub image](https://hub.docker.com/r/longzhengau/open-dynamic-export) (optionally run `docker compose up -d --build` to build the image from the source code)
 
-1. Copy `.env.example` and rename it to `.env` and change the values to suit
+2. Optionally uncomment the `influxdb` service in the `docker-compose.yml` file to enable logging to InfluxDB
 
-1. Create a `/config` folder and copy the [`config.example.json` file from the repo](https://github.com/longzheng/open-dynamic-export/blob/main/config/config.example.json) and rename it to `config.json`. Set it with the required values.
-
-1. Run `docker compose up -d` (or run `docker compose up -d --build`)
+### Web UI
+You can view the dashboard at `http://localhost:3000` (or the server port you specified in the `.env` file).
 
 ## Debug
 ### VSCode

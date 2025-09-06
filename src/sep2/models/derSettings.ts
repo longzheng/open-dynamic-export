@@ -45,30 +45,32 @@ export function generateDerSettingsResponse({
     setMaxW,
     setMaxVar,
 }: DERSettings) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { DERSettings: any } = {
+    return {
         DERSettings: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
-            updatedTime: dateToStringSeconds(updatedTime),
             modesEnabled: numberToHex(modesEnabled).padStart(8, '0'),
+            setGradW,
+            setMaxVA: setMaxVA
+                ? {
+                      multiplier: setMaxVA.multiplier,
+                      value: setMaxVA.value,
+                  }
+                : undefined,
+            setMaxVar: setMaxVar
+                ? {
+                      multiplier: setMaxVar.multiplier,
+                      value: setMaxVar.value,
+                  }
+                : undefined,
+            setMaxW: {
+                multiplier: setMaxW.multiplier,
+                value: setMaxW.value,
+            },
+            updatedTime: dateToStringSeconds(updatedTime),
             'csipaus:doeModesEnabled': numberToHex(doeModesEnabled).padStart(
-                8,
+                2,
                 '0',
             ),
-            setGradW,
-            setMaxW,
         },
     };
-
-    if (setMaxVA) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERSettings.setMaxVA = setMaxVA;
-    }
-
-    if (setMaxVar) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERSettings.setMaxVar = setMaxVar;
-    }
-
-    return response;
 }

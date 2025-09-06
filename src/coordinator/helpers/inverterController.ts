@@ -39,7 +39,8 @@ export type InverterControlTypes =
     | 'mqtt'
     | 'csipAus'
     | 'twoWayTariff'
-    | 'negativeFeedIn';
+    | 'negativeFeedIn'
+    | 'batteryChargeBuffer';
 
 export type InverterControlLimit = {
     source: InverterControlTypes;
@@ -66,6 +67,7 @@ export type InverterControlLimit = {
 
 export type InverterConfiguration =
     | { type: 'disconnect' }
+    | { type: 'deenergize' }
     | {
           type: 'limit';
           invertersCount: number;
@@ -111,6 +113,7 @@ export class InverterController {
     private controlLimitsLoopTimer: NodeJS.Timeout | null = null;
     private applyControlLoopTimer: NodeJS.Timeout | null = null;
     private abortController: AbortController;
+    private batteryChargeBufferWatts: number | null = null;
 
     constructor({
         config,
@@ -126,6 +129,8 @@ export class InverterController {
         this.publish = new Publish({ config });
         this.secondsToSample = config.inverterControl.sampleSeconds;
         this.intervalSeconds = config.inverterControl.intervalSeconds;
+        this.batteryChargeBufferWatts =
+            config.battery?.chargeBufferWatts ?? null;
         this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
@@ -318,10 +323,36 @@ export class InverterController {
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
 
+        const batteryAdjustedInverterControlLimit = (() => {
+            const batteryChargeBufferWatts = this.batteryChargeBufferWatts;
+
+            if (batteryChargeBufferWatts === null) {
+                return this.controlLimitsCache.activeInverterControlLimit;
+            }
+
+            const adjustedInverterControlLimit =
+                adjustActiveInverterControlForBatteryCharging({
+                    activeInverterControlLimit:
+                        this.controlLimitsCache.activeInverterControlLimit,
+                    batteryChargeBufferWatts,
+                });
+
+            this.logger.info(
+                {
+                    activeInverterControlLimit:
+                        this.controlLimitsCache.activeInverterControlLimit,
+                    batteryChargeBufferWatts,
+                    adjustedInverterControlLimit,
+                },
+                'Adjusted active inverter control limit for battery charging',
+            );
+
+            return adjustedInverterControlLimit;
+        })();
+
         const rampedInverterConfiguration = ((): InverterConfiguration => {
             const configuration = calculateInverterConfiguration({
-                activeInverterControlLimit:
-                    this.controlLimitsCache.activeInverterControlLimit,
+                activeInverterControlLimit: batteryAdjustedInverterControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
                 solarWatts: averagedSolarWatts,
@@ -330,6 +361,8 @@ export class InverterController {
 
             switch (configuration.type) {
                 case 'disconnect':
+                    return configuration;
+                case 'deenergize':
                     return configuration;
                 case 'limit': {
                     // ramp the target solar power ratio to prevent sudden changes (e.g. 0% > 100% > 0%)
@@ -345,7 +378,8 @@ export class InverterController {
 
                         switch (this.lastAppliedInverterConfiguration.type) {
                             case 'disconnect':
-                                // slowly ramp from 0 if previously disconnected
+                            case 'deenergize':
+                                // slowly ramp from 0 if previously disconnected/deenergized
                                 return {
                                     targetSolarWatts: 0,
                                     targetSolarPowerRatio: 0,
@@ -485,7 +519,11 @@ export function calculateInverterConfiguration({
         'calculated values',
     );
 
-    if (energize === false || connect === false) {
+    if (energize === false) {
+        return { type: 'deenergize' };
+    }
+
+    if (connect === false) {
         return { type: 'disconnect' };
     }
 
@@ -939,4 +977,28 @@ export function getActiveInverterControlLimit(
         batteryGridChargingEnabled,
         batteryGridChargingMaxWatts,
     };
+}
+
+export function adjustActiveInverterControlForBatteryCharging({
+    activeInverterControlLimit,
+    batteryChargeBufferWatts,
+}: {
+    activeInverterControlLimit: ActiveInverterControlLimit;
+    batteryChargeBufferWatts: number;
+}): ActiveInverterControlLimit {
+    if (
+        activeInverterControlLimit.opModExpLimW !== undefined &&
+        activeInverterControlLimit.opModExpLimW.value < batteryChargeBufferWatts
+    ) {
+        // adjust the export limit value to the battery charge buffer watts
+        return {
+            ...activeInverterControlLimit,
+            opModExpLimW: {
+                source: 'batteryChargeBuffer',
+                value: batteryChargeBufferWatts,
+            },
+        };
+    }
+
+    return activeInverterControlLimit;
 }

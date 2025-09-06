@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { getConfig } from '../helpers/config.js';
 import { pinoLogger } from '../helpers/logger.js';
 import { InverterController } from './helpers/inverterController.js';

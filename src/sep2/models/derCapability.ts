@@ -59,40 +59,50 @@ export function generateDerCapability({
     rtgMinPFUnderExcited,
     rtgVNom,
 }: DERCapability) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: { DERCapability: any } = {
+    return {
         DERCapability: {
             $: { xmlns: xmlns._, 'xmlns:csipaus': xmlns.csipaus },
             modesSupported: numberToHex(modesSupported).padStart(8, '0'),
+            rtgMaxVA: {
+                multiplier: rtgMaxVA.multiplier,
+                value: rtgMaxVA.value,
+            },
+            rtgMaxVar: {
+                multiplier: rtgMaxVar.multiplier,
+                value: rtgMaxVar.value,
+            },
+            rtgMaxVarNeg: rtgMaxVarNeg
+                ? {
+                      multiplier: rtgMaxVarNeg.multiplier,
+                      value: rtgMaxVarNeg.value,
+                  }
+                : undefined,
+            rtgMaxW: {
+                multiplier: rtgMaxW.multiplier,
+                value: rtgMaxW.value,
+            },
+            rtgMinPFOverExcited: rtgMinPFOverExcited
+                ? {
+                      displacement: rtgMinPFOverExcited.displacement,
+                      multiplier: rtgMinPFOverExcited.multiplier,
+                  }
+                : undefined,
+            rtgMinPFUnderExcited: rtgMinPFUnderExcited
+                ? {
+                      displacement: rtgMinPFUnderExcited.displacement,
+                      multiplier: rtgMinPFUnderExcited.multiplier,
+                  }
+                : undefined,
+            rtgVNom: rtgVNom
+                ? {
+                      multiplier: rtgVNom.multiplier,
+                      value: rtgVNom.value,
+                  }
+                : undefined,
+            type: type.toString(),
             'csipaus:doeModesSupported': numberToHex(
                 doeModesSupported,
-            ).padStart(8, '0'),
-            type: type.toString(),
-            rtgMaxVA,
-            rtgMaxW,
-            rtgMaxVar,
+            ).padStart(2, '0'),
         },
     };
-
-    if (rtgMaxVarNeg) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgMaxVarNeg = rtgMaxVarNeg;
-    }
-
-    if (rtgMinPFOverExcited) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgMinPFOverExcited = rtgMinPFOverExcited;
-    }
-
-    if (rtgMinPFUnderExcited) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgMinPFUnderExcited = rtgMinPFUnderExcited;
-    }
-
-    if (rtgVNom) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        response.DERCapability.rtgVNom = rtgVNom;
-    }
-
-    return response;
 }

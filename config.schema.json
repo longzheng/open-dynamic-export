@@ -569,6 +569,20 @@
           },
           "additionalProperties": false,
           "description": "Publish active control limits"
+        },
+        "battery": {
+          "type": "object",
+          "properties": {
+            "chargeBufferWatts": {
+              "type": "number",
+              "description": "A minimum buffer to allow the battery to charge if export limit would otherwise have prevented the battery from charging"
+            }
+          },
+          "required": [
+            "chargeBufferWatts"
+          ],
+          "additionalProperties": false,
+          "description": "Battery configuration"
         }
       },
       "required": [

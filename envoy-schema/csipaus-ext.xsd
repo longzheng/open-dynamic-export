@@ -1,0 +1,51 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    elementFormDefault="qualified"
+    xmlns="https://csipaus.org/ns" 
+    xmlns:bs="urn:ieee:std:2030.5:ns" 
+    targetNamespace="https://csipaus.org/ns"> 
+
+    <xs:import namespace="urn:ieee:std:2030.5:ns" schemaLocation="sep.xsd"/>
+    
+    <xs:element name="opModImpLimW" type="bs:ActivePower" />
+    <xs:element name="opModExpLimW" type="bs:ActivePower" />
+    <xs:element name="opModGenLimW" type="bs:ActivePower" />
+    <xs:element name="opModLoadLimW" type="bs:ActivePower" />
+    
+    <xs:element name="doeModesSupported" type="DOEControlType" />
+    <xs:element name="doeModesEnabled" type="DOEControlType" />
+	
+    <xs:element name="ConnectionPointLink" type="bs:Link" />
+    <xs:element name="ConnectionPoint" type="ConnectionPointType" />
+    
+    <xs:complexType name="DOEControlType">
+      <xs:annotation>
+        <xs:documentation>Bitmap indicating the DOE controls implemented by the device. Bit positions SHALL be defined as follows:
+0 - opModExpLimW (Maximum Imported Active Power)
+1 - opModImpLimW (Maximum Exported Active Power)
+2 - opModGenLimW (Maximum Discharge Rate)
+3 - opModLoadLimW (Maximum Charge Rate)
+All other values reserved.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleContent>
+        <xs:extension base="bs:HexBinary8" />
+      </xs:simpleContent>
+  </xs:complexType>
+  
+  <xs:complexType name="ConnectionPointType">
+    <xs:annotation>
+      <xs:documentation>Contains identification information related to the network location at which the EndDevice is installed.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="bs:Resource">
+        <xs:sequence>
+          <xs:element name="connectionPointId" minOccurs="1" maxOccurs="1" type="bs:String32">
+            <xs:annotation>
+              <xs:documentation>The identifier referring to the connection point. Typically the NMI.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+</xs:schema>
