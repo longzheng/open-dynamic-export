@@ -36,16 +36,18 @@ export const inverterDataSchema = z.object({
         operationalModeStatus: z.nativeEnum(OperationalModeStatusValue),
         genConnectStatus: connectStatusValueSchema,
     }),
-    storage: z.object({
-        capacity: z.number(),        // WChaMax
-        maxChargeRate: z.number(),   // WChaGra
-        maxDischargeRate: z.number(), // WDisChaGra
-        stateOfCharge: z.number().nullable(), // ChaState
-        chargeStatus: z.nativeEnum(ChaSt).nullable(), // ChaSt
-        storageMode: z.number(),     // StorCtl_Mod
-        chargeRate: z.number().nullable(),    // InWRte
-        dischargeRate: z.number().nullable(), // OutWRte
-    }).optional(),
+    storage: z
+        .object({
+            capacity: z.number(), // WChaMax
+            maxChargeRate: z.number(), // WChaGra
+            maxDischargeRate: z.number(), // WDisChaGra
+            stateOfCharge: z.number().nullable(), // ChaState
+            chargeStatus: z.nativeEnum(ChaSt).nullable(), // ChaSt
+            storageMode: z.number(), // StorCtl_Mod
+            chargeRate: z.number().nullable(), // InWRte
+            dischargeRate: z.number().nullable(), // OutWRte
+        })
+        .optional(),
 });
 
 export type InverterDataBase = z.infer<typeof inverterDataSchema>;

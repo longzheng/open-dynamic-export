@@ -49,19 +49,23 @@ export class MqttSetpoint implements SetpointType {
             opModGenLimW: this.cachedMessage?.opModGenLimW,
             opModImpLimW: this.cachedMessage?.opModImpLimW,
             opModLoadLimW: this.cachedMessage?.opModLoadLimW,
-            
+
             // Battery-specific controls
             batteryChargeRatePercent: undefined, // Will be calculated by controller
             batteryDischargeRatePercent: undefined, // Will be calculated by controller
             batteryStorageMode: undefined, // Will be calculated by controller
-            batteryTargetSocPercent: this.cachedMessage?.batterySocTargetPercent,
+            batteryTargetSocPercent:
+                this.cachedMessage?.batterySocTargetPercent,
             batteryImportTargetWatts: this.cachedMessage?.importTargetWatts,
             batteryExportTargetWatts: this.cachedMessage?.exportTargetWatts,
             batteryChargeMaxWatts: this.cachedMessage?.batteryChargeMaxWatts,
-            batteryDischargeMaxWatts: this.cachedMessage?.batteryDischargeMaxWatts,
+            batteryDischargeMaxWatts:
+                this.cachedMessage?.batteryDischargeMaxWatts,
             batteryPriorityMode: this.cachedMessage?.batteryPriorityMode,
-            batteryGridChargingEnabled: this.cachedMessage?.batteryGridChargingEnabled,
-            batteryGridChargingMaxWatts: this.cachedMessage?.batteryGridChargingMaxWatts,
+            batteryGridChargingEnabled:
+                this.cachedMessage?.batteryGridChargingEnabled,
+            batteryGridChargingMaxWatts:
+                this.cachedMessage?.batteryGridChargingMaxWatts,
         };
 
         writeControlLimit({ limit });
@@ -81,7 +85,7 @@ const mqttSchema = z.object({
     opModGenLimW: z.number().optional(),
     opModImpLimW: z.number().optional(),
     opModLoadLimW: z.number().optional(),
-    
+
     // Battery-specific controls
     exportTargetWatts: z.number().min(0).optional(),
     importTargetWatts: z.number().min(0).optional(),

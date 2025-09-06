@@ -55,7 +55,8 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
             inverterIndex,
         });
 
-        this.batteryControlEnabled = sunspecInverterConfig.batteryControlEnabled ?? false;
+        this.batteryControlEnabled =
+            sunspecInverterConfig.batteryControlEnabled ?? false;
         this.inverterConnection = new InverterSunSpecConnection(
             sunspecInverterConfig,
         );
@@ -87,10 +88,12 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                 signal: this.abortController.signal,
                 fn: () => this.inverterConnection.getControlsModel(),
             }),
-            storage: this.batteryControlEnabled ? await withAbortCheck({
-                signal: this.abortController.signal,
-                fn: () => this.inverterConnection.getStorageModel(),
-            }).catch(() => null) : null, // Gracefully handle if storage model is not available
+            storage: this.batteryControlEnabled
+                ? await withAbortCheck({
+                      signal: this.abortController.signal,
+                      fn: () => this.inverterConnection.getStorageModel(),
+                  }).catch(() => null)
+                : null, // Gracefully handle if storage model is not available
         };
 
         const end = performance.now();
@@ -339,17 +342,22 @@ export function generateInverterDataStorage({
 }): NonNullable<InverterData['storage']> {
     // Apply scale factors to get the actual values
     const capacity = storage.WChaMax * Math.pow(10, storage.WChaMax_SF);
-    const maxChargeRate = storage.WChaGra * Math.pow(10, storage.WChaDisChaGra_SF);
-    const maxDischargeRate = storage.WDisChaGra * Math.pow(10, storage.WChaDisChaGra_SF);
-    const stateOfCharge = storage.ChaState !== null && storage.ChaState_SF !== null 
-        ? storage.ChaState * Math.pow(10, storage.ChaState_SF) 
-        : null;
-    const chargeRate = storage.InWRte !== null && storage.InOutWRte_SF !== null
-        ? storage.InWRte * Math.pow(10, storage.InOutWRte_SF)
-        : null;
-    const dischargeRate = storage.OutWRte !== null && storage.InOutWRte_SF !== null
-        ? storage.OutWRte * Math.pow(10, storage.InOutWRte_SF)
-        : null;
+    const maxChargeRate =
+        storage.WChaGra * Math.pow(10, storage.WChaDisChaGra_SF);
+    const maxDischargeRate =
+        storage.WDisChaGra * Math.pow(10, storage.WChaDisChaGra_SF);
+    const stateOfCharge =
+        storage.ChaState !== null && storage.ChaState_SF !== null
+            ? storage.ChaState * Math.pow(10, storage.ChaState_SF)
+            : null;
+    const chargeRate =
+        storage.InWRte !== null && storage.InOutWRte_SF !== null
+            ? storage.InWRte * Math.pow(10, storage.InOutWRte_SF)
+            : null;
+    const dischargeRate =
+        storage.OutWRte !== null && storage.InOutWRte_SF !== null
+            ? storage.OutWRte * Math.pow(10, storage.InOutWRte_SF)
+            : null;
 
     return {
         capacity,
