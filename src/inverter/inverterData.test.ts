@@ -29,8 +29,12 @@ describe('inverterDataSchema', () => {
                     maxVar: 5000,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatusValue.OperationalMode,
-                    genConnectStatus: ConnectStatusValue.Connected | ConnectStatusValue.Available | ConnectStatusValue.Operating,
+                    operationalModeStatus:
+                        OperationalModeStatusValue.OperationalMode,
+                    genConnectStatus:
+                        ConnectStatusValue.Connected |
+                        ConnectStatusValue.Available |
+                        ConnectStatusValue.Operating,
                 },
                 storage: {
                     capacity: 15000,
@@ -46,7 +50,7 @@ describe('inverterDataSchema', () => {
 
             const result = inverterDataSchema.safeParse(data);
             expect(result.success).toBe(true);
-            
+
             if (result.success) {
                 expect(result.data.storage?.capacity).toBe(15000);
                 expect(result.data.storage?.stateOfCharge).toBe(75);
@@ -76,7 +80,8 @@ describe('inverterDataSchema', () => {
                     maxVar: null,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatusValue.OperationalMode,
+                    operationalModeStatus:
+                        OperationalModeStatusValue.OperationalMode,
                     genConnectStatus: ConnectStatusValue.Connected,
                 },
                 // No storage field
@@ -84,7 +89,7 @@ describe('inverterDataSchema', () => {
 
             const result = inverterDataSchema.safeParse(data);
             expect(result.success).toBe(true);
-            
+
             if (result.success) {
                 expect(result.data.storage).toBeUndefined();
             }
@@ -113,7 +118,8 @@ describe('inverterDataSchema', () => {
                 maxVar: null,
             },
             status: {
-                operationalModeStatus: OperationalModeStatusValue.OperationalMode,
+                operationalModeStatus:
+                    OperationalModeStatusValue.OperationalMode,
                 genConnectStatus: ConnectStatusValue.Connected,
             },
         };
@@ -126,16 +132,16 @@ describe('inverterDataSchema', () => {
                     maxChargeRate: 3000,
                     maxDischargeRate: 2500,
                     stateOfCharge: null, // Nullable
-                    chargeStatus: null,  // Nullable
+                    chargeStatus: null, // Nullable
                     storageMode: 0,
-                    chargeRate: null,    // Nullable
+                    chargeRate: null, // Nullable
                     dischargeRate: null, // Nullable
                 },
             };
 
             const result = inverterDataSchema.safeParse(data);
             expect(result.success).toBe(true);
-            
+
             if (result.success) {
                 expect(result.data.storage?.stateOfCharge).toBeNull();
                 expect(result.data.storage?.chargeStatus).toBeNull();
@@ -155,7 +161,7 @@ describe('inverterDataSchema', () => {
                 ChaSt.TESTING,
             ];
 
-            chargeStatuses.forEach(status => {
+            chargeStatuses.forEach((status) => {
                 const data = {
                     ...baseData,
                     storage: {
@@ -172,7 +178,7 @@ describe('inverterDataSchema', () => {
 
                 const result = inverterDataSchema.safeParse(data);
                 expect(result.success).toBe(true);
-                
+
                 if (result.success) {
                     expect(result.data.storage?.chargeStatus).toBe(status);
                 }
@@ -182,7 +188,7 @@ describe('inverterDataSchema', () => {
         it('should validate different storage modes', () => {
             const storageModes = [0, 1, 2, 3, 4, 255];
 
-            storageModes.forEach(mode => {
+            storageModes.forEach((mode) => {
                 const data = {
                     ...baseData,
                     storage: {
@@ -199,7 +205,7 @@ describe('inverterDataSchema', () => {
 
                 const result = inverterDataSchema.safeParse(data);
                 expect(result.success).toBe(true);
-                
+
                 if (result.success) {
                     expect(result.data.storage?.storageMode).toBe(mode);
                 }
@@ -210,10 +216,10 @@ describe('inverterDataSchema', () => {
             const data = {
                 ...baseData,
                 storage: {
-                    capacity: 0,           // Zero capacity
-                    maxChargeRate: 0,      // Zero charge rate
-                    maxDischargeRate: 0,   // Zero discharge rate
-                    stateOfCharge: 0,      // Empty battery
+                    capacity: 0, // Zero capacity
+                    maxChargeRate: 0, // Zero charge rate
+                    maxDischargeRate: 0, // Zero discharge rate
+                    stateOfCharge: 0, // Empty battery
                     chargeStatus: ChaSt.EMPTY,
                     storageMode: 0,
                     chargeRate: 0,
@@ -223,7 +229,7 @@ describe('inverterDataSchema', () => {
 
             const result = inverterDataSchema.safeParse(data);
             expect(result.success).toBe(true);
-            
+
             if (result.success) {
                 expect(result.data.storage?.capacity).toBe(0);
                 expect(result.data.storage?.stateOfCharge).toBe(0);
@@ -234,8 +240,8 @@ describe('inverterDataSchema', () => {
             const data = {
                 ...baseData,
                 inverter: {
-                    realPower: -2000,      // Importing power
-                    reactivePower: -100,   // Negative reactive power
+                    realPower: -2000, // Importing power
+                    reactivePower: -100, // Negative reactive power
                     voltagePhaseA: 240,
                     voltagePhaseB: null,
                     voltagePhaseC: null,
@@ -249,13 +255,13 @@ describe('inverterDataSchema', () => {
                     chargeStatus: ChaSt.DISCHARGING,
                     storageMode: 1,
                     chargeRate: 0,
-                    dischargeRate: 80,     // High discharge rate
+                    dischargeRate: 80, // High discharge rate
                 },
             };
 
             const result = inverterDataSchema.safeParse(data);
             expect(result.success).toBe(true);
-            
+
             if (result.success) {
                 expect(result.data.inverter.realPower).toBe(-2000);
                 expect(result.data.storage?.dischargeRate).toBe(80);
@@ -286,7 +292,8 @@ describe('inverterDataSchema', () => {
                     maxVar: null,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatusValue.OperationalMode,
+                    operationalModeStatus:
+                        OperationalModeStatusValue.OperationalMode,
                     genConnectStatus: ConnectStatusValue.Connected,
                 },
             };
@@ -317,7 +324,8 @@ describe('inverterDataSchema', () => {
                     maxVar: null,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatusValue.OperationalMode,
+                    operationalModeStatus:
+                        OperationalModeStatusValue.OperationalMode,
                     genConnectStatus: ConnectStatusValue.Connected,
                 },
                 storage: {
@@ -358,7 +366,8 @@ describe('inverterDataSchema', () => {
                     maxVar: null,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatusValue.OperationalMode,
+                    operationalModeStatus:
+                        OperationalModeStatusValue.OperationalMode,
                     genConnectStatus: ConnectStatusValue.Connected,
                 },
                 storage: {

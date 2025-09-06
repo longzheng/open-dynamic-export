@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
-import { getGenConnectStatusFromPVConn, generateInverterDataStorage } from './index.js';
+import {
+    getGenConnectStatusFromPVConn,
+    generateInverterDataStorage,
+} from './index.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { ChaSt } from '../../connections/sunspec/models/storage.js';
 import { type StorageModel } from '../../connections/sunspec/models/storage.js';
@@ -62,21 +65,23 @@ describe('generateInverterDataStorage', () => {
             const storageModel: StorageModel = {
                 ID: 124,
                 L: 16,
-                WChaMax: 10000,      // 10 kWh capacity
-                WChaMax_SF: 0,       // Scale factor 0
-                WChaGra: 5000,       // 5 kW charge rate
-                WDisChaGra: 4000,    // 4 kW discharge rate  
+                WChaMax: 10000, // 10 kWh capacity
+                WChaMax_SF: 0, // Scale factor 0
+                WChaGra: 5000, // 5 kW charge rate
+                WDisChaGra: 4000, // 4 kW discharge rate
                 WChaDisChaGra_SF: 0, // Scale factor 0
-                ChaState: 75,        // 75% SOC
-                ChaState_SF: 0,      // Scale factor 0
+                ChaState: 75, // 75% SOC
+                ChaState_SF: 0, // Scale factor 0
                 ChaSt: ChaSt.CHARGING, // Charging status
-                StorCtl_Mod: 2,      // Storage control mode
-                InWRte: 30,          // 30% charge rate
-                OutWRte: 25,         // 25% discharge rate
-                InOutWRte_SF: 0,     // Scale factor 0
+                StorCtl_Mod: 2, // Storage control mode
+                InWRte: 30, // 30% charge rate
+                OutWRte: 25, // 25% discharge rate
+                InOutWRte_SF: 0, // Scale factor 0
             };
 
-            const result = generateInverterDataStorage({ storage: storageModel });
+            const result = generateInverterDataStorage({
+                storage: storageModel,
+            });
 
             expect(result).toEqual({
                 capacity: 10000,
@@ -94,30 +99,32 @@ describe('generateInverterDataStorage', () => {
             const storageModel: StorageModel = {
                 ID: 124,
                 L: 16,
-                WChaMax: 1000,       // 1000 with SF -2 = 10 kWh
-                WChaMax_SF: -2,      // Scale factor -2 (divide by 100)
-                WChaGra: 500,        // 500 with SF -2 = 5 kW charge rate
-                WDisChaGra: 400,     // 400 with SF -2 = 4 kW discharge rate
+                WChaMax: 1000, // 1000 with SF -2 = 10 kWh
+                WChaMax_SF: -2, // Scale factor -2 (divide by 100)
+                WChaGra: 500, // 500 with SF -2 = 5 kW charge rate
+                WDisChaGra: 400, // 400 with SF -2 = 4 kW discharge rate
                 WChaDisChaGra_SF: -2, // Scale factor -2
-                ChaState: 7500,      // 7500 with SF -2 = 75% SOC
-                ChaState_SF: -2,     // Scale factor -2
+                ChaState: 7500, // 7500 with SF -2 = 75% SOC
+                ChaState_SF: -2, // Scale factor -2
                 ChaSt: ChaSt.DISCHARGING,
                 StorCtl_Mod: 1,
-                InWRte: 3000,        // 3000 with SF -2 = 30% charge rate
-                OutWRte: 2500,       // 2500 with SF -2 = 25% discharge rate
-                InOutWRte_SF: -2,    // Scale factor -2
+                InWRte: 3000, // 3000 with SF -2 = 30% charge rate
+                OutWRte: 2500, // 2500 with SF -2 = 25% discharge rate
+                InOutWRte_SF: -2, // Scale factor -2
             };
 
-            const result = generateInverterDataStorage({ storage: storageModel });
+            const result = generateInverterDataStorage({
+                storage: storageModel,
+            });
 
             expect(result).toEqual({
-                capacity: 10,      // 1000 * 10^(-2)
-                maxChargeRate: 5,  // 500 * 10^(-2)
+                capacity: 10, // 1000 * 10^(-2)
+                maxChargeRate: 5, // 500 * 10^(-2)
                 maxDischargeRate: 4, // 400 * 10^(-2)
                 stateOfCharge: 75, // 7500 * 10^(-2)
                 chargeStatus: ChaSt.DISCHARGING,
                 storageMode: 1,
-                chargeRate: 30,    // 3000 * 10^(-2)
+                chargeRate: 30, // 3000 * 10^(-2)
                 dischargeRate: 25, // 2500 * 10^(-2)
             });
         });
@@ -133,7 +140,7 @@ describe('generateInverterDataStorage', () => {
                 WChaGra: 5000,
                 WDisChaGra: 4000,
                 WChaDisChaGra_SF: 0,
-                ChaState: null,      // SOC not available
+                ChaState: null, // SOC not available
                 ChaState_SF: -2,
                 ChaSt: ChaSt.IDLE,
                 StorCtl_Mod: 0,
@@ -142,7 +149,9 @@ describe('generateInverterDataStorage', () => {
                 InOutWRte_SF: 0,
             };
 
-            const result = generateInverterDataStorage({ storage: storageModel });
+            const result = generateInverterDataStorage({
+                storage: storageModel,
+            });
 
             expect(result.stateOfCharge).toBeNull();
             expect(result.capacity).toBe(10000);
@@ -162,12 +171,14 @@ describe('generateInverterDataStorage', () => {
                 ChaState_SF: 0,
                 ChaSt: ChaSt.IDLE,
                 StorCtl_Mod: 0,
-                InWRte: null,        // Charge rate not available
-                OutWRte: null,       // Discharge rate not available
+                InWRte: null, // Charge rate not available
+                OutWRte: null, // Discharge rate not available
                 InOutWRte_SF: 0,
             };
 
-            const result = generateInverterDataStorage({ storage: storageModel });
+            const result = generateInverterDataStorage({
+                storage: storageModel,
+            });
 
             expect(result.chargeRate).toBeNull();
             expect(result.dischargeRate).toBeNull();

@@ -181,7 +181,7 @@ describe('FixedSetpoint', () => {
             const config: NonNullable<Config['setpoints']['fixed']> = {};
 
             const setpoint = new FixedSetpoint({ config });
-            
+
             expect(() => setpoint.destroy()).not.toThrow();
         });
     });

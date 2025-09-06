@@ -71,31 +71,41 @@ describe('Battery Control Integration Tests', () => {
 
             // Verify most restrictive values are selected
             expect(activeControlLimit.batteryTargetSocPercent?.value).toBe(70);
-            expect(activeControlLimit.batteryTargetSocPercent?.source).toBe('mqtt');
-            expect(activeControlLimit.batteryImportTargetWatts?.value).toBe(1500);
+            expect(activeControlLimit.batteryTargetSocPercent?.source).toBe(
+                'mqtt',
+            );
+            expect(activeControlLimit.batteryImportTargetWatts?.value).toBe(
+                1500,
+            );
             expect(activeControlLimit.batteryChargeMaxWatts?.value).toBe(3000);
-            expect(activeControlLimit.batteryGridChargingEnabled?.value).toBe(false);
-            expect(activeControlLimit.batteryPriorityMode?.value).toBe('battery_first');
+            expect(activeControlLimit.batteryGridChargingEnabled?.value).toBe(
+                false,
+            );
+            expect(activeControlLimit.batteryPriorityMode?.value).toBe(
+                'battery_first',
+            );
 
             // 3. Test SunSpec Storage Data Parsing
             const storageModel: StorageModel = {
                 ID: 124,
                 L: 16,
-                WChaMax: 15000,      // 15 kWh capacity
+                WChaMax: 15000, // 15 kWh capacity
                 WChaMax_SF: 0,
-                WChaGra: 5000,       // 5 kW max charge
-                WDisChaGra: 4000,    // 4 kW max discharge
+                WChaGra: 5000, // 5 kW max charge
+                WDisChaGra: 4000, // 4 kW max discharge
                 WChaDisChaGra_SF: 0,
-                ChaState: 75,        // 75% SOC
+                ChaState: 75, // 75% SOC
                 ChaState_SF: 0,
                 ChaSt: ChaSt.CHARGING,
-                StorCtl_Mod: 2,      // Storage control mode
-                InWRte: 30,          // 30% charge rate
-                OutWRte: 0,          // 0% discharge rate
+                StorCtl_Mod: 2, // Storage control mode
+                InWRte: 30, // 30% charge rate
+                OutWRte: 0, // 0% discharge rate
                 InOutWRte_SF: 0,
             };
 
-            const storageData = generateInverterDataStorage({ storage: storageModel });
+            const storageData = generateInverterDataStorage({
+                storage: storageModel,
+            });
 
             // Verify storage data parsing
             expect(storageData.capacity).toBe(15000);
@@ -107,7 +117,7 @@ describe('Battery Control Integration Tests', () => {
             // 4. Test Complete InverterData Schema Validation
             const completeInverterData = {
                 inverter: {
-                    realPower: 3500,     // Currently producing 3.5kW
+                    realPower: 3500, // Currently producing 3.5kW
                     reactivePower: 200,
                     voltagePhaseA: 240.5,
                     voltagePhaseB: 241.0,
@@ -126,19 +136,26 @@ describe('Battery Control Integration Tests', () => {
                     maxVar: 5000,
                 },
                 status: {
-                    operationalModeStatus: OperationalModeStatusValue.OperationalMode,
-                    genConnectStatus: ConnectStatusValue.Connected | ConnectStatusValue.Available | ConnectStatusValue.Operating,
+                    operationalModeStatus:
+                        OperationalModeStatusValue.OperationalMode,
+                    genConnectStatus:
+                        ConnectStatusValue.Connected |
+                        ConnectStatusValue.Available |
+                        ConnectStatusValue.Operating,
                 },
                 storage: storageData,
             };
 
-            const validationResult = inverterDataSchema.safeParse(completeInverterData);
+            const validationResult =
+                inverterDataSchema.safeParse(completeInverterData);
             expect(validationResult.success).toBe(true);
 
             if (validationResult.success) {
                 expect(validationResult.data.storage?.capacity).toBe(15000);
                 expect(validationResult.data.storage?.stateOfCharge).toBe(75);
-                expect(validationResult.data.storage?.chargeStatus).toBe(ChaSt.CHARGING);
+                expect(validationResult.data.storage?.chargeStatus).toBe(
+                    ChaSt.CHARGING,
+                );
             }
         });
 
@@ -192,7 +209,9 @@ describe('Battery Control Integration Tests', () => {
             ]);
 
             // battery_first should take precedence over export_first
-            expect(activeControl.batteryPriorityMode?.value).toBe('battery_first');
+            expect(activeControl.batteryPriorityMode?.value).toBe(
+                'battery_first',
+            );
             expect(activeControl.batteryPriorityMode?.source).toBe('mqtt');
 
             // Most restrictive values should be selected
@@ -254,7 +273,9 @@ describe('Battery Control Integration Tests', () => {
 
             // Grid charging should be disabled (most restrictive)
             expect(activeControl.batteryGridChargingEnabled?.value).toBe(false);
-            expect(activeControl.batteryGridChargingEnabled?.source).toBe('csipAus');
+            expect(activeControl.batteryGridChargingEnabled?.source).toBe(
+                'csipAus',
+            );
         });
 
         it('should validate edge cases in storage data', () => {
@@ -262,21 +283,23 @@ describe('Battery Control Integration Tests', () => {
             const edgeCaseStorage: StorageModel = {
                 ID: 124,
                 L: 16,
-                WChaMax: 0,          // Zero capacity
+                WChaMax: 0, // Zero capacity
                 WChaMax_SF: 0,
                 WChaGra: 0,
                 WDisChaGra: 0,
                 WChaDisChaGra_SF: 0,
-                ChaState: null,      // SOC unavailable
+                ChaState: null, // SOC unavailable
                 ChaState_SF: 0,
                 ChaSt: ChaSt.OFF,
                 StorCtl_Mod: 0,
-                InWRte: null,        // Rates unavailable
+                InWRte: null, // Rates unavailable
                 OutWRte: null,
                 InOutWRte_SF: 0,
             };
 
-            const storageData = generateInverterDataStorage({ storage: edgeCaseStorage });
+            const storageData = generateInverterDataStorage({
+                storage: edgeCaseStorage,
+            });
 
             expect(storageData.capacity).toBe(0);
             expect(storageData.stateOfCharge).toBeNull();

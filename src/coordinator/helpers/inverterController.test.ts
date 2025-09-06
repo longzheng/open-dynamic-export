@@ -467,19 +467,33 @@ describe('getActiveInverterControlLimit - battery control merging', () => {
         ]);
 
         expect(inverterControlLimit.batteryTargetSocPercent?.value).toBe(70);
-        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe(
+            'mqtt',
+        );
         expect(inverterControlLimit.batteryImportTargetWatts?.value).toBe(2000);
-        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe(
+            'mqtt',
+        );
         expect(inverterControlLimit.batteryExportTargetWatts?.value).toBe(3500);
-        expect(inverterControlLimit.batteryExportTargetWatts?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryExportTargetWatts?.source).toBe(
+            'mqtt',
+        );
         expect(inverterControlLimit.batteryChargeMaxWatts?.value).toBe(4000);
         expect(inverterControlLimit.batteryChargeMaxWatts?.source).toBe('mqtt');
         expect(inverterControlLimit.batteryDischargeMaxWatts?.value).toBe(4000);
-        expect(inverterControlLimit.batteryDischargeMaxWatts?.source).toBe('mqtt');
-        expect(inverterControlLimit.batteryPriorityMode?.value).toBe('battery_first');
+        expect(inverterControlLimit.batteryDischargeMaxWatts?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'battery_first',
+        );
         expect(inverterControlLimit.batteryPriorityMode?.source).toBe('mqtt');
-        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(false);
-        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(
+            false,
+        );
+        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe(
+            'mqtt',
+        );
     });
 
     it('should prioritize battery_first over export_first priority mode', () => {
@@ -508,7 +522,9 @@ describe('getActiveInverterControlLimit - battery control merging', () => {
             },
         ]);
 
-        expect(inverterControlLimit.batteryPriorityMode?.value).toBe('battery_first');
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'battery_first',
+        );
         expect(inverterControlLimit.batteryPriorityMode?.source).toBe('mqtt');
     });
 
@@ -538,7 +554,9 @@ describe('getActiveInverterControlLimit - battery control merging', () => {
             },
         ]);
 
-        expect(inverterControlLimit.batteryPriorityMode?.value).toBe('export_first');
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'export_first',
+        );
         expect(inverterControlLimit.batteryPriorityMode?.source).toBe('fixed');
     });
 
@@ -568,8 +586,12 @@ describe('getActiveInverterControlLimit - battery control merging', () => {
             },
         ]);
 
-        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(false);
-        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe('mqtt');
+        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(
+            false,
+        );
+        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe(
+            'mqtt',
+        );
     });
 
     it('should take minimum values for numeric battery limits', () => {
@@ -609,17 +631,31 @@ describe('getActiveInverterControlLimit - battery control merging', () => {
         ]);
 
         expect(inverterControlLimit.batteryTargetSocPercent?.value).toBe(60);
-        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe('csipAus');
+        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe(
+            'csipAus',
+        );
         expect(inverterControlLimit.batteryImportTargetWatts?.value).toBe(2500);
-        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe('csipAus');
+        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe(
+            'csipAus',
+        );
         expect(inverterControlLimit.batteryExportTargetWatts?.value).toBe(3000);
-        expect(inverterControlLimit.batteryExportTargetWatts?.source).toBe('csipAus');
+        expect(inverterControlLimit.batteryExportTargetWatts?.source).toBe(
+            'csipAus',
+        );
         expect(inverterControlLimit.batteryChargeMaxWatts?.value).toBe(4500);
-        expect(inverterControlLimit.batteryChargeMaxWatts?.source).toBe('csipAus');
+        expect(inverterControlLimit.batteryChargeMaxWatts?.source).toBe(
+            'csipAus',
+        );
         expect(inverterControlLimit.batteryDischargeMaxWatts?.value).toBe(4000);
-        expect(inverterControlLimit.batteryDischargeMaxWatts?.source).toBe('csipAus');
-        expect(inverterControlLimit.batteryGridChargingMaxWatts?.value).toBe(2000);
-        expect(inverterControlLimit.batteryGridChargingMaxWatts?.source).toBe('csipAus');
+        expect(inverterControlLimit.batteryDischargeMaxWatts?.source).toBe(
+            'csipAus',
+        );
+        expect(inverterControlLimit.batteryGridChargingMaxWatts?.value).toBe(
+            2000,
+        );
+        expect(inverterControlLimit.batteryGridChargingMaxWatts?.source).toBe(
+            'csipAus',
+        );
     });
 
     it('should handle mixed battery configurations correctly', () => {
@@ -653,18 +689,30 @@ describe('getActiveInverterControlLimit - battery control merging', () => {
         ]);
 
         expect(inverterControlLimit.batteryTargetSocPercent?.value).toBe(80);
-        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe('fixed');
+        expect(inverterControlLimit.batteryTargetSocPercent?.source).toBe(
+            'fixed',
+        );
         expect(inverterControlLimit.batteryImportTargetWatts?.value).toBe(2000);
-        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe('mqtt');
-        expect(inverterControlLimit.batteryPriorityMode?.value).toBe('export_first');
+        expect(inverterControlLimit.batteryImportTargetWatts?.source).toBe(
+            'mqtt',
+        );
+        expect(inverterControlLimit.batteryPriorityMode?.value).toBe(
+            'export_first',
+        );
         expect(inverterControlLimit.batteryPriorityMode?.source).toBe('fixed');
-        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(false);
-        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe('mqtt');
-        
+        expect(inverterControlLimit.batteryGridChargingEnabled?.value).toBe(
+            false,
+        );
+        expect(inverterControlLimit.batteryGridChargingEnabled?.source).toBe(
+            'mqtt',
+        );
+
         // Fields not provided by any source should be undefined
         expect(inverterControlLimit.batteryExportTargetWatts).toBeUndefined();
         expect(inverterControlLimit.batteryChargeMaxWatts).toBeUndefined();
         expect(inverterControlLimit.batteryDischargeMaxWatts).toBeUndefined();
-        expect(inverterControlLimit.batteryGridChargingMaxWatts).toBeUndefined();
+        expect(
+            inverterControlLimit.batteryGridChargingMaxWatts,
+        ).toBeUndefined();
     });
 });

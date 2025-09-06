@@ -59,7 +59,7 @@ describe('MqttSetpoint', () => {
 
             // Simulate connection event
             const connectHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'connect'
+                (call) => call[0] === 'connect',
             )?.[1];
             connectHandler?.();
 
@@ -96,12 +96,12 @@ describe('MqttSetpoint', () => {
     describe('message processing', () => {
         it('should process valid MQTT message with basic controls', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             // Simulate message event
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
-            
+
             const testMessage = {
                 opModConnect: true,
                 opModEnergize: false,
@@ -112,8 +112,8 @@ describe('MqttSetpoint', () => {
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
@@ -128,11 +128,11 @@ describe('MqttSetpoint', () => {
 
         it('should process valid MQTT message with battery controls', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
-            
+
             const testMessage = {
                 exportTargetWatts: 2500,
                 importTargetWatts: 3000,
@@ -147,8 +147,8 @@ describe('MqttSetpoint', () => {
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
@@ -165,19 +165,19 @@ describe('MqttSetpoint', () => {
 
         it('should handle export_first priority mode', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
-            
+
             const testMessage = {
                 batteryPriorityMode: 'export_first' as const,
                 batterySocTargetPercent: 30,
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
@@ -188,19 +188,19 @@ describe('MqttSetpoint', () => {
 
         it('should handle disabled grid charging', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
-            
+
             const testMessage = {
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: 0,
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
@@ -213,18 +213,15 @@ describe('MqttSetpoint', () => {
     describe('message validation', () => {
         it('should handle JSON parse errors gracefully', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
 
             // The current implementation doesn't handle JSON.parse errors
             // This test documents the current behavior - it will throw
             expect(() => {
-                messageHandler?.(
-                    'test/setpoint', 
-                    Buffer.from('invalid json')
-                );
+                messageHandler?.('test/setpoint', Buffer.from('invalid json'));
             }).toThrow('Unexpected token');
 
             const result = setpoint.getInverterControlLimit();
@@ -234,9 +231,9 @@ describe('MqttSetpoint', () => {
 
         it('should reject invalid battery SOC values', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
 
             const testMessage = {
@@ -244,8 +241,8 @@ describe('MqttSetpoint', () => {
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
@@ -255,19 +252,19 @@ describe('MqttSetpoint', () => {
 
         it('should reject negative power values', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
 
             const testMessage = {
                 exportTargetWatts: -100, // Invalid: negative
-                importTargetWatts: -50,  // Invalid: negative
+                importTargetWatts: -50, // Invalid: negative
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
@@ -278,21 +275,21 @@ describe('MqttSetpoint', () => {
 
         it('should accept valid boundary values', () => {
             const setpoint = new MqttSetpoint({ config: mqttConfig });
-            
+
             const messageHandler = mockClient.on.mock.calls.find(
-                call => call[0] === 'message'
+                (call) => call[0] === 'message',
             )?.[1];
 
             const testMessage = {
-                batterySocTargetPercent: 0,   // Valid boundary
-                batterySocMinPercent: 100,    // Valid boundary
-                exportTargetWatts: 0,         // Valid boundary
-                importTargetWatts: 0,         // Valid boundary
+                batterySocTargetPercent: 0, // Valid boundary
+                batterySocMinPercent: 100, // Valid boundary
+                exportTargetWatts: 0, // Valid boundary
+                importTargetWatts: 0, // Valid boundary
             };
 
             messageHandler?.(
-                'test/setpoint', 
-                Buffer.from(JSON.stringify(testMessage))
+                'test/setpoint',
+                Buffer.from(JSON.stringify(testMessage)),
             );
 
             const result = setpoint.getInverterControlLimit();
