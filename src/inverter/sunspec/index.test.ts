@@ -5,7 +5,10 @@ import {
     generateInverterDataStorage,
 } from './index.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
-import { ChaSt, StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
+import {
+    ChaSt,
+    StorCtl_Mod,
+} from '../../connections/sunspec/models/storage.js';
 import { type StorageModel } from '../../connections/sunspec/models/storage.js';
 
 describe('getGenConnectStatusFromPVConn', () => {
