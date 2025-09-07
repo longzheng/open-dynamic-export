@@ -199,6 +199,18 @@ export class CsipAusSetpoint implements SetpointType {
                     .control,
             opModImpLimW: this.opModImpLimWRampRateHelper.getRampedValue(),
             opModLoadLimW: this.opModLoadLimWRampRateHelper.getRampedValue(),
+            // Battery controls - not used in CSIP-AUS setpoints
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         };
 
         writeControlLimit({ limit });

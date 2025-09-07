@@ -30,6 +30,18 @@ describe('AusgridEA029Setpoint', () => {
             opModGenLimW: undefined,
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            // Battery controls - not used in two-way tariff setpoints
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         } satisfies typeof result);
     });
 
@@ -47,6 +59,18 @@ describe('AusgridEA029Setpoint', () => {
             opModGenLimW: undefined,
             opModImpLimW: undefined,
             opModLoadLimW: undefined,
+            // Battery controls - not used in two-way tariff setpoints
+            batteryChargeRatePercent: undefined,
+            batteryDischargeRatePercent: undefined,
+            batteryStorageMode: undefined,
+            batteryTargetSocPercent: undefined,
+            batteryImportTargetWatts: undefined,
+            batteryExportTargetWatts: undefined,
+            batteryChargeMaxWatts: undefined,
+            batteryDischargeMaxWatts: undefined,
+            batteryPriorityMode: undefined,
+            batteryGridChargingEnabled: undefined,
+            batteryGridChargingMaxWatts: undefined,
         } satisfies typeof result);
     });
 
