@@ -156,6 +156,11 @@ The implementation provides the foundation for battery storage integration. Futu
 4. **SMA Support**: Extend battery support to SMA inverters
 5. **Multi-Battery Systems**: Support for multiple independent battery systems
 
+## TODO
+
+- Change the way `StorCtl_Mod` is defined? it's two boolean bits normally, each 0/1. whereas Copilot chose to use 0/1/2/3?
+- is `loadLimitWatts` relevant/necessary? load is always the first priority regardless?
+
 ## Testing
 
 The implementation has been validated through:
