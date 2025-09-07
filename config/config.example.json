@@ -1,22 +1,5 @@
 {
     "setpoints": {
-        "fixed": {
-            "connect": true,
-            "exportLimitWatts": 5000,
-            "generationLimitWatts": 10000,
-            "importLimitWatts": 5000,
-            "loadLimitWatts": 10000,
-            "exportTargetWatts": 0,
-            "importTargetWatts": 0,
-            "batterySocTargetPercent": 80,
-            "batterySocMinPercent": 20,
-            "batterySocMaxPercent": 100,
-            "batteryChargeMaxWatts": 3000,
-            "batteryDischargeMaxWatts": 3000,
-            "batteryPriorityMode": "export_first",
-            "batteryGridChargingEnabled": false,
-            "batteryGridChargingMaxWatts": 2000
-        }
     },
     "inverters": [
         {
@@ -26,13 +9,11 @@
                 "ip": "192.168.1.6",
                 "port": 502
             },
-            "unitId": 1,
-            "batteryControlEnabled": true
+            "unitId": 1
         }
     ],
     "inverterControl": {
-        "enabled": true,
-        "batteryControlEnabled": true
+        "enabled": true
     },
     "meter": {
         "type": "sunspec",
