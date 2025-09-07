@@ -94,6 +94,8 @@ export class Powerwall2Client {
                     } catch (error) {
                         this.logger.error(error, 'Powerwall2 login error');
 
+                        this.token = { type: 'none' };
+
                         throw new Error(`Powerwall2 get token error`);
                     }
                 })();
