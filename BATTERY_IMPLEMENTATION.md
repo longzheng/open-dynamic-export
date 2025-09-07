@@ -28,10 +28,10 @@ The implementation adds comprehensive battery storage control capabilities to th
 - `batteryGridChargingMaxWatts`: Maximum grid charging rate
 
 #### Inverter Configuration
-- `batteryControlEnabled`: Enable battery control for SunSpec inverters
+- `batteryControlEnabled`: Enable battery control for individual SunSpec inverters
 
 #### System Configuration
-- `inverterControl.batteryControlEnabled`: Global battery control enable
+- `inverterControl.batteryControlEnabled`: Global battery control enable (for all inverters)
 
 ### 2. **SunSpec Integration**
 
