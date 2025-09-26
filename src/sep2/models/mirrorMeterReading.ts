@@ -88,7 +88,8 @@ export function generateMirrorMeterReadingObject(
                       : undefined,
                   timePeriod: Reading.timePeriod
                       ? {
-                            duration: Reading.timePeriod.duration,
+                            // ensure integer value
+                            duration: Math.round(Reading.timePeriod.duration),
                             start: dateToStringSeconds(
                                 Reading.timePeriod.start,
                             ),

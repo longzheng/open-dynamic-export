@@ -14,7 +14,6 @@ import { objectToXml } from './xml.js';
 import { type Logger } from 'pino';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { type SampleBase } from '../../coordinator/helpers/sampleBase.js';
-import { getSampleTimePeriod } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { addMilliseconds } from 'date-fns';
 import { isNetworkError, isRetryableError } from 'axios-retry';
@@ -181,13 +180,11 @@ export abstract class MirrorUsagePointHelperBase<
         // we won't know what reading types we have
         if (samples.length > 0) {
             const now = new Date();
+            const nextUpdateMilliseconds = getNextUpdateMilliseconds();
             const reading = this.getReadingFromSamples(samples);
-            const sampleTimePeriod = getSampleTimePeriod(samples);
+            const sampleDurationSeconds = nextUpdateMilliseconds / 1000;
             const lastUpdateTime = now;
-            const nextUpdateTime = addMilliseconds(
-                now,
-                getNextUpdateMilliseconds(),
-            );
+            const nextUpdateTime = addMilliseconds(now, nextUpdateMilliseconds);
             const mirrorMeterReadings = this.getReadingValues({
                 reading,
             });
@@ -219,8 +216,8 @@ export abstract class MirrorUsagePointHelperBase<
                             ),
 
                             timePeriod: {
-                                start: sampleTimePeriod.start,
-                                duration: sampleTimePeriod.durationSeconds,
+                                start: now,
+                                duration: sampleDurationSeconds,
                             },
                         },
                     };
