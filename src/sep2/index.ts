@@ -113,6 +113,10 @@ export function getSep2Instance({
                 throw new Error('End device is not enabled');
             }
 
+            mirrorUsagePointListHelper.updateEndDevice({
+                endDevice,
+            });
+
             if (endDevice.derListLink) {
                 derListHelper.updateHref({
                     href: endDevice.derListLink.href,
