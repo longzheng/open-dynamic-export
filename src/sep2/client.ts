@@ -107,8 +107,8 @@ export class SEP2Client {
 
     // From the SEP2 Client Handbook
     // A suggested naming pattern for the Usage Point mRID(s) could include a truncated LFDI with the role flags, in addition to a PEN
-    generateUsagePointMrid(roleFlags: RoleFlagsType) {
-        return `${this.lfdi.substring(0, 22)}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
+    generateUsagePointMrid(lfdi: string, roleFlags: RoleFlagsType) {
+        return `${lfdi.substring(0, 22)}${numberToHex(roleFlags).padStart(2, '0')}${this.pen}`;
     }
 
     // From the SEP2 Client Handbook

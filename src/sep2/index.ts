@@ -113,6 +113,10 @@ export function getSep2Instance({
                 throw new Error('End device is not enabled');
             }
 
+            mirrorUsagePointListHelper.updateEndDevice({
+                endDevice,
+            });
+
             if (endDevice.derListLink) {
                 derListHelper.updateHref({
                     href: endDevice.derListLink.href,
@@ -197,7 +201,8 @@ export function getSep2Instance({
         // as a direct client, we expect only one end device that matches the LFDI of our certificate
         const endDevice = endDeviceList.endDevices.find(
             (endDevice) =>
-                endDevice.lFDI === sep2Client.lfdi &&
+                // LFDI should always be uppercase but in case the server returns lowercase
+                endDevice.lFDI?.toUpperCase() === sep2Client.lfdi &&
                 endDevice.enabled === true,
         );
 
