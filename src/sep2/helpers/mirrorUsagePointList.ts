@@ -87,9 +87,6 @@ class MirrorUsagePointListPollableResource extends PollableResource<MirrorUsageP
             url,
             options: { signal },
             parseXml: parseMirrorUsagePointListXml,
-            addItems: (allResults, result) => {
-                allResults.mirrorUsagePoints.push(...result.mirrorUsagePoints);
-            },
             getItems: (result) => result.mirrorUsagePoints,
         });
     }

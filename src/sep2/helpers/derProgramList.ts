@@ -96,14 +96,6 @@ export class DerProgramListHelper extends EventEmitter<{
                                                       .signal,
                                               },
                                               parseXml: parseDerControlListXml,
-                                              addItems: (
-                                                  allResults,
-                                                  result,
-                                              ) => {
-                                                  allResults.derControls.push(
-                                                      ...result.derControls,
-                                                  );
-                                              },
                                               getItems: (result) =>
                                                   result.derControls,
                                           })
@@ -151,9 +143,6 @@ class DerProgramListPollableResource extends PollableResource<DERProgramList> {
             url,
             options: { signal },
             parseXml: parseDerProgramListXml,
-            addItems: (allResults, result) => {
-                allResults.derPrograms.push(...result.derPrograms);
-            },
             getItems: (result) => result.derPrograms,
         });
     }

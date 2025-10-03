@@ -66,9 +66,6 @@ class EndDeviceListPollableResource extends PollableResource<EndDeviceList> {
             url,
             options: { signal },
             parseXml: parseEndDeviceListXml,
-            addItems: (allResults, result) => {
-                allResults.endDevices.push(...result.endDevices);
-            },
             getItems: (result) => result.endDevices,
         });
     }

@@ -246,11 +246,6 @@ class FunctionSetAssignmentsListPollableResource extends PollableResource<Functi
             url,
             options: { signal },
             parseXml: parseFunctionSetAssignmentsListXml,
-            addItems: (allResults, result) => {
-                allResults.functionSetAssignments.push(
-                    ...result.functionSetAssignments,
-                );
-            },
             getItems: (result) => result.functionSetAssignments,
         });
     }

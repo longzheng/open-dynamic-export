@@ -7,7 +7,6 @@ export interface PaginationOptions<T extends List> {
     url: string;
     options?: Omit<AxiosRequestConfig<never>, 'params'>;
     parseXml: (xml: unknown) => T;
-    addItems: (allResults: T, result: T) => void;
     getItems: (result: T) => unknown[];
     limit?: number;
 }
@@ -17,7 +16,6 @@ export async function getListAll<T extends List>({
     url,
     options,
     parseXml,
-    addItems,
     getItems,
     limit = 10, // Default to 10 if not provided
 }: PaginationOptions<T>): Promise<T> {
@@ -41,7 +39,10 @@ export async function getListAll<T extends List>({
         if (!allResults) {
             allResults = result;
         } else {
-            addItems(allResults, result);
+            const allItems = getItems(allResults);
+            const newItems = getItems(result);
+
+            allItems.push(...newItems);
         }
     }
 
@@ -67,7 +68,7 @@ async function* getListPageGenerator<T extends List>({
     limit,
     parseXml,
     getItemsLength,
-}: Omit<PaginationOptions<T>, 'addItems' | 'getItems'> & {
+}: Omit<PaginationOptions<T>, 'getItems'> & {
     limit: number;
     getItemsLength: () => number;
 }): AsyncGenerator<T> {

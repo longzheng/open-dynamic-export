@@ -34,12 +34,6 @@ describe('getListAll', () => {
         return xml as MockStringsList;
     });
 
-    const mockAddItems = vi.fn(
-        (allResults: MockStringsList, result: MockStringsList) => {
-            allResults.strings.push(...result.strings);
-        },
-    );
-
     const mockGetItems = vi.fn((result: MockStringsList) => {
         return result.strings;
     });
@@ -60,11 +54,11 @@ describe('getListAll', () => {
             client: sep2Client,
             url: '/mockUrl',
             parseXml: mockParseXml,
-            addItems: mockAddItems,
             getItems: mockGetItems,
         });
 
         // Assert
+        expect(result.all).toBe(4);
         expect(result.strings.length).toBe(4);
         expect(result.strings).toEqual(['test1', 'test2', 'test3', 'test4']);
         expect(mockGetCalls).toBeCalledTimes(2);
@@ -93,7 +87,6 @@ describe('getListAll', () => {
                 client: sep2Client,
                 url: '/mockUrl',
                 parseXml: mockParseXml,
-                addItems: mockAddItems,
                 getItems: mockGetItems,
             }),
         ).rejects.toThrow('There are more items (4) than returned (2)');
@@ -115,11 +108,11 @@ describe('getListAll', () => {
             client: sep2Client,
             url: '/mockUrl',
             parseXml: mockParseXml,
-            addItems: mockAddItems,
             getItems: mockGetItems,
         });
 
         // Assert
+        expect(result.all).toBe(0);
         expect(result.strings.length).toBe(0);
         expect(mockGetCalls).toBeCalledTimes(1);
     });

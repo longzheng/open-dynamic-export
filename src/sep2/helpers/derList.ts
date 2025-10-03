@@ -56,9 +56,6 @@ class DerListPollableResource extends PollableResource<DERList> {
             url,
             options: { signal },
             parseXml: parseDerListXml,
-            addItems: (allResults, result) => {
-                allResults.ders.push(...result.ders);
-            },
             getItems: (result) => result.ders,
         });
     }
