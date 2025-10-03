@@ -8,6 +8,7 @@ import {
     generateMirrorUsagePointResponse,
     parseMirrorUsagePointXml,
 } from '../models/mirrorUsagePoint.js';
+import { type EndDevice } from '../models/endDevice.js';
 import { type RoleFlagsType } from '../models/roleFlagsType.js';
 import { ServiceKind } from '../models/serviceKind.js';
 import { objectToXml } from './xml.js';
@@ -44,7 +45,14 @@ export abstract class MirrorUsagePointHelperBase<
 > {
     protected client: SEP2Client;
     protected mirrorUsagePointListHref: string | null = null;
-    protected mirrorUsagePoint: MirrorUsagePoint | null = null;
+    protected state:
+        | {
+              type: 'ready';
+              mirrorUsagePoint: MirrorUsagePoint;
+          }
+        | { type: 'none' }
+        | { type: 'initializing' } = { type: 'none' };
+    private endDevice: EndDevice | null = null;
     protected samples: Sample[] = [];
     protected abstract description: string;
     protected abstract roleFlags: RoleFlagsType;
@@ -59,6 +67,18 @@ export abstract class MirrorUsagePointHelperBase<
         this.abortController = new AbortController();
     }
 
+    public async setEndDevice({ endDevice }: { endDevice: EndDevice }) {
+        if (this.endDevice && this.endDevice.lFDI !== endDevice.lFDI) {
+            throw new Error(
+                'MirrorUsagePoint EndDevice LFDI cannot be changed',
+            );
+        }
+
+        this.endDevice = endDevice;
+
+        await this.initMirrorUsagePoint();
+    }
+
     public async updateMirrorUsagePointList({
         mirrorUsagePoints,
         mirrorUsagePointListHref,
@@ -68,36 +88,73 @@ export abstract class MirrorUsagePointHelperBase<
     }) {
         this.mirrorUsagePointListHref = mirrorUsagePointListHref;
 
-        if (!this.mirrorUsagePoint) {
-            await this.initMirrorUsagePoint();
+        await this.initMirrorUsagePoint();
+
+        this.updateMirrorUsagePointPostRate({ mirrorUsagePoints });
+    }
+
+    private updateMirrorUsagePointPostRate({
+        mirrorUsagePoints,
+    }: {
+        mirrorUsagePoints: MirrorUsagePoint[];
+    }) {
+        if (this.state.type !== 'ready') {
+            return;
         }
 
-        const currentMirrorUsagePoint = this.mirrorUsagePoint;
+        const mirrorUsagePoint = this.state.mirrorUsagePoint;
 
-        if (currentMirrorUsagePoint) {
-            const serverMirrorUsagePoint = mirrorUsagePoints.find(
-                (mup) => mup.mRID === currentMirrorUsagePoint.mRID,
+        const serverMirrorUsagePoint = mirrorUsagePoints.find(
+            (mup) => mup.mRID === mirrorUsagePoint.mRID,
+        );
+
+        if (
+            serverMirrorUsagePoint &&
+            mirrorUsagePoint.postRate !== serverMirrorUsagePoint.postRate
+        ) {
+            this.logger.debug(
+                {
+                    previousPostRate: mirrorUsagePoint.postRate,
+                    newPostRate: serverMirrorUsagePoint.postRate,
+                },
+                'Updating MirrorUsagePoint postRate',
             );
-
-            // the server may change the PostRate of the MirrorUsagePoint
-            // update the post rate from polled MirrorUsagePointList data
-            if (serverMirrorUsagePoint) {
-                currentMirrorUsagePoint.postRate =
-                    serverMirrorUsagePoint.postRate;
-            }
+            mirrorUsagePoint.postRate = serverMirrorUsagePoint.postRate;
         }
-
-        this.queueMirrorMeterReadingPost();
     }
 
     private async initMirrorUsagePoint() {
+        if (this.state.type !== 'none') {
+            return;
+        }
+
+        if (!this.endDevice || !this.mirrorUsagePointListHref) {
+            this.logger.debug(
+                `Not ready to initialize MirrorUsagePoint, missing ${[!this.endDevice ? 'endDevice' : null, !this.mirrorUsagePointListHref ? 'mirrorUsagePointListHref' : null].filter(Boolean).join(', ')}`,
+            );
+            return;
+        }
+
+        // since MirrorUsagePoint can be initialized by both setEndDevice and updateMirrorUsagePointList asynchronously
+        // we need to lock the state to initializing to prevent multiple initializations
+        this.state = { type: 'initializing' };
+
+        const deviceLFDI = this.endDevice.lFDI;
+
+        if (!deviceLFDI) {
+            throw new Error('EndDevice is missing LFDI');
+        }
+
         const mirrorUsagePoint: MirrorUsagePoint = {
-            mRID: this.client.generateUsagePointMrid(this.roleFlags),
+            mRID: this.client.generateUsagePointMrid(
+                deviceLFDI,
+                this.roleFlags,
+            ),
             description: this.description,
             roleFlags: this.roleFlags,
             serviceCategoryKind: ServiceKind.Electricity,
             status: UsagePointBaseStatus.On,
-            deviceLFDI: this.client.lfdi,
+            deviceLFDI,
             mirrorMeterReading: this.getMirrorMeterReadingsWithReadingType(),
         };
 
@@ -109,11 +166,19 @@ export abstract class MirrorUsagePointHelperBase<
         // we also want to set this up early so we know the correct postRate (set by the server)
         // ignore errors creating MirrorUsagePoint as it'll try again when we post MirrorMeterReadings
         try {
-            this.mirrorUsagePoint = await this.postMirrorUsagePoint({
+            const createdMirrorUsagePoint = await this.postMirrorUsagePoint({
                 mirrorUsagePoint,
             });
+
+            this.state = {
+                type: 'ready',
+                mirrorUsagePoint: createdMirrorUsagePoint,
+            };
+
+            this.queueMirrorMeterReadingPost();
         } catch (error) {
             this.logger.debug(error, 'Failed to create MirrorUsagePoint');
+            this.state = { type: 'none' };
         }
     }
 
@@ -145,8 +210,13 @@ export abstract class MirrorUsagePointHelperBase<
     }): Record<MirrorMeterReadingKeys, number | null>;
 
     private getPostRate() {
+        const mirrorUsagePointPostRate =
+            this.state.type === 'ready'
+                ? this.state.mirrorUsagePoint.postRate
+                : null;
+
         return (
-            (this.mirrorUsagePoint?.postRate ??
+            (mirrorUsagePointPostRate ??
                 defaultPollPushRates.mirrorUsagePointPush) / 60
         );
     }
@@ -321,16 +391,19 @@ export abstract class MirrorUsagePointHelperBase<
                 failCount++;
                 this.mirrorMeterReadingsBuffer.push(reading);
 
-                // clear any existing MirrorUsagePoint as we don't want to post to it (assume it's no longer valid)
-                if (this.mirrorUsagePoint) {
-                    this.mirrorUsagePoint = null;
-                }
-
+                // reset the state and clear any existing MirrorUsagePoint as we don't want to post to it (assume it's no longer valid)
                 // Energex indicated that a MUP might get deleted; try re-create the MUP as a precaution
-                this.logger.debug(
-                    { existingMirrorUsagePoint: this.mirrorUsagePoint },
-                    'Re-creating MirrorUsagePoint due to MirrorMeterReading error',
-                );
+                if (this.state.type === 'ready') {
+                    this.logger.debug(
+                        {
+                            existingMirrorUsagePoint:
+                                this.state.mirrorUsagePoint,
+                        },
+                        'Re-creating MirrorUsagePoint due to MirrorMeterReading error',
+                    );
+
+                    this.state = { type: 'none' };
+                }
 
                 await this.initMirrorUsagePoint();
             }
@@ -347,7 +420,7 @@ export abstract class MirrorUsagePointHelperBase<
     }: {
         mirrorMeterReading: MirrorMeterReading;
     }) {
-        if (!this.mirrorUsagePoint || !this.mirrorUsagePoint.href) {
+        if (this.state.type !== 'ready' || !this.state.mirrorUsagePoint.href) {
             throw new Error('Missing mirrorUsagePoint or its href');
         }
 
@@ -355,7 +428,7 @@ export abstract class MirrorUsagePointHelperBase<
         const xml = objectToXml(data);
 
         const response = await this.client.post(
-            this.mirrorUsagePoint.href,
+            this.state.mirrorUsagePoint.href,
             xml,
             {
                 'axios-retry': {

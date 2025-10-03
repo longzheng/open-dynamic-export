@@ -33,9 +33,12 @@ afterAll(() => {
     server.close();
 });
 
+const lfdi = 'B9A8A75E324D2312AD09F8DAF9C1295A3CE4142E';
+
 describe('generateUsagePointMrid', () => {
     it('should generate usage point MRID for site', () => {
         const result = sep2Client.generateUsagePointMrid(
+            lfdi,
             RoleFlagsType.isMirror | RoleFlagsType.isPremisesAggregationPoint,
         );
 
@@ -44,6 +47,7 @@ describe('generateUsagePointMrid', () => {
 
     it('should generate usage point MRID for DER', () => {
         const result = sep2Client.generateUsagePointMrid(
+            lfdi,
             RoleFlagsType.isMirror |
                 RoleFlagsType.isDER |
                 RoleFlagsType.isSubmeter,
