@@ -70,20 +70,28 @@ export class DerProgramListHelper extends EventEmitter<{
                             const result: DerProgramListData = [];
 
                             for (const program of data.derPrograms) {
-                                const defaultDerControl =
-                                    program.defaultDerControlLink
-                                        ? parseDefaultDERControlXml(
-                                              await this.client.get(
-                                                  program.defaultDerControlLink
-                                                      .href,
-                                                  {
-                                                      signal: this
-                                                          .abortController
-                                                          .signal,
-                                                  },
-                                              ),
-                                          )
+                                const defaultDerControlLink =
+                                    program.defaultDerControlLink;
+
+                                // according to the standard the DefaultDerControlLink may be optional but the XML should not be
+                                // however on the Energex test server it's observed the server might send back an 204 No Content response which the XML parser returns as null
+                                // therefore we want to validate there is actually XML content before parsing
+                                const defaultDerControlXml =
+                                    defaultDerControlLink
+                                        ? ((await this.client.get(
+                                              defaultDerControlLink.href,
+                                              {
+                                                  signal: this.abortController
+                                                      .signal,
+                                              },
+                                          )) as object | null)
                                         : undefined;
+
+                                const defaultDerControl = defaultDerControlXml
+                                    ? parseDefaultDERControlXml(
+                                          defaultDerControlXml,
+                                      )
+                                    : undefined;
 
                                 const derControlList =
                                     program.derControlListLink
