@@ -49,6 +49,27 @@ export class MqttSetpoint implements SetpointType {
             opModGenLimW: this.cachedMessage?.opModGenLimW,
             opModImpLimW: this.cachedMessage?.opModImpLimW,
             opModLoadLimW: this.cachedMessage?.opModLoadLimW,
+            batteryChargeRatePercent:
+                this.cachedMessage?.batteryChargeRatePercent,
+            batteryDischargeRatePercent:
+                this.cachedMessage?.batteryDischargeRatePercent,
+            batteryStorageMode: this.cachedMessage?.batteryStorageMode,
+            batteryTargetSocPercent:
+                this.cachedMessage?.batteryTargetSocPercent,
+            batteryImportTargetWatts:
+                this.cachedMessage?.batteryImportTargetWatts,
+            batteryExportTargetWatts:
+                this.cachedMessage?.batteryExportTargetWatts,
+            batterySocMinPercent: this.cachedMessage?.batterySocMinPercent,
+            batterySocMaxPercent: this.cachedMessage?.batterySocMaxPercent,
+            batteryChargeMaxWatts: this.cachedMessage?.batteryChargeMaxWatts,
+            batteryDischargeMaxWatts:
+                this.cachedMessage?.batteryDischargeMaxWatts,
+            batteryPriorityMode: this.cachedMessage?.batteryPriorityMode,
+            batteryGridChargingEnabled:
+                this.cachedMessage?.batteryGridChargingEnabled,
+            batteryGridChargingMaxWatts:
+                this.cachedMessage?.batteryGridChargingMaxWatts,
         };
 
         writeControlLimit({ limit });
@@ -68,4 +89,17 @@ const mqttSchema = z.object({
     opModGenLimW: z.number().optional(),
     opModImpLimW: z.number().optional(),
     opModLoadLimW: z.number().optional(),
+    batteryChargeRatePercent: z.number().optional(),
+    batteryDischargeRatePercent: z.number().optional(),
+    batteryStorageMode: z.number().optional(),
+    batteryTargetSocPercent: z.number().optional(),
+    batteryImportTargetWatts: z.number().optional(),
+    batteryExportTargetWatts: z.number().optional(),
+    batterySocMinPercent: z.number().optional(),
+    batterySocMaxPercent: z.number().optional(),
+    batteryChargeMaxWatts: z.number().optional(),
+    batteryDischargeMaxWatts: z.number().optional(),
+    batteryPriorityMode: z.enum(['export_first', 'battery_first']).optional(),
+    batteryGridChargingEnabled: z.boolean().optional(),
+    batteryGridChargingMaxWatts: z.number().optional(),
 });

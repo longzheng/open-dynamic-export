@@ -94,6 +94,63 @@ export const configSchema = z.object({
                         .min(0)
                         .optional()
                         .describe('The load limit in watts'),
+                    exportTargetWatts: z
+                        .number()
+                        .optional()
+                        .describe(
+                            'Desired export when no solar (from battery)',
+                        ),
+                    importTargetWatts: z
+                        .number()
+                        .optional()
+                        .describe(
+                            'Desired import for battery charging from grid',
+                        ),
+                    batterySocTargetPercent: z
+                        .number()
+                        .min(0)
+                        .max(100)
+                        .optional()
+                        .describe('Target state of charge %'),
+                    batterySocMinPercent: z
+                        .number()
+                        .min(0)
+                        .max(100)
+                        .optional()
+                        .describe('Minimum reserve %'),
+                    batterySocMaxPercent: z
+                        .number()
+                        .min(0)
+                        .max(100)
+                        .optional()
+                        .describe('Maximum charge %'),
+                    batteryChargeMaxWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe('Maximum charge rate (can override SunSpec)'),
+                    batteryDischargeMaxWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe(
+                            'Maximum discharge rate (can override SunSpec)',
+                        ),
+                    batteryPriorityMode: z
+                        .enum(['export_first', 'battery_first'])
+                        .optional()
+                        .describe(
+                            'Battery priority mode: export_first | battery_first',
+                        ),
+                    batteryGridChargingEnabled: z
+                        .boolean()
+                        .optional()
+                        .describe('Allow charging battery from grid'),
+                    batteryGridChargingMaxWatts: z
+                        .number()
+                        .min(0)
+                        .optional()
+                        .describe('Maximum grid charging rate'),
                 })
                 .optional()
                 .describe('If defined, limits by manual configuration'),
@@ -153,6 +210,12 @@ export const configSchema = z.object({
                 z
                     .object({
                         type: z.literal('sunspec'),
+                        batteryControlEnabled: z
+                            .boolean()
+                            .optional()
+                            .describe(
+                                'Enable battery control for this inverter',
+                            ),
                     })
                     .merge(modbusSchema)
                     .describe('SunSpec inverter configuration'),
@@ -198,6 +261,10 @@ export const configSchema = z.object({
         .describe('Inverter configuration'),
     inverterControl: z.object({
         enabled: z.boolean().describe('Whether to control the inverters'),
+        batteryControlEnabled: z
+            .boolean()
+            .optional()
+            .describe('Whether to control battery storage (global setting)'),
         sampleSeconds: z
             .number()
             .min(0)

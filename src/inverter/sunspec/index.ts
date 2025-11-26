@@ -13,6 +13,7 @@ import { getInverterMetrics } from '../../connections/sunspec/helpers/inverterMe
 import { getNameplateMetrics } from '../../connections/sunspec/helpers/nameplateMetrics.js';
 import { getSettingsMetrics } from '../../connections/sunspec/helpers/settingsMetrics.js';
 import { getStatusMetrics } from '../../connections/sunspec/helpers/statusMetrics.js';
+import { getStorageMetrics } from '../../connections/sunspec/helpers/storageMetrics.js';
 import {
     type ControlsModel,
     type ControlsModelWrite,
@@ -28,11 +29,13 @@ import { InverterState } from '../../connections/sunspec/models/inverter.js';
 import { type NameplateModel } from '../../connections/sunspec/models/nameplate.js';
 import { type SettingsModel } from '../../connections/sunspec/models/settings.js';
 import { type StatusModel } from '../../connections/sunspec/models/status.js';
+import { type StorageModel } from '../../connections/sunspec/models/storage.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
+    private batteryControlEnabled: boolean;
 
     constructor({
         sunspecInverterConfig,
@@ -52,6 +55,9 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
             applyControl,
             inverterIndex,
         });
+
+        this.batteryControlEnabled =
+            sunspecInverterConfig.batteryControlEnabled ?? false;
 
         this.inverterConnection = new InverterSunSpecConnection(
             sunspecInverterConfig,
@@ -84,6 +90,19 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                 signal: this.abortController.signal,
                 fn: () => this.inverterConnection.getControlsModel(),
             }),
+            storage: this.batteryControlEnabled
+                ? await withAbortCheck({
+                      signal: this.abortController.signal,
+                      fn: async () => {
+                          try {
+                              return await this.inverterConnection.getStorageModel();
+                          } catch {
+                              // Storage model is optional - inverter may not have battery capability
+                              return null;
+                          }
+                      },
+                  })
+                : null,
         };
 
         const end = performance.now();
@@ -131,11 +150,13 @@ export function generateInverterData({
     nameplate,
     settings,
     status,
+    storage,
 }: {
     inverter: InverterModel;
     nameplate: NameplateModel;
     settings: SettingsModel;
     status: StatusModel;
+    storage: StorageModel | null;
 }): InverterData {
     const inverterMetrics = getInverterMetrics(inverter);
     const nameplateMetrics = getNameplateMetrics(nameplate);
@@ -181,6 +202,28 @@ export function generateInverterData({
             status,
             inverterW: inverterMetrics.W,
         }),
+        storage: storage ? generateInverterDataStorage({ storage }) : undefined,
+    };
+}
+
+export function generateInverterDataStorage({
+    storage,
+}: {
+    storage: StorageModel;
+}): NonNullable<InverterData['storage']> {
+    const storageMetrics = getStorageMetrics(storage);
+
+    return {
+        stateOfChargePercent: storageMetrics.ChaState,
+        availableEnergyWh: storageMetrics.StorAval,
+        batteryVoltage: storageMetrics.InBatV,
+        chargeStatus: storageMetrics.ChaSt,
+        maxChargeRateWatts: storageMetrics.WChaGra,
+        maxDischargeRateWatts: storageMetrics.WDisChaGra,
+        currentChargeRatePercent: storageMetrics.InWRte,
+        currentDischargeRatePercent: storageMetrics.OutWRte,
+        minReservePercent: storageMetrics.MinRsvPct,
+        gridChargingPermitted: storageMetrics.ChaGriSet,
     };
 }
 
