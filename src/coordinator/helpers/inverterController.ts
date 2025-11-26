@@ -50,20 +50,20 @@ export type InverterControlLimit = {
     opModExpLimW: number | undefined;
     opModImpLimW: number | undefined;
     opModLoadLimW: number | undefined;
-    // Battery control attributes
-    batteryChargeRatePercent: number | undefined;
-    batteryDischargeRatePercent: number | undefined;
-    batteryStorageMode: number | undefined; // Maps to StorCtl_Mod
-    batteryTargetSocPercent: number | undefined;
-    batteryImportTargetWatts: number | undefined;
-    batteryExportTargetWatts: number | undefined;
-    batterySocMinPercent: number | undefined;
-    batterySocMaxPercent: number | undefined;
-    batteryChargeMaxWatts: number | undefined;
-    batteryDischargeMaxWatts: number | undefined;
-    batteryPriorityMode: 'export_first' | 'battery_first' | undefined;
-    batteryGridChargingEnabled: boolean | undefined;
-    batteryGridChargingMaxWatts: number | undefined;
+    // Battery control attributes (all optional for backward compatibility)
+    batteryChargeRatePercent?: number | undefined;
+    batteryDischargeRatePercent?: number | undefined;
+    batteryStorageMode?: number | undefined; // Maps to StorCtl_Mod
+    batteryTargetSocPercent?: number | undefined;
+    batteryImportTargetWatts?: number | undefined;
+    batteryExportTargetWatts?: number | undefined;
+    batterySocMinPercent?: number | undefined;
+    batterySocMaxPercent?: number | undefined;
+    batteryChargeMaxWatts?: number | undefined;
+    batteryDischargeMaxWatts?: number | undefined;
+    batteryPriorityMode?: 'export_first' | 'battery_first' | undefined;
+    batteryGridChargingEnabled?: boolean | undefined;
+    batteryGridChargingMaxWatts?: number | undefined;
 };
 
 export type InverterConfiguration =

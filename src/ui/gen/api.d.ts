@@ -2008,6 +2008,31 @@ export interface components {
         InverterControlTypes: "fixed" | "mqtt" | "csipAus" | "twoWayTariff" | "negativeFeedIn" | "batteryChargeBuffer";
         InverterControlLimit: {
             /** Format: double */
+            batteryGridChargingMaxWatts?: number;
+            batteryGridChargingEnabled?: boolean;
+            /** @enum {string} */
+            batteryPriorityMode?: "export_first" | "battery_first";
+            /** Format: double */
+            batteryDischargeMaxWatts?: number;
+            /** Format: double */
+            batteryChargeMaxWatts?: number;
+            /** Format: double */
+            batterySocMaxPercent?: number;
+            /** Format: double */
+            batterySocMinPercent?: number;
+            /** Format: double */
+            batteryExportTargetWatts?: number;
+            /** Format: double */
+            batteryImportTargetWatts?: number;
+            /** Format: double */
+            batteryTargetSocPercent?: number;
+            /** Format: double */
+            batteryStorageMode?: number;
+            /** Format: double */
+            batteryDischargeRatePercent?: number;
+            /** Format: double */
+            batteryChargeRatePercent?: number;
+            /** Format: double */
             opModLoadLimW?: number;
             /** Format: double */
             opModImpLimW?: number;
@@ -2029,6 +2054,70 @@ export interface components {
         };
         ControlLimitsBySetpoint: components["schemas"]["Record_csipAus-or-fixed-or-negativeFeedIn-or-twoWayTariff-or-mqtt.InverterControlLimit-or-null_"];
         ActiveInverterControlLimit: {
+            batteryGridChargingMaxWatts?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryGridChargingEnabled?: {
+                source: components["schemas"]["InverterControlTypes"];
+                value: boolean;
+            };
+            batteryPriorityMode?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** @enum {string} */
+                value: "export_first" | "battery_first";
+            };
+            batteryDischargeMaxWatts?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryChargeMaxWatts?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batterySocMaxPercent?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batterySocMinPercent?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryExportTargetWatts?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryImportTargetWatts?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryTargetSocPercent?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryStorageMode?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryDischargeRatePercent?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
+            batteryChargeRatePercent?: {
+                source: components["schemas"]["InverterControlTypes"];
+                /** Format: double */
+                value: number;
+            };
             opModLoadLimW?: {
                 source: components["schemas"]["InverterControlTypes"];
                 /** Format: double */
