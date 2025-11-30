@@ -2147,6 +2147,18 @@ export interface components {
                 value: boolean;
             };
         };
+        BatteryControlConfiguration: {
+            /** Format: double */
+            storageMode: number;
+            /** Format: double */
+            dischargeRatePercent?: number;
+            /** Format: double */
+            chargeRatePercent?: number;
+            /** @enum {string} */
+            mode: "charge" | "discharge" | "idle";
+            /** Format: double */
+            targetPowerWatts: number;
+        };
         InverterConfiguration: {
             /** @enum {string} */
             type: "disconnect";
@@ -2154,6 +2166,7 @@ export interface components {
             /** @enum {string} */
             type: "deenergize";
         } | {
+            batteryControl?: components["schemas"]["BatteryControlConfiguration"];
             /** Format: double */
             targetSolarPowerRatio: number;
             /** Format: double */
