@@ -380,6 +380,11 @@
               "type": "boolean",
               "description": "Whether to control battery storage (global setting)"
             },
+            "batteryPowerFlowControl": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable intelligent battery power flow control (consumption → battery → export). When disabled, uses simple battery charge buffer instead."
+            },
             "sampleSeconds": {
               "type": "number",
               "minimum": 0,
