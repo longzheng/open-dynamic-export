@@ -57,11 +57,23 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
             "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
             "generationLimitWatts": 10000, // (number) optional: the maximum generation limit in watts
             "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (not currently used)
-            "loadLimitWatts": 10000 // (number) optional: the maximum load limit in watts (not currently used)
+            "loadLimitWatts": 10000, // (number) optional: the maximum load limit in watts (not currently used)
+            
+            // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true)
+            "batterySocTargetPercent": 80, // (number) optional: target state of charge (0-100)
+            "batterySocMinPercent": 20, // (number) optional: minimum SOC, no discharge below this
+            "batterySocMaxPercent": 95, // (number) optional: maximum SOC, no charge above this
+            "batteryChargeMaxWatts": 5000, // (number) optional: maximum charging power
+            "batteryDischargeMaxWatts": 5000, // (number) optional: maximum discharging power
+            "batteryPriorityMode": "battery_first" // (string) optional: "battery_first" or "export_first"
         }
     }
     ...
 }
+```
+
+> [!NOTE]
+> Battery control parameters require `inverterControl.batteryPowerFlowControl` to be enabled. See [Battery Configuration](./battery.md) for detailed information.
 ```
 
 ## MQTT
@@ -90,10 +102,20 @@ z.object({
     opModGenLimW: z.number().optional(),
     opModImpLimW: z.number().optional(),
     opModLoadLimW: z.number().optional(),
+    
+    // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true)
+    batterySocTargetPercent: z.number().optional(),
+    batterySocMinPercent: z.number().optional(),
+    batterySocMaxPercent: z.number().optional(),
+    batteryChargeMaxWatts: z.number().optional(),
+    batteryDischargeMaxWatts: z.number().optional(),
+    batteryPriorityMode: z.enum(['battery_first', 'export_first']).optional(),
+    batteryGridChargingEnabled: z.boolean().optional(),
+    batteryGridChargingMaxWatts: z.number().optional(),
 });
 ```
 
-For example
+### Example: Basic Limits
 
 ```js
 {
@@ -102,6 +124,21 @@ For example
     "opModGenLimW": 10000
 }
 ```
+
+### Example: Battery Control via MQTT
+
+```js
+{
+    "opModExpLimW": 0,
+    "batterySocTargetPercent": 100,
+    "batteryPriorityMode": "battery_first",
+    "batteryChargeMaxWatts": 5000,
+    "batteryDischargeMaxWatts": 3000
+}
+```
+
+> [!NOTE]
+> Battery control parameters allow dynamic battery management via MQTT. This enables integration with home automation, VPP programs, and time-of-use optimization. See [Battery Configuration](./battery.md) for more details.
 
 ## Negative feed-in
 

@@ -11,6 +11,43 @@ To help test and validate integrations, the project can be configured whether to
 }
 ```
 
+## Battery control
+
+The system supports comprehensive battery control with SOC awareness, priority modes, and multi-inverter support. Battery control can be enabled globally and requires both global and per-inverter configuration.
+
+```js
+{
+    "inverterControl": {
+        "enabled": true,
+        "batteryControlEnabled": true, // (true/false) optional: enable battery storage control
+        "batteryPowerFlowControl": true // (true/false) optional: use intelligent power flow control
+    },
+    ...
+}
+```
+
+### Configuration Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `batteryControlEnabled` | boolean | false | Enable battery control system globally |
+| `batteryPowerFlowControl` | boolean | false | Use intelligent power flow control (recommended) |
+
+> [!NOTE]
+> See [Battery Configuration](./battery.md) for detailed information about battery control features, priority modes, SOC management, and configuration examples.
+
+### Battery Power Flow Control vs Legacy Charge Buffer
+
+The system provides two battery control mechanisms:
+
+- **Battery Power Flow Control** (Recommended): Intelligent control with SOC awareness, configurable priority modes, and multi-inverter support
+- **Legacy Charge Buffer**: Simple override ensuring minimum charging headroom
+
+> [!IMPORTANT]
+> These mechanisms are **mutually exclusive**. The system will reject configurations that attempt to use both `battery.chargeBufferWatts` and `inverterControl.batteryPowerFlowControl` simultaneously.
+
+See the [Battery Configuration Guide](./battery.md) for migration steps and detailed feature comparisons.
+
 ## Data sampling
 
 The inverter control loop will attempt to aggregate and average a window of measurements to reduce the impact of noise and fluctuations. The `config.json` option `inverterControl.sampleSize` can be used to adjust the number of samples to average.

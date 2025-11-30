@@ -37,6 +37,8 @@ The SunSpec Modbus protocol is a widely adopted standard for communication for s
 
 The project requires SunSpec models `1`, `101` (or `102` or `103`), `120`, `121`, `122`, `123` to be supported.
 
+For battery control, the inverter must also support SunSpec model `124` (Battery Storage).
+
 ### config.json
 
 To configure a SunSpec inverter connection over TCP, add the following property to `config.json`
@@ -51,12 +53,17 @@ To configure a SunSpec inverter connection over TCP, add the following property 
                 "ip": "192.168.1.6", // (string) required: the IP address of the inverter
                 "port": 502 // (number) required: the Modbus TCP port of the inverter
             },
-            "unitId": 1 // (number) required: the Modbus unit ID of the inverter,
-            "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+            "unitId": 1, // (number) required: the Modbus unit ID of the inverter,
+            "pollingIntervalMs": 200, // (number) optional: the polling interval in milliseconds, default 200
+            "batteryControlEnabled": false // (boolean) optional: enable battery control for this inverter, default false
         }
     ],
     ...
 }
+```
+
+> [!NOTE]
+> Battery control requires global `inverterControl.batteryControlEnabled` and per-inverter `batteryControlEnabled` to be set to `true`. The system will automatically detect if the inverter has battery storage capability via SunSpec Model 124. See [Battery Configuration](./battery.md) for more details.
 ```
 
 For SunSpec over RTU, you need to modify the `connection`
