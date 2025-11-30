@@ -135,3 +135,6 @@ docs/.vitepress/cache
 
 # macOS files
 .DS_Store
+
+# Custom docker-compose setups
+docker-compose.custom.yml
