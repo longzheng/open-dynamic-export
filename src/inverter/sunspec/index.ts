@@ -6,6 +6,7 @@ import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import {
     getWMaxLimPctFromTargetSolarPowerRatio,
     type InverterConfiguration,
+    type BatteryControlConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
 import { type Config } from '../../helpers/config.js';
 import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
@@ -29,13 +30,17 @@ import { InverterState } from '../../connections/sunspec/models/inverter.js';
 import { type NameplateModel } from '../../connections/sunspec/models/nameplate.js';
 import { type SettingsModel } from '../../connections/sunspec/models/settings.js';
 import { type StatusModel } from '../../connections/sunspec/models/status.js';
-import { type StorageModel } from '../../connections/sunspec/models/storage.js';
+import {
+    type StorageModel,
+    type StorageModelWrite,
+} from '../../connections/sunspec/models/storage.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
 export class SunSpecInverterDataPoller extends InverterDataPollerBase {
     private inverterConnection: InverterSunSpecConnection;
     private batteryControlEnabled: boolean;
+    private hasStorageCapability: boolean | null = null; // null = unknown, true/false = determined
 
     constructor({
         sunspecInverterConfig,
@@ -95,9 +100,24 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                       signal: this.abortController.signal,
                       fn: async () => {
                           try {
-                              return await this.inverterConnection.getStorageModel();
+                              const storage =
+                                  await this.inverterConnection.getStorageModel();
+                              // Successfully got storage model - this inverter has battery capability
+                              if (this.hasStorageCapability === null) {
+                                  this.hasStorageCapability = true;
+                                  this.logger.info(
+                                      'Inverter has battery storage capability',
+                                  );
+                              }
+                              return storage;
                           } catch {
                               // Storage model is optional - inverter may not have battery capability
+                              if (this.hasStorageCapability === null) {
+                                  this.hasStorageCapability = false;
+                                  this.logger.info(
+                                      'Inverter does not have battery storage capability',
+                                  );
+                              }
                               return null;
                           }
                       },
@@ -132,9 +152,63 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
 
         if (this.applyControl) {
             try {
+                // Write inverter controls (solar generation limits)
                 await this.inverterConnection.writeControlsModel(
                     writeControlsModel,
                 );
+
+                // Write battery controls if present and battery control is enabled
+                if (
+                    this.batteryControlEnabled &&
+                    this.hasStorageCapability === true &&
+                    inverterConfiguration.type === 'limit' &&
+                    inverterConfiguration.batteryControl
+                ) {
+                    try {
+                        const storageModel =
+                            await this.inverterConnection.getStorageModel();
+
+                        const writeStorageModel =
+                            generateStorageModelWriteFromBatteryControl({
+                                batteryControl:
+                                    inverterConfiguration.batteryControl,
+                                storageModel,
+                            });
+
+                        await this.inverterConnection.writeStorageModel(
+                            writeStorageModel,
+                        );
+
+                        this.logger.info(
+                            {
+                                batteryControl:
+                                    inverterConfiguration.batteryControl,
+                                writeStorageModel,
+                            },
+                            'Wrote battery controls',
+                        );
+                    } catch (error) {
+                        this.logger.error(
+                            error,
+                            'Error writing battery storage controls',
+                        );
+                    }
+                } else if (
+                    this.batteryControlEnabled &&
+                    this.hasStorageCapability === false &&
+                    inverterConfiguration.type === 'limit' &&
+                    inverterConfiguration.batteryControl
+                ) {
+                    // Log that battery control was requested but this inverter doesn't have storage
+                    this.logger.debug(
+                        {
+                            inverterIndex: this.inverterIndex,
+                            batteryControl:
+                                inverterConfiguration.batteryControl,
+                        },
+                        'Battery control requested but inverter does not have storage capability - skipping',
+                    );
+                }
             } catch (error) {
                 this.logger.error(
                     error,
@@ -363,4 +437,36 @@ export function generateControlsModelWriteFromInverterConfiguration({
                 OutPFSet_Ena: OutPFSet_Ena.DISABLED,
             };
     }
+}
+
+export function generateStorageModelWriteFromBatteryControl({
+    batteryControl,
+    storageModel,
+}: {
+    batteryControl: BatteryControlConfiguration;
+    storageModel: StorageModel;
+}): StorageModelWrite {
+    // Convert target power to charge/discharge rates
+    const targetPower = Math.abs(batteryControl.targetPowerWatts);
+
+    return {
+        ...storageModel,
+        StorCtl_Mod: batteryControl.storageMode,
+        // Set charge rate when charging
+        WChaGra:
+            batteryControl.mode === 'charge'
+                ? targetPower
+                : storageModel.WChaGra,
+        // Set discharge rate when discharging
+        WDisChaGra:
+            batteryControl.mode === 'discharge'
+                ? targetPower
+                : storageModel.WDisChaGra,
+        // Optional: set percentage rates if provided
+        InWRte: batteryControl.chargeRatePercent ?? storageModel.InWRte,
+        OutWRte: batteryControl.dischargeRatePercent ?? storageModel.OutWRte,
+        // Set revert timeout for safety (60 seconds)
+        // If connection is lost, battery control will revert to default
+        InOutWRte_RvrtTms: 60,
+    };
 }

@@ -92,6 +92,7 @@ describe('generateDerSample', () => {
                     ConnectStatusValue.Operating,
             },
             invertersCount: 1,
+            battery: null,
         } satisfies typeof result);
     });
 
@@ -197,6 +198,7 @@ describe('generateDerSample', () => {
                     ConnectStatusValue.Operating,
             },
             invertersCount: 2,
+            battery: null,
         } satisfies typeof result);
     });
 });

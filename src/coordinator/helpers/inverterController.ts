@@ -23,6 +23,11 @@ import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import { differenceInSeconds } from 'date-fns';
 import { type ControlsModel } from '../../connections/sunspec/models/controls.js';
 import { Publish } from './publish.js';
+import {
+    calculateBatteryPowerFlow,
+    type BatteryPowerFlowInput,
+} from './batteryPowerFlowCalculator.js';
+import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -66,6 +71,19 @@ export type InverterControlLimit = {
     batteryGridChargingMaxWatts?: number | undefined;
 };
 
+export type BatteryControlConfiguration = {
+    // Target battery power: positive = charge, negative = discharge
+    targetPowerWatts: number;
+    // Battery operating mode
+    mode: 'charge' | 'discharge' | 'idle';
+    // Charge rate as percentage (0-100)
+    chargeRatePercent?: number | undefined;
+    // Discharge rate as percentage (0-100)
+    dischargeRatePercent?: number | undefined;
+    // SunSpec storage control mode (bitfield)
+    storageMode: number;
+};
+
 export type InverterConfiguration =
     | { type: 'disconnect' }
     | { type: 'deenergize' }
@@ -74,6 +92,7 @@ export type InverterConfiguration =
           invertersCount: number;
           targetSolarWatts: number;
           targetSolarPowerRatio: number;
+          batteryControl?: BatteryControlConfiguration | undefined;
       };
 
 const defaultValues = {
@@ -115,6 +134,7 @@ export class InverterController {
     private applyControlLoopTimer: NodeJS.Timeout | null = null;
     private abortController: AbortController;
     private batteryChargeBufferWatts: number | null = null;
+    private batteryPowerFlowControlEnabled: boolean;
 
     constructor({
         config,
@@ -132,6 +152,8 @@ export class InverterController {
         this.intervalSeconds = config.inverterControl.intervalSeconds;
         this.batteryChargeBufferWatts =
             config.battery?.chargeBufferWatts ?? null;
+        this.batteryPowerFlowControlEnabled =
+            config.inverterControl.batteryPowerFlowControl;
         this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
@@ -324,6 +346,14 @@ export class InverterController {
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
 
+        // Extract battery SOC from most recent DER sample
+        // Average SOC across all batteries (if multiple batteries present)
+        const batterySocPercent: number | null = (() => {
+            const mostRecentSample =
+                recentDerSamples[recentDerSamples.length - 1];
+            return mostRecentSample?.battery?.averageSocPercent ?? null;
+        })();
+
         const batteryAdjustedInverterControlLimit = (() => {
             const batteryChargeBufferWatts = this.batteryChargeBufferWatts;
 
@@ -358,6 +388,9 @@ export class InverterController {
                 siteWatts: averagedSiteWatts,
                 solarWatts: averagedSolarWatts,
                 maxInvertersCount,
+                batteryPowerFlowControlEnabled:
+                    this.batteryPowerFlowControlEnabled,
+                batterySocPercent,
             });
 
             switch (configuration.type) {
@@ -441,12 +474,16 @@ export function calculateInverterConfiguration({
     solarWatts,
     nameplateMaxW,
     maxInvertersCount,
+    batteryPowerFlowControlEnabled,
+    batterySocPercent,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
     solarWatts: number;
     nameplateMaxW: number;
     maxInvertersCount: number;
+    batteryPowerFlowControlEnabled: boolean;
+    batterySocPercent: number | null;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
         module: 'calculateInverterConfiguration',
@@ -477,6 +514,73 @@ export function calculateInverterConfiguration({
         activeInverterControlLimit.opModGenLimW?.value ??
         defaultValues.opModGenLimW;
 
+    // Battery power flow control logic
+    let batteryControl: BatteryControlConfiguration | undefined;
+    let finalTargetSolarWatts: number;
+
+    if (batteryPowerFlowControlEnabled && !disconnect) {
+        // Use battery power flow calculator for intelligent battery control
+        const batteryFlowInput: BatteryPowerFlowInput = {
+            solarWatts,
+            siteWatts,
+            batterySocPercent,
+            batteryTargetSocPercent:
+                activeInverterControlLimit.batteryTargetSocPercent?.value,
+            batterySocMinPercent:
+                activeInverterControlLimit.batterySocMinPercent?.value,
+            batterySocMaxPercent:
+                activeInverterControlLimit.batterySocMaxPercent?.value,
+            batteryChargeMaxWatts:
+                activeInverterControlLimit.batteryChargeMaxWatts?.value,
+            batteryDischargeMaxWatts:
+                activeInverterControlLimit.batteryDischargeMaxWatts?.value,
+            exportLimitWatts,
+            batteryPriorityMode:
+                activeInverterControlLimit.batteryPriorityMode?.value,
+            batteryGridChargingEnabled:
+                activeInverterControlLimit.batteryGridChargingEnabled?.value,
+        };
+
+        const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);
+
+        // Create battery control configuration
+        batteryControl = {
+            targetPowerWatts: batteryFlowResult.targetBatteryPowerWatts,
+            mode: batteryFlowResult.batteryMode,
+            chargeRatePercent:
+                activeInverterControlLimit.batteryChargeRatePercent?.value,
+            dischargeRatePercent:
+                activeInverterControlLimit.batteryDischargeRatePercent?.value,
+            storageMode: determineStorageMode(batteryFlowResult.batteryMode),
+        };
+
+        finalTargetSolarWatts = Math.min(
+            batteryFlowResult.targetSolarWatts,
+            generationLimitWatts,
+        );
+
+        logger.trace(
+            {
+                batteryFlowInput,
+                batteryFlowResult,
+                batteryControl,
+            },
+            'Battery power flow calculation',
+        );
+    } else {
+        // Legacy mode: use simple export limit calculation
+        const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
+            exportLimitWatts,
+            siteWatts,
+            solarWatts,
+        });
+
+        finalTargetSolarWatts = Math.min(
+            exportLimitTargetSolarWatts,
+            generationLimitWatts,
+        );
+    }
+
     const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
         siteWatts,
@@ -485,10 +589,7 @@ export function calculateInverterConfiguration({
 
     // the limits need to be applied together
     // take the lesser of the export limit target solar watts or generation limit
-    const targetSolarWatts = Math.min(
-        exportLimitTargetSolarWatts,
-        generationLimitWatts,
-    );
+    const targetSolarWatts = finalTargetSolarWatts;
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         nameplateMaxW,
@@ -533,6 +634,7 @@ export function calculateInverterConfiguration({
         invertersCount: maxInvertersCount,
         targetSolarWatts,
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
+        batteryControl,
     };
 }
 
@@ -594,6 +696,20 @@ export function calculateTargetSolarWatts({
     const solarTarget = new Decimal(solarWatts).sub(changeToMeetExportLimit);
 
     return solarTarget.toNumber();
+}
+
+/**
+ * Convert battery mode to SunSpec StorCtl_Mod bitfield value
+ */
+function determineStorageMode(mode: 'charge' | 'discharge' | 'idle'): number {
+    switch (mode) {
+        case 'charge':
+            return StorCtl_Mod.CHARGE;
+        case 'discharge':
+            return StorCtl_Mod.DISCHARGE;
+        case 'idle':
+            return 0; // No control mode
+    }
 }
 
 export type ActiveInverterControlLimit = {
