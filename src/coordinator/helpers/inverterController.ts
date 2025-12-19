@@ -447,6 +447,8 @@ export class InverterController {
                         invertersCount: configuration.invertersCount,
                         targetSolarWatts: rampedTargetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
+                        // Preserve battery control configuration from the calculated configuration
+                        batteryControl: configuration.batteryControl,
                     };
                 }
             }
