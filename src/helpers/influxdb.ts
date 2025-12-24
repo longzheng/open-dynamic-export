@@ -374,12 +374,16 @@ export function writeControlSchedulerPoints({
         return;
     }
 
+    const now = new Date();
+
     const activeControlPoint = (() => {
         if (!activeControlSchedule) {
             return null;
         }
 
-        const point = new Point('controlScheduler').tag('control', 'active');
+        const point = new Point('controlScheduler')
+            .timestamp(now)
+            .tag('control', 'active');
 
         switch (controlType) {
             case 'opModConnect': {
@@ -464,7 +468,9 @@ export function writeControlSchedulerPoints({
             return null;
         }
 
-        const point = new Point('controlScheduler').tag('control', 'default');
+        const point = new Point('controlScheduler')
+            .timestamp(now)
+            .tag('control', 'default');
 
         switch (controlType) {
             case 'opModConnect': {
@@ -589,6 +595,7 @@ export function writeInverterControllerPoints({
 
     influxDB.writeApi.writePoint(
         new Point('inverterControl')
+            .timestamp(new Date())
             .booleanField('disconnect', disconnect)
             .floatField('siteWatts', siteWatts)
             .floatField('solarWatts', solarWatts)
@@ -613,7 +620,7 @@ export function writeAmberPrice(number: number | undefined) {
     }
 
     influxDB.writeApi.writePoint(
-        new Point('amber').floatField('price', number),
+        new Point('amber').timestamp(new Date()).floatField('price', number),
     );
 }
 
@@ -622,7 +629,9 @@ export function writeControlLimit({ limit }: { limit: InverterControlLimit }) {
         return;
     }
 
-    const point = new Point('controlLimit').tag('name', limit.source);
+    const point = new Point('controlLimit')
+        .timestamp(new Date())
+        .tag('name', limit.source);
 
     if (limit.opModConnect !== undefined) {
         point.booleanField('opModConnect', limit.opModConnect);
@@ -660,9 +669,12 @@ export function writeActiveControlLimit({
         return;
     }
 
+    const now = new Date();
+
     if (limit.opModConnect !== undefined) {
         influxDB.writeApi.writePoint(
             new Point('activeControlLimit')
+                .timestamp(now)
                 .tag('name', limit.opModConnect.source)
                 .booleanField('opModConnect', limit.opModConnect.value),
         );
@@ -671,6 +683,7 @@ export function writeActiveControlLimit({
     if (limit.opModEnergize !== undefined) {
         influxDB.writeApi.writePoint(
             new Point('activeControlLimit')
+                .timestamp(now)
                 .tag('name', limit.opModEnergize.source)
                 .booleanField('opModEnergize', limit.opModEnergize.value),
         );
@@ -679,6 +692,7 @@ export function writeActiveControlLimit({
     if (limit.opModExpLimW !== undefined) {
         influxDB.writeApi.writePoint(
             new Point('activeControlLimit')
+                .timestamp(now)
                 .tag('name', limit.opModExpLimW.source)
                 .floatField('opModExpLimW', limit.opModExpLimW.value),
         );
@@ -687,6 +701,7 @@ export function writeActiveControlLimit({
     if (limit.opModGenLimW !== undefined) {
         influxDB.writeApi.writePoint(
             new Point('activeControlLimit')
+                .timestamp(now)
                 .tag('name', limit.opModGenLimW.source)
                 .floatField('opModGenLimW', limit.opModGenLimW.value),
         );
@@ -695,6 +710,7 @@ export function writeActiveControlLimit({
     if (limit.opModImpLimW !== undefined) {
         influxDB.writeApi.writePoint(
             new Point('activeControlLimit')
+                .timestamp(now)
                 .tag('name', limit.opModImpLimW.source)
                 .floatField('opModImpLimW', limit.opModImpLimW.value),
         );
@@ -703,6 +719,7 @@ export function writeActiveControlLimit({
     if (limit.opModLoadLimW !== undefined) {
         influxDB.writeApi.writePoint(
             new Point('activeControlLimit')
+                .timestamp(now)
                 .tag('name', limit.opModLoadLimW.source)
                 .floatField('opModLoadLimW', limit.opModLoadLimW.value),
         );
