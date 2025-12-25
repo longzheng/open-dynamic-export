@@ -23,6 +23,11 @@ import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import { differenceInSeconds } from 'date-fns';
 import { type ControlsModel } from '../../connections/sunspec/models/controls.js';
 import { Publish } from './publish.js';
+import {
+    calculateBatteryPowerFlow,
+    type BatteryPowerFlowInput,
+} from './batteryPowerFlowCalculator.js';
+import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -50,6 +55,33 @@ export type InverterControlLimit = {
     opModExpLimW: number | undefined;
     opModImpLimW: number | undefined;
     opModLoadLimW: number | undefined;
+    // Battery control attributes (all optional for backward compatibility)
+    batteryChargeRatePercent?: number | undefined;
+    batteryDischargeRatePercent?: number | undefined;
+    batteryStorageMode?: number | undefined; // Maps to StorCtl_Mod
+    batteryTargetSocPercent?: number | undefined;
+    batteryImportTargetWatts?: number | undefined;
+    batteryExportTargetWatts?: number | undefined;
+    batterySocMinPercent?: number | undefined;
+    batterySocMaxPercent?: number | undefined;
+    batteryChargeMaxWatts?: number | undefined;
+    batteryDischargeMaxWatts?: number | undefined;
+    batteryPriorityMode?: 'export_first' | 'battery_first' | undefined;
+    batteryGridChargingEnabled?: boolean | undefined;
+    batteryGridChargingMaxWatts?: number | undefined;
+};
+
+export type BatteryControlConfiguration = {
+    // Target battery power: positive = charge, negative = discharge
+    targetPowerWatts: number;
+    // Battery operating mode
+    mode: 'charge' | 'discharge' | 'idle';
+    // Charge rate as percentage (0-100)
+    chargeRatePercent?: number | undefined;
+    // Discharge rate as percentage (0-100)
+    dischargeRatePercent?: number | undefined;
+    // SunSpec storage control mode (bitfield)
+    storageMode: number;
 };
 
 export type InverterConfiguration =
@@ -60,6 +92,7 @@ export type InverterConfiguration =
           invertersCount: number;
           targetSolarWatts: number;
           targetSolarPowerRatio: number;
+          batteryControl?: BatteryControlConfiguration | undefined;
       };
 
 const defaultValues = {
@@ -101,6 +134,7 @@ export class InverterController {
     private applyControlLoopTimer: NodeJS.Timeout | null = null;
     private abortController: AbortController;
     private batteryChargeBufferWatts: number | null = null;
+    private batteryPowerFlowControlEnabled: boolean;
 
     constructor({
         config,
@@ -118,6 +152,8 @@ export class InverterController {
         this.intervalSeconds = config.inverterControl.intervalSeconds;
         this.batteryChargeBufferWatts =
             config.battery?.chargeBufferWatts ?? null;
+        this.batteryPowerFlowControlEnabled =
+            config.inverterControl.batteryPowerFlowControl;
         this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
@@ -310,6 +346,14 @@ export class InverterController {
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
 
+        // Extract battery SOC from most recent DER sample
+        // Average SOC across all batteries (if multiple batteries present)
+        const batterySocPercent: number | null = (() => {
+            const mostRecentSample =
+                recentDerSamples[recentDerSamples.length - 1];
+            return mostRecentSample?.battery?.averageSocPercent ?? null;
+        })();
+
         const batteryAdjustedInverterControlLimit = (() => {
             const batteryChargeBufferWatts = this.batteryChargeBufferWatts;
 
@@ -344,6 +388,9 @@ export class InverterController {
                 siteWatts: averagedSiteWatts,
                 solarWatts: averagedSolarWatts,
                 maxInvertersCount,
+                batteryPowerFlowControlEnabled:
+                    this.batteryPowerFlowControlEnabled,
+                batterySocPercent,
             });
 
             switch (configuration.type) {
@@ -400,6 +447,8 @@ export class InverterController {
                         invertersCount: configuration.invertersCount,
                         targetSolarWatts: rampedTargetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
+                        // Preserve battery control configuration from the calculated configuration
+                        batteryControl: configuration.batteryControl,
                     };
                 }
             }
@@ -427,12 +476,16 @@ export function calculateInverterConfiguration({
     solarWatts,
     nameplateMaxW,
     maxInvertersCount,
+    batteryPowerFlowControlEnabled,
+    batterySocPercent,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
     solarWatts: number;
     nameplateMaxW: number;
     maxInvertersCount: number;
+    batteryPowerFlowControlEnabled: boolean;
+    batterySocPercent: number | null;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
         module: 'calculateInverterConfiguration',
@@ -463,6 +516,73 @@ export function calculateInverterConfiguration({
         activeInverterControlLimit.opModGenLimW?.value ??
         defaultValues.opModGenLimW;
 
+    // Battery power flow control logic
+    let batteryControl: BatteryControlConfiguration | undefined;
+    let finalTargetSolarWatts: number;
+
+    if (batteryPowerFlowControlEnabled && !disconnect) {
+        // Use battery power flow calculator for intelligent battery control
+        const batteryFlowInput: BatteryPowerFlowInput = {
+            solarWatts,
+            siteWatts,
+            batterySocPercent,
+            batteryTargetSocPercent:
+                activeInverterControlLimit.batteryTargetSocPercent?.value,
+            batterySocMinPercent:
+                activeInverterControlLimit.batterySocMinPercent?.value,
+            batterySocMaxPercent:
+                activeInverterControlLimit.batterySocMaxPercent?.value,
+            batteryChargeMaxWatts:
+                activeInverterControlLimit.batteryChargeMaxWatts?.value,
+            batteryDischargeMaxWatts:
+                activeInverterControlLimit.batteryDischargeMaxWatts?.value,
+            exportLimitWatts,
+            batteryPriorityMode:
+                activeInverterControlLimit.batteryPriorityMode?.value,
+            batteryGridChargingEnabled:
+                activeInverterControlLimit.batteryGridChargingEnabled?.value,
+        };
+
+        const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);
+
+        // Create battery control configuration
+        batteryControl = {
+            targetPowerWatts: batteryFlowResult.targetBatteryPowerWatts,
+            mode: batteryFlowResult.batteryMode,
+            chargeRatePercent:
+                activeInverterControlLimit.batteryChargeRatePercent?.value,
+            dischargeRatePercent:
+                activeInverterControlLimit.batteryDischargeRatePercent?.value,
+            storageMode: determineStorageMode(batteryFlowResult.batteryMode),
+        };
+
+        finalTargetSolarWatts = Math.min(
+            batteryFlowResult.targetSolarWatts,
+            generationLimitWatts,
+        );
+
+        logger.trace(
+            {
+                batteryFlowInput,
+                batteryFlowResult,
+                batteryControl,
+            },
+            'Battery power flow calculation',
+        );
+    } else {
+        // Legacy mode: use simple export limit calculation
+        const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
+            exportLimitWatts,
+            siteWatts,
+            solarWatts,
+        });
+
+        finalTargetSolarWatts = Math.min(
+            exportLimitTargetSolarWatts,
+            generationLimitWatts,
+        );
+    }
+
     const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
         siteWatts,
@@ -471,10 +591,7 @@ export function calculateInverterConfiguration({
 
     // the limits need to be applied together
     // take the lesser of the export limit target solar watts or generation limit
-    const targetSolarWatts = Math.min(
-        exportLimitTargetSolarWatts,
-        generationLimitWatts,
-    );
+    const targetSolarWatts = finalTargetSolarWatts;
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         nameplateMaxW,
@@ -519,6 +636,7 @@ export function calculateInverterConfiguration({
         invertersCount: maxInvertersCount,
         targetSolarWatts,
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
+        batteryControl,
     };
 }
 
@@ -582,6 +700,20 @@ export function calculateTargetSolarWatts({
     return solarTarget.toNumber();
 }
 
+/**
+ * Convert battery mode to SunSpec StorCtl_Mod bitfield value
+ */
+function determineStorageMode(mode: 'charge' | 'discharge' | 'idle'): number {
+    switch (mode) {
+        case 'charge':
+            return StorCtl_Mod.CHARGE;
+        case 'discharge':
+            return StorCtl_Mod.DISCHARGE;
+        case 'idle':
+            return 0; // No control mode
+    }
+}
+
 export type ActiveInverterControlLimit = {
     opModEnergize:
         | {
@@ -619,6 +751,84 @@ export type ActiveInverterControlLimit = {
               source: InverterControlTypes;
           }
         | undefined;
+    batteryChargeRatePercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryDischargeRatePercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryStorageMode:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryTargetSocPercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryImportTargetWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryExportTargetWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batterySocMinPercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batterySocMaxPercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryChargeMaxWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryDischargeMaxWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryPriorityMode:
+        | {
+              value: 'export_first' | 'battery_first';
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryGridChargingEnabled:
+        | {
+              value: boolean;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryGridChargingMaxWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
 };
 
 export function getActiveInverterControlLimit(
@@ -630,6 +840,32 @@ export function getActiveInverterControlLimit(
     let opModExpLimW: ActiveInverterControlLimit['opModExpLimW'] = undefined;
     let opModImpLimW: ActiveInverterControlLimit['opModImpLimW'] = undefined;
     let opModLoadLimW: ActiveInverterControlLimit['opModLoadLimW'] = undefined;
+    let batteryChargeRatePercent: ActiveInverterControlLimit['batteryChargeRatePercent'] =
+        undefined;
+    let batteryDischargeRatePercent: ActiveInverterControlLimit['batteryDischargeRatePercent'] =
+        undefined;
+    let batteryStorageMode: ActiveInverterControlLimit['batteryStorageMode'] =
+        undefined;
+    let batteryTargetSocPercent: ActiveInverterControlLimit['batteryTargetSocPercent'] =
+        undefined;
+    let batteryImportTargetWatts: ActiveInverterControlLimit['batteryImportTargetWatts'] =
+        undefined;
+    let batteryExportTargetWatts: ActiveInverterControlLimit['batteryExportTargetWatts'] =
+        undefined;
+    let batterySocMinPercent: ActiveInverterControlLimit['batterySocMinPercent'] =
+        undefined;
+    let batterySocMaxPercent: ActiveInverterControlLimit['batterySocMaxPercent'] =
+        undefined;
+    let batteryChargeMaxWatts: ActiveInverterControlLimit['batteryChargeMaxWatts'] =
+        undefined;
+    let batteryDischargeMaxWatts: ActiveInverterControlLimit['batteryDischargeMaxWatts'] =
+        undefined;
+    let batteryPriorityMode: ActiveInverterControlLimit['batteryPriorityMode'] =
+        undefined;
+    let batteryGridChargingEnabled: ActiveInverterControlLimit['batteryGridChargingEnabled'] =
+        undefined;
+    let batteryGridChargingMaxWatts: ActiveInverterControlLimit['batteryGridChargingMaxWatts'] =
+        undefined;
 
     for (const controlLimit of controlLimits) {
         if (!controlLimit) {
@@ -715,6 +951,144 @@ export function getActiveInverterControlLimit(
                 };
             }
         }
+
+        // Battery control attributes - use most restrictive values
+        if (controlLimit.batteryChargeRatePercent !== undefined) {
+            if (
+                batteryChargeRatePercent === undefined ||
+                controlLimit.batteryChargeRatePercent <
+                    batteryChargeRatePercent.value
+            ) {
+                batteryChargeRatePercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryChargeRatePercent,
+                };
+            }
+        }
+
+        if (controlLimit.batteryDischargeRatePercent !== undefined) {
+            if (
+                batteryDischargeRatePercent === undefined ||
+                controlLimit.batteryDischargeRatePercent <
+                    batteryDischargeRatePercent.value
+            ) {
+                batteryDischargeRatePercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryDischargeRatePercent,
+                };
+            }
+        }
+
+        if (controlLimit.batteryStorageMode !== undefined) {
+            batteryStorageMode = {
+                source: controlLimit.source,
+                value: controlLimit.batteryStorageMode,
+            };
+        }
+
+        if (controlLimit.batteryTargetSocPercent !== undefined) {
+            batteryTargetSocPercent = {
+                source: controlLimit.source,
+                value: controlLimit.batteryTargetSocPercent,
+            };
+        }
+
+        if (controlLimit.batteryImportTargetWatts !== undefined) {
+            batteryImportTargetWatts = {
+                source: controlLimit.source,
+                value: controlLimit.batteryImportTargetWatts,
+            };
+        }
+
+        if (controlLimit.batteryExportTargetWatts !== undefined) {
+            batteryExportTargetWatts = {
+                source: controlLimit.source,
+                value: controlLimit.batteryExportTargetWatts,
+            };
+        }
+
+        if (controlLimit.batterySocMinPercent !== undefined) {
+            if (
+                batterySocMinPercent === undefined ||
+                controlLimit.batterySocMinPercent > batterySocMinPercent.value
+            ) {
+                batterySocMinPercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batterySocMinPercent,
+                };
+            }
+        }
+
+        if (controlLimit.batterySocMaxPercent !== undefined) {
+            if (
+                batterySocMaxPercent === undefined ||
+                controlLimit.batterySocMaxPercent < batterySocMaxPercent.value
+            ) {
+                batterySocMaxPercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batterySocMaxPercent,
+                };
+            }
+        }
+
+        if (controlLimit.batteryChargeMaxWatts !== undefined) {
+            if (
+                batteryChargeMaxWatts === undefined ||
+                controlLimit.batteryChargeMaxWatts < batteryChargeMaxWatts.value
+            ) {
+                batteryChargeMaxWatts = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryChargeMaxWatts,
+                };
+            }
+        }
+
+        if (controlLimit.batteryDischargeMaxWatts !== undefined) {
+            if (
+                batteryDischargeMaxWatts === undefined ||
+                controlLimit.batteryDischargeMaxWatts <
+                    batteryDischargeMaxWatts.value
+            ) {
+                batteryDischargeMaxWatts = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryDischargeMaxWatts,
+                };
+            }
+        }
+
+        if (controlLimit.batteryPriorityMode !== undefined) {
+            batteryPriorityMode = {
+                source: controlLimit.source,
+                value: controlLimit.batteryPriorityMode,
+            };
+        }
+
+        if (controlLimit.batteryGridChargingEnabled !== undefined) {
+            if (
+                batteryGridChargingEnabled === undefined ||
+                // false overrides true for safety
+                (batteryGridChargingEnabled.value === true &&
+                    controlLimit.batteryGridChargingEnabled === false)
+            ) {
+                batteryGridChargingEnabled = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryGridChargingEnabled,
+                };
+            }
+        }
+
+        if (controlLimit.batteryGridChargingMaxWatts !== undefined) {
+            if (
+                batteryGridChargingMaxWatts === undefined ||
+                controlLimit.batteryGridChargingMaxWatts <
+                    batteryGridChargingMaxWatts.value
+            ) {
+                batteryGridChargingMaxWatts = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryGridChargingMaxWatts,
+                };
+            }
+        }
     }
 
     return {
@@ -724,6 +1098,19 @@ export function getActiveInverterControlLimit(
         opModExpLimW,
         opModImpLimW,
         opModLoadLimW,
+        batteryChargeRatePercent,
+        batteryDischargeRatePercent,
+        batteryStorageMode,
+        batteryTargetSocPercent,
+        batteryImportTargetWatts,
+        batteryExportTargetWatts,
+        batterySocMinPercent,
+        batterySocMaxPercent,
+        batteryChargeMaxWatts,
+        batteryDischargeMaxWatts,
+        batteryPriorityMode,
+        batteryGridChargingEnabled,
+        batteryGridChargingMaxWatts,
     };
 }
 

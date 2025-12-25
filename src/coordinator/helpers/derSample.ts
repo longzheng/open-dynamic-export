@@ -44,6 +44,21 @@ export const derSampleDataSchema = z.object({
         genConnectStatus: z.number(),
     }),
     invertersCount: z.number(),
+    // Battery aggregated data across all inverters with storage
+    battery: z
+        .object({
+            // Average state of charge across all batteries
+            averageSocPercent: z.number().nullable(),
+            // Total available energy across all batteries
+            totalAvailableEnergyWh: z.number().nullable(),
+            // Total max charge rate across all batteries
+            totalMaxChargeRateWatts: z.number(),
+            // Total max discharge rate across all batteries
+            totalMaxDischargeRateWatts: z.number(),
+            // Number of inverters with battery storage
+            batteryCount: z.number(),
+        })
+        .nullable(),
 });
 
 export type DerSampleData = z.infer<typeof derSampleDataSchema>;
@@ -126,5 +141,40 @@ export function generateDerSample({
             ) satisfies ConnectStatusValue,
         },
         invertersCount: invertersData.length,
+        battery: (() => {
+            const batteriesData = invertersData
+                .map((data) => data.storage)
+                .filter(
+                    (storage): storage is NonNullable<typeof storage> =>
+                        storage !== undefined,
+                );
+
+            if (batteriesData.length === 0) {
+                return null;
+            }
+
+            const socValues = batteriesData
+                .map((battery) => battery.stateOfChargePercent)
+                .filter((soc): soc is NonNullable<typeof soc> => soc !== null);
+
+            return {
+                averageSocPercent:
+                    socValues.length > 0
+                        ? averageNumbersArray(socValues)
+                        : null,
+                totalAvailableEnergyWh: sumNumbersNullableArray(
+                    batteriesData.map((battery) => battery.availableEnergyWh),
+                ),
+                totalMaxChargeRateWatts: sumNumbersArray(
+                    batteriesData.map((battery) => battery.maxChargeRateWatts),
+                ),
+                totalMaxDischargeRateWatts: sumNumbersArray(
+                    batteriesData.map(
+                        (battery) => battery.maxDischargeRateWatts,
+                    ),
+                ),
+                batteryCount: batteriesData.length,
+            };
+        })(),
     };
 }

@@ -23,6 +23,8 @@ features:
     details: Load-following export control
   - title: Two-way tarrifs/negative feed-in
     details: Curtail export based on fixed schedules or dynamic pricing
+  - title: Intelligent battery control
+    details: SOC-aware battery management with configurable priority modes and multi-inverter support
 ---
 
 <div class="img-dashboard">

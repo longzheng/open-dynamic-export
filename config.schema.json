@@ -59,6 +59,59 @@
                   "type": "number",
                   "minimum": 0,
                   "description": "The load limit in watts"
+                },
+                "exportTargetWatts": {
+                  "type": "number",
+                  "description": "Desired export when no solar (from battery)"
+                },
+                "importTargetWatts": {
+                  "type": "number",
+                  "description": "Desired import for battery charging from grid"
+                },
+                "batterySocTargetPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Target state of charge %"
+                },
+                "batterySocMinPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Minimum reserve %"
+                },
+                "batterySocMaxPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Maximum charge %"
+                },
+                "batteryChargeMaxWatts": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Maximum charge rate (can override SunSpec)"
+                },
+                "batteryDischargeMaxWatts": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Maximum discharge rate (can override SunSpec)"
+                },
+                "batteryPriorityMode": {
+                  "type": "string",
+                  "enum": [
+                    "export_first",
+                    "battery_first"
+                  ],
+                  "description": "Battery priority mode: export_first | battery_first"
+                },
+                "batteryGridChargingEnabled": {
+                  "type": "boolean",
+                  "description": "Allow charging battery from grid"
+                },
+                "batteryGridChargingMaxWatts": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Maximum grid charging rate"
                 }
               },
               "additionalProperties": false,
@@ -166,6 +219,10 @@
                   "type": {
                     "type": "string",
                     "const": "sunspec"
+                  },
+                  "batteryControlEnabled": {
+                    "type": "boolean",
+                    "description": "Enable battery control for this inverter"
                   },
                   "connection": {
                     "anyOf": [
@@ -318,6 +375,15 @@
             "enabled": {
               "type": "boolean",
               "description": "Whether to control the inverters"
+            },
+            "batteryControlEnabled": {
+              "type": "boolean",
+              "description": "Whether to control battery storage (global setting)"
+            },
+            "batteryPowerFlowControl": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable intelligent battery power flow control (consumption → battery → export). When disabled, uses simple battery charge buffer instead."
             },
             "sampleSeconds": {
               "type": "number",
