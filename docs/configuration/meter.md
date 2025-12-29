@@ -65,11 +65,10 @@ z.object({
     ]),
     voltage: z.object({
         // must be per phase measurements
-        type: z.literal('perPhaseNet'),
+        type: z.literal('perPhase'),
         phaseA: z.number().nullable(),
         phaseB: z.number().nullable(),
         phaseC: z.number().nullable(),
-        net: z.number(),
     }),
     frequency: z.number().nullable(),
 });
@@ -92,11 +91,10 @@ For example
         "net": 1500
     },
     "voltage": {
-        "type": "perPhaseNet",
+        "type": "perPhase",
         "phaseA": 230,
         "phaseB": 232,
-        "phaseC": 228,
-        "net": 230
+        "phaseC": 228
     },
     "frequency": 50
 }
@@ -119,11 +117,10 @@ or
         "net": 800
     },
     "voltage": {
-        "type": "perPhaseNet",
+        "type": "perPhase",
         "phaseA": 230,
         "phaseB": null,
-        "phaseC": null,
-        "net": 230
+        "phaseC": null
     },
     "frequency": 50
 }
