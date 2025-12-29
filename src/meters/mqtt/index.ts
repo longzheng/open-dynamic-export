@@ -33,7 +33,10 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
             const result = siteSampleDataSchema.safeParse(JSON.parse(data));
 
             if (!result.success) {
-                this.logger.error({ message: 'Invalid MQTT message', data });
+                this.logger.error(
+                    { error: result.error.message, data },
+                    'Invalid MQTT message',
+                );
                 return;
             }
 
