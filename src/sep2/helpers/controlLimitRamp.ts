@@ -1,6 +1,14 @@
 import { cappedChange } from '../../helpers/math.js';
 import { type RampRateHelper } from './rampRate.js';
 
+export type ControlLimitRampTarget =
+    | {
+          type: 'active' | 'default';
+          value: number | undefined;
+          rampTimeSeconds: number | undefined;
+      }
+    | { type: 'none'; value: number | undefined };
+
 export class ControlLimitRampHelper {
     private rampRateHelper: RampRateHelper;
     private cachedValue:
@@ -10,36 +18,34 @@ export class ControlLimitRampHelper {
               time: Date;
               isRamping: boolean;
           }
-        | { type: 'none' } = { type: 'none' };
+        | { type: 'none'; value: number | undefined } = {
+        type: 'none',
+        value: undefined,
+    };
     private target:
         | {
               type: 'active' | 'default';
               value: number;
               endDateTime: Date | null;
           }
-        | { type: 'none' } = { type: 'none' };
+        | { type: 'none'; value: number | undefined } = {
+        type: 'none',
+        value: undefined,
+    };
 
     constructor({ rampRateHelper }: { rampRateHelper: RampRateHelper }) {
         this.rampRateHelper = rampRateHelper;
     }
 
-    public updateTarget(
-        target:
-            | {
-                  type: 'active' | 'default';
-                  value: number | undefined;
-                  rampTimeSeconds: number | undefined;
-              }
-            | { type: 'none' },
-    ) {
+    public updateTarget(target: ControlLimitRampTarget) {
         switch (target.type) {
             case 'none':
-                this.target = { type: 'none' };
+                this.target = { type: 'none', value: target.value };
                 return;
             case 'active':
             case 'default': {
                 if (target.value === undefined) {
-                    this.target = { type: 'none' };
+                    this.target = { type: 'none', value: target.value };
                     return;
                 }
 
@@ -68,7 +74,7 @@ export class ControlLimitRampHelper {
         const value = ((): number | undefined => {
             switch (this.target.type) {
                 case 'none':
-                    return undefined;
+                    return this.target.value;
                 case 'active':
                 case 'default': {
                     switch (this.cachedValue.type) {
@@ -129,7 +135,7 @@ export class ControlLimitRampHelper {
 
         this.cachedValue = (() => {
             if (value === undefined || this.target.type === 'none') {
-                return { type: 'none' };
+                return { type: 'none', value: this.target.value };
             }
 
             const hasReachedTarget = value === this.target.value;
