@@ -24,6 +24,27 @@
                   "minLength": 10,
                   "maxLength": 11,
                   "description": "For in-band registration, the NMI of the site"
+                },
+                "fixedDefault": {
+                  "type": "object",
+                  "properties": {
+                    "exportLimitWatts": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "The default export limit in watts"
+                    },
+                    "importLimitWatts": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "The default import limit in watts"
+                    }
+                  },
+                  "required": [
+                    "exportLimitWatts",
+                    "importLimitWatts"
+                  ],
+                  "additionalProperties": false,
+                  "description": "The default limits in case CSIP-AUS server is unreachable and there is no default control"
                 }
               },
               "required": [

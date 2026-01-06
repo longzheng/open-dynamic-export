@@ -11,7 +11,9 @@ import { type DerControlsHelperChangedData } from '../../sep2/helpers/derControl
 import { type SetpointType } from '../setpoint.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
+import { type ControlLimitRampTarget } from '../../sep2/helpers/controlLimitRamp.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
+import { type Config } from '../../helpers/config.js';
 
 export class CsipAusSetpoint implements SetpointType {
     private schedulerByControlType: {
@@ -22,14 +24,18 @@ export class CsipAusSetpoint implements SetpointType {
     private opModImpLimWRampRateHelper: ControlLimitRampHelper;
     private opModLoadLimWRampRateHelper: ControlLimitRampHelper;
     private logger: Logger;
+    private config: Config;
 
     constructor({
         client,
         rampRateHelper,
+        config,
     }: {
         client: SEP2Client;
         rampRateHelper: RampRateHelper;
+        config: Config;
     }) {
+        this.config = config;
         this.logger = pinoLogger.child({ module: 'InverterController' });
 
         this.schedulerByControlType = {
@@ -91,7 +97,7 @@ export class CsipAusSetpoint implements SetpointType {
             this.schedulerByControlType.opModExpLimW.getActiveScheduleDerControlBaseValue();
 
         this.opModExpLimWRampRateHelper.updateTarget(
-            (() => {
+            ((): ControlLimitRampTarget => {
                 switch (opModExpLimW.type) {
                     case 'active':
                     case 'default': {
@@ -107,7 +113,11 @@ export class CsipAusSetpoint implements SetpointType {
                         };
                     }
                     case 'none':
-                        return { type: 'none' };
+                        return {
+                            type: 'none',
+                            value: this.config.setpoints.csipAus?.fixedDefault
+                                ?.exportLimitWatts,
+                        };
                 }
             })(),
         );
@@ -116,7 +126,7 @@ export class CsipAusSetpoint implements SetpointType {
             this.schedulerByControlType.opModGenLimW.getActiveScheduleDerControlBaseValue();
 
         this.opModGenLimWRampRateHelper.updateTarget(
-            (() => {
+            ((): ControlLimitRampTarget => {
                 switch (opModGenLimW.type) {
                     case 'active':
                     case 'default': {
@@ -132,7 +142,7 @@ export class CsipAusSetpoint implements SetpointType {
                         };
                     }
                     case 'none':
-                        return { type: 'none' };
+                        return { type: 'none', value: undefined };
                 }
             })(),
         );
@@ -141,7 +151,7 @@ export class CsipAusSetpoint implements SetpointType {
             this.schedulerByControlType.opModImpLimW.getActiveScheduleDerControlBaseValue();
 
         this.opModImpLimWRampRateHelper.updateTarget(
-            (() => {
+            ((): ControlLimitRampTarget => {
                 switch (opModImpLimW.type) {
                     case 'active':
                     case 'default': {
@@ -157,7 +167,11 @@ export class CsipAusSetpoint implements SetpointType {
                         };
                     }
                     case 'none':
-                        return { type: 'none' };
+                        return {
+                            type: 'none',
+                            value: this.config.setpoints.csipAus?.fixedDefault
+                                ?.importLimitWatts,
+                        };
                 }
             })(),
         );
@@ -166,7 +180,7 @@ export class CsipAusSetpoint implements SetpointType {
             this.schedulerByControlType.opModLoadLimW.getActiveScheduleDerControlBaseValue();
 
         this.opModLoadLimWRampRateHelper.updateTarget(
-            (() => {
+            ((): ControlLimitRampTarget => {
                 switch (opModLoadLimW.type) {
                     case 'active':
                     case 'default': {
@@ -182,7 +196,7 @@ export class CsipAusSetpoint implements SetpointType {
                         };
                     }
                     case 'none':
-                        return { type: 'none' };
+                        return { type: 'none', value: undefined };
                 }
             })(),
         );

@@ -63,6 +63,21 @@ export const configSchema = z.object({
                         .describe(
                             'For in-band registration, the NMI of the site',
                         ),
+                    fixedDefault: z
+                        .object({
+                            exportLimitWatts: z
+                                .number()
+                                .min(0)
+                                .describe('The default export limit in watts'),
+                            importLimitWatts: z
+                                .number()
+                                .min(0)
+                                .describe('The default import limit in watts'),
+                        })
+                        .optional()
+                        .describe(
+                            'The default limits in case CSIP-AUS server is unreachable and there is no default control',
+                        ),
                 })
                 .optional()
                 .describe('If defined, limit by CSIP-AUS server'),

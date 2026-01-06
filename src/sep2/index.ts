@@ -87,6 +87,7 @@ export function getSep2Instance({
     const setpoint = new CsipAusSetpoint({
         client: sep2Client,
         rampRateHelper,
+        config,
     });
 
     const derControlsHelper = new DerControlsHelper({

@@ -36,7 +36,12 @@ To use the CSIP-AUS provided limits as a setpoint, add following property to `co
         "csipAus": {
             "host": "https://sep2-test.energyq.com.au", // (string) required: the CSIP-AUS server host
             "dcapUri": "/api/v2/dcap", // (string) required: the device capability discovery URI
-            "nmi": "1234567890" // (string) optional: for utilities that require in-band registration, the NMI of the site
+            "nmi": "1234567890", // (string) optional: for utilities that require in-band registration, the NMI of the site
+            "fixedDefault": // (object) optional: the default limits in case CSIP-AUS server is unreachable and there is no default control which may be defined in the connection agreement
+            {
+                "exportLimitWatts": 1500, // (number) the default export limit in watts
+                "importLimitWatts": 1500, // (number) the default import limit in watts
+            }
         }
     }
     ...
