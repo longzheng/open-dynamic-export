@@ -140,8 +140,6 @@ export class DerHelper {
         derCapability: DERCapability;
     }) {
         if (!this.config?.der) {
-            this.logger.warn('DER not initialised, skipping postDerCapability');
-
             return;
         }
 
@@ -169,8 +167,6 @@ export class DerHelper {
         derSettings: DERSettings;
     }) {
         if (!this.config?.der) {
-            this.logger.warn('DER not initialised, skipping postDerSettings');
-
             return;
         }
 
@@ -194,8 +190,6 @@ export class DerHelper {
 
     private async putDerStatus({ derStatus }: { derStatus: DERStatus }) {
         if (!this.config?.der) {
-            this.logger.warn('DER not initialised, skipping postDerStatus');
-
             return;
         }
 
