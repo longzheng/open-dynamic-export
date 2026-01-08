@@ -89,7 +89,7 @@ export function generateDerSample({
         frequency: averageNumbersNullableArray(
             invertersData
                 .map((data) => data.inverter.frequency)
-                .filter((number) => number !== null && number > 0),
+                .filter((number) => number > 0),
         ),
         nameplate: {
             type: Math.max(
