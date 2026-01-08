@@ -5,7 +5,6 @@ import {
     perPhaseNetMeasurementSchema,
 } from '../../helpers/measurement.js';
 import {
-    averageNumbersArray,
     averageNumbersNullableArray,
     sumNumbersArray,
     sumNumbersNullableArray,
@@ -72,17 +71,25 @@ export function generateDerSample({
         voltage: {
             type: 'perPhase',
             phaseA: averageNumbersNullableArray(
-                invertersData.map((data) => data.inverter.voltagePhaseA),
+                invertersData
+                    .map((data) => data.inverter.voltagePhaseA)
+                    .filter((number) => number !== null && number > 0),
             ),
             phaseB: averageNumbersNullableArray(
-                invertersData.map((data) => data.inverter.voltagePhaseB),
+                invertersData
+                    .map((data) => data.inverter.voltagePhaseB)
+                    .filter((number) => number !== null && number > 0),
             ),
             phaseC: averageNumbersNullableArray(
-                invertersData.map((data) => data.inverter.voltagePhaseC),
+                invertersData
+                    .map((data) => data.inverter.voltagePhaseC)
+                    .filter((number) => number !== null && number > 0),
             ),
         },
-        frequency: averageNumbersArray(
-            invertersData.map((data) => data.inverter.frequency),
+        frequency: averageNumbersNullableArray(
+            invertersData
+                .map((data) => data.inverter.frequency)
+                .filter((number) => number !== null && number > 0),
         ),
         nameplate: {
             type: Math.max(
