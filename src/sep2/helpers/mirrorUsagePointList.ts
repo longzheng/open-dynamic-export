@@ -1,14 +1,14 @@
-import { type SEP2Client } from '../client.js';
+import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
-import { PollableResource } from './pollableResource.js';
-import { type MirrorUsagePointList } from '../models/mirrorUsagePointList.js';
+import type { MirrorUsagePointList } from '../models/mirrorUsagePointList.js';
 import { parseMirrorUsagePointListXml } from '../models/mirrorUsagePointList.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import type { SiteSample } from '../../meters/siteSample.js';
+import type { EndDevice } from '../models/endDevice.js';
 import { MirrorUsagePointSiteHelper } from './mirrorUsagePointSite.js';
 import { MirrorUsagePointDerHelper } from './mirrorUsagePointDer.js';
 import { getListAll } from './pagination.js';
-import { type DerSample } from '../../coordinator/helpers/derSample.js';
-import { type SiteSample } from '../../meters/siteSample.js';
-import { type EndDevice } from '../models/endDevice.js';
+import { PollableResource } from './pollableResource.js';
 
 export class MirrorUsagePointListHelper {
     private href: string | null = null;

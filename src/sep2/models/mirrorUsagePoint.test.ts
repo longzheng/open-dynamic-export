@@ -1,13 +1,14 @@
 import { it, expect, describe } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks.js';
+import { objectToXml } from '../helpers/xml.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 import {
     parseMirrorUsagePointXmlObject,
     generateMirrorUsagePointResponse,
 } from './mirrorUsagePoint.js';
 import { RoleFlagsType } from './roleFlagsType.js';
 import { ServiceKind } from './serviceKind.js';
-import { objectToXml } from '../helpers/xml.js';
 import { QualityFlags } from './qualityFlags.js';
 import { CommodityType } from './commodityType.js';
 import { KindType } from './kindType.js';
@@ -16,7 +17,6 @@ import { FlowDirectionType } from './flowDirectionType.js';
 import { PhaseCode } from './phaseCode.js';
 import { UomType } from './uomType.js';
 import { UsagePointBaseStatus } from './usagePointBaseStatus.js';
-import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should parse end device DER with XML', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

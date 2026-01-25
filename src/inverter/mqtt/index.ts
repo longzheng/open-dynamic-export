@@ -1,11 +1,11 @@
+import mqtt from 'mqtt';
 import {
     type InverterDataBase,
     inverterDataSchema,
     type InverterData,
 } from '../inverterData.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
-import { type Config } from '../../helpers/config.js';
-import mqtt from 'mqtt';
+import type { Config } from '../../helpers/config.js';
 
 export class MqttInverterDataPoller extends InverterDataPollerBase {
     private client: mqtt.MqttClient;

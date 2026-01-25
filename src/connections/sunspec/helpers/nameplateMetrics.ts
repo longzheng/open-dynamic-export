@@ -2,7 +2,7 @@ import {
     numberWithPow10,
     numberNullableWithPow10,
 } from '../../../helpers/number.js';
-import { type NameplateModel } from '../models/nameplate.js';
+import type { NameplateModel } from '../models/nameplate.js';
 
 export function getNameplateMetrics(nameplate: NameplateModel) {
     return {

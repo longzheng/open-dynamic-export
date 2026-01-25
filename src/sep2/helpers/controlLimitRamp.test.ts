@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { addSeconds } from 'date-fns';
 import {
     ControlLimitRampHelper,
     calculateRampedValue,
 } from './controlLimitRamp.js';
 import { RampRateHelper } from './rampRate.js';
-import { addSeconds } from 'date-fns';
 
 afterEach(() => {
     vi.getRealSystemTime();

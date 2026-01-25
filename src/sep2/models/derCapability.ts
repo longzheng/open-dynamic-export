@@ -1,14 +1,14 @@
+import { z } from 'zod';
 import { numberToHex } from '../../helpers/number.js';
+import { xmlns } from '../helpers/namespace.js';
 import { activePowerSchema } from './activePower.js';
 import { apparentPowerSchema } from './apparentPower.js';
 import { derControlTypeSchema } from './derControlType.js';
 import { derTypeSchema } from './derType.js';
 import { doeControlTypeSchema } from './doeModesSupportedType.js';
-import { xmlns } from '../helpers/namespace.js';
 import { reactivePowerSchema } from './reactivePower.js';
 import { voltageRMSSchema } from './voltageRms.js';
 import { powerFactorSchema } from './powerFactor.js';
-import { z } from 'zod';
 
 export const derCapabilitySchema = z.object({
     modesSupported: derControlTypeSchema.describe(

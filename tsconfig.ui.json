@@ -6,7 +6,7 @@
         "lib": ["ES2020", "DOM", "DOM.Iterable"],
         "module": "ESNext",
         "skipLibCheck": true,
-        "paths": { "@/*": ["./src/ui/*"] },
+        "verbatimModuleSyntax": true,
 
         /* Bundler mode */
         "moduleResolution": "bundler",
@@ -20,7 +20,11 @@
         "strict": true,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "noFallthroughCasesInSwitch": true
+        "noFallthroughCasesInSwitch": true,
+
+        "paths": {
+            "@/*": ["./src/ui/*"]
+        }
     },
     "include": ["src/ui/", "tailwind.config.ts"]
 }

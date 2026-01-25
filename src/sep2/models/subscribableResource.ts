@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { assertString } from '../helpers/assert.js';
 import { stringToBoolean } from '../helpers/boolean.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
-import { z } from 'zod';
 
 export const subscribableResourceSchema = z
     .object({

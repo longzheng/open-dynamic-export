@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
     derControlBaseSchema,
     parseDERControlBaseXmlObject,
@@ -6,7 +7,6 @@ import {
     parseRandomizableEventXmlObject,
     randomizableEventSchema,
 } from './randomizableEvent.js';
-import { z } from 'zod';
 
 export const derControlSchema = z
     .object({

@@ -1,11 +1,11 @@
-import { type Logger } from 'pino';
-import { pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
+import type { Logger } from 'pino';
+import { pinoLogger } from '../helpers/logger.js';
 import { tryCatchResult, type Result } from '../helpers/result.js';
-import { type InverterData } from './inverterData.js';
-import { type InverterConfiguration } from '../coordinator/helpers/inverterController.js';
+import type { InverterConfiguration } from '../coordinator/helpers/inverterController.js';
 import { writeLatency } from '../helpers/influxdb.js';
 import { withRetry } from '../helpers/withRetry.js';
+import type { InverterData } from './inverterData.js';
 
 export abstract class InverterDataPollerBase extends EventEmitter<{
     data: [Result<InverterData>];

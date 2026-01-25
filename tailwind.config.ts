@@ -1,8 +1,6 @@
-import { type Config } from 'tailwindcss';
-
+import type { Config } from 'tailwindcss';
 import { heroui } from '@heroui/theme';
-
-import { type ReadingLocation } from '@/components/reading';
+import type { ReadingLocation } from '@/components/reading';
 
 export const readingColors: Record<ReadingLocation, string> = {
     site: '#A5EEFD',

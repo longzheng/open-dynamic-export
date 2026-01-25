@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { stringHexToEnumType } from '../../helpers/enum.js';
 import { assertString } from '../helpers/assert.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
@@ -5,7 +6,6 @@ import {
     responseRequiredTypeSchema,
     type ResponseRequiredType,
 } from './responseRequired.js';
-import { z } from 'zod';
 
 export const respondableResourceSchema = z
     .object({

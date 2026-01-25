@@ -2,11 +2,11 @@ import { it, expect, describe } from 'vitest';
 import { parseStringPromise } from 'xml2js';
 import { getMockFile } from '../helpers/mocks.js';
 import { objectToXml } from '../helpers/xml.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 import {
     generateConnectionPointResponse,
     parseConnectionPointXml,
 } from './connectionPoint.js';
-import { validateXml } from '../helpers/xsdValidator.js';
 
 describe('parseConnectionPointXml', () => {
     it('should parse connection point XML', async () => {

@@ -1,9 +1,9 @@
+import type { z } from 'zod';
 import { listSchema, parseListXmlObject } from './list.js';
 import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
 } from './subscribableResource.js';
-import { type z } from 'zod';
 
 export const subscribableListSchema = listSchema.merge(
     subscribableResourceSchema,

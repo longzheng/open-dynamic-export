@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { numberToHex } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
@@ -10,7 +11,6 @@ import {
     parseUsagePointBaseXmlObject,
     usagePointBaseSchema,
 } from './usagePointBase.js';
-import { z } from 'zod';
 
 export const mirrorUsagePointSchema = z
     .object({

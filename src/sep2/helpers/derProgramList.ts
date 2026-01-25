@@ -1,12 +1,12 @@
 import EventEmitter from 'node:events';
-import { type SEP2Client } from '../client.js';
+import { z } from 'zod';
+import type { Logger } from 'pino';
+import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
-import { PollableResource } from './pollableResource.js';
 import {
     parseDerProgramListXml,
     type DERProgramList,
 } from '../models/derProgramList.js';
-import { getListAll } from './pagination.js';
 import { derProgramSchema } from '../models/derProgram.js';
 import {
     defaultDERControlSchema,
@@ -14,9 +14,9 @@ import {
 } from '../models/defaultDerControl.js';
 import { parseDerControlListXml } from '../models/derControlList.js';
 import { derControlSchema } from '../models/derControl.js';
-import { z } from 'zod';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
+import { getListAll } from './pagination.js';
+import { PollableResource } from './pollableResource.js';
 
 export const derProgramListDataSchema = z.array(
     z.object({

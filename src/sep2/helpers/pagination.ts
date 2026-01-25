@@ -1,6 +1,6 @@
-import { type AxiosRequestConfig } from 'axios';
-import { type SEP2Client } from '../client.js';
-import { type List } from '../models/list.js';
+import type { AxiosRequestConfig } from 'axios';
+import type { SEP2Client } from '../client.js';
+import type { List } from '../models/list.js';
 
 export interface PaginationOptions<T extends List> {
     client: SEP2Client;

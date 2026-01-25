@@ -1,9 +1,9 @@
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { PowerLimitChart } from '../components/PowerLimitChart';
 import { BooleanLimitChart } from '../components/BooleanLimitChart';
 import { $api } from '@/client';
 
-export const Route = createLazyFileRoute('/limits')({
+export const Route = createFileRoute('/limits')({
     component: Limits,
 });
 

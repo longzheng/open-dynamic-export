@@ -1,12 +1,12 @@
-import { type SiteSample } from '../siteSample.js';
+import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { assertNonNull } from '../../helpers/null.js';
-import { type InvertersPoller } from '../../coordinator/helpers/inverterSample.js';
-import { type Config } from '../../helpers/config.js';
-import { type DerSample } from '../../coordinator/helpers/derSample.js';
+import type { InvertersPoller } from '../../coordinator/helpers/inverterSample.js';
+import type { Config } from '../../helpers/config.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
 import { MeterSunSpecConnection } from '../../connections/sunspec/connection/meter.js';
 import { getMeterMetrics } from '../../connections/sunspec/helpers/meterMetrics.js';
-import { type MeterModel } from '../../connections/sunspec/models/meter.js';
+import type { MeterModel } from '../../connections/sunspec/models/meter.js';
 
 type SunSpecMeterConfig = Extract<Config['meter'], { type: 'sunspec' }>;
 

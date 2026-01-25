@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { assertString } from '../helpers/assert.js';
-import { linkSchema, parseLinkXmlObject } from './link.js';
 import { safeParseIntString } from '../../helpers/number.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
 import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
@@ -10,7 +11,6 @@ import {
     parseIdentifiedObjectXmlObject,
 } from './identifiedObject.js';
 import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
-import { z } from 'zod';
 
 export const derProgramSchema = z
     .object({

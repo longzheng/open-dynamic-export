@@ -8,37 +8,32 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-
-// Create Virtual Routes
-
-const ReadingsLazyImport = createFileRoute('/readings')()
-const LimitsLazyImport = createFileRoute('/limits')()
-const IndexLazyImport = createFileRoute('/')()
+import { Route as ReadingsImport } from './routes/readings'
+import { Route as LimitsImport } from './routes/limits'
+import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
-const ReadingsLazyRoute = ReadingsLazyImport.update({
+const ReadingsRoute = ReadingsImport.update({
   id: '/readings',
   path: '/readings',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/readings.lazy').then((d) => d.Route))
+} as any)
 
-const LimitsLazyRoute = LimitsLazyImport.update({
+const LimitsRoute = LimitsImport.update({
   id: '/limits',
   path: '/limits',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/limits.lazy').then((d) => d.Route))
+} as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -48,21 +43,21 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
     '/limits': {
       id: '/limits'
       path: '/limits'
       fullPath: '/limits'
-      preLoaderRoute: typeof LimitsLazyImport
+      preLoaderRoute: typeof LimitsImport
       parentRoute: typeof rootRoute
     }
     '/readings': {
       id: '/readings'
       path: '/readings'
       fullPath: '/readings'
-      preLoaderRoute: typeof ReadingsLazyImport
+      preLoaderRoute: typeof ReadingsImport
       parentRoute: typeof rootRoute
     }
   }
@@ -71,22 +66,22 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/limits': typeof LimitsLazyRoute
-  '/readings': typeof ReadingsLazyRoute
+  '/': typeof IndexRoute
+  '/limits': typeof LimitsRoute
+  '/readings': typeof ReadingsRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/limits': typeof LimitsLazyRoute
-  '/readings': typeof ReadingsLazyRoute
+  '/': typeof IndexRoute
+  '/limits': typeof LimitsRoute
+  '/readings': typeof ReadingsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/limits': typeof LimitsLazyRoute
-  '/readings': typeof ReadingsLazyRoute
+  '/': typeof IndexRoute
+  '/limits': typeof LimitsRoute
+  '/readings': typeof ReadingsRoute
 }
 
 export interface FileRouteTypes {
@@ -99,15 +94,15 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  LimitsLazyRoute: typeof LimitsLazyRoute
-  ReadingsLazyRoute: typeof ReadingsLazyRoute
+  IndexRoute: typeof IndexRoute
+  LimitsRoute: typeof LimitsRoute
+  ReadingsRoute: typeof ReadingsRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  LimitsLazyRoute: LimitsLazyRoute,
-  ReadingsLazyRoute: ReadingsLazyRoute,
+  IndexRoute: IndexRoute,
+  LimitsRoute: LimitsRoute,
+  ReadingsRoute: ReadingsRoute,
 }
 
 export const routeTree = rootRoute
@@ -126,13 +121,13 @@ export const routeTree = rootRoute
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
     },
     "/limits": {
-      "filePath": "limits.lazy.tsx"
+      "filePath": "limits.tsx"
     },
     "/readings": {
-      "filePath": "readings.lazy.tsx"
+      "filePath": "readings.tsx"
     }
   }
 }

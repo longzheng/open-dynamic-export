@@ -1,10 +1,10 @@
+import { z } from 'zod';
 import {
     noPhaseMeasurementSchema,
     perPhaseMeasurementSchema,
     perPhaseNetMeasurementSchema,
 } from '../helpers/measurement.js';
-import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
-import { z } from 'zod';
+import type { SampleBase } from '../coordinator/helpers/sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for site sample
 export const siteSampleDataSchema = z.object({

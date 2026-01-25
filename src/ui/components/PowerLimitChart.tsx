@@ -1,16 +1,16 @@
-import { type components } from '../gen/api';
 import { Card, CardHeader, CardBody } from '@heroui/card';
-import {
-    type ChartDataset,
-    type ChartOptions,
-    type Scale,
-    type CoreScaleOptions,
+import type {
+    ChartDataset,
+    ChartOptions,
+    Scale,
+    CoreScaleOptions,
 } from 'chart.js';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
-import { type AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import type { components } from '../gen/api';
 
 Chart.register(annotationPlugin);
 
@@ -175,10 +175,7 @@ export function PowerLimitChart({
                             size: 11,
                         },
                         color: 'rgba(255, 255, 255, 0.6)',
-                        callback(
-                            this: Scale<CoreScaleOptions>,
-                            tickValue: number | string,
-                        ) {
+                        callback(tickValue: number | string) {
                             return `${tickValue} W`;
                         },
                     },

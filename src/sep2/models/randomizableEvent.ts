@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { eventSchema, parseEventXmlObject } from './event.js';
-import { z } from 'zod';
 
 export const randomizableEventSchema = z
     .object({

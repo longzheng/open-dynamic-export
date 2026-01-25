@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { DERTyp } from '../connections/sunspec/models/nameplate.js';
 import { connectStatusValueSchema } from '../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
-import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
+import type { SampleBase } from '../coordinator/helpers/sampleBase.js';
 
 export const inverterDataSchema = z.object({
     inverter: z.object({

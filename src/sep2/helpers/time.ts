@@ -1,9 +1,9 @@
+import type { Logger } from 'pino';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
-import { PollableResource } from './pollableResource.js';
-import { type Time } from '../models/time.js';
+import type { Time } from '../models/time.js';
 import { parseTimeXml } from '../models/time.js';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
+import { PollableResource } from './pollableResource.js';
 
 export class TimeHelper {
     private href: string | null = null;

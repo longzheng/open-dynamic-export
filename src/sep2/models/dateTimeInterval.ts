@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
-import { z } from 'zod';
 
 export const dateTimeIntervalSchema = z.object({
     duration: z.number().describe('Duration of the interval, in seconds.'),

@@ -1,6 +1,6 @@
+import { writeFile } from 'fs/promises';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { configSchema } from '../src/helpers/config.js';
-import { writeFile } from 'fs/promises';
 
 const jsonSchema = zodToJsonSchema(configSchema, 'config');
 
