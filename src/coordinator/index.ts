@@ -1,7 +1,6 @@
 import { getConfig } from '../helpers/config.js';
 import { pinoLogger } from '../helpers/logger.js';
 import { InverterController } from './helpers/inverterController.js';
-import { RampRateHelper } from '../sep2/helpers/rampRate.js';
 import {
     writeDerSamplePoints,
     writeSiteSamplePoints,
@@ -32,11 +31,8 @@ export function createCoordinator(): Coordinator {
         invertersPoller,
     });
 
-    const rampRateHelper = new RampRateHelper();
-
     const setpoints = getSetpoints({
         config,
-        rampRateHelper,
     });
 
     const inverterController = new InverterController({
@@ -48,8 +44,6 @@ export function createCoordinator(): Coordinator {
 
     invertersPoller.on('data', (derSample) => {
         writeDerSamplePoints(derSample);
-
-        rampRateHelper.onDerSample(derSample);
 
         setpoints.csipAus?.onDerSample(derSample);
 

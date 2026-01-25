@@ -5,7 +5,6 @@ import { MqttSetpoint } from './mqtt/index.js';
 import { AmberSetpoint } from './negativeFeedIn/amber/index.js';
 import { AusgridEA029Setpoint } from './twoWayTariff/ausgridEA029/index.js';
 import { SapnRELE2WSetpoint } from './twoWayTariff/sapnRELE2W/index.js';
-import { type RampRateHelper } from '../sep2/helpers/rampRate.js';
 
 export type Setpoints = {
     csipAus: CsipAusSetpoint | null;
@@ -15,18 +14,11 @@ export type Setpoints = {
     mqtt: MqttSetpoint | null;
 };
 
-export function getSetpoints({
-    config,
-    rampRateHelper,
-}: {
-    config: Config;
-    rampRateHelper: RampRateHelper;
-}): Setpoints {
+export function getSetpoints({ config }: { config: Config }): Setpoints {
     return {
         csipAus: config.setpoints.csipAus
             ? new CsipAusSetpoint({
                   csipAusConfig: config.setpoints.csipAus,
-                  rampRateHelper,
               })
             : null,
         fixed: config.setpoints.fixed

@@ -27,7 +27,7 @@ import { DeviceCapabilityHelper } from '../../sep2/helpers/deviceCapability.js';
 import { EndDeviceListHelper } from '../../sep2/helpers/endDeviceList.js';
 import { FunctionSetAssignmentsListHelper } from '../../sep2/helpers/functionSetAssignmentsList.js';
 import { MirrorUsagePointListHelper } from '../../sep2/helpers/mirrorUsagePointList.js';
-import { type RampRateHelper } from '../../sep2/helpers/rampRate.js';
+import { RampRateHelper } from '../../sep2/helpers/rampRate.js';
 import { RegistrationHelper } from '../../sep2/helpers/registration.js';
 import { TimeHelper } from '../../sep2/helpers/time.js';
 import { objectToXml } from '../../sep2/helpers/xml.js';
@@ -60,17 +60,17 @@ export class CsipAusSetpoint implements SetpointType {
     private mirrorUsagePointListHelper: MirrorUsagePointListHelper;
     private derControlsHelper: DerControlsHelper;
     private deviceCapabilityHelper: DeviceCapabilityHelper;
+    private rampRateHelper: RampRateHelper;
 
     constructor({
-        rampRateHelper,
         csipAusConfig,
     }: {
-        rampRateHelper: RampRateHelper;
         csipAusConfig: NonNullable<Config['setpoints']['csipAus']>;
     }) {
         this.csipAusConfig = csipAusConfig;
         this.logger = pinoLogger.child({ module: 'CsipAusSetpoint' });
         this.abortController = new AbortController();
+        this.rampRateHelper = new RampRateHelper();
 
         const sep2Certificate = getSep2Certificate();
 
@@ -99,7 +99,7 @@ export class CsipAusSetpoint implements SetpointType {
 
         this.derHelper = new DerHelper({
             client: this.sep2Client,
-            rampRateHelper,
+            rampRateHelper: this.rampRateHelper,
         });
 
         this.functionSetAssignmentsListHelper =
@@ -139,19 +139,19 @@ export class CsipAusSetpoint implements SetpointType {
         };
 
         this.opModExpLimWRampRateHelper = new ControlLimitRampHelper({
-            rampRateHelper,
+            rampRateHelper: this.rampRateHelper,
         });
 
         this.opModGenLimWRampRateHelper = new ControlLimitRampHelper({
-            rampRateHelper,
+            rampRateHelper: this.rampRateHelper,
         });
 
         this.opModImpLimWRampRateHelper = new ControlLimitRampHelper({
-            rampRateHelper,
+            rampRateHelper: this.rampRateHelper,
         });
 
         this.opModLoadLimWRampRateHelper = new ControlLimitRampHelper({
-            rampRateHelper,
+            rampRateHelper: this.rampRateHelper,
         });
 
         this.derControlsHelper = new DerControlsHelper({
@@ -161,7 +161,7 @@ export class CsipAusSetpoint implements SetpointType {
 
             this.updateSep2ControlsData(data);
 
-            rampRateHelper.setDefaultDERControlRampRate(
+            this.rampRateHelper.setDefaultDERControlRampRate(
                 data.fallbackControl.type === 'default'
                     ? (data.fallbackControl.data.defaultControl.setGradW ??
                           null)
@@ -281,6 +281,7 @@ export class CsipAusSetpoint implements SetpointType {
     }
 
     onDerSample(derSample: DerSample) {
+        this.rampRateHelper.onDerSample(derSample);
         this.derHelper.onDerSample(derSample);
         this.mirrorUsagePointListHelper.addDerSample(derSample);
     }
