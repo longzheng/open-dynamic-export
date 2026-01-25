@@ -1,11 +1,11 @@
 import { type Config } from '../helpers/config.js';
-import { type CsipAusSetpoint } from './csipAus/index.js';
+import { CsipAusSetpoint } from './csipAus/index.js';
 import { FixedSetpoint } from './fixed/index.js';
 import { MqttSetpoint } from './mqtt/index.js';
 import { AmberSetpoint } from './negativeFeedIn/amber/index.js';
 import { AusgridEA029Setpoint } from './twoWayTariff/ausgridEA029/index.js';
 import { SapnRELE2WSetpoint } from './twoWayTariff/sapnRELE2W/index.js';
-import { type Sep2Instance } from '../sep2/index.js';
+import { type RampRateHelper } from '../sep2/helpers/rampRate.js';
 
 export type Setpoints = {
     csipAus: CsipAusSetpoint | null;
@@ -17,13 +17,18 @@ export type Setpoints = {
 
 export function getSetpoints({
     config,
-    sep2Instance,
+    rampRateHelper,
 }: {
     config: Config;
-    sep2Instance: Sep2Instance | null;
+    rampRateHelper: RampRateHelper;
 }): Setpoints {
     return {
-        csipAus: sep2Instance?.setpoint ?? null,
+        csipAus: config.setpoints.csipAus
+            ? new CsipAusSetpoint({
+                  csipAusConfig: config.setpoints.csipAus,
+                  rampRateHelper,
+              })
+            : null,
         fixed: config.setpoints.fixed
             ? new FixedSetpoint({ config: config.setpoints.fixed })
             : null,

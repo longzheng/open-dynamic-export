@@ -6,7 +6,6 @@ import {
     writeDerSamplePoints,
     writeSiteSamplePoints,
 } from '../helpers/influxdb.js';
-import { getSep2Instance } from '../sep2/index.js';
 import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
 import { type SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
 import { InvertersPoller } from './helpers/inverterSample.js';
@@ -35,14 +34,9 @@ export function createCoordinator(): Coordinator {
 
     const rampRateHelper = new RampRateHelper();
 
-    const sep2Instance = getSep2Instance({
-        config,
-        rampRateHelper,
-    });
-
     const setpoints = getSetpoints({
         config,
-        sep2Instance,
+        rampRateHelper,
     });
 
     const inverterController = new InverterController({
@@ -57,8 +51,7 @@ export function createCoordinator(): Coordinator {
 
         rampRateHelper.onDerSample(derSample);
 
-        sep2Instance?.derHelper.onDerSample(derSample);
-        sep2Instance?.mirrorUsagePointListHelper.addDerSample(derSample);
+        setpoints.csipAus?.onDerSample(derSample);
 
         inverterController.updateDerSample(derSample);
     });
@@ -66,7 +59,7 @@ export function createCoordinator(): Coordinator {
     siteSamplePoller.on('data', ({ siteSample }) => {
         writeSiteSamplePoints(siteSample);
 
-        sep2Instance?.mirrorUsagePointListHelper.addSiteSample(siteSample);
+        setpoints.csipAus?.onSiteSample(siteSample);
 
         inverterController.updateSiteSample(siteSample);
     });
@@ -78,7 +71,6 @@ export function createCoordinator(): Coordinator {
         setpoints,
         destroy: () => {
             logger.info('Destroying coordinator');
-            sep2Instance?.destroy();
             siteSamplePoller.destroy();
             invertersPoller.destroy();
             inverterController.destroy();
