@@ -1,16 +1,16 @@
-import { type Logger } from 'pino';
-import {
-    type InverterControlLimit,
-    type SupportedControlTypes,
+import type { Logger } from 'pino';
+import type {
+    InverterControlLimit,
+    SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController.js';
-import { type DerSample } from '../../coordinator/helpers/derSample.js';
-import { type Config } from '../../helpers/config.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import type { Config } from '../../helpers/config.js';
 import { env } from '../../helpers/env.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { getSep2Certificate } from '../../helpers/sep2Cert.js';
-import { type SiteSample } from '../../meters/siteSample.js';
+import type { SiteSample } from '../../meters/siteSample.js';
 import { SEP2Client } from '../../sep2/client.js';
 import {
     ControlLimitRampHelper,
@@ -36,8 +36,8 @@ import {
     generateEndDeviceResponse,
     parseEndDeviceXml,
 } from '../../sep2/models/endDevice.js';
-import { type EndDeviceList } from '../../sep2/models/endDeviceList.js';
-import { type SetpointType } from '../setpoint.js';
+import type { EndDeviceList } from '../../sep2/models/endDeviceList.js';
+import type { SetpointType } from '../setpoint.js';
 
 export class CsipAusSetpoint implements SetpointType {
     private schedulerByControlType: {

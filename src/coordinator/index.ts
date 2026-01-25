@@ -1,15 +1,15 @@
 import { getConfig } from '../helpers/config.js';
 import { pinoLogger } from '../helpers/logger.js';
-import { InverterController } from './helpers/inverterController.js';
 import {
     writeDerSamplePoints,
     writeSiteSamplePoints,
 } from '../helpers/influxdb.js';
-import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
-import { type SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
-import { InvertersPoller } from './helpers/inverterSample.js';
+import type { SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
 import { destroySetpoints, type Setpoints } from '../setpoints/index.js';
 import { getSetpoints } from '../setpoints/index.js';
+import { InvertersPoller } from './helpers/inverterSample.js';
+import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
+import { InverterController } from './helpers/inverterController.js';
 
 const logger = pinoLogger.child({ module: 'coordinator' });
 

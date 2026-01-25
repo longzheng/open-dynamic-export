@@ -1,4 +1,4 @@
-import { type Config } from '../helpers/config.js';
+import type { Config } from '../helpers/config.js';
 import { CsipAusSetpoint } from './csipAus/index.js';
 import { FixedSetpoint } from './fixed/index.js';
 import { MqttSetpoint } from './mqtt/index.js';
