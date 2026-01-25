@@ -17,8 +17,9 @@ import { generateMockFunctionSetAssignments } from '../../../tests/sep2/Function
 import { randomInt } from 'crypto';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 
-vi.mock('crypto', async () => {
-    const actual = await import('crypto');
+vi.mock('node:crypto', async (importOriginal) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const actual = await importOriginal<typeof import('node:crypto')>();
     return {
         ...actual,
         randomInt: vi.fn(actual.randomInt),

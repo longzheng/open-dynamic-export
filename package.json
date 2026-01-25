@@ -33,7 +33,6 @@
     "@tanstack/router-plugin": "^1.58.12",
     "@tsconfig/strictest": "^2.0.5",
     "@types/cors": "^2.8.17",
-    "@types/eslint__js": "^8.42.3",
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/eslint-plugin-tailwindcss": "^3.17.0",
     "@types/express": "^5.0.0",
@@ -64,7 +63,7 @@
     "vite-tsconfig-paths": "^5.0.1",
     "vitepress": "^1.6.3",
     "vitepress-plugin-mermaid": "^2.0.17",
-    "vitest": "^3.0.4",
+    "vitest": "^4.0.18",
     "zod-to-json-schema": "^3.24.1"
   },
   "dependencies": {
@@ -96,7 +95,6 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "fast-deep-equal": "^3.1.3",
-    "framer-motion": "~11.9.0",
     "jsrsasign": "^11.1.0",
     "modbus-serial": "^8.0.17",
     "mqtt": "^5.10.3",

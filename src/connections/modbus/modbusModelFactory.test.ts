@@ -15,7 +15,7 @@ import {
 import { ModbusConnection } from './connection/base.js';
 import { SunSpecConnection } from '../sunspec/connection/base.js';
 
-vi.mock(import('modbus-serial'));
+vi.mock('modbus-serial');
 
 type Model = {
     ID: number;
