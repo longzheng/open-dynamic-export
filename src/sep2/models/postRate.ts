@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
-import { z } from 'zod';
 
 export const postRateSchema = z
     .union([z.number(), z.null()])

@@ -1,4 +1,4 @@
-import { type InverterData } from '../inverterData.js';
+import type { InverterData } from '../inverterData.js';
 import { enumHasValue } from '../../helpers/enum.js';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
@@ -7,15 +7,15 @@ import {
     getWMaxLimPctFromTargetSolarPowerRatio,
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
-import { type Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/config.js';
 import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
 import { getInverterMetrics } from '../../connections/sunspec/helpers/inverterMetrics.js';
 import { getNameplateMetrics } from '../../connections/sunspec/helpers/nameplateMetrics.js';
 import { getSettingsMetrics } from '../../connections/sunspec/helpers/settingsMetrics.js';
 import { getStatusMetrics } from '../../connections/sunspec/helpers/statusMetrics.js';
-import {
-    type ControlsModel,
-    type ControlsModelWrite,
+import type {
+    ControlsModel,
+    ControlsModelWrite,
 } from '../../connections/sunspec/models/controls.js';
 import {
     Conn,
@@ -23,11 +23,11 @@ import {
     VArPct_Ena,
     OutPFSet_Ena,
 } from '../../connections/sunspec/models/controls.js';
-import { type InverterModel } from '../../connections/sunspec/models/inverter.js';
+import type { InverterModel } from '../../connections/sunspec/models/inverter.js';
 import { InverterState } from '../../connections/sunspec/models/inverter.js';
-import { type NameplateModel } from '../../connections/sunspec/models/nameplate.js';
-import { type SettingsModel } from '../../connections/sunspec/models/settings.js';
-import { type StatusModel } from '../../connections/sunspec/models/status.js';
+import type { NameplateModel } from '../../connections/sunspec/models/nameplate.js';
+import type { SettingsModel } from '../../connections/sunspec/models/settings.js';
+import type { StatusModel } from '../../connections/sunspec/models/status.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 

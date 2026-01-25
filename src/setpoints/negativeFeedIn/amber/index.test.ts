@@ -8,10 +8,10 @@ import {
     it,
     vi,
 } from 'vitest';
-import { AmberSetpoint } from './index.js';
 import { setupServer } from 'msw/node';
 import { HttpResponse, http } from 'msw';
-import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json' assert { type: 'json' };
+import sitePricesJson from '../../../../tests/amber/mocks/sitePrices.json' with { type: 'json' };
+import { AmberSetpoint } from './index.js';
 
 describe('AmberSetpoint', () => {
     const mockRestHandlers = [

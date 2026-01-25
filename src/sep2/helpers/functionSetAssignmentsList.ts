@@ -1,25 +1,25 @@
 import EventEmitter from 'node:events';
-import { type SEP2Client } from '../client.js';
+import { z } from 'zod';
+import type { Logger } from 'pino';
+import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
-import { PollableResource } from './pollableResource.js';
 import {
     parseFunctionSetAssignmentsListXml,
     type FunctionSetAssignmentsList,
 } from '../models/functionSetAssignmentsList.js';
-import { getListAll } from './pagination.js';
-import { type DerProgramListData } from './derProgramList.js';
-import {
-    derProgramListDataSchema,
-    DerProgramListHelper,
-} from './derProgramList.js';
 import {
     functionSetAssignmentsSchema,
     type FunctionSetAssignments,
 } from '../models/functionSetAssignments.js';
-import { z } from 'zod';
 import { createFileCache } from '../../helpers/fileCache.js';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
+import { PollableResource } from './pollableResource.js';
+import { getListAll } from './pagination.js';
+import type { DerProgramListData } from './derProgramList.js';
+import {
+    derProgramListDataSchema,
+    DerProgramListHelper,
+} from './derProgramList.js';
 
 const functionSetAssignmentsListDataSchema = z.array(
     z.object({

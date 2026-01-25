@@ -1,19 +1,19 @@
-import { type Logger } from 'pino';
-import {
-    type InverterControlLimit,
-    type SupportedControlTypes,
+import type { Logger } from 'pino';
+import type {
+    InverterControlLimit,
+    SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController.js';
-import { type RampRateHelper } from '../../sep2/helpers/rampRate.js';
-import { type SEP2Client } from '../../sep2/client.js';
+import type { RampRateHelper } from '../../sep2/helpers/rampRate.js';
+import type { SEP2Client } from '../../sep2/client.js';
 import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
 import { pinoLogger } from '../../helpers/logger.js';
-import { type DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
-import { type SetpointType } from '../setpoint.js';
+import type { DerControlsHelperChangedData } from '../../sep2/helpers/derControls.js';
+import type { SetpointType } from '../setpoint.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
-import { type ControlLimitRampTarget } from '../../sep2/helpers/controlLimitRamp.js';
+import type { ControlLimitRampTarget } from '../../sep2/helpers/controlLimitRamp.js';
 import { ControlLimitRampHelper } from '../../sep2/helpers/controlLimitRamp.js';
-import { type Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/config.js';
 
 export class CsipAusSetpoint implements SetpointType {
     private schedulerByControlType: {

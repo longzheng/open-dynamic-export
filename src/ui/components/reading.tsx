@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
 import { useNavigate } from '@tanstack/react-router';
-import { type IconType } from 'react-icons/lib';
+import type { IconType } from 'react-icons/lib';
 import { TbCircuitVoltmeter, TbPlug, TbSquareLetterQ } from 'react-icons/tb';
 import { PiWaveSineBold } from 'react-icons/pi';
 import { FormattedNumber } from 'react-intl';

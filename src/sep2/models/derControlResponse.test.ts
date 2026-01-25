@@ -1,8 +1,8 @@
 import { it, expect } from 'vitest';
-import { generateDerControlResponse } from './derControlResponse.js';
 import { objectToXml } from '../helpers/xml.js';
-import { ResponseStatus } from './responseStatus.js';
 import { validateXml } from '../helpers/xsdValidator.js';
+import { generateDerControlResponse } from './derControlResponse.js';
+import { ResponseStatus } from './responseStatus.js';
 
 it('should generate DERControlResponse XML', () => {
     const response = generateDerControlResponse({

@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { readFileSync } from 'fs';
+import { z } from 'zod';
 import { env } from './env.js';
 
 const modbusSchema = z.object({

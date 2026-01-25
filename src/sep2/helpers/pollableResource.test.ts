@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { type PollRate } from '../models/pollRate.js';
-import { PollableResource } from './pollableResource.js';
+import type { PollRate } from '../models/pollRate.js';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
+import { PollableResource } from './pollableResource.js';
 
 type MockResponse = {
     hello: string;

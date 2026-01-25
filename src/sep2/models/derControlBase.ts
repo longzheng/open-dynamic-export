@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringToBoolean } from '../helpers/boolean.js';
@@ -7,7 +8,6 @@ import {
     parseActivePowerXmlObject,
     type ActivePower,
 } from './activePower.js';
-import { z } from 'zod';
 
 export const derControlBaseSchema = z.object({
     opModImpLimW: activePowerSchema.optional().describe('site import limit'),

@@ -1,10 +1,10 @@
+import { z } from 'zod';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
     mathMaxNullableArray,
     mathMinNullableArray,
 } from './number.js';
-import { z } from 'zod';
 
 // per-phase measurements where the phases cannot be net metered (e.g. voltage)
 export const perPhaseMeasurementSchema = z.object({

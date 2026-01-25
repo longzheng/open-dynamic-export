@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SunSpecConnection } from '../sunspec/connection/base.js';
 import {
     convertReadRegisters,
     convertWriteRegisters,
@@ -13,7 +14,6 @@ import {
     uint16ToRegisters,
 } from './helpers/converters.js';
 import { ModbusConnection } from './connection/base.js';
-import { SunSpecConnection } from '../sunspec/connection/base.js';
 
 vi.mock('modbus-serial');
 

@@ -1,7 +1,7 @@
 import mqtt from 'mqtt';
-import { type Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/config.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import { type SiteSampleData, type SiteSample } from '../siteSample.js';
+import type { SiteSampleData, SiteSample } from '../siteSample.js';
 import { siteSampleDataSchema } from '../siteSample.js';
 
 export class MqttSiteSamplePoller extends SiteSamplePollerBase {

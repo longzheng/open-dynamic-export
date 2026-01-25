@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
 import { responseStatusSchema } from './responseStatus.js';
-import { z } from 'zod';
 
 export const derControlResponseSchema = z.object({
     createdDateTime: z.coerce.date(),

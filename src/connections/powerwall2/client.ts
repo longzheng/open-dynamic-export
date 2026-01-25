@@ -1,8 +1,8 @@
-import { type Logger } from 'pino';
-import { pinoLogger } from '../../helpers/logger.js';
-import { type AxiosRequestConfig, type AxiosInstance } from 'axios';
 import * as https from 'node:https';
+import type { Logger } from 'pino';
+import type { AxiosRequestConfig, AxiosInstance } from 'axios';
 import axios, { AxiosError } from 'axios';
+import { pinoLogger } from '../../helpers/logger.js';
 import {
     meterAggregatesSchema,
     metersSiteSchema,

@@ -2,7 +2,6 @@ import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
 import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { FormattedNumber } from 'react-intl';
-
 import { title } from '@/components/primitives';
 import {
     ReadingCard,
@@ -11,7 +10,7 @@ import {
     ReadingValueUnit,
 } from '@/components/reading';
 import { $api } from '@/client';
-import { type components } from '@/gen/api';
+import type { components } from '@/gen/api';
 
 export const Route = createLazyFileRoute('/')({
     component: Index,
@@ -319,6 +318,13 @@ function Index() {
                                                     (voltage) =>
                                                         voltage !== null,
                                                 );
+
+                                                if (
+                                                    nonNullableVoltages.length ===
+                                                    0
+                                                ) {
+                                                    return 0;
+                                                }
 
                                                 return (
                                                     nonNullableVoltages.reduce(

@@ -2,9 +2,8 @@ import { HeroUIProvider } from '@heroui/system';
 import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { IntlProvider } from 'react-intl';
-
-import { Navbar } from '@/components/navbar';
 import { lazy, Suspense } from 'react';
+import { Navbar } from '@/components/navbar';
 
 const queryClient = new QueryClient();
 

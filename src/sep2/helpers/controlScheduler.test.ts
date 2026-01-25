@@ -1,8 +1,10 @@
+import { randomInt } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-    type ControlSchedule,
-    type RandomizedControlSchedule,
-} from './controlScheduler.js';
+import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
+import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
+import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
+import { ResponseRequiredType } from '../models/responseRequired.js';
+import type { MergedControlsData } from './derControls.js';
 import {
     generateControlsSchedule,
     filterControlsOfType,
@@ -10,12 +12,10 @@ import {
     applyRandomizationToControlSchedule,
     applyRandomizationToDatetime,
 } from './controlScheduler.js';
-import { type MergedControlsData } from './derControls.js';
-import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
-import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
-import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
-import { randomInt } from 'crypto';
-import { ResponseRequiredType } from '../models/responseRequired.js';
+import type {
+    ControlSchedule,
+    RandomizedControlSchedule,
+} from './controlScheduler.js';
 
 vi.mock('node:crypto', async (importOriginal) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports

@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { Chart } from 'chart.js/auto';
-import { type TooltipItem } from 'chart.js';
+import type { TooltipItem } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { useEffect, useMemo, useRef } from 'react';
 import { Card, CardBody, CardHeader } from '@heroui/card';

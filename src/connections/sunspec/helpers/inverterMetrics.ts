@@ -3,7 +3,7 @@ import {
     numberWithPow10,
     numberNullableWithPow10,
 } from '../../../helpers/number.js';
-import { type InverterModel } from '../models/inverter.js';
+import type { InverterModel } from '../models/inverter.js';
 import { getSitePhasesFromInverter } from './sitePhases.js';
 
 export function getInverterMetrics(inverter: InverterModel) {

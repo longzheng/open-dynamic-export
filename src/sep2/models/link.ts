@@ -1,5 +1,5 @@
-import { assertString } from '../helpers/assert.js';
 import { z } from 'zod';
+import { assertString } from '../helpers/assert.js';
 
 export const linkSchema = z.object({
     href: z.string(),

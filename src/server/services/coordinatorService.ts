@@ -1,14 +1,14 @@
-import { type DERTyp } from '../../connections/sunspec/models/nameplate.js';
-import {
-    type ActiveInverterControlLimit,
-    type InverterConfiguration,
-    type InverterControlLimit,
+import type { DERTyp } from '../../connections/sunspec/models/nameplate.js';
+import type {
+    ActiveInverterControlLimit,
+    InverterConfiguration,
+    InverterControlLimit,
 } from '../../coordinator/helpers/inverterController.js';
-import { type Coordinator } from '../../coordinator/index.js';
+import type { Coordinator } from '../../coordinator/index.js';
 import { createCoordinator } from '../../coordinator/index.js';
-import { type Result } from '../../helpers/result.js';
-import { type ConnectStatusValue } from '../../sep2/models/connectStatus.js';
-import { type OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
+import type { Result } from '../../helpers/result.js';
+import type { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import type { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 
 type InvertersDataCache = Result<InverterData>[];
 

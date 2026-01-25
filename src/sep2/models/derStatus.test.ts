@@ -1,10 +1,10 @@
 import { it, expect, describe } from 'vitest';
 import { objectToXml } from '../helpers/xml.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 import { generateDerStatusResponse } from './derStatus.js';
 import { ConnectStatusValue } from './connectStatus.js';
 import { OperationalModeStatusValue } from './operationModeStatus.js';
 import { StorageModeStatusValue } from './storageModeStatus.js';
-import { validateXml } from '../helpers/xsdValidator.js';
 
 describe('generateDerStatusResponse', () => {
     it('should generate DERStatus XML', () => {

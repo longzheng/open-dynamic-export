@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 // 0 = Not Applicable (default, if not specified)
 // 1 = Electricity secondary metered value (a premises meter is typically on the low voltage, or secondary, side of a service transformer)
 // 2 = Electricity primary metered value (measured on the high voltage, or primary, side of the service transformer)

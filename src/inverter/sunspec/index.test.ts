@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
-import { getGenConnectStatusFromPVConn } from './index.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
+import { getGenConnectStatusFromPVConn } from './index.js';
 
 describe('getGenConnectStatusFromPVConn', () => {
     it('should return 0 if inverter is disconnected', () => {

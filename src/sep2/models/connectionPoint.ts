@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
-import { z } from 'zod';
 
 export const connectionPointSchema = z.object({
     connectionPointId: z.string().optional(),

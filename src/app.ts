@@ -1,9 +1,9 @@
 import express, { json, urlencoded } from 'express';
 import cors from 'cors';
-import { RegisterRoutes } from '../dist/routes.js';
-import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import redoc from 'redoc-express';
 import ViteExpress from 'vite-express';
+import { RegisterRoutes } from '../dist/routes.js';
+import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import { env } from './helpers/env.js';
 
 const port = env.SERVER_PORT;

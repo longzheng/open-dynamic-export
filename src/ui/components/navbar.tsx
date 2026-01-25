@@ -10,7 +10,6 @@ import {
 } from '@heroui/navbar';
 import { clsx } from 'clsx';
 import { useMatchRoute } from '@tanstack/react-router';
-
 import { siteConfig } from '@/config/site';
 import { Logo } from '@/components/icons';
 

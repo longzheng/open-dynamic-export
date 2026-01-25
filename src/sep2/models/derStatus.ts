@@ -1,9 +1,9 @@
-import { connectStatusSchema } from './connectStatus.js';
+import { z } from 'zod';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
 import { numberToHex } from '../../helpers/number.js';
+import { connectStatusSchema } from './connectStatus.js';
 import { operationalModeStatusSchema } from './operationModeStatus.js';
-import { z } from 'zod';
 import { stateOfChargeStatusSchema } from './stateOfChargeStatus.js';
 import { storageModeStatusSchema } from './storageModeStatus.js';
 

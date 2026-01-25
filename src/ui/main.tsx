@@ -1,10 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-
 import '@/styles/globals.css';
-
-// Import the generated route tree
 import { routeTree } from './routeTree.gen';
 
 // Create a new router instance

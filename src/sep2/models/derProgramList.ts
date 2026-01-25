@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { assertArray } from '../helpers/assert.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import { derProgramSchema, parseDERProgramXmlObject } from './derProgram.js';
@@ -5,7 +6,6 @@ import {
     parseSubscribableListXmlObject,
     subscribableListSchema,
 } from './subscribableList.js';
-import { z } from 'zod';
 
 export const derProgramListSchema = z
     .object({

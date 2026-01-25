@@ -1,10 +1,10 @@
 import EventEmitter from 'events';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
-import { PollableResource } from './pollableResource.js';
 import {
     parseDeviceCapabilityXml,
     type DeviceCapability,
 } from '../models/deviceCapability.js';
+import { PollableResource } from './pollableResource.js';
 
 export class DeviceCapabilityHelper extends EventEmitter<{
     data: [DeviceCapability];

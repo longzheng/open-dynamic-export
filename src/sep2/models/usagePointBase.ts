@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { stringHexToEnumType } from '../../helpers/enum.js';
 import { assertString } from '../helpers/assert.js';
 import {
@@ -6,8 +7,8 @@ import {
 } from './identifiedObject.js';
 import { roleFlagsTypeSchema, type RoleFlagsType } from './roleFlagsType.js';
 import { serviceKindSchema } from './serviceKind.js';
-import { z } from 'zod';
 import { usagePointBaseStatusSchema } from './usagePointBaseStatus.js';
+
 export const usagePointBaseSchema = z
     .object({
         roleFlags: roleFlagsTypeSchema,

@@ -1,12 +1,12 @@
+import { z } from 'zod';
 import { numberToHex } from '../../helpers/number.js';
+import { dateToStringSeconds } from '../helpers/date.js';
+import { xmlns } from '../helpers/namespace.js';
 import { activePowerSchema } from './activePower.js';
 import { apparentPowerSchema } from './apparentPower.js';
-import { dateToStringSeconds } from '../helpers/date.js';
 import { derControlTypeSchema } from './derControlType.js';
-import { xmlns } from '../helpers/namespace.js';
 import { reactivePowerSchema } from './reactivePower.js';
 import { doeControlTypeSchema } from './doeModesSupportedType.js';
-import { z } from 'zod';
 
 export const derSettingsSchema = z.object({
     updatedTime: z.coerce.date(),

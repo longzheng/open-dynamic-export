@@ -1,9 +1,9 @@
+import { z } from 'zod';
 import { linkSchema, parseLinkXmlObject } from './link.js';
 import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
 } from './subscribableResource.js';
-import { z } from 'zod';
 
 export const derSchema = z
     .object({

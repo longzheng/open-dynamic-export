@@ -3,7 +3,7 @@ import {
     numberWithPow10,
     numberNullableWithPow10,
 } from '../../../helpers/number.js';
-import { type MeterModel } from '../models/meter.js';
+import type { MeterModel } from '../models/meter.js';
 import { getSitePhasesFromMeter } from './sitePhases.js';
 
 export function getMeterMetrics(meter: MeterModel) {

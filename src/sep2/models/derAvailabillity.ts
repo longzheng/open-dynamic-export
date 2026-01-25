@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
-import { z } from 'zod';
 
 export const derAvailabilitySchema = z.object({
     readingTime: z.coerce.date(),

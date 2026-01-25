@@ -1,11 +1,11 @@
-import { type Config, type SetpointKeys } from '../helpers/config.js';
+import type { Config, SetpointKeys } from '../helpers/config.js';
+import type { Sep2Instance } from '../sep2/index.js';
 import { FixedSetpoint } from './fixed/index.js';
-import { type SetpointType } from './setpoint.js';
+import type { SetpointType } from './setpoint.js';
 import { MqttSetpoint } from './mqtt/index.js';
 import { AmberSetpoint } from './negativeFeedIn/amber/index.js';
 import { AusgridEA029Setpoint } from './twoWayTariff/ausgridEA029/index.js';
 import { SapnRELE2WSetpoint } from './twoWayTariff/sapnRELE2W/index.js';
-import { type Sep2Instance } from '../sep2/index.js';
 
 export type Setpoints = Record<SetpointKeys, SetpointType | null>;
 

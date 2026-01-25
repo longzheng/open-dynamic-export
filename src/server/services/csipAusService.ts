@@ -4,10 +4,10 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
 } from '../../sep2/helpers/cert.js';
-import { type CsipAusSetpoint } from '../../setpoints/csipAus/index.js';
-import { type ResponseRequiredType } from '../../sep2/models/responseRequired.js';
+import type { CsipAusSetpoint } from '../../setpoints/csipAus/index.js';
+import type { ResponseRequiredType } from '../../sep2/models/responseRequired.js';
+import type { SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
 import { coordinatorService } from './coordinatorService.js';
-import { type SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
 
 type CertificateIds = {
     lfdi: string;

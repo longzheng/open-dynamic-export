@@ -1,9 +1,9 @@
+import { z } from 'zod';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
-import { z } from 'zod';
 
 export const registrationSchema = z
     .object({

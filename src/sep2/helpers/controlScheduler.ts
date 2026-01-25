@@ -1,23 +1,23 @@
-import { type Logger } from 'pino';
-import { type SEP2Client } from '../client.js';
+import { randomInt } from 'crypto';
+import type { Logger } from 'pino';
+import { addSeconds, isEqual, max } from 'date-fns';
+import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
-import { type DERControlBase } from '../models/derControlBase.js';
-import {
-    type DerControlsHelperChangedData,
-    type MergedControlsData,
+import type { DERControlBase } from '../models/derControlBase.js';
+import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
+import type { DERControl } from '../models/derControl.js';
+import { ResponseStatus } from '../models/responseStatus.js';
+import type { ResponseRequiredType } from '../models/responseRequired.js';
+import type {
+    DerControlsHelperChangedData,
+    MergedControlsData,
 } from './derControls.js';
 import { DerControlResponseHelper } from './derControlResponse.js';
 import {
     getDerControlEndDate,
     sortByProgramPrimacyAndEventCreationTime,
 } from './derControl.js';
-import { randomInt } from 'crypto';
-import { addSeconds, isEqual, max } from 'date-fns';
-import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
-import { type DERControl } from '../models/derControl.js';
-import { type FallbackControl } from './fallbackControl.js';
-import { ResponseStatus } from '../models/responseStatus.js';
-import { type ResponseRequiredType } from '../models/responseRequired.js';
+import type { FallbackControl } from './fallbackControl.js';
 
 export type ControlType = Exclude<keyof DERControlBase, 'rampTms'>;
 
