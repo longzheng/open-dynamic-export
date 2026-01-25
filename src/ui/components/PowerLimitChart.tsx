@@ -1,10 +1,5 @@
 import { Card, CardHeader, CardBody } from '@heroui/card';
-import type {
-    ChartDataset,
-    ChartOptions,
-    Scale,
-    CoreScaleOptions,
-} from 'chart.js';
+import type { ChartDataset, ChartOptions } from 'chart.js';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
 import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
