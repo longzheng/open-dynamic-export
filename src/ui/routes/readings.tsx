@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { Chart } from 'chart.js/auto';
 import type { TooltipItem } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -7,7 +7,7 @@ import { Card, CardBody, CardHeader } from '@heroui/card';
 import { readingColors } from '../../../tailwind.config';
 import { $api } from '@/client';
 
-export const Route = createLazyFileRoute('/readings')({
+export const Route = createFileRoute('/readings')({
     component: Readings,
 });
 

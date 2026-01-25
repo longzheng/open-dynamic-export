@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardBody, CardFooter } from '@heroui/card';
-import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { FormattedNumber } from 'react-intl';
 import { title } from '@/components/primitives';
@@ -12,7 +12,7 @@ import {
 import { $api } from '@/client';
 import type { components } from '@/gen/api';
 
-export const Route = createLazyFileRoute('/')({
+export const Route = createFileRoute('/')({
     component: Index,
 });
 
