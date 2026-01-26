@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { numberToHex } from '../../helpers/number.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
@@ -12,39 +13,40 @@ import { uomTypeSchema } from './uomType.js';
 import { identifiedObjectSchema } from './identifiedObject.js';
 import { dateTimeIntervalSchema } from './dateTimeInterval.js';
 
-export const mirrorMeterReadingSchema = z
-    .object({
-        lastUpdateTime: z.coerce.date().optional(),
-        nextUpdateTime: z.coerce.date().optional(),
-        Reading: z
-            .object({
-                timePeriod: dateTimeIntervalSchema.optional(),
-                qualityFlags: qualityFlagsSchema.optional(),
-                value: z.number(),
-            })
-            .optional(),
-        ReadingType: z
-            .object({
+export const mirrorMeterReadingSchema = v.intersect([
+    v.object({
+        lastUpdateTime: v.optional(coerceDateSchema),
+        nextUpdateTime: v.optional(coerceDateSchema),
+        Reading: v.optional(
+            v.object({
+                timePeriod: v.optional(dateTimeIntervalSchema),
+                qualityFlags: v.optional(qualityFlagsSchema),
+                value: v.number(),
+            }),
+        ),
+        ReadingType: v.optional(
+            v.object({
                 commodity: commodityTypeSchema,
                 kind: kindTypeSchema,
                 dataQualifier: dataQualifierTypeSchema,
                 flowDirection: flowDirectionTypeSchema,
                 phase: phaseCodeSchema,
-                powerOfTenMultiplier: z.number(),
-                intervalLength: z.number().optional(),
+                powerOfTenMultiplier: v.number(),
+                intervalLength: v.optional(v.number()),
                 uom: uomTypeSchema,
-            })
-            .optional(),
-    })
-    .merge(identifiedObjectSchema);
+            }),
+        ),
+    }),
+    identifiedObjectSchema,
+]);
 
-export type MirrorMeterReading = z.infer<typeof mirrorMeterReadingSchema>;
+export type MirrorMeterReading = v.InferOutput<typeof mirrorMeterReadingSchema>;
 
 export function generateMirrorMeterReadingResponse(
     mirrorMeterReading: MirrorMeterReading,
 ) {
     // Validate input against schema
-    const validatedInput = mirrorMeterReadingSchema.parse(mirrorMeterReading);
+    const validatedInput = v.parse(mirrorMeterReadingSchema, mirrorMeterReading);
 
     const response = {
         MirrorMeterReading: {
@@ -69,7 +71,7 @@ export function generateMirrorMeterReadingObject(
         version,
         Reading,
         ReadingType,
-    } = mirrorMeterReadingSchema.parse(mirrorMeterReading);
+    } = v.parse(mirrorMeterReadingSchema, mirrorMeterReading);
 
     return {
         mRID,

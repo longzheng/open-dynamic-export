@@ -1,5 +1,5 @@
 import EventEmitter from 'node:events';
-import { z } from 'zod';
+import * as v from 'valibot';
 import type { Logger } from 'pino';
 import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
@@ -21,19 +21,19 @@ import {
     DerProgramListHelper,
 } from './derProgramList.js';
 
-const functionSetAssignmentsListDataSchema = z.array(
-    z.object({
+const functionSetAssignmentsListDataSchema = v.array(
+    v.object({
         functionSetAssignments: functionSetAssignmentsSchema,
-        derProgramList: derProgramListDataSchema.nullable(),
+        derProgramList: v.nullable(derProgramListDataSchema),
     }),
 );
 
-const fsaCacheDataSchema = z.object({
-    lfdi: z.string(),
+const fsaCacheDataSchema = v.object({
+    lfdi: v.string(),
     data: functionSetAssignmentsListDataSchema,
 });
 
-export type FunctionSetAssignmentsListData = z.infer<
+export type FunctionSetAssignmentsListData = v.InferOutput<
     typeof functionSetAssignmentsListDataSchema
 >;
 

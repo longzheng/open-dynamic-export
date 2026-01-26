@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 
 // DER StorageModeStatus value:
 // 0 – storage charging
@@ -11,9 +12,9 @@ export enum StorageModeStatusValue {
     StorageHolding = 2,
 }
 
-const storageModeStatusValueSchema = z.nativeEnum(StorageModeStatusValue);
+const storageModeStatusValueSchema = v.enum(StorageModeStatusValue);
 
-export const storageModeStatusSchema = z.object({
-    dateTime: z.coerce.date(),
+export const storageModeStatusSchema = v.object({
+    dateTime: coerceDateSchema,
     value: storageModeStatusValueSchema,
 });

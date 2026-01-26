@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // 3 = Time obtained from external authoritative source such as NTP
 // 4 = Time obtained from level 3 source
@@ -13,4 +13,4 @@ export enum TimeQuality {
     Uncoordinated = '7',
 }
 
-export const timeQualitySchema = z.nativeEnum(TimeQuality);
+export const timeQualitySchema = v.enum(TimeQuality);

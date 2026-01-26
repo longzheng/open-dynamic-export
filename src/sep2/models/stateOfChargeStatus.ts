@@ -1,7 +1,8 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { perCentSchema } from './perCent.js';
 
-export const stateOfChargeStatusSchema = z.object({
-    dateTime: z.coerce.date(),
+export const stateOfChargeStatusSchema = v.object({
+    dateTime: coerceDateSchema,
     value: perCentSchema,
 });

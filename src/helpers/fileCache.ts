@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'fs/promises';
-import type { ZodSchema } from 'zod';
+import * as v from 'valibot';
 import { env } from './env.js';
 import { pinoLogger } from './logger.js';
 
@@ -8,7 +8,7 @@ export function createFileCache<T>({
     schema,
 }: {
     filename: string;
-    schema: ZodSchema<T>;
+    schema: v.BaseSchema<unknown, T, v.BaseIssue<unknown>>;
 }) {
     const cachePath = `${env.CONFIG_DIR}/cache_${filename}.json`;
 
@@ -25,17 +25,17 @@ export function createFileCache<T>({
             return null;
         }
 
-        const result = schema.safeParse(JSON.parse(cachedFile));
+        const result = v.safeParse(schema, JSON.parse(cachedFile));
 
         if (!result.success) {
             pinoLogger.warn({
-                error: result.error,
+                error: result.issues,
                 message: 'Failed to parse cache file',
             });
             return null;
         }
 
-        return result.data;
+        return result.output;
     }
 
     async function set(data: T): Promise<void> {

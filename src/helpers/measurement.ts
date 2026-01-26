@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import {
     averageNumbersArray,
     averageNumbersNullableArray,
@@ -7,34 +7,34 @@ import {
 } from './number.js';
 
 // per-phase measurements where the phases cannot be net metered (e.g. voltage)
-export const perPhaseMeasurementSchema = z.object({
-    type: z.literal('perPhase'),
-    phaseA: z.number().nullable(),
-    phaseB: z.number().nullable(),
-    phaseC: z.number().nullable(),
+export const perPhaseMeasurementSchema = v.object({
+    type: v.literal('perPhase'),
+    phaseA: v.nullable(v.number()),
+    phaseB: v.nullable(v.number()),
+    phaseC: v.nullable(v.number()),
 });
 
-export type PerPhaseMeasurement = z.infer<typeof perPhaseMeasurementSchema>;
+export type PerPhaseMeasurement = v.InferOutput<typeof perPhaseMeasurementSchema>;
 
 // per-phase measurements where the phases can be net metered (e.g. power)
-export const perPhaseNetMeasurementSchema = z.object({
-    type: z.literal('perPhaseNet'),
-    phaseA: z.number().nullable(),
-    phaseB: z.number().nullable(),
-    phaseC: z.number().nullable(),
-    net: z.number(),
+export const perPhaseNetMeasurementSchema = v.object({
+    type: v.literal('perPhaseNet'),
+    phaseA: v.nullable(v.number()),
+    phaseB: v.nullable(v.number()),
+    phaseC: v.nullable(v.number()),
+    net: v.number(),
 });
 
-export type PerPhaseNetMeasurement = z.infer<
+export type PerPhaseNetMeasurement = v.InferOutput<
     typeof perPhaseNetMeasurementSchema
 >;
 
-export const noPhaseMeasurementSchema = z.object({
-    type: z.literal('noPhase'),
-    net: z.number(),
+export const noPhaseMeasurementSchema = v.object({
+    type: v.literal('noPhase'),
+    net: v.number(),
 });
 
-export type NoPhaseMeasurement = z.infer<typeof noPhaseMeasurementSchema>;
+export type NoPhaseMeasurement = v.InferOutput<typeof noPhaseMeasurementSchema>;
 
 export type AssertedPerPhaseNetOrNoPhaseMeasurementArray =
     | {

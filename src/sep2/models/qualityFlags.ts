@@ -1,4 +1,4 @@
-import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
+import { bitwiseEnumSchema } from '../../helpers/valibot.js';
 
 // List of codes indicating the quality of the reading, using specification:
 // Bit 0 - valid: data that has gone through all required validation checks and either passed them all or has been verified
@@ -18,4 +18,4 @@ export enum QualityFlags {
     Projected = 1 << 6,
 }
 
-export const qualityFlagsSchema = zodBitwiseEnumSchema(QualityFlags);
+export const qualityFlagsSchema = bitwiseEnumSchema(QualityFlags);

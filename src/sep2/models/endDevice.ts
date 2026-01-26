@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { assertString } from '../helpers/assert.js';
 import { booleanToString, stringToBoolean } from '../helpers/boolean.js';
 import { dateToStringSeconds, stringIntToDate } from '../helpers/date.js';
@@ -10,22 +11,23 @@ import {
     subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export const endDeviceSchema = z
-    .object({
-        lFDI: z.string().optional(),
-        sFDI: z.string(),
-        changedTime: z.coerce.date(),
-        enabled: z.boolean(),
-        derListLink: listLinkSchema.optional(),
-        logEventListLink: listLinkSchema.optional(),
-        registrationLink: linkSchema.optional(),
-        functionSetAssignmentsListLink: listLinkSchema.optional(),
-        subscriptionListLink: listLinkSchema.optional(),
-        connectionPointLink: linkSchema.optional(),
-    })
-    .merge(subscribableResourceSchema);
+export const endDeviceSchema = v.intersect([
+    v.object({
+        lFDI: v.optional(v.string()),
+        sFDI: v.string(),
+        changedTime: coerceDateSchema,
+        enabled: v.boolean(),
+        derListLink: v.optional(listLinkSchema),
+        logEventListLink: v.optional(listLinkSchema),
+        registrationLink: v.optional(linkSchema),
+        functionSetAssignmentsListLink: v.optional(listLinkSchema),
+        subscriptionListLink: v.optional(listLinkSchema),
+        connectionPointLink: v.optional(linkSchema),
+    }),
+    subscribableResourceSchema,
+]);
 
-export type EndDevice = z.infer<typeof endDeviceSchema>;
+export type EndDevice = v.InferOutput<typeof endDeviceSchema>;
 
 export type EndDeviceResponse = Pick<
     EndDevice,

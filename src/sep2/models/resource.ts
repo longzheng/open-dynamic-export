@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertString } from '../helpers/assert.js';
 
-export const resourceSchema = z.object({
-    href: z.string().optional(),
+export const resourceSchema = v.object({
+    href: v.optional(v.string()),
 });
 
-export type Resource = z.infer<typeof resourceSchema>;
+export type Resource = v.InferOutput<typeof resourceSchema>;
 
 export function parseResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

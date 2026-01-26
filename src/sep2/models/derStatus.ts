@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
 import { numberToHex } from '../../helpers/number.js';
@@ -7,16 +8,16 @@ import { operationalModeStatusSchema } from './operationModeStatus.js';
 import { stateOfChargeStatusSchema } from './stateOfChargeStatus.js';
 import { storageModeStatusSchema } from './storageModeStatus.js';
 
-export const derStatusSchema = z.object({
-    readingTime: z.coerce.date(),
+export const derStatusSchema = v.object({
+    readingTime: coerceDateSchema,
     operationalModeStatus: operationalModeStatusSchema,
     genConnectStatus: connectStatusSchema,
-    storConnectStatus: connectStatusSchema.optional(),
-    stateOfChargeStatus: stateOfChargeStatusSchema.optional(),
-    storageModeStatus: storageModeStatusSchema.optional(),
+    storConnectStatus: v.optional(connectStatusSchema),
+    stateOfChargeStatus: v.optional(stateOfChargeStatusSchema),
+    storageModeStatus: v.optional(storageModeStatusSchema),
 });
 
-export type DERStatus = z.infer<typeof derStatusSchema>;
+export type DERStatus = v.InferOutput<typeof derStatusSchema>;
 
 export function generateDerStatusResponse({
     readingTime,

@@ -1,10 +1,10 @@
-import type { z } from 'zod';
+import type { InferOutput } from 'valibot';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { SiteSample } from '../siteSample.js';
 import type { Config } from '../../helpers/config.js';
 import { getPowerwall2Client } from '../../connections/powerwall2/getClient.js';
 import type { Powerwall2Client } from '../../connections/powerwall2/client.js';
-import type { metersSiteSchema } from '../../connections/powerwall2/api.js';
+import { metersSiteSchema } from '../../connections/powerwall2/api.js';
 
 export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
     private client: Powerwall2Client;
@@ -56,7 +56,7 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
 export function generateSiteSample({
     meter,
 }: {
-    meter: z.infer<typeof metersSiteSchema>;
+    meter: InferOutput<typeof metersSiteSchema>;
 }): SiteSample {
     const firstMeter = meter[0];
 

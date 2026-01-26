@@ -1,16 +1,16 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { defaultDERControlSchema } from '../models/defaultDerControl.js';
 
-export const fallbackControlSchema = z.union([
-    z.object({
-        type: z.literal('default'),
-        data: z.object({
+export const fallbackControlSchema = v.union([
+    v.object({
+        type: v.literal('default'),
+        data: v.object({
             defaultControl: defaultDERControlSchema,
         }),
     }),
-    z.object({
-        type: z.literal('none'),
+    v.object({
+        type: v.literal('none'),
     }),
 ]);
 
-export type FallbackControl = z.infer<typeof fallbackControlSchema>;
+export type FallbackControl = v.InferOutput<typeof fallbackControlSchema>;

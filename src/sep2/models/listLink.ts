@@ -1,15 +1,16 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { linkSchema, parseLinkXmlObject } from './link.js';
 
-export const listLinkSchema = z
-    .object({
-        all: z.number().optional(),
-    })
-    .merge(linkSchema);
+export const listLinkSchema = v.intersect([
+    v.object({
+        all: v.optional(v.number()),
+    }),
+    linkSchema,
+]);
 
-export type ListLink = z.infer<typeof listLinkSchema>;
+export type ListLink = v.InferOutput<typeof listLinkSchema>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseListLinkXmlObject(xmlObject: any): ListLink {
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */

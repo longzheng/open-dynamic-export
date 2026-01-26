@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 export enum UsagePointBaseStatus {
     Off = '0',
     On = '1',
 }
 
-export const usagePointBaseStatusSchema = z.nativeEnum(UsagePointBaseStatus);
+export const usagePointBaseStatusSchema = v.enum(UsagePointBaseStatus);

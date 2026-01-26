@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertArray } from '../helpers/assert.js';
 import { derControlSchema, parseDERControlXmlObject } from './derControl.js';
 import {
@@ -6,13 +6,14 @@ import {
     subscribableListSchema,
 } from './subscribableList.js';
 
-export const derControlListSchema = z
-    .object({
-        derControls: derControlSchema.array(),
-    })
-    .merge(subscribableListSchema);
+export const derControlListSchema = v.intersect([
+    v.object({
+        derControls: v.array(derControlSchema),
+    }),
+    subscribableListSchema,
+]);
 
-export type DERControlList = z.infer<typeof derControlListSchema>;
+export type DERControlList = v.InferOutput<typeof derControlListSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerControlListXml(xml: any): DERControlList {
