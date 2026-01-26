@@ -15,7 +15,9 @@ export const respondableResourceSchema = v.intersect([
     resourceSchema,
 ]);
 
-export type RespondableResource = v.InferOutput<typeof respondableResourceSchema>;
+export type RespondableResource = v.InferOutput<
+    typeof respondableResourceSchema
+>;
 
 export function parseRespondableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

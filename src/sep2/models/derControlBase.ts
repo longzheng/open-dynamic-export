@@ -26,14 +26,8 @@ export const derControlBaseSchema = v.object({
         v.optional(activePowerSchema),
         v.description('site load limit'),
     ),
-    opModEnergize: v.pipe(
-        v.optional(v.boolean()),
-        v.description('energize'),
-    ),
-    opModConnect: v.pipe(
-        v.optional(v.boolean()),
-        v.description('connect'),
-    ),
+    opModEnergize: v.pipe(v.optional(v.boolean()), v.description('energize')),
+    opModConnect: v.pipe(v.optional(v.boolean()), v.description('connect')),
     rampTms: v.pipe(
         v.optional(v.number()),
         v.description(

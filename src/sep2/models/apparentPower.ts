@@ -8,9 +8,7 @@ export const apparentPowerSchema = v.pipe(
         ),
         multiplier: v.pipe(
             v.number(),
-            v.description(
-                'Specifies exponent of uom. power of ten multiplier',
-            ),
+            v.description('Specifies exponent of uom. power of ten multiplier'),
         ),
     }),
     v.description(

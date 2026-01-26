@@ -10,7 +10,9 @@ export const subscribableResourceSchema = v.intersect([
     resourceSchema,
 ]);
 
-export type SubscribableResource = v.InferOutput<typeof subscribableResourceSchema>;
+export type SubscribableResource = v.InferOutput<
+    typeof subscribableResourceSchema
+>;
 
 export function parseSubscribableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

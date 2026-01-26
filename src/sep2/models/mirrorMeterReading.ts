@@ -46,7 +46,10 @@ export function generateMirrorMeterReadingResponse(
     mirrorMeterReading: MirrorMeterReading,
 ) {
     // Validate input against schema
-    const validatedInput = v.parse(mirrorMeterReadingSchema, mirrorMeterReading);
+    const validatedInput = v.parse(
+        mirrorMeterReadingSchema,
+        mirrorMeterReading,
+    );
 
     const response = {
         MirrorMeterReading: {

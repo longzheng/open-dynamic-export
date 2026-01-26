@@ -7,9 +7,7 @@ export const powerFactorSchema = v.pipe(
         displacement: v.number(),
         multiplier: v.pipe(
             v.number(),
-            v.description(
-                'Specifies exponent of uom. power of ten multiplier',
-            ),
+            v.description('Specifies exponent of uom. power of ten multiplier'),
         ),
     }),
     v.description(

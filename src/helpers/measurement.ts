@@ -14,7 +14,9 @@ export const perPhaseMeasurementSchema = v.object({
     phaseC: v.nullable(v.number()),
 });
 
-export type PerPhaseMeasurement = v.InferOutput<typeof perPhaseMeasurementSchema>;
+export type PerPhaseMeasurement = v.InferOutput<
+    typeof perPhaseMeasurementSchema
+>;
 
 // per-phase measurements where the phases can be net metered (e.g. power)
 export const perPhaseNetMeasurementSchema = v.object({

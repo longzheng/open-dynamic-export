@@ -15,7 +15,9 @@ export const mirrorUsagePointListSchema = v.intersect([
     listSchema,
 ]);
 
-export type MirrorUsagePointList = v.InferOutput<typeof mirrorUsagePointListSchema>;
+export type MirrorUsagePointList = v.InferOutput<
+    typeof mirrorUsagePointListSchema
+>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {
