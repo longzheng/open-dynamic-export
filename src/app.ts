@@ -30,7 +30,6 @@ app.get('/api/docs/swagger.json', (_req, res) => {
 
 app.get(
     '/api/docs',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     redoc.default({
         title: 'API Documentation',
         specUrl: '/api/docs/swagger.json',

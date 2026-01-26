@@ -8,82 +8,43 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReadingsRouteImport } from './routes/readings'
+import { Route as LimitsRouteImport } from './routes/limits'
+import { Route as IndexRouteImport } from './routes/index'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as ReadingsImport } from './routes/readings'
-import { Route as LimitsImport } from './routes/limits'
-import { Route as IndexImport } from './routes/index'
-
-// Create/Update Routes
-
-const ReadingsRoute = ReadingsImport.update({
+const ReadingsRoute = ReadingsRouteImport.update({
   id: '/readings',
   path: '/readings',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LimitsRoute = LimitsImport.update({
+const LimitsRoute = LimitsRouteImport.update({
   id: '/limits',
   path: '/limits',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/limits': {
-      id: '/limits'
-      path: '/limits'
-      fullPath: '/limits'
-      preLoaderRoute: typeof LimitsImport
-      parentRoute: typeof rootRoute
-    }
-    '/readings': {
-      id: '/readings'
-      path: '/readings'
-      fullPath: '/readings'
-      preLoaderRoute: typeof ReadingsImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/limits': typeof LimitsRoute
   '/readings': typeof ReadingsRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/limits': typeof LimitsRoute
   '/readings': typeof ReadingsRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/limits': typeof LimitsRoute
   '/readings': typeof ReadingsRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/limits' | '/readings'
@@ -92,11 +53,36 @@ export interface FileRouteTypes {
   id: '__root__' | '/' | '/limits' | '/readings'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LimitsRoute: typeof LimitsRoute
   ReadingsRoute: typeof ReadingsRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/readings': {
+      id: '/readings'
+      path: '/readings'
+      fullPath: '/readings'
+      preLoaderRoute: typeof ReadingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/limits': {
+      id: '/limits'
+      path: '/limits'
+      fullPath: '/limits'
+      preLoaderRoute: typeof LimitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -104,31 +90,6 @@ const rootRouteChildren: RootRouteChildren = {
   LimitsRoute: LimitsRoute,
   ReadingsRoute: ReadingsRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/limits",
-        "/readings"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/limits": {
-      "filePath": "limits.tsx"
-    },
-    "/readings": {
-      "filePath": "readings.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
