@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // 0 = Not Applicable (default, if not specified)
 // 32 = Phase C (and S2)
@@ -26,4 +26,4 @@ export enum PhaseCode {
     PhaseABC = '224',
 }
 
-export const phaseCodeSchema = z.nativeEnum(PhaseCode);
+export const phaseCodeSchema = v.enum(PhaseCode);

@@ -12,7 +12,7 @@ SMA inverters support [SMA Modbus protocol](https://www.sma.de/en/products/produ
 
 To configure a SMA inverter connection, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "inverters": [ // (array) required: list of inverters
         {
@@ -23,8 +23,8 @@ To configure a SMA inverter connection, add the following property to `config.js
                 "ip": "192.168.1.6", // (string) required: the IP address of the inverter
                 "port": 502 // (number) required: the Modbus TCP port of the inverter
             },
-            "unitId": 1 // (number) required: the Modbus unit ID of the inverter,
-            "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+            "unitId": 1, // (number) required: the Modbus unit ID of the inverter,
+            "pollingIntervalMs": 200 // (number) optional: the polling interval in milliseconds, default 200
         }
     ],
     ...
@@ -41,7 +41,7 @@ The project requires SunSpec models `1`, `101` (or `102` or `103`), `120`, `121`
 
 To configure a SunSpec inverter connection over TCP, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "inverters": [ // (array) required: list of inverters
         {
@@ -51,8 +51,8 @@ To configure a SunSpec inverter connection over TCP, add the following property 
                 "ip": "192.168.1.6", // (string) required: the IP address of the inverter
                 "port": 502 // (number) required: the Modbus TCP port of the inverter
             },
-            "unitId": 1 // (number) required: the Modbus unit ID of the inverter,
-            "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+            "unitId": 1, // (number) required: the Modbus unit ID of the inverter,
+            "pollingIntervalMs": 200 // (number) optional: the polling interval in milliseconds, default 200
         }
     ],
     ...
@@ -61,7 +61,7 @@ To configure a SunSpec inverter connection over TCP, add the following property 
 
 For SunSpec over RTU, you need to modify the `connection`
 
-```js
+```jsonc
             "connection": {
                 "type": "rtu", // (string) required: the type of connection (tcp, rtu)
                 "path": "/dev/ttyUSB0",  // (string) required: the path to the serial port
@@ -82,7 +82,7 @@ A MQTT topic can be read to get the inveter measurements.
 
 To configure a MQTT inverter connection, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "inverters": [
         {
@@ -90,8 +90,8 @@ To configure a MQTT inverter connection, add the following property to `config.j
             "host": "mqtt://192.168.1.2", // (string) required: the MQTT broker host
             "username": "user", // (string) optional: the MQTT broker username
             "password": "password", // (string) optional: the MQTT broker password
-            "topic": "inverters/1" // (string) required: the MQTT topic to read
-            "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+            "topic": "inverters/1", // (string) required: the MQTT topic to read
+            "pollingIntervalMs": 200 // (number) optional: the polling interval in milliseconds, default 200
         }
     ]
     ...
@@ -100,100 +100,68 @@ To configure a MQTT inverter connection, add the following property to `config.j
 
 The MQTT topic must contain a JSON message that meets the following schema
 
-```js
-z.object({
-    inverter: z.object({
-        /**
-         * Positive values = inverter export (produce) power
-         *
-         * Negative values = inverter import (consume) power
-         *
-         * Value is total (net across all phases) measurement
-         */
-        realPower: z.number(),
-        /**
-         * Positive values = inverter export (produce) power
-         *
-         * Negative values = inverter import (consume) power
-         *
-         * Value is total (net across all phases) measurement
-         */
-        reactivePower: z.number(),
-        // Voltage of phase A (null if not available)
-        voltagePhaseA: z.number().nullable(),
-        // Voltage of phase B (null if not available)
-        voltagePhaseB: z.number().nullable(),
-        // Voltage of phase C (null if not available)
-        voltagePhaseC: z.number().nullable(),
-        frequency: z.number(),
-    }),
-    nameplate: z.object({
-        /**
-         * Type of DER device Enumeration
-         *
-         * PV = 4,
-         * PV_STOR = 82,
-         */
-        type: z.nativeEnum(DERTyp),
-        // Maximum active power output in W
-        maxW: z.number(),
-        // Maximum apparent power output in VA
-        maxVA: z.number(),
-        // Maximum reactive power output in var
-        maxVar: z.number(),
-    }),
-    settings: z.object({
-        // Currently set active power output in W
-        maxW: z.number(),
-        // Currently set apparent power output in VA
-        maxVA: z.number().nullable(),
-        // Currently set reactive power output in var
-        maxVar: z.number().nullable(),
-    }),
-    status: z.object({
-        // DER OperationalModeStatus value:
-        // 0 - Not applicable / Unknown
-        // 1 - Off
-        // 2 - Operational mode
-        // 3 - Test mode
-        operationalModeStatus: z.nativeEnum(OperationalModeStatusValue),
-        // DER ConnectStatus value (bitmap):
-        // 0 - Connected
-        // 1 - Available
-        // 2 - Operating
-        // 3 - Test
-        // 4 - Fault / Error
-        genConnectStatus: connectStatusValueSchema,
-    }),
-})
-```
-
-For example
-
-```json
+```jsonc
 {
     "inverter": {
-        "realPower": 4500,
-        "reactivePower": 1500,
-        "voltagePhaseA": 230.5,
+        // Positive values = inverter exporting (producing) real power.
+        // Negative values = inverter importing (consuming) real power.
+        // This is the total/net real power across all phases.
+        "realPower": 1234.5,
+
+        // Reactive power (var). Sign convention depends on the upstream system.
+        "reactivePower": 120.0,
+
+        // Per-phase voltages in volts.
+        // Nullable because some devices/reporting modes don’t provide per-phase values.
+        "voltagePhaseA": 230.4,
         "voltagePhaseB": null,
         "voltagePhaseC": null,
-        "frequency": 50.1
+
+        // Grid frequency in Hz.
+        "frequency": 50.0,
     },
+
     "nameplate": {
-        "type": 4, // PV = 4
+        // Type of DER device (enum).
+        // Allowed numeric values:
+        // - 4  = PV (solar)
+        // - 82 = PV_STOR (solar + storage)
+        "type": 4,
+
+        // Device nameplate limits (capability ratings).
         "maxW": 5000,
-        "maxVA": 5000,
-        "maxVar": 5000
+        "maxVA": 5500,
+        "maxVar": 2000,
     },
+
     "settings": {
+        // Currently configured export/production limit in watts.
         "maxW": 5000,
-        "maxVA": 5000,
-        "maxVar": 5000
+
+        // Optional configured limits; null if not set / not supported.
+        "maxVA": null,
+        "maxVar": null,
     },
+
     "status": {
-        "operationalModeStatus": 2, // OperationalModeStatusValue.OperationalMode = 2
-        "genConnectStatus": 7 // ConnectStatusValue.Connected | ConnectStatusValue.Available | ConnectStatusValue.Operating = 7
-    }
+        // Operational mode status (enum).
+        // Allowed numeric values:
+        // - 0 = Not applicable / Unknown
+        // - 1 = Off
+        // - 2 = Operational mode
+        // - 3 = Test mode
+        "operationalModeStatus": 2,
+
+        // Connection / availability / operating state bitmap (bitwise enum).
+        // This is an integer whose bits may be combined:
+        // - (1 << 0) = 1  => Connected
+        // - (1 << 1) = 2  => Available
+        // - (1 << 2) = 4  => Operating
+        // - (1 << 3) = 8  => Test
+        // - (1 << 4) = 16 => Fault / Error
+        //
+        // Example: 1 + 2 + 4 = 7 means Connected + Available + Operating.
+        "genConnectStatus": 7,
+    },
 }
 ```

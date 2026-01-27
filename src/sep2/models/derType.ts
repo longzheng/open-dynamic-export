@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // 0 - Not applicable / Unknown
 // 1 - Virtual or mixed DER
@@ -26,4 +26,4 @@ export enum DERType {
     CombinedPVAndStorage = 83,
 }
 
-export const derTypeSchema = z.nativeEnum(DERType);
+export const derTypeSchema = v.enum(DERType);

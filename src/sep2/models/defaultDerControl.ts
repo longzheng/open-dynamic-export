@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import {
@@ -14,26 +14,27 @@ import {
     subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export const defaultDERControlSchema = z
-    .object({
+export const defaultDERControlSchema = v.intersect([
+    v.object({
         derControlBase: derControlBaseSchema,
-        setGradW: z
-            .number()
-            .optional()
-            .describe(
+        setGradW: v.pipe(
+            v.optional(v.number()),
+            v.description(
                 'Set default rate of change (ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a default ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setGradW).',
             ),
-        setSoftGradW: z
-            .number()
-            .optional()
-            .describe(
+        ),
+        setSoftGradW: v.pipe(
+            v.optional(v.number()),
+            v.description(
                 'Set soft-start rate of change (soft-start ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a ramp rate. When present, this value SHALL update the value of the corresponding setting (DERSettings::setSoftGradW).',
             ),
-    })
-    .merge(identifiedObjectSchema)
-    .merge(subscribableResourceSchema);
+        ),
+    }),
+    identifiedObjectSchema,
+    subscribableResourceSchema,
+]);
 
-export type DefaultDERControl = z.infer<typeof defaultDERControlSchema>;
+export type DefaultDERControl = v.InferOutput<typeof defaultDERControlSchema>;
 
 export function parseDefaultDERControlXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

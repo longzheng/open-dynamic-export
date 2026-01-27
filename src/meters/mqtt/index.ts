@@ -1,4 +1,5 @@
 import mqtt from 'mqtt';
+import * as v from 'valibot';
 import type { Config } from '../../helpers/config.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { SiteSampleData, SiteSample } from '../siteSample.js';
@@ -30,17 +31,17 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
         this.client.on('message', (_topic, message) => {
             const data = message.toString();
 
-            const result = siteSampleDataSchema.safeParse(JSON.parse(data));
+            const result = v.safeParse(siteSampleDataSchema, JSON.parse(data));
 
             if (!result.success) {
                 this.logger.error(
-                    { error: result.error.message, data },
+                    { error: result.issues, data },
                     'Invalid MQTT message',
                 );
                 return;
             }
 
-            this.cachedMessage = result.data;
+            this.cachedMessage = result.output;
         });
 
         void this.startPolling();

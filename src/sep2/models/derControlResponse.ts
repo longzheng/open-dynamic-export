@@ -1,18 +1,20 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
 import { responseStatusSchema } from './responseStatus.js';
 
-export const derControlResponseSchema = z.object({
-    createdDateTime: z.coerce.date(),
-    endDeviceLFDI: z.string(),
+export const derControlResponseSchema = v.object({
+    createdDateTime: coerceDateSchema,
+    endDeviceLFDI: v.string(),
     status: responseStatusSchema,
-    subject: z
-        .string()
-        .describe('The mRID of the DERControl that is being responded to'),
+    subject: v.pipe(
+        v.string(),
+        v.description('The mRID of the DERControl that is being responded to'),
+    ),
 });
 
-export type DerControlResponse = z.infer<typeof derControlResponseSchema>;
+export type DerControlResponse = v.InferOutput<typeof derControlResponseSchema>;
 
 export function generateDerControlResponse({
     createdDateTime,

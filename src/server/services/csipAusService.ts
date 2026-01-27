@@ -39,7 +39,7 @@ export function getCsipLimitSchedule(
         [type].getControlSchedules();
 }
 
-// workaround tsoa type issue with zod infer types
+// workaround tsoa type issue with schema infer types
 type RandomizedControlSchedule = ControlSchedule & {
     effectiveStartInclusive: Date;
     effectiveEndExclusive: Date;

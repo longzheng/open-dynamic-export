@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // The status field contains the acknowledgement or status. Each event type (DRLC, DER, Price, or Text) can return different status information (e.g. an Acknowledge will be returned for a Price event where a DRLC event can return Event Received, Event Started, and Event Completed). The Status field value definitions are defined in Table 27: Response Types by Function Set.
 // EventReceived = 1,
@@ -38,4 +38,4 @@ export enum ResponseStatus {
     EventExpired = 254,
 }
 
-export const responseStatusSchema = z.nativeEnum(ResponseStatus);
+export const responseStatusSchema = v.enum(ResponseStatus);

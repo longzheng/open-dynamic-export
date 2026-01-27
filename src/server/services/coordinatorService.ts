@@ -85,7 +85,7 @@ class CoordinatorService {
 
 export const coordinatorService = new CoordinatorService();
 
-// workaround tsoa type issue with zod infer types
+// workaround tsoa type issue with schema infer types
 type DerSample = {
     date: Date;
     realPower:

@@ -1,4 +1,5 @@
 import mqtt from 'mqtt';
+import * as v from 'valibot';
 import {
     type InverterDataBase,
     inverterDataSchema,
@@ -39,12 +40,12 @@ export class MqttInverterDataPoller extends InverterDataPollerBase {
         this.client.on('message', (_topic, message) => {
             const data = message.toString();
 
-            const result = inverterDataSchema.safeParse(JSON.parse(data));
+            const result = v.safeParse(inverterDataSchema, JSON.parse(data));
 
             if (!result.success) {
                 this.logger.error(
                     {
-                        error: result.error.message,
+                        error: result.issues,
                         data,
                     },
                     'Invalid MQTT message',
@@ -52,7 +53,7 @@ export class MqttInverterDataPoller extends InverterDataPollerBase {
                 return;
             }
 
-            this.cachedMessage = result.data;
+            this.cachedMessage = result.output;
         });
 
         void this.startPolling();

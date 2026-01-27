@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import {
     identifiedObjectSchema,
     parseIdentifiedObjectXmlObject,
@@ -10,16 +10,17 @@ import {
     subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export const functionSetAssignmentsSchema = z
-    .object({
-        derProgramListLink: listLinkSchema.optional(),
-        responseSetListLink: listLinkSchema.optional(),
-        timeLink: linkSchema.optional(),
-    })
-    .merge(subscribableResourceSchema)
-    .merge(identifiedObjectSchema);
+export const functionSetAssignmentsSchema = v.intersect([
+    v.object({
+        derProgramListLink: v.optional(listLinkSchema),
+        responseSetListLink: v.optional(listLinkSchema),
+        timeLink: v.optional(linkSchema),
+    }),
+    subscribableResourceSchema,
+    identifiedObjectSchema,
+]);
 
-export type FunctionSetAssignments = z.infer<
+export type FunctionSetAssignments = v.InferOutput<
     typeof functionSetAssignmentsSchema
 >;
 

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertArray } from '../helpers/assert.js';
 import {
     functionSetAssignmentsSchema,
@@ -10,14 +10,15 @@ import {
     subscribableListSchema,
 } from './subscribableList.js';
 
-export const functionSetAssignmentsListSchema = z
-    .object({
+export const functionSetAssignmentsListSchema = v.intersect([
+    v.object({
         pollRate: pollRateSchema,
-        functionSetAssignments: functionSetAssignmentsSchema.array(),
-    })
-    .merge(subscribableListSchema);
+        functionSetAssignments: v.array(functionSetAssignmentsSchema),
+    }),
+    subscribableListSchema,
+]);
 
-export type FunctionSetAssignmentsList = z.infer<
+export type FunctionSetAssignmentsList = v.InferOutput<
     typeof functionSetAssignmentsListSchema
 >;
 

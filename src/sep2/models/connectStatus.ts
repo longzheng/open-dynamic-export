@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
+import * as v from 'valibot';
+import { bitwiseEnumSchema, coerceDateSchema } from '../../helpers/valibot.js';
 
 // DER ConnectStatus value (bitmap):
 // 0 - Connected
@@ -16,10 +16,9 @@ export enum ConnectStatusValue {
     Fault = 1 << 4,
 }
 
-export const connectStatusValueSchema =
-    zodBitwiseEnumSchema(ConnectStatusValue);
+export const connectStatusValueSchema = bitwiseEnumSchema(ConnectStatusValue);
 
-export const connectStatusSchema = z.object({
-    dateTime: z.coerce.date(),
+export const connectStatusSchema = v.object({
+    dateTime: coerceDateSchema,
     value: connectStatusValueSchema,
 });

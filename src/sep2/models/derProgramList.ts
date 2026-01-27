@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertArray } from '../helpers/assert.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import { derProgramSchema, parseDERProgramXmlObject } from './derProgram.js';
@@ -7,14 +7,15 @@ import {
     subscribableListSchema,
 } from './subscribableList.js';
 
-export const derProgramListSchema = z
-    .object({
+export const derProgramListSchema = v.intersect([
+    v.object({
         pollRate: pollRateSchema,
-        derPrograms: derProgramSchema.array(),
-    })
-    .merge(subscribableListSchema);
+        derPrograms: v.array(derProgramSchema),
+    }),
+    subscribableListSchema,
+]);
 
-export type DERProgramList = z.infer<typeof derProgramListSchema>;
+export type DERProgramList = v.InferOutput<typeof derProgramListSchema>;
 
 export function parseDerProgramListXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

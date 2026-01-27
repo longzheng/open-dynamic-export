@@ -10,7 +10,7 @@ In export limited scenarios, a "solar soaking" battery may not be able to charge
 
 To configure a charge buffer, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "battery": {
         "chargeBufferWatts": 100 // (number) required: the minimum charge buffer in watts
