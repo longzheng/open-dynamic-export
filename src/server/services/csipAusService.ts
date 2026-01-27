@@ -4,7 +4,6 @@ import {
     getCertificateLfdi,
     getCertificateSfdi,
 } from '../../sep2/helpers/cert.js';
-import type { CsipAusSetpoint } from '../../setpoints/csipAus/index.js';
 import type { ResponseRequiredType } from '../../sep2/models/responseRequired.js';
 import type { SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
 import { coordinatorService } from './coordinatorService.js';
@@ -35,9 +34,7 @@ export function getCsipLimitSchedule(
         throw new Error('CSIP-AUS setpoint is not running');
     }
 
-    const csipAusSetpointClass = csipAusSetpoint as CsipAusSetpoint;
-
-    return csipAusSetpointClass
+    return csipAusSetpoint
         .getSchedulerByControlType()
         [type].getControlSchedules();
 }
