@@ -1,12 +1,12 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
 
-export const connectionPointSchema = z.object({
-    connectionPointId: z.string().optional(),
+export const connectionPointSchema = v.object({
+    connectionPointId: v.optional(v.string()),
 });
 
-export type ConnectionPoint = z.infer<typeof connectionPointSchema>;
+export type ConnectionPoint = v.InferOutput<typeof connectionPointSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseConnectionPointXml(xml: any): ConnectionPoint {

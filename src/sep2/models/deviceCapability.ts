@@ -1,16 +1,16 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { linkSchema, parseLinkXmlObject } from './link.js';
 import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 
-export const deviceCapabilitySchema = z.object({
+export const deviceCapabilitySchema = v.object({
     pollRate: pollRateSchema,
     timeLink: linkSchema,
     endDeviceListLink: listLinkSchema,
     mirrorUsagePointListLink: listLinkSchema,
 });
 
-export type DeviceCapability = z.infer<typeof deviceCapabilitySchema>;
+export type DeviceCapability = v.InferOutput<typeof deviceCapabilitySchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDeviceCapabilityXml(xml: any): DeviceCapability {

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { stringHexToEnumType } from '../../helpers/enum.js';
 import { assertString } from '../helpers/assert.js';
 import {
@@ -9,15 +9,16 @@ import { roleFlagsTypeSchema, type RoleFlagsType } from './roleFlagsType.js';
 import { serviceKindSchema } from './serviceKind.js';
 import { usagePointBaseStatusSchema } from './usagePointBaseStatus.js';
 
-export const usagePointBaseSchema = z
-    .object({
+export const usagePointBaseSchema = v.intersect([
+    v.object({
         roleFlags: roleFlagsTypeSchema,
         serviceCategoryKind: serviceKindSchema,
         status: usagePointBaseStatusSchema,
-    })
-    .merge(identifiedObjectSchema);
+    }),
+    identifiedObjectSchema,
+]);
 
-export type UsagePointBase = z.infer<typeof usagePointBaseSchema>;
+export type UsagePointBase = v.InferOutput<typeof usagePointBaseSchema>;
 
 export function parseUsagePointBaseXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,11 +29,13 @@ export function parseUsagePointBaseXmlObject(
     const roleFlags = stringHexToEnumType<RoleFlagsType>(
         assertString(xmlObject['roleFlags'][0]),
     );
-    const serviceCategoryKind = serviceKindSchema.parse(
+    const serviceCategoryKind = v.parse(
+        serviceKindSchema,
         assertString(xmlObject['serviceCategoryKind'][0]),
     );
 
-    const status = usagePointBaseStatusSchema.parse(
+    const status = v.parse(
+        usagePointBaseStatusSchema,
         assertString(xmlObject['status'][0]),
     );
     /* eslint-enable @typescript-eslint/no-unsafe-member-access */

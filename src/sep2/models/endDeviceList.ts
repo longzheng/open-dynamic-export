@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertArray } from '../helpers/assert.js';
 import { endDeviceSchema, parseEndDeviceObject } from './endDevice.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
@@ -7,14 +7,15 @@ import {
     subscribableListSchema,
 } from './subscribableList.js';
 
-export const endDeviceListSchema = z
-    .object({
+export const endDeviceListSchema = v.intersect([
+    v.object({
         pollRate: pollRateSchema,
-        endDevices: endDeviceSchema.array(),
-    })
-    .merge(subscribableListSchema);
+        endDevices: v.array(endDeviceSchema),
+    }),
+    subscribableListSchema,
+]);
 
-export type EndDeviceList = z.infer<typeof endDeviceListSchema>;
+export type EndDeviceList = v.InferOutput<typeof endDeviceListSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceListXml(xml: any): EndDeviceList {

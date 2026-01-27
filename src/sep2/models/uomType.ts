@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // The following values are recommended values sourced from the unit of measure enumeration in IEC 61968-9 [61968]. Other values from the unit of measure enumeration in IEC 61968-9 [61968] MAY be used.
 // 0 = Not Applicable (default, if not specified)
@@ -68,4 +68,4 @@ export enum UomType {
     Therm = '169',
 }
 
-export const uomTypeSchema = z.nativeEnum(UomType);
+export const uomTypeSchema = v.enum(UomType);

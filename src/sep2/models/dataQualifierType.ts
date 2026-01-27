@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // 0 = Not Applicable (default, if not specified)
 // 2 = Average
@@ -18,4 +18,4 @@ export enum DataQualifierType {
     SampleStandardDeviation = '30',
 }
 
-export const dataQualifierTypeSchema = z.nativeEnum(DataQualifierType);
+export const dataQualifierTypeSchema = v.enum(DataQualifierType);

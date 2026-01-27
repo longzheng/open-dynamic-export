@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { numberToHex } from '../../helpers/number.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
@@ -8,33 +9,42 @@ import { derControlTypeSchema } from './derControlType.js';
 import { reactivePowerSchema } from './reactivePower.js';
 import { doeControlTypeSchema } from './doeModesSupportedType.js';
 
-export const derSettingsSchema = z.object({
-    updatedTime: z.coerce.date(),
+export const derSettingsSchema = v.object({
+    updatedTime: coerceDateSchema,
     modesEnabled: derControlTypeSchema,
-    doeModesEnabled: doeControlTypeSchema.describe(
-        'Bitmap indicating the DOE controls implemented by the device. See DOEControlType for values.',
+    doeModesEnabled: v.pipe(
+        doeControlTypeSchema,
+        v.description(
+            'Bitmap indicating the DOE controls implemented by the device. See DOEControlType for values.',
+        ),
     ),
-    setGradW: z
-        .number()
-        .describe(
+    setGradW: v.pipe(
+        v.number(),
+        v.description(
             'Set default rate of change (ramp rate) of active power output due to command or internal action, defined in %setWMax / second. Resolution is in hundredths of a percent/second. A value of 0 means there is no limit. Interpreted as a percentage change in output capability limit per second when used as a default ramp rate.',
         ),
-    setMaxVA: apparentPowerSchema
-        .optional()
-        .describe(
+    ),
+    setMaxVA: v.pipe(
+        v.optional(apparentPowerSchema),
+        v.description(
             'Set limit for maximum apparent power capability of the DER (in VA). Defaults to rtgMaxVA.',
         ),
-    setMaxW: activePowerSchema.describe(
-        'Set limit for maximum active power capability of the DER (in W). Defaults to rtgMaxW.',
     ),
-    setMaxVar: reactivePowerSchema
-        .optional()
-        .describe(
+    setMaxW: v.pipe(
+        activePowerSchema,
+        v.description(
+            'Set limit for maximum active power capability of the DER (in W). Defaults to rtgMaxW.',
+        ),
+    ),
+    setMaxVar: v.pipe(
+        v.optional(reactivePowerSchema),
+        v.description(
             'Set limit for maximum reactive power delivered by the DER (in var). SHALL be a positive value <= rtgMaxVar (default).',
         ),
+    ),
 });
 
-export type DERSettings = z.infer<typeof derSettingsSchema>;
+export type DERSettings = v.InferOutput<typeof derSettingsSchema>;
 
 export function generateDerSettingsResponse({
     updatedTime,

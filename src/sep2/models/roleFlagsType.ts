@@ -1,4 +1,4 @@
-import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
+import { bitwiseEnumSchema } from '../../helpers/valibot.js';
 
 // Bit 0 - isMirror - SHALL be set if the server is not the measurement device
 // Bit 1 - isPremisesAggregationPoint - SHALL be set if the UsagePoint is the point of delivery for a premises
@@ -19,4 +19,4 @@ export enum RoleFlagsType {
     // Reserved bits 7 to 15
 }
 
-export const roleFlagsTypeSchema = zodBitwiseEnumSchema(RoleFlagsType);
+export const roleFlagsTypeSchema = bitwiseEnumSchema(RoleFlagsType);

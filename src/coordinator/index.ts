@@ -1,11 +1,9 @@
 import { getConfig } from '../helpers/config.js';
 import { pinoLogger } from '../helpers/logger.js';
-import { RampRateHelper } from '../sep2/helpers/rampRate.js';
 import {
     writeDerSamplePoints,
     writeSiteSamplePoints,
 } from '../helpers/influxdb.js';
-import { getSep2Instance } from '../sep2/index.js';
 import type { SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
 import { destroySetpoints, type Setpoints } from '../setpoints/index.js';
 import { getSetpoints } from '../setpoints/index.js';
@@ -33,16 +31,8 @@ export function createCoordinator(): Coordinator {
         invertersPoller,
     });
 
-    const rampRateHelper = new RampRateHelper();
-
-    const sep2Instance = getSep2Instance({
-        config,
-        rampRateHelper,
-    });
-
     const setpoints = getSetpoints({
         config,
-        sep2Instance,
     });
 
     const inverterController = new InverterController({
@@ -55,10 +45,7 @@ export function createCoordinator(): Coordinator {
     invertersPoller.on('data', (derSample) => {
         writeDerSamplePoints(derSample);
 
-        rampRateHelper.onDerSample(derSample);
-
-        sep2Instance?.derHelper.onDerSample(derSample);
-        sep2Instance?.mirrorUsagePointListHelper.addDerSample(derSample);
+        setpoints.csipAus?.onDerSample(derSample);
 
         inverterController.updateDerSample(derSample);
     });
@@ -66,7 +53,7 @@ export function createCoordinator(): Coordinator {
     siteSamplePoller.on('data', ({ siteSample }) => {
         writeSiteSamplePoints(siteSample);
 
-        sep2Instance?.mirrorUsagePointListHelper.addSiteSample(siteSample);
+        setpoints.csipAus?.onSiteSample(siteSample);
 
         inverterController.updateSiteSample(siteSample);
     });
@@ -78,7 +65,6 @@ export function createCoordinator(): Coordinator {
         setpoints,
         destroy: () => {
             logger.info('Destroying coordinator');
-            sep2Instance?.destroy();
             siteSamplePoller.destroy();
             invertersPoller.destroy();
             inverterController.destroy();

@@ -1,15 +1,18 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertString } from '../helpers/assert.js';
 import { stringToBoolean } from '../helpers/boolean.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
 
-export const subscribableResourceSchema = z
-    .object({
-        subscribable: z.boolean(),
-    })
-    .merge(resourceSchema);
+export const subscribableResourceSchema = v.intersect([
+    v.object({
+        subscribable: v.boolean(),
+    }),
+    resourceSchema,
+]);
 
-export type SubscribableResource = z.infer<typeof subscribableResourceSchema>;
+export type SubscribableResource = v.InferOutput<
+    typeof subscribableResourceSchema
+>;
 
 export function parseSubscribableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

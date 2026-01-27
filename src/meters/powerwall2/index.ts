@@ -1,4 +1,4 @@
-import type { z } from 'zod';
+import type { InferOutput } from 'valibot';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { SiteSample } from '../siteSample.js';
 import type { Config } from '../../helpers/config.js';
@@ -56,7 +56,7 @@ export class Powerwall2SiteSamplePoller extends SiteSamplePollerBase {
 export function generateSiteSample({
     meter,
 }: {
-    meter: z.infer<typeof metersSiteSchema>;
+    meter: InferOutput<typeof metersSiteSchema>;
 }): SiteSample {
     const firstMeter = meter[0];
 

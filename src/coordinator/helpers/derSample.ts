@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import {
     noPhaseMeasurementSchema,
     perPhaseMeasurementSchema,
@@ -16,36 +16,36 @@ import type { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import type { SampleBase } from './sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
-export const derSampleDataSchema = z.object({
-    realPower: z.union([
+export const derSampleDataSchema = v.object({
+    realPower: v.union([
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
     ]),
-    reactivePower: z.union([
+    reactivePower: v.union([
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
     ]),
-    voltage: perPhaseMeasurementSchema.nullable(),
-    frequency: z.number().nullable(),
-    nameplate: z.object({
-        type: z.number(),
-        maxW: z.number(),
-        maxVA: z.number(),
-        maxVar: z.number(),
+    voltage: v.nullable(perPhaseMeasurementSchema),
+    frequency: v.nullable(v.number()),
+    nameplate: v.object({
+        type: v.number(),
+        maxW: v.number(),
+        maxVA: v.number(),
+        maxVar: v.number(),
     }),
-    settings: z.object({
-        setMaxW: z.number(),
-        setMaxVA: z.number().nullable(),
-        setMaxVar: z.number().nullable(),
+    settings: v.object({
+        setMaxW: v.number(),
+        setMaxVA: v.nullable(v.number()),
+        setMaxVar: v.nullable(v.number()),
     }),
-    status: z.object({
-        operationalModeStatus: z.number(),
-        genConnectStatus: z.number(),
+    status: v.object({
+        operationalModeStatus: v.number(),
+        genConnectStatus: v.number(),
     }),
-    invertersCount: z.number(),
+    invertersCount: v.number(),
 });
 
-export type DerSampleData = z.infer<typeof derSampleDataSchema>;
+export type DerSampleData = v.InferOutput<typeof derSampleDataSchema>;
 
 export type DerSample = SampleBase & DerSampleData;
 

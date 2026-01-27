@@ -16,7 +16,7 @@ Write active limits to a MQTT topic.
 
 To configure a MQTT output, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "publish": {
         "mqtt": {
@@ -30,82 +30,50 @@ To configure a MQTT output, add the following property to `config.json`
 }
 ```
 
-The MQTT topic will contain a JSON message that meets the following Zod schema
+The MQTT topic will contain a JSON message that meets the following schema
 
-```ts
-const inverterControlTypesSchema = z.union([
-  z.literal("csipAus"),
-  z.literal("fixed"),
-  z.literal("mqtt"),
-  z.literal("negativeFeedIn")
-  z.literal("twoWayTariff"),
-])
-
-const activeInverterControlLimitSchema = z.object({
-  opModEnergize: z.union([
-    z.object({
-      value: z.boolean(),
-      source: inverterControlTypesSchema
-    }),
-    z.undefined()
-  ]),
-  opModConnect: z.union([
-    z.object({
-      value: z.boolean(),
-      source: inverterControlTypesSchema
-    }),
-    z.undefined()
-  ]),
-  opModGenLimW: z.union([
-    z.object({
-      value: z.number(),
-      source: inverterControlTypesSchema
-    }),
-    z.undefined()
-  ]),
-  opModExpLimW: z.union([
-    z.object({
-      value: z.number(),
-      source: inverterControlTypesSchema
-    }),
-    z.undefined()
-  ]),
-  opModImpLimW: z.union([
-    z.object({
-      value: z.number(),
-      source: inverterControlTypesSchema
-    }),
-    z.undefined()
-  ]),
-  opModLoadLimW: z.union([
-    z.object({
-      value: z.number(),
-      source: inverterControlTypesSchema
-    }),
-    z.undefined()
-  ])
-})
-```
-
-For example
-
-```js
+```jsonc
 {
+    // Active inverter control limits currently in effect.
+    //
+    // Each field is either:
+    //   - undefined (no active control / not currently applied), OR
+    //   - an object { value: <boolean|number>, source: <InverterControlTypes> }
+    //
+    // InverterControlTypes:
+    //   "fixed" | "mqtt" | "csipAus" | "twoWayTariff" | "negativeFeedIn" | "batteryChargeBuffer"
+
+    // Energize / enable inverter operation.
     "opModEnergize": {
+        "value": true,
         "source": "csipAus",
-        "value": true
     },
+
+    // Connect/disconnect inverter to/from grid (or enable grid connection mode).
     "opModConnect": {
-        "source": "csipAus",
-        "value": true
+        "value": true,
+        "source": "fixed",
     },
+
+    // Generation limit in watts (W).
+    "opModGenLimW": {
+        "value": 5000,
+        "source": "twoWayTariff",
+    },
+
+    // Export limit in watts (W).
     "opModExpLimW": {
-        "source": "csipAus",
-        "value": 1500
+        "value": 0,
+        "source": "negativeFeedIn",
     },
-    "opModImpLimW": {
-        "source": "csipAus",
-        "value": 1500
-    }
+
+    // Import limit in watts (W).
+    "opModImpLimW": undefined,
+
+    // Load limit in watts (W).
+    "opModLoadLimW": {
+        "value": 3000,
+        "source": "batteryChargeBuffer",
+    },
 }
 ```

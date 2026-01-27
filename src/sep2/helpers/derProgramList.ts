@@ -1,5 +1,5 @@
 import EventEmitter from 'node:events';
-import { z } from 'zod';
+import * as v from 'valibot';
 import type { Logger } from 'pino';
 import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
@@ -18,15 +18,15 @@ import { pinoLogger } from '../../helpers/logger.js';
 import { getListAll } from './pagination.js';
 import { PollableResource } from './pollableResource.js';
 
-export const derProgramListDataSchema = z.array(
-    z.object({
+export const derProgramListDataSchema = v.array(
+    v.object({
         program: derProgramSchema,
-        defaultDerControl: defaultDERControlSchema.optional(),
-        derControls: derControlSchema.array().optional(),
+        defaultDerControl: v.optional(defaultDERControlSchema),
+        derControls: v.optional(v.array(derControlSchema)),
     }),
 );
 
-export type DerProgramListData = z.infer<typeof derProgramListDataSchema>;
+export type DerProgramListData = v.InferOutput<typeof derProgramListDataSchema>;
 
 export class DerProgramListHelper extends EventEmitter<{
     data: [DerProgramListData];

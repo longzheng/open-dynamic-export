@@ -1,14 +1,19 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
-export const apparentPowerSchema = z
-    .object({
-        value: z.number().describe('Value in volt-amperes (uom 61)'),
-        multiplier: z
-            .number()
-            .describe('Specifies exponent of uom. power of ten multiplier'),
-    })
-    .describe(
+export const apparentPowerSchema = v.pipe(
+    v.object({
+        value: v.pipe(
+            v.number(),
+            v.description('Value in volt-amperes (uom 61)'),
+        ),
+        multiplier: v.pipe(
+            v.number(),
+            v.description('Specifies exponent of uom. power of ten multiplier'),
+        ),
+    }),
+    v.description(
         'The apparent power S (in VA) is the product of root mean square (RMS) voltage and RMS current.',
-    );
+    ),
+);
 
-export type ApparentPower = z.infer<typeof apparentPowerSchema>;
+export type ApparentPower = v.InferOutput<typeof apparentPowerSchema>;

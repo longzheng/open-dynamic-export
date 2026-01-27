@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // 0 = Not Applicable (default, if not specified)
 // 1 = Forward (delivered to customer)
@@ -10,4 +10,4 @@ export enum FlowDirectionType {
     Reverse = '19',
 }
 
-export const flowDirectionTypeSchema = z.nativeEnum(FlowDirectionType);
+export const flowDirectionTypeSchema = v.enum(FlowDirectionType);

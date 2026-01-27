@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
 import {
@@ -19,17 +20,18 @@ import {
     subscribableResourceSchema,
 } from './subscribableResource.js';
 
-export const eventSchema = z
-    .object({
-        creationTime: z.coerce.date(),
+export const eventSchema = v.intersect([
+    v.object({
+        creationTime: coerceDateSchema,
         interval: dateTimeIntervalSchema,
         eventStatus: eventStatusSchema,
-    })
-    .merge(respondableResourceSchema)
-    .merge(subscribableResourceSchema)
-    .merge(identifiedObjectSchema);
+    }),
+    respondableResourceSchema,
+    subscribableResourceSchema,
+    identifiedObjectSchema,
+]);
 
-export type Event = z.infer<typeof eventSchema>;
+export type Event = v.InferOutput<typeof eventSchema>;
 
 export function parseEventXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

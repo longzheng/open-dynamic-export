@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // Service kind
 // 0 - electricity
@@ -19,4 +19,4 @@ export enum ServiceKind {
     Cooling = '6',
 }
 
-export const serviceKindSchema = z.nativeEnum(ServiceKind);
+export const serviceKindSchema = v.enum(ServiceKind);
