@@ -171,10 +171,14 @@ type SiteSample = {
     frequency: number | null;
 };
 
-type ControlLimitsBySetpoint = Record<
-    'csipAus' | 'fixed' | 'negativeFeedIn' | 'twoWayTariff' | 'mqtt',
-    InverterControlLimit | null
->;
+type Setpoint =
+    | 'csipAus'
+    | 'fixed'
+    | 'negativeFeedIn'
+    | 'twoWayTariff'
+    | 'mqtt';
+
+type ControlLimitsBySetpoint = Record<Setpoint, InverterControlLimit | null>;
 
 type InverterData = {
     date: Date;

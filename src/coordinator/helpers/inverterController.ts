@@ -79,10 +79,7 @@ export class InverterController {
     private setpoints: Setpoints;
     private loadWattsCache: number | null = null;
     private controlLimitsCache: {
-        controlLimitsBySetpoint: Record<
-            SetpointKeys,
-            InverterControlLimit | null
-        >;
+        controlLimitsBySetpoint: ControlLimitsBySetpoint;
         activeInverterControlLimit: ActiveInverterControlLimit;
     } | null = null;
     private lastAppliedInverterConfiguration: InverterConfiguration | null =
@@ -581,6 +578,11 @@ export function calculateTargetSolarWatts({
 
     return solarTarget.toNumber();
 }
+
+export type ControlLimitsBySetpoint = Record<
+    SetpointKeys,
+    InverterControlLimit | null
+>;
 
 export type ActiveInverterControlLimit = {
     opModEnergize:
