@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 ARG DEBUG=false
 
@@ -23,7 +23,7 @@ COPY . .
 RUN if [ "$DEBUG" = "true" ]; then npm run build:debug; else npm run build; fi
 
 # Production
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
 ENV NODE_ENV=production
 
