@@ -16,6 +16,7 @@ import { DERControlType } from '../models/derControlType.js';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import { getAxiosErrorCleaned } from '../../helpers/axios.js';
 import type { RampRateHelper } from './rampRate.js';
 import { objectToXml } from './xml.js';
 
@@ -157,7 +158,10 @@ export class DerHelper {
 
             this.lastSentDerCapability = derCapability;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER capability');
+            this.logger.error(
+                { error: getAxiosErrorCleaned(error) },
+                'Error updating DER capability',
+            );
         }
     }
 
@@ -184,7 +188,10 @@ export class DerHelper {
 
             this.lastSentDerSettings = derSettings;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER settings');
+            this.logger.error(
+                { error: getAxiosErrorCleaned(error) },
+                'Error updating DER settings',
+            );
         }
     }
 
@@ -207,7 +214,10 @@ export class DerHelper {
 
             this.lastSentDerStatus = derStatus;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER status');
+            this.logger.error(
+                { error: getAxiosErrorCleaned(error) },
+                'Error updating DER status',
+            );
         }
     }
 

@@ -7,6 +7,7 @@ import { generateDerControlResponse } from '../models/derControlResponse.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { ResponseStatus } from '../models/responseStatus.js';
+import { getAxiosErrorCleaned } from '../../helpers/axios.js';
 import { objectToXml } from './xml.js';
 
 type HistoryKey = {
@@ -93,7 +94,7 @@ export class DerControlResponseHelper {
         } catch (error) {
             this.logger.error(
                 {
-                    error,
+                    error: getAxiosErrorCleaned(error),
                     mRID,
                     status,
                     response,

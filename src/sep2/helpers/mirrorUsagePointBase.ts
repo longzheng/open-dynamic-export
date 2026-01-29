@@ -19,6 +19,7 @@ import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { UsagePointBaseStatus } from '../models/usagePointBaseStatus.js';
+import { getAxiosErrorCleaned } from '../../helpers/axios.js';
 import { objectToXml } from './xml.js';
 
 export type MirrorMeterReadingDefinitions = Required<
@@ -58,6 +59,7 @@ export abstract class MirrorUsagePointHelperBase<
     protected abstract roleFlags: RoleFlagsType;
     protected mirrorMeterReadingPostTimer: NodeJS.Timeout | null = null;
     protected abstract logger: Logger;
+    // a buffer to store any MirrorMeterReadings that failed to send (even with retry) to be retried at the next post interval
     private mirrorMeterReadingsBuffer: CappedArrayStack<MirrorMeterReading> =
         new CappedArrayStack({ limit: 1000 });
     private abortController: AbortController;
@@ -177,7 +179,10 @@ export abstract class MirrorUsagePointHelperBase<
 
             this.queueMirrorMeterReadingPost();
         } catch (error) {
-            this.logger.debug(error, 'Failed to create MirrorUsagePoint');
+            this.logger.debug(
+                { error: getAxiosErrorCleaned(error) },
+                'Failed to create MirrorUsagePoint',
+            );
             this.state = { type: 'none' };
         }
     }
@@ -238,11 +243,6 @@ export abstract class MirrorUsagePointHelperBase<
             );
         }
 
-        // this is a function because we want to evaluate `this.mirrorUsagePoint?.postRate` every time
-        // the mirrorUsagePoint may be updated after we post to it so we want to get the latest postRate
-        const getNextUpdateMilliseconds = () =>
-            getMillisecondsToNextHourMinutesInterval(this.getPostRate());
-
         const samples = this.getSamplesAndClear();
 
         // we only want to post if we have samples
@@ -250,7 +250,8 @@ export abstract class MirrorUsagePointHelperBase<
         // we won't know what reading types we have
         if (samples.length > 0) {
             const now = new Date();
-            const nextUpdateMilliseconds = getNextUpdateMilliseconds();
+            const nextUpdateMilliseconds =
+                getMillisecondsToNextHourMinutesInterval(this.getPostRate());
             const reading = this.getReadingFromSamples(samples);
             const sampleDurationSeconds = nextUpdateMilliseconds / 1000;
             const lastUpdateTime = now;
@@ -302,6 +303,8 @@ export abstract class MirrorUsagePointHelperBase<
                 },
                 'Sent MirrorMeterReadings',
             );
+        } else {
+            this.logger.debug('No samples to send for MirrorMeterReadings');
         }
 
         this.queueMirrorMeterReadingPost();
@@ -387,7 +390,12 @@ export abstract class MirrorUsagePointHelperBase<
                 });
                 successCount++;
             } catch (error) {
-                this.logger.debug(error, 'Failed to post MirrorMeterReading');
+                this.logger.debug(
+                    {
+                        error: getAxiosErrorCleaned(error),
+                    },
+                    'Failed to post MirrorMeterReading',
+                );
                 failCount++;
                 this.mirrorMeterReadingsBuffer.push(reading);
 
