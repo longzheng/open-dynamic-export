@@ -170,7 +170,8 @@ export function convertReadRegisters<
                         } catch (error) {
                             if (error instanceof Error) {
                                 throw new Error(
-                                    `Error converting read value for key ${key.toString()} with value ${value.toString()}: ${error.message}`,
+                                    `Error converting read value for key ${key.toString()} with value ${value.toString()}`,
+                                    { cause: error },
                                 );
                             }
 
@@ -221,7 +222,8 @@ export function convertWriteRegisters<
             } catch (error) {
                 if (error instanceof Error) {
                     throw new Error(
-                        `Error converting write value for key ${key.toString()} with value ${String(value)}: ${error.message}`,
+                        `Error converting write value for key ${key.toString()} with value ${String(value)}`,
+                        { cause: error },
                     );
                 }
 

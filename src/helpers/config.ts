@@ -408,8 +408,10 @@ export function getConfig() {
     const configJson = (() => {
         try {
             return readFileSync(getConfigPath(), 'utf8');
-        } catch {
-            throw new Error(`Error reading ./config/config.json`);
+        } catch (error) {
+            throw new Error(`Error reading ./config/config.json`, {
+                cause: error,
+            });
         }
     })();
 
