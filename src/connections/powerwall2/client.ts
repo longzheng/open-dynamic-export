@@ -97,7 +97,9 @@ export class Powerwall2Client {
 
                         this.token = { type: 'none' };
 
-                        throw new Error(`Powerwall2 get token error`);
+                        throw new Error(`Powerwall2 get token error`, {
+                            cause: error,
+                        });
                     }
                 })();
 

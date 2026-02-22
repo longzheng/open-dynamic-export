@@ -25,7 +25,7 @@ export async function withRetry<T>(
             return result;
         } catch (error) {
             if (abortController?.signal.aborted) {
-                throw new Error('Operation was aborted');
+                throw new Error('Operation was aborted', { cause: error });
             }
 
             pinoLogger.debug(
