@@ -129,4 +129,4 @@ export const defaultPollPushRates = {
     functionSetAssignmentsListPoll: 300,
     derProgramListPoll: 300,
     mirrorUsagePointPush: 300,
-};
+} as const;
