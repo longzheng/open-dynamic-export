@@ -1,7 +1,9 @@
 import type { Logger } from 'pino';
-import { addMilliseconds } from 'date-fns';
 import { isNetworkError, isRetryableError } from 'axios-retry';
-import { getMillisecondsToNextHourMinutesInterval } from '../../helpers/time.js';
+import {
+    getMillisecondsToNextUtcIntervalTick,
+    getUtcTickStart,
+} from '../../helpers/time.js';
 import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
 import type { MirrorMeterReading } from '../models/mirrorMeterReading.js';
@@ -209,16 +211,29 @@ export abstract class MirrorUsagePointHelperBase<
         reading: Reading;
     }): Record<MirrorMeterReadingKeys, number | null>;
 
-    private getPostRate() {
+    private getPostRateSeconds() {
         const mirrorUsagePointPostRate =
             this.state.type === 'ready'
                 ? this.state.mirrorUsagePoint.postRate
                 : null;
 
         return (
-            (mirrorUsagePointPostRate ??
-                defaultPollPushRates.mirrorUsagePointPush) / 60
+            mirrorUsagePointPostRate ??
+            defaultPollPushRates.mirrorUsagePointPush
         );
+    }
+
+    private getCurrentIntervalRange() {
+        const intervalSeconds = this.getPostRateSeconds();
+        const start = getUtcTickStart({
+            intervalSeconds,
+        });
+
+        return {
+            intervalSeconds,
+            start,
+            end: new Date(start.getTime() + intervalSeconds * 1_000),
+        };
     }
 
     public async mirrorMeterReadingsPost() {
@@ -238,23 +253,16 @@ export abstract class MirrorUsagePointHelperBase<
             );
         }
 
-        // this is a function because we want to evaluate `this.mirrorUsagePoint?.postRate` every time
-        // the mirrorUsagePoint may be updated after we post to it so we want to get the latest postRate
-        const getNextUpdateMilliseconds = () =>
-            getMillisecondsToNextHourMinutesInterval(this.getPostRate());
-
-        const samples = this.getSamplesAndClear();
+        const interval = this.getCurrentIntervalRange();
+        const samples = this.getSamplesForCompletedIntervalsAndClear({
+            currentIntervalStart: interval.start,
+        });
 
         // we only want to post if we have samples
         // without samples, the reading values min/max will be infinity
         // we won't know what reading types we have
         if (samples.length > 0) {
-            const now = new Date();
-            const nextUpdateMilliseconds = getNextUpdateMilliseconds();
             const reading = this.getReadingFromSamples(samples);
-            const sampleDurationSeconds = nextUpdateMilliseconds / 1000;
-            const lastUpdateTime = now;
-            const nextUpdateTime = addMilliseconds(now, nextUpdateMilliseconds);
             const mirrorMeterReadings = this.getReadingValues({
                 reading,
             });
@@ -272,8 +280,8 @@ export abstract class MirrorUsagePointHelperBase<
                         mRID: this.getReadingMrid(key),
                         description:
                             mirrorMeterReadingDefinitions[key].description,
-                        lastUpdateTime,
-                        nextUpdateTime,
+                        lastUpdateTime: interval.start,
+                        nextUpdateTime: interval.end,
                         Reading: {
                             // the value must not contain a decimal point
                             // shift the base value by the power of 10 multiplier
@@ -286,8 +294,8 @@ export abstract class MirrorUsagePointHelperBase<
                             ),
 
                             timePeriod: {
-                                start: now,
-                                duration: sampleDurationSeconds,
+                                start: interval.start,
+                                duration: interval.intervalSeconds,
                             },
                         },
                     };
@@ -314,7 +322,7 @@ export abstract class MirrorUsagePointHelperBase<
 
         this.mirrorMeterReadingPostTimer = setTimeout(() => {
             void this.mirrorMeterReadingsPost();
-        }, getMillisecondsToNextHourMinutesInterval(this.getPostRate()));
+        }, getMillisecondsToNextUtcIntervalTick(this.getPostRateSeconds()));
     }
 
     private getMirrorMeterReadingsWithReadingType(): Omit<
@@ -332,10 +340,19 @@ export abstract class MirrorUsagePointHelperBase<
         );
     }
 
-    protected getSamplesAndClear(): Sample[] {
-        const cache = this.samples;
-        this.samples = [];
-        return cache;
+    protected getSamplesForCompletedIntervalsAndClear({
+        currentIntervalStart,
+    }: {
+        currentIntervalStart: Date;
+    }): Sample[] {
+        const completedSamples = this.samples.filter(
+            (sample) => sample.date.getTime() < currentIntervalStart.getTime(),
+        );
+        this.samples = this.samples.filter(
+            (sample) => sample.date.getTime() >= currentIntervalStart.getTime(),
+        );
+
+        return completedSamples;
     }
 
     private async postMirrorUsagePoint({
