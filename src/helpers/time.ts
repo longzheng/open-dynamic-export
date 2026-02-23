@@ -1,24 +1,35 @@
-// calculate the delay until the next minutes interval within the hour
-// for example, 15 will return the delay until XX:15, XX:30, XX:45, or XX:00
-// for example, 30 will return the delay until XX:30 or XX:00
-export function getMillisecondsToNextHourMinutesInterval(
-    minutesInterval: number,
-): number {
-    if (minutesInterval <= 0) {
-        throw new Error('Interval must be greater than 0 minutes');
+function validateIntervalSeconds(intervalSeconds: number) {
+    if (!Number.isFinite(intervalSeconds) || intervalSeconds <= 0) {
+        throw new Error('Interval must be greater than 0 seconds');
     }
+}
 
-    if (minutesInterval > 30) {
-        throw new Error('Interval must be <= 30 minutes');
-    }
+export function getUtcTickStart({
+    intervalSeconds,
+    date = new Date(),
+}: {
+    intervalSeconds: number;
+    date?: Date;
+}): Date {
+    validateIntervalSeconds(intervalSeconds);
+
+    const intervalMs = intervalSeconds * 1_000;
+    const currentMs = date.getTime();
+
+    return new Date(Math.floor(currentMs / intervalMs) * intervalMs);
+}
+
+// calculate the delay until the next UTC interval tick.
+// for example, a 300 second interval will return the delay until the next :00, :05, :10... mark.
+export function getMillisecondsToNextUtcIntervalTick(
+    intervalSeconds: number,
+): number {
+    validateIntervalSeconds(intervalSeconds);
 
     const now = new Date();
-    const currentMinutes = now.getMinutes();
-    const nextIntervalMinutes =
-        Math.ceil((currentMinutes + 1) / minutesInterval) * minutesInterval;
+    const intervalMs = intervalSeconds * 1_000;
+    const currentTickStart = getUtcTickStart({ intervalSeconds, date: now });
+    const nextTick = currentTickStart.getTime() + intervalMs;
 
-    const nextIntervalMark = new Date(now);
-    nextIntervalMark.setMinutes(nextIntervalMinutes, 0, 0);
-
-    return nextIntervalMark.getTime() - now.getTime();
+    return nextTick - now.getTime();
 }
