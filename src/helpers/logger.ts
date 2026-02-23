@@ -9,22 +9,27 @@ export const pinoLogger = pino({
         ...stdSerializers,
         err: (error) => {
             if (error instanceof AxiosError) {
-                return {
-                    message: error.message,
-                    code: error.code,
-                    url: error.config?.url,
-                    method: error.config?.method,
+                const { config, response } = error;
 
-                    request: error.request
-                        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                          { headers: error.request?.getHeaders?.() }
-                        : undefined,
-                    response: error.response
+                return {
+                    response: response
                         ? {
-                              status: error.response.status,
-                              headers: error.response.headers,
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: response.headers,
                               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                              data: error.response.data,
+                              data: response.data,
+                          }
+                        : undefined,
+                    config: config
+                        ? {
+                              headers: config.headers,
+                              baseURL: config.baseURL,
+                              method: config.method,
+                              url: config.url,
+                              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                              data: config.data,
+                              'axios-retry': config['axios-retry'],
                           }
                         : undefined,
                 };
