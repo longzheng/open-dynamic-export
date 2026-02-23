@@ -1,65 +1,73 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getMillisecondsToNextHourMinutesInterval } from './time.js';
+import {
+    getMillisecondsToNextUtcIntervalTick,
+    getUtcTickStart,
+} from './time.js';
 
-describe('getMillisecondsToNextHourInterval', () => {
+describe('time helpers', () => {
     beforeEach(() => {
-        // tell vitest we use mocked time
         vi.useFakeTimers();
     });
 
     afterEach(() => {
-        // restoring date after each test run
         vi.useRealTimers();
     });
 
-    it('should return the correct milliseconds for a 15-minute interval', () => {
-        const now = new Date('2023-01-01T10:05:00Z');
-        vi.setSystemTime(now);
-        const result = getMillisecondsToNextHourMinutesInterval(15);
-        expect(result).toBe(10 * 60 * 1_000); // in 10 minutes
+    describe('getUtcTickStart', () => {
+        it('should align to 5-minute UTC tick', () => {
+            const tick = getUtcTickStart({
+                intervalSeconds: 300,
+                date: new Date('2023-01-01T10:07:45.900Z'),
+            });
+
+            expect(tick.toISOString()).toBe('2023-01-01T10:05:00.000Z');
+        });
+
+        it('should align to 1-minute UTC tick', () => {
+            const tick = getUtcTickStart({
+                intervalSeconds: 60,
+                date: new Date('2023-01-01T10:07:45.900Z'),
+            });
+
+            expect(tick.toISOString()).toBe('2023-01-01T10:07:00.000Z');
+        });
+
+        it('should throw for invalid interval', () => {
+            expect(() => getUtcTickStart({ intervalSeconds: 0 })).toThrowError(
+                'Interval must be greater than 0 seconds',
+            );
+        });
     });
 
-    it('should return the correct milliseconds for a 30-minute interval', () => {
-        const now = new Date('2023-01-01T10:45:15');
-        vi.setSystemTime(now);
-        const result = getMillisecondsToNextHourMinutesInterval(30);
-        expect(result).toBe(14 * 60 * 1_000 + 45 * 1_000); // in 14 minutes 45 seconds
-    });
+    describe('getMillisecondsToNextUtcIntervalTick', () => {
+        it('should return the delay to next 5-minute UTC tick', () => {
+            const now = new Date('2023-01-01T10:07:45.123Z');
+            vi.setSystemTime(now);
 
-    it('should return the correct milliseconds for a 29-minute interval', () => {
-        const now = new Date('2023-01-01T10:00:01Z');
-        vi.setSystemTime(now);
-        const result = getMillisecondsToNextHourMinutesInterval(29);
-        expect(result).toBe(28 * 60 * 1_000 + 59 * 1_000); // in 29 minutes 59 seconds
-    });
+            const result = getMillisecondsToNextUtcIntervalTick(300);
+            const expectedNextTick = new Date('2023-01-01T10:10:00.000Z');
 
-    it('should return the correct milliseconds for a 1-minute interval', () => {
-        const now = new Date('2023-01-01T10:59:05Z');
-        vi.setSystemTime(now);
-        const result = getMillisecondsToNextHourMinutesInterval(1);
-        expect(result).toBe(55 * 1_000); // in 55 seconds
-    });
+            expect(result).toBe(expectedNextTick.getTime() - now.getTime());
+        });
 
-    it('should throw for 31-minute interval', () => {
-        const now = new Date('2023-01-01T10:00:00Z');
-        vi.setSystemTime(now);
-        expect(() => getMillisecondsToNextHourMinutesInterval(31)).toThrowError(
-            'Interval must be <= 30 minutes',
-        );
-    });
+        it('should return the delay to next 1-minute UTC tick', () => {
+            const now = new Date('2023-01-01T10:07:45.123Z');
+            vi.setSystemTime(now);
 
-    it('should throw for negative interval', () => {
-        const now = new Date('2023-01-01T10:00:00Z');
-        vi.setSystemTime(now);
-        expect(() => getMillisecondsToNextHourMinutesInterval(-1)).toThrowError(
-            'Interval must be greater than 0 minutes',
-        );
-    });
+            const result = getMillisecondsToNextUtcIntervalTick(60);
+            const expectedNextTick = new Date('2023-01-01T10:08:00.000Z');
 
-    it('should handle edge case where current time is exactly on the interval, return next interval', () => {
-        const now = new Date('2023-01-01T10:15:00Z');
-        vi.setSystemTime(now);
-        const result = getMillisecondsToNextHourMinutesInterval(15);
-        expect(result).toBe(15 * 60 * 1_000); // in 15 minutes
+            expect(result).toBe(expectedNextTick.getTime() - now.getTime());
+        });
+
+        it('should return full interval when exactly on tick boundary', () => {
+            const now = new Date('2023-01-01T10:10:00.000Z');
+            vi.setSystemTime(now);
+
+            const result = getMillisecondsToNextUtcIntervalTick(300);
+            const expectedNextTick = new Date('2023-01-01T10:15:00.000Z');
+
+            expect(result).toBe(expectedNextTick.getTime() - now.getTime());
+        });
     });
 });
