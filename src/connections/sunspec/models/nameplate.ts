@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import {
     registersToUint16,
     registersToSunssf,
@@ -357,3 +358,5 @@ export enum DERTyp {
     PV = 4,
     PV_STOR = 82,
 }
+
+export const derTypSchema = v.enum(DERTyp);
