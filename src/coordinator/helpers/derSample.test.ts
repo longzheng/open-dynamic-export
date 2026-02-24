@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as v from 'valibot';
 import type { InverterData } from '../../inverter/inverterData.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
-import { generateDerSample } from './derSample.js';
+import { derSampleDataSchema, generateDerSample } from './derSample.js';
 
 describe('generateDerSample', () => {
     beforeEach(() => {
@@ -198,5 +199,71 @@ describe('generateDerSample', () => {
             },
             invertersCount: 2,
         } satisfies typeof result);
+    });
+});
+
+describe('derSampleDataSchema', () => {
+    const validDerSampleData = {
+        realPower: {
+            type: 'noPhase',
+            net: 1000,
+        },
+        reactivePower: {
+            type: 'noPhase',
+            net: 100,
+        },
+        voltage: {
+            type: 'perPhase',
+            phaseA: 230,
+            phaseB: 231,
+            phaseC: 229,
+        },
+        frequency: 50,
+        nameplate: {
+            type: DERTyp.PV,
+            maxW: 7000,
+            maxVA: 7000,
+            maxVar: 7000,
+        },
+        settings: {
+            setMaxW: 7000,
+            setMaxVA: 7000,
+            setMaxVar: 7000,
+        },
+        status: {
+            operationalModeStatus: OperationalModeStatusValue.OperationalMode,
+            genConnectStatus: ConnectStatusValue.Connected,
+        },
+        invertersCount: 1,
+    };
+
+    it('should accept operationalModeStatus enum number values', () => {
+        expect(
+            v.safeParse(derSampleDataSchema, validDerSampleData).success,
+        ).toBe(true);
+    });
+
+    it('should reject operationalModeStatus values outside the enum', () => {
+        expect(
+            v.safeParse(derSampleDataSchema, {
+                ...validDerSampleData,
+                status: {
+                    ...validDerSampleData.status,
+                    operationalModeStatus: 99,
+                },
+            }).success,
+        ).toBe(false);
+    });
+
+    it('should reject non-number operationalModeStatus enum keys', () => {
+        expect(
+            v.safeParse(derSampleDataSchema, {
+                ...validDerSampleData,
+                status: {
+                    ...validDerSampleData.status,
+                    operationalModeStatus: 'OperationalMode',
+                },
+            }).success,
+        ).toBe(false);
     });
 });

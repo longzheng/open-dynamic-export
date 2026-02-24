@@ -1,7 +1,7 @@
 import * as v from 'valibot';
-import { DERTyp } from '../connections/sunspec/models/nameplate.js';
+import { derTypSchema } from '../connections/sunspec/models/nameplate.js';
 import { connectStatusValueSchema } from '../sep2/models/connectStatus.js';
-import { OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
+import { operationalModeStatusValueSchema } from '../sep2/models/operationModeStatus.js';
 import type { SampleBase } from '../coordinator/helpers/sampleBase.js';
 
 export const inverterDataSchema = v.object({
@@ -21,7 +21,7 @@ export const inverterDataSchema = v.object({
         frequency: v.number(),
     }),
     nameplate: v.object({
-        type: v.enum(DERTyp),
+        type: derTypSchema,
         maxW: v.number(),
         maxVA: v.number(),
         maxVar: v.number(),
@@ -32,7 +32,7 @@ export const inverterDataSchema = v.object({
         maxVar: v.nullable(v.number()),
     }),
     status: v.object({
-        operationalModeStatus: v.enum(OperationalModeStatusValue),
+        operationalModeStatus: operationalModeStatusValueSchema,
         genConnectStatus: connectStatusValueSchema,
     }),
 });

@@ -14,7 +14,9 @@ export enum OperationalModeStatusValue {
     TestMode = 3,
 }
 
-const operationalModeStatusValueSchema = v.enum(OperationalModeStatusValue);
+export const operationalModeStatusValueSchema = v.enum(
+    OperationalModeStatusValue,
+);
 
 export const operationalModeStatusSchema = v.object({
     dateTime: coerceDateSchema,

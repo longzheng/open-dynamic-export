@@ -11,7 +11,10 @@ import {
 } from '../../helpers/number.js';
 import type { InverterData } from '../../inverter/inverterData.js';
 import { DERType } from '../../sep2/models/derType.js';
-import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
+import {
+    OperationalModeStatusValue,
+    operationalModeStatusValueSchema,
+} from '../../sep2/models/operationModeStatus.js';
 import type { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import type { SampleBase } from './sampleBase.js';
 
@@ -25,8 +28,19 @@ export const derSampleDataSchema = v.object({
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
     ]),
-    voltage: v.nullable(perPhaseMeasurementSchema),
-    frequency: v.nullable(v.number()),
+    voltage: v.nullable(
+        v.pipe(
+            perPhaseMeasurementSchema,
+            v.check(
+                ({ phaseA, phaseB, phaseC }) =>
+                    (phaseA === null || phaseA >= 0) &&
+                    (phaseB === null || phaseB >= 0) &&
+                    (phaseC === null || phaseC >= 0),
+                'Voltage must be non-negative per phase',
+            ),
+        ),
+    ),
+    frequency: v.nullable(v.pipe(v.number(), v.minValue(0))),
     nameplate: v.object({
         type: v.number(),
         maxW: v.number(),
@@ -39,10 +53,10 @@ export const derSampleDataSchema = v.object({
         setMaxVar: v.nullable(v.number()),
     }),
     status: v.object({
-        operationalModeStatus: v.number(),
+        operationalModeStatus: operationalModeStatusValueSchema,
         genConnectStatus: v.number(),
     }),
-    invertersCount: v.number(),
+    invertersCount: v.pipe(v.number(), v.minValue(0)),
 });
 
 export type DerSampleData = v.InferOutput<typeof derSampleDataSchema>;

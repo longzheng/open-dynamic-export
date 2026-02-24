@@ -21,8 +21,17 @@ export const siteSampleDataSchema = v.object({
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
     ]),
-    voltage: perPhaseMeasurementSchema,
-    frequency: v.nullable(v.number()),
+    voltage: v.pipe(
+        perPhaseMeasurementSchema,
+        v.check(
+            ({ phaseA, phaseB, phaseC }) =>
+                (phaseA === null || phaseA >= 0) &&
+                (phaseB === null || phaseB >= 0) &&
+                (phaseC === null || phaseC >= 0),
+            'Voltage must be non-negative per phase',
+        ),
+    ),
+    frequency: v.nullable(v.pipe(v.number(), v.minValue(0))),
 });
 
 export type SiteSampleData = v.InferOutput<typeof siteSampleDataSchema>;
