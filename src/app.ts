@@ -40,7 +40,8 @@ app.get(
     }),
 );
 
-RegisterRoutes(app);
+const registerRoutes = RegisterRoutes as (app: express.Express) => void;
+registerRoutes(app);
 
 // the docker image will not contain `vite.config.ts`
 // specify the outDir inline

@@ -4,6 +4,7 @@
         "target": "ESNext",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
+        "types": ["node"],
         "outDir": "dist",
         "resolveJsonModule": true,
         "esModuleInterop": true,
