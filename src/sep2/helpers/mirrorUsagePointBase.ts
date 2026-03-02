@@ -122,6 +122,7 @@ export abstract class MirrorUsagePointHelperBase<
                 'Updating MirrorUsagePoint postRate',
             );
             mirrorUsagePoint.postRate = serverMirrorUsagePoint.postRate;
+            this.queueMirrorMeterReadingPost();
         }
     }
 
