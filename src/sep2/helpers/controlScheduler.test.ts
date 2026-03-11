@@ -4,8 +4,8 @@ import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
-import type { MergedControlsData } from './derControls.js';
 import { CurrentStatus } from '../models/currentStatus.js';
+import type { MergedControlsData } from './derControls.js';
 import {
     generateControlsSchedule,
     partitionSupersededControls,
@@ -53,7 +53,10 @@ describe('partitionSupersededControls', () => {
             }),
         };
 
-        const result = partitionSupersededControls([supersededControl, activeControl]);
+        const result = partitionSupersededControls([
+            supersededControl,
+            activeControl,
+        ]);
 
         expect(result.superseded).toStrictEqual([supersededControl]);
         expect(result.active).toStrictEqual([activeControl]);
@@ -491,8 +494,16 @@ describe('generateControlsSchedule', () => {
             control: generateMockDERControl({
                 creationTime,
                 eventStatus: { currentStatus: CurrentStatus.Superseded },
-                interval: { start: new Date('2026-03-11T01:08:47Z'), duration: 1200 },
-                derControlBase: { opModExpLimW: { value: 9500, multiplier: 0 } },
+                interval: {
+                    start: new Date('2026-03-11T01:08:47Z'),
+                    duration: 1200,
+                },
+                derControlBase: {
+                    opModExpLimW: {
+                        value: 9500,
+                        multiplier: 0,
+                    },
+                },
             }),
         };
 
@@ -502,8 +513,13 @@ describe('generateControlsSchedule', () => {
             control: generateMockDERControl({
                 creationTime,
                 eventStatus: { currentStatus: CurrentStatus.Scheduled },
-                interval: { start: new Date('2026-03-11T01:15:51Z'), duration: 300 },
-                derControlBase: { opModExpLimW: { value: 4375, multiplier: 0 } },
+                interval: {
+                    start: new Date('2026-03-11T01:15:51Z'),
+                    duration: 300,
+                },
+                derControlBase: {
+                    opModExpLimW: { value: 4375, multiplier: 0 },
+                },
             }),
         };
 

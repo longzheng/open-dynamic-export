@@ -301,7 +301,10 @@ export function partitionSupersededControls(
     const active: MergedControlsData[] = [];
 
     for (const control of activeOrScheduledControls) {
-        if (control.control.eventStatus.currentStatus === CurrentStatus.Superseded) {
+        if (
+            control.control.eventStatus.currentStatus ===
+            CurrentStatus.Superseded
+        ) {
             superseded.push(control);
         } else {
             active.push(control);
@@ -391,9 +394,8 @@ function buildChunkedControlsScheduleByPriority({
 
         const {
             superseded: serverSupersededControls,
-            active: nonSupersededControls
+            active: nonSupersededControls,
         } = partitionSupersededControls(controlsAtTime);
-
 
         if (nonSupersededControls.length === 0) {
             continue;
@@ -409,8 +411,8 @@ function buildChunkedControlsScheduleByPriority({
 
         const supersededControls = [
             ...serverSupersededControls,
-            ...sortedControls.slice(1)
-        ]
+            ...sortedControls.slice(1),
+        ];
 
         for (const supersededControl of supersededControls) {
             void onSupersededControl?.({
