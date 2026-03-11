@@ -479,6 +479,49 @@ describe('generateControlsSchedule', () => {
             new Date('2024-01-01T00:00:10Z'),
         );
     });
+
+    it('should correctly identify superseded control when primacy and creationTime are equal', () => {
+        const fsa = generateMockFunctionSetAssignments({});
+        const program = generateMockDERProgram({ primacy: 2 });
+        const creationTime = new Date('2026-03-11T01:15:51.000Z');
+
+        const supersededControl: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                creationTime,
+                eventStatus: { currentStatus: CurrentStatus.Superseded },
+                interval: { start: new Date('2026-03-11T01:08:47Z'), duration: 1200 },
+                derControlBase: { opModExpLimW: { value: 9500, multiplier: 0 } },
+            }),
+        };
+
+        const activeControl: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                creationTime,
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+                interval: { start: new Date('2026-03-11T01:15:51Z'), duration: 300 },
+                derControlBase: { opModExpLimW: { value: 4375, multiplier: 0 } },
+            }),
+        };
+
+        const onSupersededControl = vi.fn();
+
+        const result = generateControlsSchedule({
+            activeOrScheduledControlsOfType: [supersededControl, activeControl],
+            onSupersededControl,
+        });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]?.mRID).toBe(activeControl.control.mRID);
+        expect(onSupersededControl).toHaveBeenCalledOnce();
+        expect(onSupersededControl).toHaveBeenCalledWith({
+            supersededControl: supersededControl.control,
+            supersedingControl: activeControl.control,
+        });
+    });
 });
 
 describe('getUniqueDatetimesFromControls', () => {
