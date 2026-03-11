@@ -8,6 +8,7 @@ import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
 import type { DERControl } from '../models/derControl.js';
 import { ResponseStatus } from '../models/responseStatus.js';
 import type { ResponseRequiredType } from '../models/responseRequired.js';
+import { CurrentStatus } from '../models/currentStatus.js';
 import type {
     DerControlsHelperChangedData,
     MergedControlsData,
@@ -290,6 +291,26 @@ export function filterControlsOfType<
     );
 }
 
+export function partitionSupersededControls(
+    activeOrScheduledControls: MergedControlsData[],
+): {
+    superseded: MergedControlsData[];
+    active: MergedControlsData[];
+} {
+    const superseded: MergedControlsData[] = [];
+    const active: MergedControlsData[] = [];
+
+    for (const control of activeOrScheduledControls) {
+        if (control.control.eventStatus.currentStatus === CurrentStatus.Superseded) {
+            superseded.push(control);
+        } else {
+            active.push(control);
+        }
+    }
+
+    return { superseded, active };
+}
+
 export function generateControlsSchedule({
     activeOrScheduledControlsOfType,
     onSupersededControl,
@@ -368,28 +389,34 @@ function buildChunkedControlsScheduleByPriority({
                 getDerControlEndDate(control.control) > datetimeEvent,
         );
 
-        if (controlsAtTime.length === 0) {
+        const {
+            superseded: serverSupersededControls,
+            active: nonSupersededControls
+        } = partitionSupersededControls(controlsAtTime);
+
+
+        if (nonSupersededControls.length === 0) {
             continue;
         }
 
-        // sort controls by priority
-        const sortedControls = controlsAtTime.sort(
+        // sort non-superseded controls by priority
+        const sortedControls = nonSupersededControls.sort(
             sortByProgramPrimacyAndEventCreationTime,
         );
 
         // get the top priority control
         const firstControl = sortedControls.at(0)!;
 
-        if (sortedControls.length > 1) {
-            // for the superseded events we need to respond to
-            const supersededControls = sortedControls.slice(1);
+        const supersededControls = [
+            ...serverSupersededControls,
+            ...sortedControls.slice(1)
+        ]
 
-            for (const supersededControl of supersededControls) {
-                void onSupersededControl?.({
-                    supersededControl: supersededControl.control,
-                    supersedingControl: firstControl.control,
-                });
-            }
+        for (const supersededControl of supersededControls) {
+            void onSupersededControl?.({
+                supersededControl: supersededControl.control,
+                supersedingControl: firstControl.control,
+            });
         }
 
         // add to schedule until the next datetime event

@@ -5,8 +5,10 @@ import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import type { MergedControlsData } from './derControls.js';
+import { CurrentStatus } from '../models/currentStatus.js';
 import {
     generateControlsSchedule,
+    partitionSupersededControls,
     filterControlsOfType,
     getSortedUniqueDatetimesFromControls,
     applyRandomizationToControlSchedule,
@@ -28,6 +30,72 @@ vi.mock('node:crypto', async (importOriginal) => {
 
 beforeEach(() => {
     vi.restoreAllMocks();
+});
+
+describe('partitionSupersededControls', () => {
+    const fsa = generateMockFunctionSetAssignments({});
+    const program = generateMockDERProgram({ primacy: 2 });
+
+    it('should partition superseded and active controls', () => {
+        const supersededControl: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                eventStatus: { currentStatus: CurrentStatus.Superseded },
+            }),
+        };
+
+        const activeControl: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            }),
+        };
+
+        const result = partitionSupersededControls([supersededControl, activeControl]);
+
+        expect(result.superseded).toStrictEqual([supersededControl]);
+        expect(result.active).toStrictEqual([activeControl]);
+    });
+
+    it('should return all controls as active when none are superseded', () => {
+        const control1: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            }),
+        };
+
+        const control2: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                eventStatus: { currentStatus: CurrentStatus.Active },
+            }),
+        };
+
+        const result = partitionSupersededControls([control1, control2]);
+
+        expect(result.superseded).toStrictEqual([]);
+        expect(result.active).toStrictEqual([control1, control2]);
+    });
+
+    it('should return all controls as superseded when all are superseded', () => {
+        const control: MergedControlsData = {
+            fsa,
+            program,
+            control: generateMockDERControl({
+                eventStatus: { currentStatus: CurrentStatus.Superseded },
+            }),
+        };
+
+        const result = partitionSupersededControls([control]);
+
+        expect(result.superseded).toStrictEqual([control]);
+        expect(result.active).toStrictEqual([]);
+    });
 });
 
 describe('filterControlsOfType', () => {
