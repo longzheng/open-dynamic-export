@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CurrentStatus } from '../models/currentStatus.js';
 import {
     getDerControlEndDate,
     sortByProgramPrimacy,
@@ -24,11 +25,17 @@ describe('sortByProgramPrimacyAndEventCreationTime', () => {
     it('should sort by program primacy first', () => {
         const a: Data = {
             program: { primacy: 1 },
-            control: { creationTime: new Date() },
+            control: {
+                creationTime: new Date(),
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
         };
         const b: Data = {
             program: { primacy: 2 },
-            control: { creationTime: new Date() },
+            control: {
+                creationTime: new Date(),
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
         };
 
         const result = [b, a].sort(sortByProgramPrimacyAndEventCreationTime);
@@ -39,20 +46,52 @@ describe('sortByProgramPrimacyAndEventCreationTime', () => {
     it('should sort by creation time if primacy the same', () => {
         const a: Data = {
             program: { primacy: 1 }, // lower primacy
-            control: { creationTime: new Date(1724047806690) },
+            control: {
+                creationTime: new Date(1724047806690),
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
         };
         const b: Data = {
             program: { primacy: 2 }, // older
-            control: { creationTime: new Date(1724047806690) },
+            control: {
+                creationTime: new Date(1724047806690),
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
         };
         const c: Data = {
             program: { primacy: 2 }, // newer
-            control: { creationTime: new Date(1724047806695) },
+            control: {
+                creationTime: new Date(1724047806695),
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
         };
 
         const result = [c, b, a].sort(sortByProgramPrimacyAndEventCreationTime);
 
         expect(result).toStrictEqual([a, c, b]);
+    });
+
+    it('should sort non-superseded controls before superseded controls when primacy is the same', () => {
+        const nonSuperseded: Data = {
+            program: { primacy: 1 },
+            control: {
+                creationTime: new Date(1724047806690),
+                eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
+        };
+        const superseded: Data = {
+            program: { primacy: 1 },
+            control: {
+                creationTime: new Date(1724047806695),
+                eventStatus: { currentStatus: CurrentStatus.Superseded },
+            },
+        };
+
+        const result = [superseded, nonSuperseded].sort(
+            sortByProgramPrimacyAndEventCreationTime,
+        );
+
+        expect(result).toStrictEqual([nonSuperseded, superseded]);
     });
 });
 
