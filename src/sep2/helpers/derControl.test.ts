@@ -72,11 +72,18 @@ describe('sortByProgramPrimacyAndEventCreationTime', () => {
     });
 
     it('should sort non-superseded controls before superseded controls when primacy is the same', () => {
-        const nonSuperseded: Data = {
+        const nonSupersededScheduled: Data = {
             program: { primacy: 1 },
             control: {
-                creationTime: new Date(1724047806690),
+                creationTime: new Date(1724047806690), // older than superseded
                 eventStatus: { currentStatus: CurrentStatus.Scheduled },
+            },
+        };
+        const nonSupersededActive: Data = {
+            program: { primacy: 1 },
+            control: {
+                creationTime: new Date(1724047806680), // older than superseded
+                eventStatus: { currentStatus: CurrentStatus.Active },
             },
         };
         const superseded: Data = {
@@ -87,11 +94,17 @@ describe('sortByProgramPrimacyAndEventCreationTime', () => {
             },
         };
 
-        const result = [superseded, nonSuperseded].sort(
-            sortByProgramPrimacyAndEventCreationTime,
-        );
+        const result = [
+            superseded,
+            nonSupersededScheduled,
+            nonSupersededActive,
+        ].sort(sortByProgramPrimacyAndEventCreationTime);
 
-        expect(result).toStrictEqual([nonSuperseded, superseded]);
+        expect(result).toStrictEqual([
+            nonSupersededScheduled,
+            nonSupersededActive,
+            superseded,
+        ]);
     });
 });
 
