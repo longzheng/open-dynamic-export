@@ -88,12 +88,26 @@ To specify setpoint limits based on a MQTT topic, add the following property to 
     "setpoints": {
         "mqtt": {
             "host": "mqtt://192.168.1.123",
-            "topic": "setpoints"
+            "topic": "setpoints",
+            "stalenessTimeoutSeconds": 300 // (number) optional: discard MQTT setpoints if no message received within this many seconds
         }
     }
     ...
 }
 ```
+
+### Staleness Timeout
+
+If `stalenessTimeoutSeconds` is configured, MQTT setpoints act as a dead-man's switch: if no new MQTT message is received within the timeout period, all MQTT setpoint values are discarded and the system falls back to fixed setpoints.
+
+This protects against external automation tools crashing or losing connectivity — without it, the last MQTT message persists indefinitely, potentially leaving the system in an unintended state (e.g., grid charging left enabled).
+
+When a new MQTT message arrives after a staleness expiry, MQTT control resumes immediately.
+
+> [!TIP]
+> If not configured, the existing behavior is preserved: the last MQTT message persists indefinitely.
+
+### MQTT Message Schema
 
 The MQTT topic must contain a JSON message that meets the following schema
 

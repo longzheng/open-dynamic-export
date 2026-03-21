@@ -178,6 +178,9 @@ Grid charging behavior:
 
 Grid charging is designed to be controlled by external automation tools via MQTT or fixed setpoints. No built-in tariff or forecasting logic is included — integration with tools like [EMHASS](https://github.com/davidusb-geek/emhass), Home Assistant automations, or time-of-use tariff schedules is left to the external controller.
 
+> [!TIP]
+> When using MQTT to control grid charging, configure `stalenessTimeoutSeconds` on the MQTT setpoint as a dead-man's switch. If the external automation tool crashes or loses connectivity, the MQTT setpoints will be discarded after the timeout and the system falls back to fixed setpoints (which should have `batteryGridChargingEnabled` absent or `false`). See [MQTT Setpoint Staleness Timeout](#mqtt-setpoint-staleness-timeout) for configuration details.
+
 **Example: MQTT-controlled grid charging for time-of-use tariffs**
 
 ```jsonc
@@ -215,6 +218,28 @@ This allows integration with:
 - Weather forecasts
 - VPP programs
 - Home automation systems
+
+### MQTT Setpoint Staleness Timeout
+
+By default, the last MQTT message persists indefinitely. If the external automation tool crashes or loses connectivity, the system can get stuck with stale setpoints (e.g., grid charging left enabled).
+
+Configure `stalenessTimeoutSeconds` on the MQTT setpoint as a dead-man's switch:
+
+```jsonc
+{
+    "setpoints": {
+        "mqtt": {
+            "host": "mqtt://192.168.1.123",
+            "topic": "open-dynamic-export/control",
+            "stalenessTimeoutSeconds": 300  // 5 minutes
+        }
+    }
+}
+```
+
+If no MQTT message is received within the timeout, all MQTT setpoint values are discarded and the system falls back to fixed setpoints. When a new message arrives, MQTT control resumes immediately.
+
+This mirrors the 60-second SunSpec `_RvrtTms` safety timeout at the inverter level — if you don't hear from me within X seconds, revert to safe defaults.
 
 ### SunSpec Integration
 
