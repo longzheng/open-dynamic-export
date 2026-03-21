@@ -13,7 +13,7 @@ To help test and validate integrations, the project can be configured whether to
 
 ## Battery control
 
-The system supports comprehensive battery control with SOC awareness, priority modes, and multi-inverter support. Battery control can be enabled globally and requires both global and per-inverter configuration.
+The project supports comprehensive battery control with SoC (state of charge) awareness, priority modes, and multi-inverter support. Battery control can be enabled globally and requires both global and per-inverter configuration.
 
 ```js
 {
@@ -34,13 +34,13 @@ The system supports comprehensive battery control with SOC awareness, priority m
 | `batteryPowerFlowControl` | boolean | false | Use intelligent power flow control (recommended) |
 
 > [!NOTE]
-> See [Battery Configuration](./battery.md) for detailed information about battery control features, priority modes, SOC management, and configuration examples.
+> See [Battery Configuration](./battery.md) for detailed information about battery control features, priority modes, SoC management, and configuration examples.
 
 ### Battery Power Flow Control vs Legacy Charge Buffer
 
 The system provides two battery control mechanisms:
 
-- **Battery Power Flow Control** (Recommended): Intelligent control with SOC awareness, configurable priority modes, and multi-inverter support
+- **Battery Power Flow Control** (Recommended): Intelligent control with SoC awareness, configurable priority modes, and multi-inverter support
 - **Legacy Charge Buffer**: Simple override ensuring minimum charging headroom
 
 > [!IMPORTANT]
