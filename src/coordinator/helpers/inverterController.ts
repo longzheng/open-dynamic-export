@@ -538,6 +538,8 @@ export function calculateInverterConfiguration({
                 activeInverterControlLimit.batteryPriorityMode?.value,
             batteryGridChargingEnabled:
                 activeInverterControlLimit.batteryGridChargingEnabled?.value,
+            batteryGridChargingMaxWatts:
+                activeInverterControlLimit.batteryGridChargingMaxWatts?.value,
         };
 
         const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);

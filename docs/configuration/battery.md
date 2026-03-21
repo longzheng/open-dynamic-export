@@ -92,8 +92,8 @@ Enable battery power flow control in `config.json`:
 | `batteryChargeMaxWatts` | number | - | Maximum charging power (watts) |
 | `batteryDischargeMaxWatts` | number | - | Maximum discharging power (watts) |
 | `batteryPriorityMode` | string | - | `"battery_first"` or `"export_first"` |
-| `batteryGridChargingEnabled` | boolean | false | Allow charging from grid (future use) |
-| `batteryGridChargingMaxWatts` | number | - | Max grid charging power (future use) |
+| `batteryGridChargingEnabled` | boolean | false | Allow charging battery from grid when solar is insufficient |
+| `batteryGridChargingMaxWatts` | number | - | Maximum power drawn from grid for battery charging (watts) |
 
 ### Priority Modes
 
@@ -161,6 +161,41 @@ dischargePower = min(importPower, batteryDischargeMaxWatts, availableBatteryPowe
 
 The project automatically uses the battery to offset grid imports, reducing energy costs.
 
+### Grid Charging
+
+When `batteryGridChargingEnabled` is `true` and the battery is below its target SoC, the system charges the battery from the grid when solar power is insufficient:
+
+```
+Grid charging behavior:
+1. Solar charges battery first (existing behavior applies when excess solar)
+2. When solar is insufficient, grid tops up:
+   gridChargePower = min(batteryGridChargingMaxWatts, batteryChargeMaxWatts, batteryNeedWatts)
+3. Battery discharge is suppressed while grid charging is enabled
+```
+
+> [!IMPORTANT]
+> When grid charging is active, the battery does **not** discharge to reduce imports. These are conflicting goals — one pulls power from the grid to charge, the other discharges to reduce grid pull. When the battery reaches its target SoC, it holds idle until the external controller disables grid charging.
+
+Grid charging is designed to be controlled by external automation tools via MQTT or fixed setpoints. No built-in tariff or forecasting logic is included — integration with tools like [EMHASS](https://github.com/davidusb-geek/emhass), Home Assistant automations, or time-of-use tariff schedules is left to the external controller.
+
+**Example: MQTT-controlled grid charging for time-of-use tariffs**
+
+```jsonc
+// Off-peak: enable grid charging at 3kW, charge battery to 100%
+{
+    "batteryGridChargingEnabled": true,
+    "batteryGridChargingMaxWatts": 3000,
+    "batterySocTargetPercent": 100,
+    "batteryPriorityMode": "battery_first"
+}
+
+// Peak: disable grid charging, discharge to reduce imports
+{
+    "batteryGridChargingEnabled": false,
+    "batteryPriorityMode": "export_first"
+}
+```
+
 ### MQTT Dynamic Control
 
 Battery parameters can be changed dynamically via MQTT:
@@ -197,7 +232,6 @@ Battery control uses **SunSpec Model 124** (Battery Storage):
 
 ### Known Limitations
 
-- **`batteryGridChargingEnabled` not yet implemented**: The parameter is accepted in configuration but not yet used in the power flow logic. Battery cannot currently charge from the grid when solar is insufficient.
 - **Simplified battery need calculation**: `calculateBatteryNeedWatts()` returns the full `maxChargePower` when SoC is below target, rather than calculating precise watt-hours needed from battery capacity. This means the system requests maximum charge rate until target SoC is reached.
 - **No per-inverter battery scheduling**: All battery-capable inverters receive the same charge/discharge command. Per-inverter differentiation (e.g., based on individual SoC) is not yet supported.
 
@@ -333,6 +367,41 @@ Runtime behavior:
 - Battery commands sent only to Inverter 1
 - SoC and power limits from Inverter 1 used for calculations
 - No errors or warnings for Inverter 2 lacking battery
+
+#### Example 4: Grid Charging with External Automation
+
+Goal: Charge battery from grid during off-peak hours, controlled by external automation via MQTT
+
+```jsonc
+{
+    "inverterControl": {
+        "enabled": true,
+        "batteryControlEnabled": true,
+        "batteryPowerFlowControl": true
+    },
+    "inverters": [{
+        "type": "sunspec",
+        "batteryControlEnabled": true,
+        "connection": { "type": "tcp", "ip": "192.168.1.6", "port": 502 },
+        "unitId": 1
+    }],
+    "setpoints": {
+        "fixed": {
+            "batterySocTargetPercent": 50,
+            "batteryPriorityMode": "battery_first",
+            "batteryChargeMaxWatts": 5000,
+            "batteryDischargeMaxWatts": 5000,
+            "exportLimitWatts": 0
+        }
+    }
+}
+```
+
+External automation (e.g., Home Assistant, EMHASS) publishes MQTT messages to control grid charging:
+- **Off-peak start**: `{"batteryGridChargingEnabled": true, "batteryGridChargingMaxWatts": 3000, "batterySocTargetPercent": 100}`
+- **Peak start**: `{"batteryGridChargingEnabled": false, "batteryPriorityMode": "export_first"}`
+
+While grid charging is enabled, the battery charges from solar + grid. Once it reaches the target SoC, it holds idle until the external tool disables grid charging, at which point normal discharge behavior resumes.
 
 ## Legacy Charge Buffer
 

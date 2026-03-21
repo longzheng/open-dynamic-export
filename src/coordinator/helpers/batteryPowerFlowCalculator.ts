@@ -37,6 +37,8 @@ export type BatteryPowerFlowInput = {
     batteryPriorityMode: 'export_first' | 'battery_first' | undefined;
     // Whether grid charging is enabled
     batteryGridChargingEnabled: boolean | undefined;
+    // Maximum power to draw from grid for battery charging in watts
+    batteryGridChargingMaxWatts: number | undefined;
 };
 
 const logger: Logger = pinoLogger.child({
@@ -67,6 +69,8 @@ export function calculateBatteryPowerFlow(
         batteryDischargeMaxWatts,
         exportLimitWatts,
         batteryPriorityMode,
+        batteryGridChargingEnabled,
+        batteryGridChargingMaxWatts,
     } = input;
 
     logger.trace({ input }, 'Calculating battery power flow');
@@ -147,17 +151,43 @@ export function calculateBatteryPowerFlow(
         }
     }
 
-    // Handle battery discharge when importing power
-    if (availablePower < 0 && canDischarge) {
-        // We're importing (consuming more than generating)
-        // Consider discharging battery to reduce import
-        // Only if we haven't reached min SOC
-        const importPower = Math.abs(availablePower);
+    // Handle importing / balanced scenarios
+    if (availablePower <= 0) {
+        const gridChargingActive = batteryGridChargingEnabled === true;
 
-        // Discharge up to the import need, respecting battery limits
-        targetBatteryPowerWatts = -Math.min(importPower, maxDischargePower);
-        batteryMode = 'discharge';
-        targetExportWatts = 0; // Not exporting when importing
+        const batteryNeedWatts = calculateBatteryNeedWatts({
+            batterySocPercent,
+            targetSocPercent: targetSoc,
+            maxChargePower,
+        });
+
+        if (gridChargingActive && canCharge && batteryNeedWatts > 0) {
+            // Grid charging: charge battery from grid, capped at gridChargingMaxWatts
+            const gridChargeLimit =
+                batteryGridChargingMaxWatts ?? maxChargePower;
+            const gridChargePower = Math.min(
+                gridChargeLimit,
+                maxChargePower,
+                batteryNeedWatts,
+            );
+
+            targetBatteryPowerWatts = gridChargePower;
+            batteryMode = 'charge';
+            targetExportWatts = 0;
+        } else if (gridChargingActive) {
+            // Grid charging enabled but battery at/above target — hold idle
+            // to avoid charge/discharge oscillation.
+            // External tool disables grid charging when discharge should resume.
+            targetBatteryPowerWatts = 0;
+            batteryMode = 'idle';
+            targetExportWatts = 0;
+        } else if (availablePower < 0 && canDischarge) {
+            // Normal behavior: discharge battery to reduce grid imports
+            const importPower = Math.abs(availablePower);
+            targetBatteryPowerWatts = -Math.min(importPower, maxDischargePower);
+            batteryMode = 'discharge';
+            targetExportWatts = 0;
+        }
     }
 
     // Calculate target solar watts (for curtailment)

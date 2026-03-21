@@ -19,6 +19,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -44,6 +45,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -68,6 +70,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -93,6 +96,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 10000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -120,6 +124,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'export_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -145,6 +150,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 10000,
                 batteryPriorityMode: 'export_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -169,6 +175,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 3000,
                 batteryPriorityMode: 'export_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -196,6 +203,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 10000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -218,6 +226,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -240,6 +249,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -264,6 +274,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -287,6 +298,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -311,6 +323,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -335,6 +348,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: undefined,
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -358,6 +372,7 @@ describe('calculateBatteryPowerFlow', () => {
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
                 batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
             };
 
             const result = calculateBatteryPowerFlow(input);
@@ -365,6 +380,259 @@ describe('calculateBatteryPowerFlow', () => {
             // Should use defaults (0-100% SOC, unlimited charge power)
             expect(result.batteryMode).toBe('charge');
             expect(result.targetBatteryPowerWatts).toBeGreaterThan(0);
+        });
+    });
+
+    describe('grid charging', () => {
+        it('should charge battery from grid when importing and battery below target', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing 3000W
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(3000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should cap grid charging at batteryGridChargingMaxWatts', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 5000, // Importing 5000W
+                batterySocPercent: 30,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 2000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(2000);
+        });
+
+        it('should cap grid charging at batteryChargeMaxWatts when lower than grid max', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 5000,
+                batterySocPercent: 30,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 2000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(2000);
+        });
+
+        it('should discharge normally when grid charging is disabled', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing 3000W
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-3000);
+        });
+
+        it('should idle when grid charging enabled but battery at target SoC', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80, // At target
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Should idle, not discharge — avoids charge/discharge oscillation
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should idle when grid charging enabled but battery at max SoC', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing
+                batterySocPercent: 95,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 95, // At max — canCharge is false
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Grid charging active but can't charge — idle, not discharge
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+        });
+
+        it('should charge from grid when power is exactly balanced', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5000,
+                siteWatts: 0, // Balanced
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(3000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should use normal solar charging when excess solar available', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 10000,
+                siteWatts: -8000, // Exporting 8000W
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Excess solar — normal battery_first behavior, grid charging irrelevant
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(5000);
+            expect(result.targetExportWatts).toBe(3000);
+        });
+
+        it('should fall back to batteryChargeMaxWatts when gridChargingMaxWatts is undefined', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 5000, // Importing
+                batterySocPercent: 30,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 4000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(4000);
+        });
+
+        it('should charge from grid when SoC is unknown', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 5000, // Importing
+                batterySocPercent: null, // Unknown
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Unknown SoC assumed chargeable
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(3000);
+        });
+
+        it('should discharge normally when batteryGridChargingEnabled is undefined', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing
+                batterySocPercent: 60,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: undefined,
+                batteryGridChargingMaxWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // undefined treated as disabled — normal discharge
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-3000);
         });
     });
 });
