@@ -97,7 +97,7 @@ Enable battery power flow control in `config.json`:
 
 ### Priority Modes
 
-#### Battery First Mode
+#### Battery First Mode (`battery_first`)
 
 Power allocation priority: **Consumption → Battery → Export**
 
@@ -110,7 +110,7 @@ Available solar power = Solar generation - Site consumption
 
 **Use case**: Maximize battery charging, export surplus only
 
-#### Export First Mode
+#### Export First Mode (`export_first`)
 
 Power allocation priority: **Consumption → Export → Battery**
 
