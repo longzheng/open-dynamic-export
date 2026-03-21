@@ -1,5 +1,5 @@
+import type { Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
-import { type Logger } from 'pino';
 
 export type BatteryPowerFlowCalculation = {
     // Target battery power: positive = charge, negative = discharge, 0 = idle

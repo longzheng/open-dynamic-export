@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getStorageMetrics } from './storageMetrics.js';
 import { ChaSt, ChaGriSet, StorCtl_Mod } from '../models/storage.js';
+import { getStorageMetrics } from './storageMetrics.js';
 
 describe('getStorageMetrics', () => {
     it('should apply scale factors correctly to storage metrics', () => {

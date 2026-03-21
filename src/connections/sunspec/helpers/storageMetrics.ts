@@ -2,7 +2,7 @@ import {
     numberWithPow10,
     numberNullableWithPow10,
 } from '../../../helpers/number.js';
-import { type StorageModel } from '../models/storage.js';
+import type { StorageModel } from '../models/storage.js';
 
 export function getStorageMetrics(storage: StorageModel) {
     return {

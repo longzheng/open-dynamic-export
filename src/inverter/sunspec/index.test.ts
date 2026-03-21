@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import {
-    getGenConnectStatusFromPVConn,
-    generateInverterDataStorage,
-} from './index.js';
-import {
     ChaSt,
     ChaGriSet,
     StorCtl_Mod,
 } from '../../connections/sunspec/models/storage.js';
+import {
+    getGenConnectStatusFromPVConn,
+    generateInverterDataStorage,
+} from './index.js';
 
 describe('getGenConnectStatusFromPVConn', () => {
     it('should return 0 if inverter is disconnected', () => {

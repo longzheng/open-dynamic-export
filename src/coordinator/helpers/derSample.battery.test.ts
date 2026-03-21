@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { generateDerSample } from './derSample.js';
-import { type InverterData } from '../../inverter/inverterData.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { ChaSt, ChaGriSet } from '../../connections/sunspec/models/storage.js';
+import { generateDerSample } from './derSample.js';
 
 describe('generateDerSample - Battery Aggregation', () => {
     const createMockInverterData = (

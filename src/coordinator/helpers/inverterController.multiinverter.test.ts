@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateInverterConfiguration } from './inverterController.js';
-import { type ActiveInverterControlLimit } from './inverterController.js';
+import type { ActiveInverterControlLimit } from './inverterController.js';
 
 describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', () => {
     const createBasicActiveLimit = (

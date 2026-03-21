@@ -99,7 +99,9 @@ const mqttSchema = v.object({
     batterySocMaxPercent: v.optional(v.number()),
     batteryChargeMaxWatts: v.optional(v.number()),
     batteryDischargeMaxWatts: v.optional(v.number()),
-    batteryPriorityMode: v.optional(v.picklist(['export_first', 'battery_first'])),
+    batteryPriorityMode: v.optional(
+        v.picklist(['export_first', 'battery_first']),
+    ),
     batteryGridChargingEnabled: v.optional(v.boolean()),
     batteryGridChargingMaxWatts: v.optional(v.number()),
 });

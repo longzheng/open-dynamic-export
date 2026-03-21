@@ -21,13 +21,13 @@ import { cappedChange } from '../../helpers/math.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import type { ControlsModel } from '../../connections/sunspec/models/controls.js';
+import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
 import type { DerSample } from './derSample.js';
 import { Publish } from './publish.js';
 import {
     calculateBatteryPowerFlow,
     type BatteryPowerFlowInput,
 } from './batteryPowerFlowCalculator.js';
-import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
