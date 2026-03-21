@@ -144,6 +144,12 @@ Aggregated values:
 - Total max discharge: 8kW
 ```
 
+#### Design Decisions
+
+**Why average SOC?** When multiple batteries exist, the system calculates the average SOC rather than min/max because it encourages fair, balanced charging across all batteries and provides a single representative value for power flow calculations.
+
+**Why send the same command to all inverters?** The same battery control configuration is sent to all inverters for simplicity and safety. Each inverter's capability detection independently determines whether to execute battery commands, so inverters without storage silently ignore them. This avoids complex per-inverter scheduling while remaining extensible for future per-inverter control if needed.
+
 ### Import Power Handling
 
 When the site is importing power (consuming more than generating):
@@ -297,6 +303,12 @@ power flow control. If you need the legacy behavior, either remove battery.charg
 (legacy) or set inverterControl.batteryPowerFlowControl to false (use new battery control).
 ```
 
+## Known Limitations
+
+- **`batteryGridChargingEnabled` not yet implemented**: The parameter is accepted in configuration but not yet used in the power flow logic. Battery cannot currently charge from the grid when solar is insufficient.
+- **Simplified battery need calculation**: `calculateBatteryNeedWatts()` returns the full `maxChargePower` when SOC is below target, rather than calculating precise watt-hours needed from battery capacity. This means the system requests maximum charge rate until target SOC is reached.
+- **No per-inverter battery scheduling**: All battery-capable inverters receive the same charge/discharge command. Per-inverter differentiation (e.g., based on individual SOC) is not yet supported.
+
 ## Troubleshooting
 
 ### Battery Control Not Working
@@ -314,6 +326,17 @@ power flow control. If you need the legacy behavior, either remove battery.charg
    ```jsonc
    "inverters": [{ "batteryControlEnabled": true, ... }]
    ```
+
+### Log Messages
+
+Key log messages for diagnosing battery issues:
+
+| Message | Level | Meaning |
+|---------|-------|---------|
+| `Inverter has battery storage capability` | INFO | SunSpec Model 124 detected on inverter |
+| `Inverter does not have battery storage capability` | INFO | Inverter lacks Model 124 — battery commands will be skipped |
+| `Wrote battery controls` | INFO | Battery charge/discharge command written successfully |
+| `Battery control requested but inverter does not have storage capability - skipping` | DEBUG | Expected when a non-battery inverter is in the config with `batteryControlEnabled` |
 
 ### No SOC Data Available
 
