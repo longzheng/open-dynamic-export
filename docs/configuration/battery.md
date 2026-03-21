@@ -226,7 +226,7 @@ Key log messages for diagnosing battery issues:
 | Message | Level | Meaning |
 |---------|-------|---------|
 | `Inverter has battery storage capability` | INFO | SunSpec Model 124 detected on inverter |
-| `Inverter does not have battery storage capability` | INFO | Inverter lacks Model 124 — battery commands will be skipped |
+| `Inverter does not have battery storage capability` | WARN | Inverter lacks Model 124 — battery commands will be skipped |
 | `Wrote battery controls` | INFO | Battery charge/discharge command written successfully |
 | `Battery control requested but inverter does not have storage capability - skipping` | DEBUG | Expected when a non-battery inverter is in the config with `batteryControlEnabled` |
 

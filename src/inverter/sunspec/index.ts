@@ -114,7 +114,7 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                               // Storage model is optional - inverter may not have battery capability
                               if (this.hasStorageCapability === null) {
                                   this.hasStorageCapability = false;
-                                  this.logger.info(
+                                  this.logger.warn(
                                       'Inverter does not have battery storage capability',
                                   );
                               }
