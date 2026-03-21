@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import { numberToHex } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { xmlns } from '../helpers/namespace.js';
@@ -10,17 +11,17 @@ import {
     parseUsagePointBaseXmlObject,
     usagePointBaseSchema,
 } from './usagePointBase.js';
-import { z } from 'zod';
 
-export const mirrorUsagePointSchema = z
-    .object({
-        postRate: postRateSchema.optional(),
-        deviceLFDI: z.string(),
-        mirrorMeterReading: mirrorMeterReadingSchema.array().optional(),
-    })
-    .merge(usagePointBaseSchema);
+export const mirrorUsagePointSchema = v.intersect([
+    v.object({
+        postRate: v.optional(postRateSchema),
+        deviceLFDI: v.string(),
+        mirrorMeterReading: v.optional(v.array(mirrorMeterReadingSchema)),
+    }),
+    usagePointBaseSchema,
+]);
 
-export type MirrorUsagePoint = z.infer<typeof mirrorUsagePointSchema>;
+export type MirrorUsagePoint = v.InferOutput<typeof mirrorUsagePointSchema>;
 
 export function parseMirrorUsagePointXml(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,7 +64,7 @@ export function generateMirrorUsagePointResponse(
         status,
         deviceLFDI,
         mirrorMeterReading,
-    } = mirrorUsagePointSchema.parse(mirrorUsagePoint);
+    } = v.parse(mirrorUsagePointSchema, mirrorUsagePoint);
 
     return {
         MirrorUsagePoint: {

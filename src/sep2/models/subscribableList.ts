@@ -1,15 +1,16 @@
+import * as v from 'valibot';
 import { listSchema, parseListXmlObject } from './list.js';
 import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
 } from './subscribableResource.js';
-import { type z } from 'zod';
 
-export const subscribableListSchema = listSchema.merge(
+export const subscribableListSchema = v.intersect([
+    listSchema,
     subscribableResourceSchema,
-);
+]);
 
-export type SubscribableList = z.infer<typeof subscribableListSchema>;
+export type SubscribableList = v.InferOutput<typeof subscribableListSchema>;
 
 export function parseSubscribableListXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,39 +1,39 @@
 import EventEmitter from 'node:events';
-import { type SEP2Client } from '../client.js';
+import * as v from 'valibot';
+import type { Logger } from 'pino';
+import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
-import { PollableResource } from './pollableResource.js';
 import {
     parseFunctionSetAssignmentsListXml,
     type FunctionSetAssignmentsList,
 } from '../models/functionSetAssignmentsList.js';
-import { getListAll } from './pagination.js';
-import { type DerProgramListData } from './derProgramList.js';
-import {
-    derProgramListDataSchema,
-    DerProgramListHelper,
-} from './derProgramList.js';
 import {
     functionSetAssignmentsSchema,
     type FunctionSetAssignments,
 } from '../models/functionSetAssignments.js';
-import { z } from 'zod';
 import { createFileCache } from '../../helpers/fileCache.js';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
+import { PollableResource } from './pollableResource.js';
+import { getListAll } from './pagination.js';
+import type { DerProgramListData } from './derProgramList.js';
+import {
+    derProgramListDataSchema,
+    DerProgramListHelper,
+} from './derProgramList.js';
 
-const functionSetAssignmentsListDataSchema = z.array(
-    z.object({
+const functionSetAssignmentsListDataSchema = v.array(
+    v.object({
         functionSetAssignments: functionSetAssignmentsSchema,
-        derProgramList: derProgramListDataSchema.nullable(),
+        derProgramList: v.nullable(derProgramListDataSchema),
     }),
 );
 
-const fsaCacheDataSchema = z.object({
-    lfdi: z.string(),
+const fsaCacheDataSchema = v.object({
+    lfdi: v.string(),
     data: functionSetAssignmentsListDataSchema,
 });
 
-export type FunctionSetAssignmentsListData = z.infer<
+export type FunctionSetAssignmentsListData = v.InferOutput<
     typeof functionSetAssignmentsListDataSchema
 >;
 

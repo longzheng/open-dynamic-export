@@ -1,12 +1,12 @@
-import { z } from 'zod';
-import { DERTyp } from '../connections/sunspec/models/nameplate.js';
+import * as v from 'valibot';
+import { derTypSchema } from '../connections/sunspec/models/nameplate.js';
 import { connectStatusValueSchema } from '../sep2/models/connectStatus.js';
-import { OperationalModeStatusValue } from '../sep2/models/operationModeStatus.js';
-import { type SampleBase } from '../coordinator/helpers/sampleBase.js';
+import { operationalModeStatusValueSchema } from '../sep2/models/operationModeStatus.js';
+import type { SampleBase } from '../coordinator/helpers/sampleBase.js';
 import { ChaSt, ChaGriSet } from '../connections/sunspec/models/storage.js';
 
-export const inverterDataSchema = z.object({
-    inverter: z.object({
+export const inverterDataSchema = v.object({
+    inverter: v.object({
         /**
          * Positive values = inverter export (produce) power
          *
@@ -14,47 +14,47 @@ export const inverterDataSchema = z.object({
          *
          * Value is total (net across all phases) measurement
          */
-        realPower: z.number(),
-        reactivePower: z.number(),
-        voltagePhaseA: z.number().nullable(),
-        voltagePhaseB: z.number().nullable(),
-        voltagePhaseC: z.number().nullable(),
-        frequency: z.number(),
+        realPower: v.number(),
+        reactivePower: v.number(),
+        voltagePhaseA: v.nullable(v.number()),
+        voltagePhaseB: v.nullable(v.number()),
+        voltagePhaseC: v.nullable(v.number()),
+        frequency: v.number(),
     }),
-    nameplate: z.object({
-        type: z.nativeEnum(DERTyp),
-        maxW: z.number(),
-        maxVA: z.number(),
-        maxVar: z.number(),
+    nameplate: v.object({
+        type: derTypSchema,
+        maxW: v.number(),
+        maxVA: v.number(),
+        maxVar: v.number(),
     }),
-    settings: z.object({
-        maxW: z.number(),
-        maxVA: z.number().nullable(),
-        maxVar: z.number().nullable(),
+    settings: v.object({
+        maxW: v.number(),
+        maxVA: v.nullable(v.number()),
+        maxVar: v.nullable(v.number()),
     }),
-    status: z.object({
-        operationalModeStatus: z.nativeEnum(OperationalModeStatusValue),
+    status: v.object({
+        operationalModeStatus: operationalModeStatusValueSchema,
         genConnectStatus: connectStatusValueSchema,
     }),
-    storage: z
-        .object({
+    storage: v.optional(
+        v.object({
             // Battery capacity and state
-            stateOfChargePercent: z.number().nullable(),
-            availableEnergyWh: z.number().nullable(),
-            batteryVoltage: z.number().nullable(),
-            chargeStatus: z.nativeEnum(ChaSt).nullable(),
+            stateOfChargePercent: v.nullable(v.number()),
+            availableEnergyWh: v.nullable(v.number()),
+            batteryVoltage: v.nullable(v.number()),
+            chargeStatus: v.nullable(v.enum(ChaSt)),
             // Charge/discharge rates and limits
-            maxChargeRateWatts: z.number(),
-            maxDischargeRateWatts: z.number(),
-            currentChargeRatePercent: z.number().nullable(),
-            currentDischargeRatePercent: z.number().nullable(),
+            maxChargeRateWatts: v.number(),
+            maxDischargeRateWatts: v.number(),
+            currentChargeRatePercent: v.nullable(v.number()),
+            currentDischargeRatePercent: v.nullable(v.number()),
             // Control settings
-            minReservePercent: z.number().nullable(),
-            gridChargingPermitted: z.nativeEnum(ChaGriSet).nullable(),
-        })
-        .optional(),
+            minReservePercent: v.nullable(v.number()),
+            gridChargingPermitted: v.nullable(v.enum(ChaGriSet)),
+        }),
+    ),
 });
 
-export type InverterDataBase = z.infer<typeof inverterDataSchema>;
+export type InverterDataBase = v.InferOutput<typeof inverterDataSchema>;
 
 export type InverterData = SampleBase & InverterDataBase;

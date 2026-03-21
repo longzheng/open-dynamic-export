@@ -1,8 +1,8 @@
-import { type SiteSample } from '../siteSample.js';
+import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
-import { type Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/config.js';
 import { SmaConnection } from '../../connections/modbus/connection/sma.js';
-import { type SmaCore1MeteringGridMsModels } from '../../connections/modbus/models/sma/core1/meteringGridMs.js';
+import type { SmaCore1MeteringGridMsModels } from '../../connections/modbus/models/sma/core1/meteringGridMs.js';
 
 type SmaMeterConfig = Extract<Config['meter'], { type: 'sma' }>;
 

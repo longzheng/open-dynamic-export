@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import {
-    type PerPhaseMeasurement,
-    type NoPhaseMeasurement,
-    type AssertedPerPhaseNetOrNoPhaseMeasurementArray,
-    type PerPhaseNetMeasurement,
+import type {
+    PerPhaseMeasurement,
+    NoPhaseMeasurement,
+    AssertedPerPhaseNetOrNoPhaseMeasurementArray,
+    PerPhaseNetMeasurement,
 } from './measurement.js';
 import {
     assertPerPhaseNetOrNoPhaseMeasurementArray,

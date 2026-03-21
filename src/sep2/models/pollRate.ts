@@ -1,12 +1,13 @@
+import * as v from 'valibot';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
-import { z } from 'zod';
 
-export const pollRateSchema = z
-    .union([z.number(), z.null()])
-    .describe('In seconds');
+export const pollRateSchema = v.pipe(
+    v.nullable(v.number()),
+    v.description('In seconds'),
+);
 
-export type PollRate = z.infer<typeof pollRateSchema>;
+export type PollRate = v.InferOutput<typeof pollRateSchema>;
 
 export function parsePollRateXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

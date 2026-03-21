@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import { assertArray } from '../helpers/assert.js';
 import { listSchema, parseListXmlObject } from './list.js';
 import {
@@ -7,14 +7,17 @@ import {
 } from './mirrorUsagePoint.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 
-export const mirrorUsagePointListSchema = z
-    .object({
+export const mirrorUsagePointListSchema = v.intersect([
+    v.object({
         pollRate: pollRateSchema,
-        mirrorUsagePoints: mirrorUsagePointSchema.array(),
-    })
-    .merge(listSchema);
+        mirrorUsagePoints: v.array(mirrorUsagePointSchema),
+    }),
+    listSchema,
+]);
 
-export type MirrorUsagePointList = z.infer<typeof mirrorUsagePointListSchema>;
+export type MirrorUsagePointList = v.InferOutput<
+    typeof mirrorUsagePointListSchema
+>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseMirrorUsagePointListXml(xml: any): MirrorUsagePointList {

@@ -1,67 +1,80 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 import {
     noPhaseMeasurementSchema,
     perPhaseMeasurementSchema,
     perPhaseNetMeasurementSchema,
 } from '../../helpers/measurement.js';
 import {
-    averageNumbersArray,
     averageNumbersNullableArray,
     sumNumbersArray,
     sumNumbersNullableArray,
 } from '../../helpers/number.js';
-import { type InverterData } from '../../inverter/inverterData.js';
-import { type SampleBase } from './sampleBase.js';
+import type { InverterData } from '../../inverter/inverterData.js';
 import { DERType } from '../../sep2/models/derType.js';
-import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
-import { type ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import {
+    OperationalModeStatusValue,
+    operationalModeStatusValueSchema,
+} from '../../sep2/models/operationModeStatus.js';
+import type { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import type { SampleBase } from './sampleBase.js';
 
 // aligns with the CSIP-AUS requirements for DER monitoring
-export const derSampleDataSchema = z.object({
-    realPower: z.union([
+export const derSampleDataSchema = v.object({
+    realPower: v.union([
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
     ]),
-    reactivePower: z.union([
+    reactivePower: v.union([
         perPhaseNetMeasurementSchema,
         noPhaseMeasurementSchema,
     ]),
-    voltage: perPhaseMeasurementSchema.nullable(),
-    frequency: z.number().nullable(),
-    nameplate: z.object({
-        type: z.number(),
-        maxW: z.number(),
-        maxVA: z.number(),
-        maxVar: z.number(),
+    voltage: v.nullable(
+        v.pipe(
+            perPhaseMeasurementSchema,
+            v.check(
+                ({ phaseA, phaseB, phaseC }) =>
+                    (phaseA === null || phaseA >= 0) &&
+                    (phaseB === null || phaseB >= 0) &&
+                    (phaseC === null || phaseC >= 0),
+                'Voltage must be non-negative per phase',
+            ),
+        ),
+    ),
+    frequency: v.nullable(v.pipe(v.number(), v.minValue(0))),
+    nameplate: v.object({
+        type: v.number(),
+        maxW: v.number(),
+        maxVA: v.number(),
+        maxVar: v.number(),
     }),
-    settings: z.object({
-        setMaxW: z.number(),
-        setMaxVA: z.number().nullable(),
-        setMaxVar: z.number().nullable(),
+    settings: v.object({
+        setMaxW: v.number(),
+        setMaxVA: v.nullable(v.number()),
+        setMaxVar: v.nullable(v.number()),
     }),
-    status: z.object({
-        operationalModeStatus: z.number(),
-        genConnectStatus: z.number(),
+    status: v.object({
+        operationalModeStatus: operationalModeStatusValueSchema,
+        genConnectStatus: v.number(),
     }),
-    invertersCount: z.number(),
+    invertersCount: v.pipe(v.number(), v.minValue(0)),
     // Battery aggregated data across all inverters with storage
-    battery: z
-        .object({
+    battery: v.nullable(
+        v.object({
             // Average state of charge across all batteries
-            averageSocPercent: z.number().nullable(),
+            averageSocPercent: v.nullable(v.number()),
             // Total available energy across all batteries
-            totalAvailableEnergyWh: z.number().nullable(),
+            totalAvailableEnergyWh: v.nullable(v.number()),
             // Total max charge rate across all batteries
-            totalMaxChargeRateWatts: z.number(),
+            totalMaxChargeRateWatts: v.number(),
             // Total max discharge rate across all batteries
-            totalMaxDischargeRateWatts: z.number(),
+            totalMaxDischargeRateWatts: v.number(),
             // Number of inverters with battery storage
-            batteryCount: z.number(),
-        })
-        .nullable(),
+            batteryCount: v.number(),
+        }),
+    ),
 });
 
-export type DerSampleData = z.infer<typeof derSampleDataSchema>;
+export type DerSampleData = v.InferOutput<typeof derSampleDataSchema>;
 
 export type DerSample = SampleBase & DerSampleData;
 
@@ -87,17 +100,25 @@ export function generateDerSample({
         voltage: {
             type: 'perPhase',
             phaseA: averageNumbersNullableArray(
-                invertersData.map((data) => data.inverter.voltagePhaseA),
+                invertersData
+                    .map((data) => data.inverter.voltagePhaseA)
+                    .filter((number) => number !== null && number > 0),
             ),
             phaseB: averageNumbersNullableArray(
-                invertersData.map((data) => data.inverter.voltagePhaseB),
+                invertersData
+                    .map((data) => data.inverter.voltagePhaseB)
+                    .filter((number) => number !== null && number > 0),
             ),
             phaseC: averageNumbersNullableArray(
-                invertersData.map((data) => data.inverter.voltagePhaseC),
+                invertersData
+                    .map((data) => data.inverter.voltagePhaseC)
+                    .filter((number) => number !== null && number > 0),
             ),
         },
-        frequency: averageNumbersArray(
-            invertersData.map((data) => data.inverter.frequency),
+        frequency: averageNumbersNullableArray(
+            invertersData
+                .map((data) => data.inverter.frequency)
+                .filter((number) => number > 0),
         ),
         nameplate: {
             type: Math.max(

@@ -1,17 +1,17 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
-import { type MergedControlsData } from './derControls.js';
+import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
+import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
+import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
+import { CurrentStatus } from '../models/currentStatus.js';
 import {
     DerControlsHelper,
     sortMergedControlsDataByStartTimeAscending,
 } from './derControls.js';
-import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
-import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
-import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
-import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
-import { CurrentStatus } from '../models/currentStatus.js';
+import type { MergedControlsData } from './derControls.js';
 
 const sep2Client = new SEP2Client({
     host: 'http://example.com',

@@ -1,6 +1,7 @@
+import * as v from 'valibot';
 import { assertString } from '../helpers/assert.js';
-import { linkSchema, parseLinkXmlObject } from './link.js';
 import { safeParseIntString } from '../../helpers/number.js';
+import { linkSchema, parseLinkXmlObject } from './link.js';
 import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
@@ -10,19 +11,19 @@ import {
     parseIdentifiedObjectXmlObject,
 } from './identifiedObject.js';
 import { listLinkSchema, parseListLinkXmlObject } from './listLink.js';
-import { z } from 'zod';
 
-export const derProgramSchema = z
-    .object({
-        defaultDerControlLink: linkSchema.optional(),
-        derControlListLink: listLinkSchema.optional(),
-        derCurveListLink: listLinkSchema.optional(),
-        primacy: z.number(),
-    })
-    .merge(subscribableResourceSchema)
-    .merge(identifiedObjectSchema);
+export const derProgramSchema = v.intersect([
+    v.object({
+        defaultDerControlLink: v.optional(linkSchema),
+        derControlListLink: v.optional(listLinkSchema),
+        derCurveListLink: v.optional(listLinkSchema),
+        primacy: v.number(),
+    }),
+    subscribableResourceSchema,
+    identifiedObjectSchema,
+]);
 
-export type DERProgram = z.infer<typeof derProgramSchema>;
+export type DERProgram = v.InferOutput<typeof derProgramSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERProgramXmlObject(xmlObject: any): DERProgram {

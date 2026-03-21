@@ -1,24 +1,24 @@
-import { type InverterData } from '../inverterData.js';
+import { Decimal } from 'decimal.js';
+import type { InverterData } from '../inverterData.js';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
-import { type InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
-import { type Config } from '../../helpers/config.js';
+import type { InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
+import type { Config } from '../../helpers/config.js';
 import { numberWithPow10 } from '../../helpers/number.js';
-import { Decimal } from 'decimal.js';
 import { SmaConnection } from '../../connections/modbus/connection/sma.js';
-import { type SmaCore1GridMsModels } from '../../connections/modbus/models/sma/core1/gridMs.js';
-import { type SmaCore1InverterModels } from '../../connections/modbus/models/sma/core1/inverter.js';
-import {
-    type SmaCore1InverterControlModels,
-    type SmaCore1InverterControl2,
+import type { SmaCore1GridMsModels } from '../../connections/modbus/models/sma/core1/gridMs.js';
+import type { SmaCore1InverterModels } from '../../connections/modbus/models/sma/core1/inverter.js';
+import type {
+    SmaCore1InverterControlModels,
+    SmaCore1InverterControl2,
 } from '../../connections/modbus/models/sma/core1/inverterControl.js';
 import {
     SmaCore1InverterControlWModCfgWMod,
     SmaCore1InverterControlFstStop,
 } from '../../connections/modbus/models/sma/core1/inverterControl.js';
-import { type SmaCore1Nameplate } from '../../connections/modbus/models/sma/core1/nameplate.js';
-import { type SmaCore1Operation } from '../../connections/modbus/models/sma/core1/operation.js';
+import type { SmaCore1Nameplate } from '../../connections/modbus/models/sma/core1/nameplate.js';
+import type { SmaCore1Operation } from '../../connections/modbus/models/sma/core1/operation.js';
 import { SmaCore1OperationGriSwStt } from '../../connections/modbus/models/sma/core1/operation.js';
 import { DERTyp } from '../../connections/sunspec/models/nameplate.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';

@@ -8,12 +8,12 @@ import {
     afterAll,
     beforeAll,
 } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 import { SEP2Client } from '../client.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import { getMockFile } from './mocks.js';
 import { TimeHelper } from './time.js';
-import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
 
 describe('TimeHelper', () => {
     const sep2Client = new SEP2Client({

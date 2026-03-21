@@ -2045,14 +2045,14 @@ export interface components {
             source: components["schemas"]["InverterControlTypes"];
         };
         /** @description Construct a type with a set of properties K of type T */
-        "Record_csipAus-or-fixed-or-negativeFeedIn-or-twoWayTariff-or-mqtt.InverterControlLimit-or-null_": {
+        "Record_Setpoint.InverterControlLimit-or-null_": {
             csipAus: components["schemas"]["InverterControlLimit"];
             fixed: components["schemas"]["InverterControlLimit"];
             negativeFeedIn: components["schemas"]["InverterControlLimit"];
             twoWayTariff: components["schemas"]["InverterControlLimit"];
             mqtt: components["schemas"]["InverterControlLimit"];
         };
-        ControlLimitsBySetpoint: components["schemas"]["Record_csipAus-or-fixed-or-negativeFeedIn-or-twoWayTariff-or-mqtt.InverterControlLimit-or-null_"];
+        ControlLimitsBySetpoint: components["schemas"]["Record_Setpoint.InverterControlLimit-or-null_"];
         ActiveInverterControlLimit: {
             batteryGridChargingMaxWatts?: {
                 source: components["schemas"]["InverterControlTypes"];

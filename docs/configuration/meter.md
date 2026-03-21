@@ -10,15 +10,15 @@ A MQTT topic can be read to get the site's import/export measurements.
 
 To configure a MQTT meter connection, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "meter": {
         "type": "mqtt", // (string) required: the type of meter
         "host": "mqtt://192.168.1.2", // (string) required: the MQTT broker host
         "username": "user", // (string) optional: the MQTT broker username
         "password": "password", // (string) optional: the MQTT broker password
-        "topic": "site" // (string) required: the MQTT topic to read
-        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+        "topic": "site", // (string) required: the MQTT topic to read
+        "pollingIntervalMs": 200 // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 }
@@ -26,106 +26,49 @@ To configure a MQTT meter connection, add the following property to `config.json
 
 The MQTT topic must contain a JSON message that meets the following schema
 
-```js
-z.object({
-    /**
-     * Positive values = site import power
-     *
-     * Negative values = site export power
-     */
-    realPower: z.union([
-        // either per phase measurements
-        z.object({
-            type: z.literal('perPhaseNet'),
-            phaseA: z.number().nullable(),
-            phaseB: z.number().nullable(),
-            phaseC: z.number().nullable(),
-            net: z.number(),
-        }),
-        // or total (net across all phases) measurement
-        z.object({
-            type: z.literal('noPhase'),
-            net: z.number(),
-        }),
-    ]),
-    reactivePower: z.union([
-        // either per phase measurements
-        z.object({
-            type: z.literal('perPhaseNet'),
-            phaseA: z.number().nullable(),
-            phaseB: z.number().nullable(),
-            phaseC: z.number().nullable(),
-            net: z.number(),
-        }),
-        // or total (net across all phases) measurement
-        z.object({
-            type: z.literal('noPhase'),
-            net: z.number(),
-        }),
-    ]),
-    voltage: z.object({
-        // must be per phase measurements
-        type: z.literal('perPhaseNet'),
-        phaseA: z.number().nullable(),
-        phaseB: z.number().nullable(),
-        phaseC: z.number().nullable(),
-        net: z.number(),
-    }),
-    frequency: z.number().nullable(),
-});
-```
-
-For example
-
-```js
-// three phase
+```jsonc
 {
+    // Site-level power snapshot (CSIP-AUS site sample aligned).
+    //
+    // Sign convention for site real/reactive power:
+    //   Positive = site import (consuming from grid)
+    //   Negative = site export (producing to grid)
+    //
+    // realPower and reactivePower are tagged unions:
+    //   - { "type": "perPhaseNet", ... }  // per-phase values may exist AND a required net value exists
+    //   - { "type": "noPhase", "net": ... } // only a net value exists (no per-phase breakdown)
     "realPower": {
         "type": "perPhaseNet",
-        "phaseA": -1000,
-        "phaseB": -2000,
-        "phaseC": -3000,
-        "net": -6000
-    },
-    "reactivePower": {
-        "type": "noPhase",
-        "net": 1500
-    },
-    "voltage": {
-        "type": "perPhaseNet",
-        "phaseA": 230,
-        "phaseB": 232,
-        "phaseC": 228,
-        "net": 230
-    },
-    "frequency": 50
-}
-```
-
-or
-
-```js
-// single phase
-{
-    "realPower": {
-        "type": "perPhaseNet",
-        "phaseA": -1200,
+        // Per-phase values (nullable if not available).
+        // Units typically watts (W) for realPower.
+        "phaseA": 1200.0,
         "phaseB": null,
         "phaseC": null,
-        "net": -1200
+
+        // Required net/total across phases.
+        // Positive = importing; negative = exporting.
+        "net": 1200.0,
     },
+
     "reactivePower": {
         "type": "noPhase",
-        "net": 800
+        // Units typically vars (var) for reactivePower.
+        // Positive/negative meaning depends on your upstream convention,
+        // but the schema sign convention comment applies the same way.
+        "net": 80.0,
     },
+
+    // Voltage is per-phase only (not nettable).
     "voltage": {
-        "type": "perPhaseNet",
-        "phaseA": 230,
-        "phaseB": null,
+        "type": "perPhase",
+        // Units typically volts (V). Nullable per-phase values if not available.
+        "phaseA": 230.4,
+        "phaseB": 229.9,
         "phaseC": null,
-        "net": 230
     },
-    "frequency": 50
+
+    // Frequency in Hz; nullable if not available.
+    "frequency": 50.0,
 }
 ```
 
@@ -137,7 +80,7 @@ SMA inverters support [SMA Modbus protocol](https://www.sma.de/en/products/produ
 
 To configure a SMA inverter with meter connection, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "meter": {
         "type": "sma", // (string) required: the type of meter
@@ -147,9 +90,9 @@ To configure a SMA inverter with meter connection, add the following property to
             "ip": "192.168.1.6", // (string) required: the IP address of the inverter
             "port": 502 // (number) required: the Modbus TCP port of the inverter
         },
-        "unitId": 240 // (number) required: the SunSpec unit ID of the meter
-        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption),
-        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+        "unitId": 240, // (number) required: the SunSpec unit ID of the meter
+        "location": "feedin", // (string) optional: the location of the meter (feedin or consumption),
+        "pollingIntervalMs": 200 // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 }
@@ -157,7 +100,7 @@ To configure a SMA inverter with meter connection, add the following property to
 
 ## SunSpec
 
-The SunSpec Modbus protocol is a widely adopted standard for communication for solar inverters. The protocol supports TCP, RTU and other transport layers. Compatibility is not well documented across inverter brands and models. 
+The SunSpec Modbus protocol is a widely adopted standard for communication for solar inverters. The protocol supports TCP, RTU and other transport layers. Compatibility is not well documented across inverter brands and models.
 
 Inverters that have an integrated meter may expose a meter via the SunSpec models as well.
 
@@ -167,7 +110,7 @@ The project requires SunSpec models `1`, `201` (or `202`, `203`) to be supported
 
 To configure a SunSpec meter connection over TCP, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "meter": {
         "type": "sunspec", // (string) required: the type of meter
@@ -176,9 +119,9 @@ To configure a SunSpec meter connection over TCP, add the following property to 
             "ip": "192.168.1.6", // (string) required: the IP address of the inverter
             "port": 502 // (number) required: the Modbus TCP port of the inverter
         },
-        "unitId": 240 // (number) required: the SunSpec unit ID of the meter
-        "location": "feedin" // (string) optional: the location of the meter (feedin or consumption),
-        "pollingIntervalMs":  // (number) optional: the polling interval in milliseconds, default 200
+        "unitId": 240, // (number) required: the SunSpec unit ID of the meter
+        "location": "feedin", // (string) optional: the location of the meter (feedin or consumption),
+        "pollingIntervalMs": 200,  // (number) optional: the polling interval in milliseconds, default 200
     }
     ...
 }
@@ -186,7 +129,7 @@ To configure a SunSpec meter connection over TCP, add the following property to 
 
 For SunSpec over RTU, you need to modify the `connection`
 
-```js
+```jsonc
             "connection": {
                 "type": "rtu", // (string) required: the type of connection (tcp, rtu)
                 "path": "/dev/ttyUSB0",  // (string) required: the path to the serial port
@@ -207,7 +150,7 @@ To enable SunSpec/Modbus on Fronius inverters/meter, you'll need to access the i
 
 Sites with a Tesla Powerwall 2 can use the Backup Gateway 2's meter and local API.
 
-```js
+```jsonc
     "meter": {
         "type": "powerwall2", // (string) required: the type of meter
         "ip": "192.168.1.68", // (string) required: the IP address of the Powerwall 2 Gateway

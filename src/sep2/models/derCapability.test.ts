@@ -1,10 +1,10 @@
 import { it, expect } from 'vitest';
 import { objectToXml } from '../helpers/xml.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 import { generateDerCapability } from './derCapability.js';
 import { DERControlType } from './derControlType.js';
 import { DOEControlType } from './doeModesSupportedType.js';
 import { DERType } from './derType.js';
-import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should generate DERCapability XML', () => {
     const response = generateDerCapability({

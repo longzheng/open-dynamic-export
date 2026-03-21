@@ -1,9 +1,9 @@
 import { RoleFlagsType } from '../models/roleFlagsType.js';
-import {
-    type NoPhaseMeasurement,
-    type PerPhaseNetMeasurement,
-    type AvgMaxMin,
-    type PerPhaseMeasurement,
+import type {
+    NoPhaseMeasurement,
+    PerPhaseNetMeasurement,
+    AvgMaxMin,
+    PerPhaseMeasurement,
 } from '../../helpers/measurement.js';
 import {
     assertPerPhaseNetOrNoPhaseMeasurementArray,
@@ -15,17 +15,17 @@ import { DataQualifierType } from '../models/dataQualifierType.js';
 import { FlowDirectionType } from '../models/flowDirectionType.js';
 import { PhaseCode } from '../models/phaseCode.js';
 import { UomType } from '../models/uomType.js';
-import { type MirrorMeterReadingDefinitions } from './mirrorUsagePointBase.js';
-import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
 import { pinoLogger } from '../../helpers/logger.js';
-import { type DerSample } from '../../coordinator/helpers/derSample.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
 import { CommodityType } from '../models/commodityType.js';
 import { KindType } from '../models/kindType.js';
-import { type SEP2Client } from '../client.js';
+import type { SEP2Client } from '../client.js';
 import {
     objectEntriesWithType,
     objectFromEntriesWithType,
 } from '../../helpers/object.js';
+import { MirrorUsagePointHelperBase } from './mirrorUsagePointBase.js';
+import type { MirrorMeterReadingDefinitions } from './mirrorUsagePointBase.js';
 
 type DerReading = {
     realPower: AvgMaxMin<PerPhaseNetMeasurement | NoPhaseMeasurement>;
@@ -330,7 +330,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Average,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -342,7 +342,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Average,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseB,
+            phase: PhaseCode.PhaseBN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -354,7 +354,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Average,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseC,
+            phase: PhaseCode.PhaseCN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -366,7 +366,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Maximum,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -378,7 +378,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Maximum,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseB,
+            phase: PhaseCode.PhaseBN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -390,7 +390,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Maximum,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseC,
+            phase: PhaseCode.PhaseCN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -402,7 +402,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Minimum,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseA,
+            phase: PhaseCode.PhaseAN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -414,7 +414,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Minimum,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseB,
+            phase: PhaseCode.PhaseBN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },
@@ -426,7 +426,7 @@ const mirrorMeterReadingDefinitions = {
             kind: KindType.Power,
             dataQualifier: DataQualifierType.Minimum,
             flowDirection: FlowDirectionType.Reverse,
-            phase: PhaseCode.PhaseC,
+            phase: PhaseCode.PhaseCN,
             powerOfTenMultiplier: 0,
             uom: UomType.Voltage,
         },

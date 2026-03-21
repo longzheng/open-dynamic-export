@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringToBoolean } from '../helpers/boolean.js';
@@ -7,26 +8,35 @@ import {
     parseActivePowerXmlObject,
     type ActivePower,
 } from './activePower.js';
-import { z } from 'zod';
 
-export const derControlBaseSchema = z.object({
-    opModImpLimW: activePowerSchema.optional().describe('site import limit'),
-    opModExpLimW: activePowerSchema.optional().describe('site export limit'),
-    opModGenLimW: activePowerSchema
-        .optional()
-        .describe('site generation limit'),
-    opModLoadLimW: activePowerSchema.optional().describe('site load limit'),
-    opModEnergize: z.boolean().optional().describe('energize'),
-    opModConnect: z.boolean().optional().describe('connect'),
-    rampTms: z
-        .number()
-        .optional()
-        .describe(
+export const derControlBaseSchema = v.object({
+    opModImpLimW: v.pipe(
+        v.optional(activePowerSchema),
+        v.description('site import limit'),
+    ),
+    opModExpLimW: v.pipe(
+        v.optional(activePowerSchema),
+        v.description('site export limit'),
+    ),
+    opModGenLimW: v.pipe(
+        v.optional(activePowerSchema),
+        v.description('site generation limit'),
+    ),
+    opModLoadLimW: v.pipe(
+        v.optional(activePowerSchema),
+        v.description('site load limit'),
+    ),
+    opModEnergize: v.pipe(v.optional(v.boolean()), v.description('energize')),
+    opModConnect: v.pipe(v.optional(v.boolean()), v.description('connect')),
+    rampTms: v.pipe(
+        v.optional(v.number()),
+        v.description(
             'Requested ramp time, in hundredths of a second, for the device to transition from the current DERControl mode setting(s) to the new mode setting(s). If absent, use default ramp rate (setGradW). Resolution is 1/100 sec.',
         ),
+    ),
 });
 
-export type DERControlBase = z.infer<typeof derControlBaseSchema>;
+export type DERControlBase = v.InferOutput<typeof derControlBaseSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {

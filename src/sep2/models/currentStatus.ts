@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // Field representing the current status type.
 // 0 = Scheduled This status indicates that the event has been scheduled and the event has not yet started. The server SHALL set the event to this status when the event is first scheduled and persist until the event has become active or has been cancelled. For events with a start time less than or equal to the current time, this status SHALL never be indicated, the event SHALL start with a status of “Active”.
@@ -16,4 +16,4 @@ export enum CurrentStatus {
     Superseded = '4',
 }
 
-export const currentStatusSchema = z.nativeEnum(CurrentStatus);
+export const currentStatusSchema = v.enum(CurrentStatus);

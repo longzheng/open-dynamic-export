@@ -8,6 +8,7 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 export default defineConfig({
     build: {
         outDir: './dist/ui',
+        chunkSizeWarningLimit: 1000,
     },
     plugins: [
         TanStackRouterVite({

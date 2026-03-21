@@ -1,17 +1,18 @@
+import * as v from 'valibot';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
-import { z } from 'zod';
 
-export const identifiedObjectSchema = z
-    .object({
-        description: z.string().optional(),
-        mRID: z.string(),
-        version: z.number().optional(),
-    })
-    .merge(resourceSchema);
+export const identifiedObjectSchema = v.intersect([
+    v.object({
+        description: v.optional(v.string()),
+        mRID: v.string(),
+        version: v.optional(v.number()),
+    }),
+    resourceSchema,
+]);
 
-export type IdentifiedObject = z.infer<typeof identifiedObjectSchema>;
+export type IdentifiedObject = v.InferOutput<typeof identifiedObjectSchema>;
 
 export function parseIdentifiedObjectXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

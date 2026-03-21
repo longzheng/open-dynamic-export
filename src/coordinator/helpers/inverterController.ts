@@ -1,7 +1,8 @@
-import { type ControlType } from '../../sep2/helpers/controlScheduler.js';
 import { Decimal } from 'decimal.js';
+import type { Logger } from 'pino';
+import { differenceInSeconds } from 'date-fns';
+import type { ControlType } from '../../sep2/helpers/controlScheduler.js';
 import { numberWithPow10, roundToDecimals } from '../../helpers/number.js';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
 import {
     writeActiveControlLimit,
@@ -9,19 +10,18 @@ import {
     writeLatency,
     writeLoadWatts,
 } from '../../helpers/influxdb.js';
-import { type SiteSample } from '../../meters/siteSample.js';
-import { type Setpoints } from '../../setpoints/index.js';
+import type { SiteSample } from '../../meters/siteSample.js';
+import type { Setpoints } from '../../setpoints/index.js';
 import {
     objectEntriesWithType,
     objectFromEntriesWithType,
 } from '../../helpers/object.js';
-import { type Config, type SetpointKeys } from '../../helpers/config.js';
+import type { Config, SetpointKeys } from '../../helpers/config.js';
 import { cappedChange } from '../../helpers/math.js';
-import { type DerSample } from './derSample.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
-import { differenceInSeconds } from 'date-fns';
-import { type ControlsModel } from '../../connections/sunspec/models/controls.js';
+import type { ControlsModel } from '../../connections/sunspec/models/controls.js';
+import type { DerSample } from './derSample.js';
 import { Publish } from './publish.js';
 import {
     calculateBatteryPowerFlow,
@@ -112,10 +112,7 @@ export class InverterController {
     private setpoints: Setpoints;
     private loadWattsCache: number | null = null;
     private controlLimitsCache: {
-        controlLimitsBySetpoint: Record<
-            SetpointKeys,
-            InverterControlLimit | null
-        >;
+        controlLimitsBySetpoint: ControlLimitsBySetpoint;
         activeInverterControlLimit: ActiveInverterControlLimit;
     } | null = null;
     private lastAppliedInverterConfiguration: InverterConfiguration | null =
@@ -713,6 +710,11 @@ function determineStorageMode(mode: 'charge' | 'discharge' | 'idle'): number {
             return 0; // No control mode
     }
 }
+
+export type ControlLimitsBySetpoint = Record<
+    SetpointKeys,
+    InverterControlLimit | null
+>;
 
 export type ActiveInverterControlLimit = {
     opModEnergize:

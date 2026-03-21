@@ -1,16 +1,21 @@
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
-import { z } from 'zod';
 
-export const dateTimeIntervalSchema = z.object({
-    duration: z.number().describe('Duration of the interval, in seconds.'),
-    start: z.coerce
-        .date()
-        .describe('Date and time of the start of the interval.'),
+export const dateTimeIntervalSchema = v.object({
+    duration: v.pipe(
+        v.number(),
+        v.description('Duration of the interval, in seconds.'),
+    ),
+    start: v.pipe(
+        coerceDateSchema,
+        v.description('Date and time of the start of the interval.'),
+    ),
 });
 
-export type DateTimeInterval = z.infer<typeof dateTimeIntervalSchema>;
+export type DateTimeInterval = v.InferOutput<typeof dateTimeIntervalSchema>;
 
 export function parseDateTimeIntervalXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

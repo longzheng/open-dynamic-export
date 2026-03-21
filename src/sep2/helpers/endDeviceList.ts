@@ -1,11 +1,11 @@
 import EventEmitter from 'node:events';
-import { type SEP2Client } from '../client.js';
+import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
-import { PollableResource } from './pollableResource.js';
 import {
     parseEndDeviceListXml,
     type EndDeviceList,
 } from '../models/endDeviceList.js';
+import { PollableResource } from './pollableResource.js';
 import { getListAll } from './pagination.js';
 
 export class EndDeviceListHelper extends EventEmitter<{

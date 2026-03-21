@@ -1,10 +1,10 @@
-import { type CommonModel } from '../models/common.js';
+import type { Logger } from 'pino';
+import type { CommonModel } from '../models/common.js';
 import { commonModel } from '../models/common.js';
 import { registersToUint32 } from '../../modbus/helpers/converters.js';
-import { type ModbusConnection } from '../../modbus/connection/base.js';
+import type { ModbusConnection } from '../../modbus/connection/base.js';
 import { getModbusConnection } from '../../modbus/connections.js';
-import { type Logger } from 'pino';
-import { type ModbusSchema } from '../../../helpers/config.js';
+import type { ModbusSchema } from '../../../helpers/config.js';
 
 export type ModelAddress = {
     start: number;

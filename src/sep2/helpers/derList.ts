@@ -1,8 +1,8 @@
 import EventEmitter from 'node:events';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
-import { PollableResource } from './pollableResource.js';
-import { type DERList } from '../models/derList.js';
+import type { DERList } from '../models/derList.js';
 import { parseDerListXml } from '../models/derList.js';
+import { PollableResource } from './pollableResource.js';
 import { getListAll } from './pagination.js';
 
 export class DerListHelper extends EventEmitter<{

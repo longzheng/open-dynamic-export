@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 // 0 = Not Applicable (default, if not specified)
 // 3 = Currency
@@ -14,4 +14,4 @@ export enum KindType {
     Power = '37',
 }
 
-export const kindTypeSchema = z.nativeEnum(KindType);
+export const kindTypeSchema = v.enum(KindType);

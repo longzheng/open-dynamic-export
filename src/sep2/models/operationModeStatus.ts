@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 
 // DER OperationalModeStatus value:
 // 0 - Not applicable / Unknown
@@ -13,11 +14,11 @@ export enum OperationalModeStatusValue {
     TestMode = 3,
 }
 
-const operationalModeStatusValueSchema = z.nativeEnum(
+export const operationalModeStatusValueSchema = v.enum(
     OperationalModeStatusValue,
 );
 
-export const operationalModeStatusSchema = z.object({
-    dateTime: z.coerce.date(),
+export const operationalModeStatusSchema = v.object({
+    dateTime: coerceDateSchema,
     value: operationalModeStatusValueSchema,
 });

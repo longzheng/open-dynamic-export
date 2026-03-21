@@ -1,8 +1,9 @@
-import { type Logger } from 'pino';
-import { pinoLogger } from '../../helpers/logger.js';
-import { type AxiosRequestConfig, type AxiosInstance } from 'axios';
 import * as https from 'node:https';
+import type { Logger } from 'pino';
+import type { AxiosRequestConfig, AxiosInstance } from 'axios';
 import axios, { AxiosError } from 'axios';
+import * as v from 'valibot';
+import { pinoLogger } from '../../helpers/logger.js';
 import {
     meterAggregatesSchema,
     metersSiteSchema,
@@ -45,7 +46,7 @@ export class Powerwall2Client {
     public async getMeterAggregates({ signal }: { signal: AbortSignal }) {
         const response = await this.get('/api/meters/aggregates', { signal });
 
-        const data = meterAggregatesSchema.parse(response);
+        const data = v.parse(meterAggregatesSchema, response);
 
         return data;
     }
@@ -53,7 +54,7 @@ export class Powerwall2Client {
     public async getSoe({ signal }: { signal: AbortSignal }) {
         const response = await this.get('/api/system_status/soe', { signal });
 
-        const data = systemStatusSoeSchema.parse(response);
+        const data = v.parse(systemStatusSoeSchema, response);
 
         return data;
     }
@@ -61,7 +62,7 @@ export class Powerwall2Client {
     public async getMetersSite({ signal }: { signal: AbortSignal }) {
         const response = await this.get('/api/meters/site', { signal });
 
-        const data = metersSiteSchema.parse(response);
+        const data = v.parse(metersSiteSchema, response);
 
         return data;
     }
@@ -96,7 +97,9 @@ export class Powerwall2Client {
 
                         this.token = { type: 'none' };
 
-                        throw new Error(`Powerwall2 get token error`);
+                        throw new Error(`Powerwall2 get token error`, {
+                            cause: error,
+                        });
                     }
                 })();
 

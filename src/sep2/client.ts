@@ -1,20 +1,16 @@
-import {
-    type AxiosInstance,
-    type AxiosRequestConfig,
-    type AxiosResponse,
-} from 'axios';
+import * as https from 'node:https';
+import { createHash } from 'node:crypto';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
-import * as https from 'node:https';
+import axiosRetry, { exponentialDelay } from 'axios-retry';
+import { numberToHex } from '../helpers/number.js';
 import {
     getCertificateFingerprint,
     getCertificateLfdi,
     getCertificateSfdi,
 } from './helpers/cert.js';
-import { type RoleFlagsType } from './models/roleFlagsType.js';
-import { numberToHex } from '../helpers/number.js';
-import { createHash } from 'node:crypto';
-import axiosRetry, { exponentialDelay } from 'axios-retry';
+import type { RoleFlagsType } from './models/roleFlagsType.js';
 
 const USER_AGENT = 'open-dynamic-export';
 
@@ -133,4 +129,4 @@ export const defaultPollPushRates = {
     functionSetAssignmentsListPoll: 300,
     derProgramListPoll: 300,
     mirrorUsagePointPush: 300,
-};
+} as const;

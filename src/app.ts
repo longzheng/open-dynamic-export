@@ -1,9 +1,9 @@
 import express, { json, urlencoded } from 'express';
 import cors from 'cors';
-import { RegisterRoutes } from '../dist/routes.js';
-import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import redoc from 'redoc-express';
 import ViteExpress from 'vite-express';
+import { RegisterRoutes } from '../dist/routes.js';
+import swaggerJson from '../dist/swagger.json' with { type: 'json' };
 import { env } from './helpers/env.js';
 
 const port = env.SERVER_PORT;
@@ -30,7 +30,6 @@ app.get('/api/docs/swagger.json', (_req, res) => {
 
 app.get(
     '/api/docs',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     redoc.default({
         title: 'API Documentation',
         specUrl: '/api/docs/swagger.json',

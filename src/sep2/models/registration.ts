@@ -1,19 +1,21 @@
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
 import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
-import { z } from 'zod';
 
-export const registrationSchema = z
-    .object({
-        dateTimeRegistered: z.coerce.date(),
-        pIN: z.number(),
+export const registrationSchema = v.intersect([
+    v.object({
+        dateTimeRegistered: coerceDateSchema,
+        pIN: v.number(),
         pollRate: pollRateSchema,
-    })
-    .merge(resourceSchema);
+    }),
+    resourceSchema,
+]);
 
-export type Registration = z.infer<typeof registrationSchema>;
+export type Registration = v.InferOutput<typeof registrationSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseRegistrationXml(xml: any): Registration {

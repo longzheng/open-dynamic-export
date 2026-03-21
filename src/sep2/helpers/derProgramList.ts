@@ -1,12 +1,12 @@
 import EventEmitter from 'node:events';
-import { type SEP2Client } from '../client.js';
+import * as v from 'valibot';
+import type { Logger } from 'pino';
+import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
-import { PollableResource } from './pollableResource.js';
 import {
     parseDerProgramListXml,
     type DERProgramList,
 } from '../models/derProgramList.js';
-import { getListAll } from './pagination.js';
 import { derProgramSchema } from '../models/derProgram.js';
 import {
     defaultDERControlSchema,
@@ -14,19 +14,19 @@ import {
 } from '../models/defaultDerControl.js';
 import { parseDerControlListXml } from '../models/derControlList.js';
 import { derControlSchema } from '../models/derControl.js';
-import { z } from 'zod';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
+import { getListAll } from './pagination.js';
+import { PollableResource } from './pollableResource.js';
 
-export const derProgramListDataSchema = z.array(
-    z.object({
+export const derProgramListDataSchema = v.array(
+    v.object({
         program: derProgramSchema,
-        defaultDerControl: defaultDERControlSchema.optional(),
-        derControls: derControlSchema.array().optional(),
+        defaultDerControl: v.optional(defaultDERControlSchema),
+        derControls: v.optional(v.array(derControlSchema)),
     }),
 );
 
-export type DerProgramListData = z.infer<typeof derProgramListDataSchema>;
+export type DerProgramListData = v.InferOutput<typeof derProgramListDataSchema>;
 
 export class DerProgramListHelper extends EventEmitter<{
     data: [DerProgramListData];

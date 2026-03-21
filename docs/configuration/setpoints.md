@@ -1,25 +1,23 @@
 # Setpoints
 
-One or more setpoints can be configured to set the operating envelope of the site. 
+One or more setpoints can be configured to set the operating envelope of the site.
 
 All setpoints are restrictive, that is a combination of multiple setpoints will evaluate all setpoints and enforce the most prohibitive value of each control type at any one time.
 
 [[toc]]
-
 
 ## Control modes
 
 The software supports 6 control modes mapped to the CSIP-AUS Dynamic Operating Envelope (DOE) modes.
 
 | Mode            | Description                                                                                    | Overlap resolution     | Default value |
-|-----------------|------------------------------------------------------------------------------------------------|------------------------|---------------|
+| --------------- | ---------------------------------------------------------------------------------------------- | ---------------------- | ------------- |
 | opModConnect    | Connection to the grid                                                                         | Prioritize disconnect  | Connect       |
 | opModEnergize   | Generate or consume energy (in practice for most inverters this is the same as `opModConnect`) | Prioritize de-energize | Energized     |
 | opModExportLimW | Maximum site export limit (in watts)                                                           | Lower limit            | Unlimited     |
 | opModGenLimW    | Maximum inverter generation limit (in watts)                                                   | Lower limit            | Unlimited     |
 | opModImpLimW    | Maximum site import limit (in watts)                                                           | Lower limit            | Unlimited     |
 | opModLoadLimW   | Maximum controllable load limit (in watts)                                                     | Lower limit            | Unlimited     |
-
 
 ## CSIP-AUS dynamic connection
 
@@ -30,13 +28,18 @@ Apply dynamic limits from an Australian energy utility CSIP-AUS server using a s
 
 To use the CSIP-AUS provided limits as a setpoint, add following property to `config.json`
 
-```js
+```jsonc
 {
     "setpoints": {
         "csipAus": {
             "host": "https://sep2-test.energyq.com.au", // (string) required: the CSIP-AUS server host
             "dcapUri": "/api/v2/dcap", // (string) required: the device capability discovery URI
-            "nmi": "1234567890" // (string) optional: for utilities that require in-band registration, the NMI of the site
+            "nmi": "1234567890", // (string) optional: for utilities that require in-band registration, the NMI of the site
+            "fixedDefault": // (object) optional: the default limits in case CSIP-AUS server is unreachable and there is no default control which may be defined in the connection agreement
+            {
+                "exportLimitWatts": 1500, // (number) the default export limit in watts
+                "importLimitWatts": 1500, // (number) the default import limit in watts
+            }
         }
     }
     ...
@@ -49,7 +52,7 @@ The `nmi` is not required for Energex/Ergon Energy/Energy Queensland.
 
 To use a setpoint to specify fixed limits (such as for fixed export limits), add the following property to `config.json`
 
-```js
+```jsonc
 {
     "setpoints": {
         "fixed": {
@@ -80,7 +83,7 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
 
 To specify setpoint limits based on a MQTT topic, add the following property to `config.json`
 
-```js
+```jsonc
 {
     "setpoints": {
         "mqtt": {
@@ -94,34 +97,53 @@ To specify setpoint limits based on a MQTT topic, add the following property to 
 
 The MQTT topic must contain a JSON message that meets the following schema
 
-```js
-z.object({
-    opModConnect: z.boolean().optional(),
-    opModEnergize: z.boolean().optional(),
-    opModExpLimW: z.number().optional(),
-    opModGenLimW: z.number().optional(),
-    opModImpLimW: z.number().optional(),
-    opModLoadLimW: z.number().optional(),
-    
-    // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true)
-    batterySocTargetPercent: z.number().optional(),
-    batterySocMinPercent: z.number().optional(),
-    batterySocMaxPercent: z.number().optional(),
-    batteryChargeMaxWatts: z.number().optional(),
-    batteryDischargeMaxWatts: z.number().optional(),
-    batteryPriorityMode: z.enum(['battery_first', 'export_first']).optional(),
-    batteryGridChargingEnabled: z.boolean().optional(),
-    batteryGridChargingMaxWatts: z.number().optional(),
-});
+```jsonc
+{
+    // Schema:
+    // opModConnect: boolean (optional)
+    // opModEnergize: boolean (optional)
+    // opModExpLimW: number (optional)
+    // opModGenLimW: number (optional)
+    // opModImpLimW: number (optional)
+    // opModLoadLimW: number (optional)
+    //
+    // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true):
+    // batterySocTargetPercent: number (optional)
+    // batterySocMinPercent: number (optional)
+    // batterySocMaxPercent: number (optional)
+    // batteryChargeMaxWatts: number (optional)
+    // batteryDischargeMaxWatts: number (optional)
+    // batteryPriorityMode: "battery_first" | "export_first" (optional)
+    // batteryGridChargingEnabled: boolean (optional)
+    // batteryGridChargingMaxWatts: number (optional)
+}
 ```
 
 ### Example: Basic Limits
 
-```js
+```jsonc
 {
+    // MQTT control payload for inverter operating mode / limits.
+    // All fields are optional: omit fields you are not setting.
+    //
+    // Units:
+    // - *LimW fields are watts (W)
+    // - opModConnect/opModEnergize are booleans
+    //
+    // Typical intent (aligning with earlier docs):
+    // - opModConnect: connect/disconnect inverter (or enable/disable grid connection mode)
+    // - opModEnergize: energize/enable inverter operation
+    // - opModGenLimW: generation limit (W)
+    // - opModExpLimW: export limit (W)
+    // - opModImpLimW: import limit (W)
+    // - opModLoadLimW: load limit (W)
+
+    "opModConnect": true,
     "opModEnergize": true,
-    "opModExpLimW": 5000,
-    "opModGenLimW": 10000
+    "opModExpLimW": 0,
+    "opModGenLimW": 5000,
+    "opModImpLimW": 3000,
+    "opModLoadLimW": 3500,
 }
 ```
 
@@ -145,7 +167,8 @@ z.object({
 To set a zero export limit setpoint based on negative feed-in, add the following property to `config.json`
 
 For Amber Electric:
-```js
+
+```jsonc
 {
     "setpoints": {
         "negativeFeedIn": {
@@ -163,7 +186,8 @@ For Amber Electric:
 To set a zero export limit setpoint based on two-way tariffs, add the following property to `config.json`
 
 For [Ausgrid solar tariff](https://www.ausgrid.com.au/Connections/Solar-and-batteries/Solar-tariffs) EA029:
-```js
+
+```jsonc
 {
     "setpoints": {
         "twoWayTariff": {
@@ -175,7 +199,8 @@ For [Ausgrid solar tariff](https://www.ausgrid.com.au/Connections/Solar-and-batt
 ```
 
 For [SAPN RELE2W](https://www.sapowernetworks.com.au/public/download.jsp?id=328119) tariff:
-```js
+
+```jsonc
 {
     "setpoints": {
         "twoWayTariff": {

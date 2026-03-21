@@ -1,11 +1,11 @@
+import * as v from 'valibot';
 import { assertString } from '../helpers/assert.js';
-import { z } from 'zod';
 
-export const linkSchema = z.object({
-    href: z.string(),
+export const linkSchema = v.object({
+    href: v.string(),
 });
 
-export type Link = z.infer<typeof linkSchema>;
+export type Link = v.InferOutput<typeof linkSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseLinkXmlObject(xmlObject: any): Link {

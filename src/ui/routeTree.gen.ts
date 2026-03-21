@@ -8,87 +8,43 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReadingsRouteImport } from './routes/readings'
+import { Route as LimitsRouteImport } from './routes/limits'
+import { Route as IndexRouteImport } from './routes/index'
 
-// Import Routes
-
-import { Route as rootRoute } from './routes/__root'
-
-// Create Virtual Routes
-
-const ReadingsLazyImport = createFileRoute('/readings')()
-const LimitsLazyImport = createFileRoute('/limits')()
-const IndexLazyImport = createFileRoute('/')()
-
-// Create/Update Routes
-
-const ReadingsLazyRoute = ReadingsLazyImport.update({
+const ReadingsRoute = ReadingsRouteImport.update({
   id: '/readings',
   path: '/readings',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/readings.lazy').then((d) => d.Route))
-
-const LimitsLazyRoute = LimitsLazyImport.update({
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LimitsRoute = LimitsRouteImport.update({
   id: '/limits',
   path: '/limits',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/limits.lazy').then((d) => d.Route))
-
-const IndexLazyRoute = IndexLazyImport.update({
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/limits': {
-      id: '/limits'
-      path: '/limits'
-      fullPath: '/limits'
-      preLoaderRoute: typeof LimitsLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/readings': {
-      id: '/readings'
-      path: '/readings'
-      fullPath: '/readings'
-      preLoaderRoute: typeof ReadingsLazyImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/limits': typeof LimitsLazyRoute
-  '/readings': typeof ReadingsLazyRoute
+  '/': typeof IndexRoute
+  '/limits': typeof LimitsRoute
+  '/readings': typeof ReadingsRoute
 }
-
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/limits': typeof LimitsLazyRoute
-  '/readings': typeof ReadingsLazyRoute
+  '/': typeof IndexRoute
+  '/limits': typeof LimitsRoute
+  '/readings': typeof ReadingsRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/limits': typeof LimitsLazyRoute
-  '/readings': typeof ReadingsLazyRoute
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/limits': typeof LimitsRoute
+  '/readings': typeof ReadingsRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/limits' | '/readings'
@@ -97,43 +53,43 @@ export interface FileRouteTypes {
   id: '__root__' | '/' | '/limits' | '/readings'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  LimitsLazyRoute: typeof LimitsLazyRoute
-  ReadingsLazyRoute: typeof ReadingsLazyRoute
+  IndexRoute: typeof IndexRoute
+  LimitsRoute: typeof LimitsRoute
+  ReadingsRoute: typeof ReadingsRoute
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  LimitsLazyRoute: LimitsLazyRoute,
-  ReadingsLazyRoute: ReadingsLazyRoute,
-}
-
-export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/limits",
-        "/readings"
-      ]
-    },
-    "/": {
-      "filePath": "index.lazy.tsx"
-    },
-    "/limits": {
-      "filePath": "limits.lazy.tsx"
-    },
-    "/readings": {
-      "filePath": "readings.lazy.tsx"
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/readings': {
+      id: '/readings'
+      path: '/readings'
+      fullPath: '/readings'
+      preLoaderRoute: typeof ReadingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/limits': {
+      id: '/limits'
+      path: '/limits'
+      fullPath: '/limits'
+      preLoaderRoute: typeof LimitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-ROUTE_MANIFEST_END */
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  LimitsRoute: LimitsRoute,
+  ReadingsRoute: ReadingsRoute,
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

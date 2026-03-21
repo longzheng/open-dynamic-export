@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { addSeconds } from 'date-fns';
 import {
     ControlLimitRampHelper,
     calculateRampedValue,
 } from './controlLimitRamp.js';
 import { RampRateHelper } from './rampRate.js';
-import { addSeconds } from 'date-fns';
 
 afterEach(() => {
     vi.getRealSystemTime();
@@ -19,13 +19,22 @@ describe('ControlLimitRampHelper', () => {
         helper = new ControlLimitRampHelper({ rampRateHelper });
     });
 
-    it('should return no value for no target', () => {
-        helper.updateTarget({ type: 'none' });
+    it('should return no value for no target with undefined', () => {
+        helper.updateTarget({ type: 'none', value: undefined });
 
         // cache initial value
         expect(helper.getRampedValue()).toBe(undefined);
 
         expect(helper.getRampedValue()).toBe(undefined);
+    });
+
+    it('should return a value for no target with a value', () => {
+        helper.updateTarget({ type: 'none', value: 5000 });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(5000);
+
+        expect(helper.getRampedValue()).toBe(5000);
     });
 
     it('should return no value for undefined target', () => {

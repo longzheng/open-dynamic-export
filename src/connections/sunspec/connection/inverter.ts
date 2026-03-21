@@ -1,24 +1,18 @@
 import { differenceInSeconds } from 'date-fns';
-import {
-    type ControlsModel,
-    type ControlsModelWrite,
-} from '../models/controls.js';
+import type { ControlsModel, ControlsModelWrite } from '../models/controls.js';
 import { controlsModel } from '../models/controls.js';
 import { inverterModel } from '../models/inverter.js';
-import { type NameplateModel } from '../models/nameplate.js';
+import type { NameplateModel } from '../models/nameplate.js';
 import { nameplateModel } from '../models/nameplate.js';
-import { type SettingsModel } from '../models/settings.js';
+import type { SettingsModel } from '../models/settings.js';
 import { settingsModel } from '../models/settings.js';
-import { type StatusModel } from '../models/status.js';
+import type { StatusModel } from '../models/status.js';
 import { statusModel } from '../models/status.js';
-import {
-    type StorageModel,
-    type StorageModelWrite,
-} from '../models/storage.js';
+import type { StorageModel, StorageModelWrite } from '../models/storage.js';
 import { storageModel } from '../models/storage.js';
-import { SunSpecConnection } from './base.js';
 import { mpptModuleModel, type MpptModuleModel } from '../models/mppt.js';
 import { mpptModel } from '../models/mppt.js';
+import { SunSpecConnection } from './base.js';
 
 export class InverterSunSpecConnection extends SunSpecConnection {
     // the nameplate model should never change so we can cache it

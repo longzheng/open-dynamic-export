@@ -1,434 +1,550 @@
-import { z } from 'zod';
 import { readFileSync } from 'fs';
+import * as v from 'valibot';
 import { env } from './env.js';
 
-const modbusSchema = z.object({
-    connection: z.union([
-        z.object({
-            type: z.literal('tcp'),
-            ip: z
-                .string()
-                .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
-                .describe('The IP address of the Modbus device'),
-            port: z
-                .number()
-                .min(1)
-                .max(65535)
-                .describe('The port of the Modbus device'),
+const modbusSchema = v.object({
+    connection: v.union([
+        v.object({
+            type: v.literal('tcp'),
+            ip: v.pipe(
+                v.string(),
+                v.regex(/^(\d{1,3}\.){3}\d{1,3}$/),
+                v.description('The IP address of the Modbus device'),
+            ),
+            port: v.pipe(
+                v.number(),
+                v.minValue(1),
+                v.maxValue(65535),
+                v.description('The port of the Modbus device'),
+            ),
         }),
-        z.object({
-            type: z.literal('rtu'),
-            path: z.string().describe('The device path of the Modbus device'),
-            baudRate: z
-                .number()
-                .min(1)
-                .max(115200)
-                .describe('The baud rate of the Modbus device'),
+        v.object({
+            type: v.literal('rtu'),
+            path: v.pipe(
+                v.string(),
+                v.description('The device path of the Modbus device'),
+            ),
+            baudRate: v.pipe(
+                v.number(),
+                v.minValue(1),
+                v.maxValue(115200),
+                v.description('The baud rate of the Modbus device'),
+            ),
         }),
     ]),
-    unitId: z
-        .number()
-        .min(1)
-        .max(255)
-        .default(1)
-        .describe('The unit/slave ID of the Modbus device. Defaults to 1.'),
-    pollingIntervalMs: z
-        .number()
-        .optional()
-        .describe(
+    unitId: v.pipe(
+        v.optional(v.pipe(v.number(), v.minValue(1), v.maxValue(255)), 1),
+        v.description('The unit/slave ID of the Modbus device. Defaults to 1.'),
+    ),
+    pollingIntervalMs: v.pipe(
+        v.optional(v.number(), 200),
+        v.description(
             'The minimum number of seconds between polling, subject to the latency of the polling loop.',
-        )
-        .default(200),
+        ),
+    ),
 });
 
-export type ModbusSchema = z.infer<typeof modbusSchema>;
+export type ModbusSchema = v.InferOutput<typeof modbusSchema>;
 
-export const configSchema = z
-    .object({
-        setpoints: z
-            .object({
-                csipAus: z
-                    .object({
-                        host: z
-                            .string()
-                            .url()
-                            .describe('The host of the CSIP-AUS server'),
-                        dcapUri: z
-                            .string()
-                            .describe(
-                                'The URI of the DeviceCapability resource',
-                            ),
-                        nmi: z
-                            .string()
-                            .min(10)
-                            .max(11)
-                            .optional()
-                            .describe(
-                                'For in-band registration, the NMI of the site',
-                            ),
-                    })
-                    .optional()
-                    .describe('If defined, limit by CSIP-AUS server'),
-                fixed: z
-                    .object({
-                        connect: z
-                            .boolean()
-                            .optional()
-                            .describe(
-                                'Whether the inverter should be connected to the grid',
-                            ),
-                        exportLimitWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe('The export limit in watts'),
-                        generationLimitWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe('The generation limit in watts'),
-                        importLimitWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe('The import limit in watts'),
-                        loadLimitWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe('The load limit in watts'),
-                        exportTargetWatts: z
-                            .number()
-                            .optional()
-                            .describe(
-                                'Desired export when no solar (from battery)',
-                            ),
-                        importTargetWatts: z
-                            .number()
-                            .optional()
-                            .describe(
-                                'Desired import for battery charging from grid',
-                            ),
-                        batterySocTargetPercent: z
-                            .number()
-                            .min(0)
-                            .max(100)
-                            .optional()
-                            .describe('Target state of charge %'),
-                        batterySocMinPercent: z
-                            .number()
-                            .min(0)
-                            .max(100)
-                            .optional()
-                            .describe('Minimum reserve %'),
-                        batterySocMaxPercent: z
-                            .number()
-                            .min(0)
-                            .max(100)
-                            .optional()
-                            .describe('Maximum charge %'),
-                        batteryChargeMaxWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe(
-                                'Maximum charge rate (can override SunSpec)',
-                            ),
-                        batteryDischargeMaxWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe(
-                                'Maximum discharge rate (can override SunSpec)',
-                            ),
-                        batteryPriorityMode: z
-                            .enum(['export_first', 'battery_first'])
-                            .optional()
-                            .describe(
-                                'Battery priority mode: export_first | battery_first',
-                            ),
-                        batteryGridChargingEnabled: z
-                            .boolean()
-                            .optional()
-                            .describe('Allow charging battery from grid'),
-                        batteryGridChargingMaxWatts: z
-                            .number()
-                            .min(0)
-                            .optional()
-                            .describe('Maximum grid charging rate'),
-                    })
-                    .optional()
-                    .describe('If defined, limits by manual configuration'),
-                negativeFeedIn: z
-                    .union([
-                        z.object({
-                            type: z.literal('amber'),
-                            apiKey: z
-                                .string()
-                                .describe('The API key for the Amber API'),
-                            siteId: z
-                                .string()
-                                .optional()
-                                .describe('The site ID for the Amber API'),
-                        }),
-                        z.never(), // TODO
-                    ])
-                    .optional()
-                    .describe('If defined, limit by negative feed-in'),
-                twoWayTariff: z
-                    .union([
-                        z.object({
-                            type: z.literal('ausgridEA029'),
-                        }),
-                        z.object({
-                            type: z.literal('sapnRELE2W'),
-                        }),
-                    ])
-                    .optional()
-                    .describe('If defined, limit by two-way tariff'),
-                mqtt: z
-                    .object({
-                        host: z
-                            .string()
-                            .describe(
-                                'The host of the MQTT broker, including "mqtt://"',
-                            ),
-                        username: z
-                            .string()
-                            .optional()
-                            .describe('The username for the MQTT broker'),
-                        password: z
-                            .string()
-                            .optional()
-                            .describe('The password for the MQTT broker'),
-                        topic: z
-                            .string()
-                            .describe('The topic to pull control limits from'),
-                    })
-                    .optional()
-                    .describe('If defined, limit by MQTT'),
-            })
-            .describe('Setpoints configuration'),
-        inverters: z
-            .array(
-                z.union([
-                    z
-                        .object({
-                            type: z.literal('sunspec'),
-                            batteryControlEnabled: z
-                                .boolean()
-                                .optional()
-                                .describe(
-                                    'Enable battery control for this inverter',
+const configObjectSchema = v.object({
+    setpoints: v.pipe(
+            v.object({
+                csipAus: v.pipe(
+                    v.optional(
+                        v.object({
+                            host: v.pipe(
+                                v.string(),
+                                v.url(),
+                                v.description(
+                                    'The host of the CSIP-AUS server',
                                 ),
-                        })
-                        .merge(modbusSchema)
-                        .describe('SunSpec inverter configuration'),
-                    z
-                        .object({
-                            type: z.literal('sma'),
-                            model: z.literal('core1'),
-                        })
-                        .merge(modbusSchema)
-                        .describe('SMA inverter configuration'),
-                    z
-                        .object({
-                            type: z.literal('mqtt'),
-                            host: z
-                                .string()
-                                .describe(
+                            ),
+                            dcapUri: v.pipe(
+                                v.string(),
+                                v.description(
+                                    'The URI of the DeviceCapability resource',
+                                ),
+                            ),
+                            nmi: v.pipe(
+                                v.optional(
+                                    v.pipe(
+                                        v.string(),
+                                        v.minLength(10),
+                                        v.maxLength(11),
+                                    ),
+                                ),
+                                v.description(
+                                    'For in-band registration, the NMI of the site',
+                                ),
+                            ),
+                            fixedDefault: v.pipe(
+                                v.optional(
+                                    v.object({
+                                        exportLimitWatts: v.pipe(
+                                            v.number(),
+                                            v.minValue(0),
+                                            v.description(
+                                                'The default export limit in watts',
+                                            ),
+                                        ),
+                                        importLimitWatts: v.pipe(
+                                            v.number(),
+                                            v.minValue(0),
+                                            v.description(
+                                                'The default import limit in watts',
+                                            ),
+                                        ),
+                                    }),
+                                ),
+                                v.description(
+                                    'The default limits in case CSIP-AUS server is unreachable and there is no default control',
+                                ),
+                            ),
+                        }),
+                    ),
+                    v.description('If defined, limit by CSIP-AUS server'),
+                ),
+                fixed: v.pipe(
+                    v.optional(
+                        v.object({
+                            connect: v.pipe(
+                                v.optional(v.boolean()),
+                                v.description(
+                                    'Whether the inverter should be connected to the grid',
+                                ),
+                            ),
+                            exportLimitWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description('The export limit in watts'),
+                            ),
+                            generationLimitWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description('The generation limit in watts'),
+                            ),
+                            importLimitWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description('The import limit in watts'),
+                            ),
+                            loadLimitWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description('The load limit in watts'),
+                            ),
+                            exportTargetWatts: v.pipe(
+                                v.optional(v.number()),
+                                v.description(
+                                    'Desired export when no solar (from battery)',
+                                ),
+                            ),
+                            importTargetWatts: v.pipe(
+                                v.optional(v.number()),
+                                v.description(
+                                    'Desired import for battery charging from grid',
+                                ),
+                            ),
+                            batterySocTargetPercent: v.pipe(
+                                v.optional(
+                                    v.pipe(
+                                        v.number(),
+                                        v.minValue(0),
+                                        v.maxValue(100),
+                                    ),
+                                ),
+                                v.description('Target state of charge %'),
+                            ),
+                            batterySocMinPercent: v.pipe(
+                                v.optional(
+                                    v.pipe(
+                                        v.number(),
+                                        v.minValue(0),
+                                        v.maxValue(100),
+                                    ),
+                                ),
+                                v.description('Minimum reserve %'),
+                            ),
+                            batterySocMaxPercent: v.pipe(
+                                v.optional(
+                                    v.pipe(
+                                        v.number(),
+                                        v.minValue(0),
+                                        v.maxValue(100),
+                                    ),
+                                ),
+                                v.description('Maximum charge %'),
+                            ),
+                            batteryChargeMaxWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description(
+                                    'Maximum charge rate (can override SunSpec)',
+                                ),
+                            ),
+                            batteryDischargeMaxWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description(
+                                    'Maximum discharge rate (can override SunSpec)',
+                                ),
+                            ),
+                            batteryPriorityMode: v.pipe(
+                                v.optional(
+                                    v.picklist([
+                                        'export_first',
+                                        'battery_first',
+                                    ]),
+                                ),
+                                v.description(
+                                    'Battery priority mode: export_first | battery_first',
+                                ),
+                            ),
+                            batteryGridChargingEnabled: v.pipe(
+                                v.optional(v.boolean()),
+                                v.description(
+                                    'Allow charging battery from grid',
+                                ),
+                            ),
+                            batteryGridChargingMaxWatts: v.pipe(
+                                v.optional(
+                                    v.pipe(v.number(), v.minValue(0)),
+                                ),
+                                v.description('Maximum grid charging rate'),
+                            ),
+                        }),
+                    ),
+                    v.description(
+                        'If defined, limits by manual configuration',
+                    ),
+                ),
+                negativeFeedIn: v.pipe(
+                    v.optional(
+                        v.union([
+                            v.object({
+                                type: v.literal('amber'),
+                                apiKey: v.pipe(
+                                    v.string(),
+                                    v.description(
+                                        'The API key for the Amber API',
+                                    ),
+                                ),
+                                siteId: v.pipe(
+                                    v.optional(v.string()),
+                                    v.description(
+                                        'The site ID for the Amber API',
+                                    ),
+                                ),
+                            }),
+                        ]),
+                    ),
+                    v.description('If defined, limit by negative feed-in'),
+                ),
+                twoWayTariff: v.pipe(
+                    v.optional(
+                        v.union([
+                            v.object({
+                                type: v.literal('ausgridEA029'),
+                            }),
+                            v.object({
+                                type: v.literal('sapnRELE2W'),
+                            }),
+                        ]),
+                    ),
+                    v.description('If defined, limit by two-way tariff'),
+                ),
+                mqtt: v.pipe(
+                    v.optional(
+                        v.object({
+                            host: v.pipe(
+                                v.string(),
+                                v.description(
                                     'The host of the MQTT broker, including "mqtt://"',
                                 ),
-                            username: z
-                                .string()
-                                .optional()
-                                .describe('The username for the MQTT broker'),
-                            password: z
-                                .string()
-                                .optional()
-                                .describe('The password for the MQTT broker'),
-                            topic: z
-                                .string()
-                                .describe(
+                            ),
+                            username: v.pipe(
+                                v.optional(v.string()),
+                                v.description(
+                                    'The username for the MQTT broker',
+                                ),
+                            ),
+                            password: v.pipe(
+                                v.optional(v.string()),
+                                v.description(
+                                    'The password for the MQTT broker',
+                                ),
+                            ),
+                            topic: v.pipe(
+                                v.string(),
+                                v.description(
+                                    'The topic to pull control limits from',
+                                ),
+                            ),
+                        }),
+                    ),
+                    v.description('If defined, limit by MQTT'),
+                ),
+            }),
+            v.description('Setpoints configuration'),
+        ),
+        inverters: v.pipe(
+            v.array(
+                v.union([
+                    v.pipe(
+                        v.intersect([
+                            v.object({
+                                type: v.literal('sunspec'),
+                                batteryControlEnabled: v.pipe(
+                                    v.optional(v.boolean()),
+                                    v.description(
+                                        'Enable battery control for this inverter',
+                                    ),
+                                ),
+                            }),
+                            modbusSchema,
+                        ]),
+                        v.description('SunSpec inverter configuration'),
+                    ),
+                    v.pipe(
+                        v.intersect([
+                            v.object({
+                                type: v.literal('sma'),
+                                model: v.literal('core1'),
+                            }),
+                            modbusSchema,
+                        ]),
+                        v.description('SMA inverter configuration'),
+                    ),
+                    v.pipe(
+                        v.object({
+                            type: v.literal('mqtt'),
+                            host: v.pipe(
+                                v.string(),
+                                v.description(
+                                    'The host of the MQTT broker, including "mqtt://"',
+                                ),
+                            ),
+                            username: v.pipe(
+                                v.optional(v.string()),
+                                v.description(
+                                    'The username for the MQTT broker',
+                                ),
+                            ),
+                            password: v.pipe(
+                                v.optional(v.string()),
+                                v.description(
+                                    'The password for the MQTT broker',
+                                ),
+                            ),
+                            topic: v.pipe(
+                                v.string(),
+                                v.description(
                                     'The topic to pull inverter readings from',
                                 ),
-                            pollingIntervalMs: z
-                                .number()
-                                .optional()
-                                .describe(
+                            ),
+                            pollingIntervalMs: v.pipe(
+                                v.optional(v.number(), 200),
+                                v.description(
                                     'The minimum number of seconds between polling, subject to the latency of the polling loop.',
-                                )
-                                .default(200),
-                        })
-                        .describe('MQTT inverter configuration'),
+                                ),
+                            ),
+                        }),
+                        v.description('MQTT inverter configuration'),
+                    ),
                 ]),
-            )
-            .describe('Inverter configuration'),
-        inverterControl: z.object({
-            enabled: z.boolean().describe('Whether to control the inverters'),
-            batteryControlEnabled: z
-                .boolean()
-                .optional()
-                .describe(
+            ),
+            v.description('Inverter configuration'),
+        ),
+        inverterControl: v.object({
+            enabled: v.pipe(
+                v.boolean(),
+                v.description('Whether to control the inverters'),
+            ),
+            batteryControlEnabled: v.pipe(
+                v.optional(v.boolean()),
+                v.description(
                     'Whether to control battery storage (global setting)',
                 ),
-            batteryPowerFlowControl: z
-                .boolean()
-                .optional()
-                .default(false)
-                .describe(
+            ),
+            batteryPowerFlowControl: v.pipe(
+                v.optional(v.boolean(), false),
+                v.description(
                     'Enable intelligent battery power flow control (consumption → battery → export). When disabled, uses simple battery charge buffer instead.',
                 ),
-            sampleSeconds: z
-                .number()
-                .min(0)
-                .describe(
+            ),
+            sampleSeconds: v.pipe(
+                v.optional(v.pipe(v.number(), v.minValue(0)), 5),
+                v.description(
                     `How many seconds of inverter and site data to sample to make control decisions.
 A shorter time will increase responsiveness to load changes but may introduce oscillations.
 A longer time will smooth out load changes but may result in overshoot.`,
-                )
-                .optional()
-                .default(5),
-            intervalSeconds: z
-                .number()
-                .min(0)
-                .describe(
+                ),
+            ),
+            intervalSeconds: v.pipe(
+                v.optional(v.pipe(v.number(), v.minValue(0)), 1),
+                v.description(
                     `The minimum number of seconds between control commands, subject to the latency of the control loop.`,
-                )
-                .optional()
-                .default(1),
+                ),
+            ),
         }),
-        meter: z.union([
-            z
-                .object({
-                    type: z.literal('sunspec'),
-                    location: z.union([
-                        z.literal('feedin'),
-                        z.literal('consumption'),
-                    ]),
-                })
-                .merge(modbusSchema)
-                .describe('SunSpec meter configuration'),
-            z
-                .object({
-                    type: z.literal('sma'),
-                    model: z.literal('core1'),
-                })
-                .merge(modbusSchema)
-                .describe('SMA meter configuration'),
-            z
-                .object({
-                    type: z.literal('powerwall2'),
-                    ip: z
-                        .string()
-                        .regex(/^(\d{1,3}\.){3}\d{1,3}$/)
-                        .describe('The IP address of the Powerwall 2 gateway'),
-                    password: z
-                        .string()
-                        .describe(
+        meter: v.union([
+            v.pipe(
+                v.intersect([
+                    v.object({
+                        type: v.literal('sunspec'),
+                        location: v.union([
+                            v.literal('feedin'),
+                            v.literal('consumption'),
+                        ]),
+                    }),
+                    modbusSchema,
+                ]),
+                v.description('SunSpec meter configuration'),
+            ),
+            v.pipe(
+                v.intersect([
+                    v.object({
+                        type: v.literal('sma'),
+                        model: v.literal('core1'),
+                    }),
+                    modbusSchema,
+                ]),
+                v.description('SMA meter configuration'),
+            ),
+            v.pipe(
+                v.object({
+                    type: v.literal('powerwall2'),
+                    ip: v.pipe(
+                        v.string(),
+                        v.regex(/^(\d{1,3}\.){3}\d{1,3}$/),
+                        v.description(
+                            'The IP address of the Powerwall 2 gateway',
+                        ),
+                    ),
+                    password: v.pipe(
+                        v.string(),
+                        v.description(
                             'The customer password of the Powerwall 2 gateway. By default, this is the last 5 characters of the password sticker inside the gateway.',
                         ),
-                    timeoutSeconds: z
-                        .number()
-                        .optional()
-                        .describe('Request timeout in seconds')
-                        .default(2),
-                    pollingIntervalMs: z
-                        .number()
-                        .optional()
-                        .describe(
+                    ),
+                    timeoutSeconds: v.pipe(
+                        v.optional(v.number(), 2),
+                        v.description('Request timeout in seconds'),
+                    ),
+                    pollingIntervalMs: v.pipe(
+                        v.optional(v.number(), 200),
+                        v.description(
                             'The minimum number of seconds between polling, subject to the latency of the polling loop.',
-                        )
-                        .default(200),
-                })
-                .describe('Powerwall 2 meter configuration'),
-            z
-                .object({
-                    type: z.literal('mqtt'),
-                    host: z
-                        .string()
-                        .describe(
+                        ),
+                    ),
+                }),
+                v.description('Powerwall 2 meter configuration'),
+            ),
+            v.pipe(
+                v.object({
+                    type: v.literal('mqtt'),
+                    host: v.pipe(
+                        v.string(),
+                        v.description(
                             'The host of the MQTT broker, including "mqtt://"',
                         ),
-                    username: z
-                        .string()
-                        .optional()
-                        .describe('The username for the MQTT broker'),
-                    password: z
-                        .string()
-                        .optional()
-                        .describe('The password for the MQTT broker'),
-                    topic: z
-                        .string()
-                        .describe('The topic to pull meter readings from'),
-                    pollingIntervalMs: z
-                        .number()
-                        .optional()
-                        .describe(
-                            'The minimum number of seconds between polling, subject to the latency of the polling loop.',
-                        )
-                        .default(200),
-                })
-                .describe('MQTT meter configuration'),
-        ]),
-        publish: z
-            .object({
-                mqtt: z
-                    .object({
-                        host: z
-                            .string()
-                            .describe(
-                                'The host of the MQTT broker, including "mqtt://"',
-                            ),
-                        username: z
-                            .string()
-                            .optional()
-                            .describe('The username for the MQTT broker'),
-                        password: z
-                            .string()
-                            .optional()
-                            .describe('The password for the MQTT broker'),
-                        topic: z
-                            .string()
-                            .describe('The topic to publish limits'),
-                    })
-                    .optional(),
-            })
-            .describe('Publish active control limits')
-            .optional(),
-        battery: z
-            .object({
-                chargeBufferWatts: z
-                    .number()
-                    .describe(
-                        'A minimum buffer to allow the battery to charge if export limit would otherwise have prevented the battery from charging',
                     ),
-            })
-            .describe('Battery configuration')
-            .optional(),
-    })
-    .refine(
-        (config) => {
-            // Reject configuration that uses both legacy battery charge buffer
-            // and new battery power flow control
-            const hasLegacyChargeBuffer =
-                config.battery?.chargeBufferWatts !== undefined;
-            const hasNewBatteryControl =
-                config.inverterControl.batteryPowerFlowControl === true;
+                    username: v.pipe(
+                        v.optional(v.string()),
+                        v.description('The username for the MQTT broker'),
+                    ),
+                    password: v.pipe(
+                        v.optional(v.string()),
+                        v.description('The password for the MQTT broker'),
+                    ),
+                    topic: v.pipe(
+                        v.string(),
+                        v.description('The topic to pull meter readings from'),
+                    ),
+                    pollingIntervalMs: v.pipe(
+                        v.optional(v.number(), 200),
+                        v.description(
+                            'The minimum number of seconds between polling, subject to the latency of the polling loop.',
+                        ),
+                    ),
+                }),
+                v.description('MQTT meter configuration'),
+            ),
+        ]),
+        publish: v.pipe(
+            v.optional(
+                v.object({
+                    mqtt: v.optional(
+                        v.object({
+                            host: v.pipe(
+                                v.string(),
+                                v.description(
+                                    'The host of the MQTT broker, including "mqtt://"',
+                                ),
+                            ),
+                            username: v.pipe(
+                                v.optional(v.string()),
+                                v.description(
+                                    'The username for the MQTT broker',
+                                ),
+                            ),
+                            password: v.pipe(
+                                v.optional(v.string()),
+                                v.description(
+                                    'The password for the MQTT broker',
+                                ),
+                            ),
+                            topic: v.pipe(
+                                v.string(),
+                                v.description('The topic to publish limits'),
+                            ),
+                        }),
+                    ),
+                }),
+            ),
+            v.description('Publish active control limits'),
+        ),
+        battery: v.pipe(
+            v.optional(
+                v.object({
+                    chargeBufferWatts: v.pipe(
+                        v.number(),
+                        v.description(
+                            'A minimum buffer to allow the battery to charge if export limit would otherwise have prevented the battery from charging',
+                        ),
+                    ),
+                }),
+            ),
+            v.description('Battery configuration'),
+        ),
+});
 
-            // Both cannot be enabled simultaneously
-            return !(hasLegacyChargeBuffer && hasNewBatteryControl);
-        },
-        {
-            message:
-                'Cannot use both legacy battery.chargeBufferWatts and new inverterControl.batteryPowerFlowControl. ' +
-                'Please use only one battery control method: ' +
-                'either remove battery.chargeBufferWatts (legacy) or set inverterControl.batteryPowerFlowControl to false (use new battery control).',
-            path: ['battery', 'chargeBufferWatts'],
-        },
-    );
+// Exported for JSON Schema generation (toJsonSchema cannot convert v.check)
+export { configObjectSchema };
 
-export type Config = z.infer<typeof configSchema>;
+// Full schema with runtime validation
+export const configSchema = v.pipe(
+    configObjectSchema,
+    v.check((config) => {
+        // Reject configuration that uses both legacy battery charge buffer
+        // and new battery power flow control
+        const hasLegacyChargeBuffer =
+            config.battery?.chargeBufferWatts !== undefined;
+        const hasNewBatteryControl =
+            config.inverterControl.batteryPowerFlowControl === true;
+
+        // Both cannot be enabled simultaneously
+        return !(hasLegacyChargeBuffer && hasNewBatteryControl);
+    }, 'Cannot use both legacy battery.chargeBufferWatts and new inverterControl.batteryPowerFlowControl. Please use only one battery control method: either remove battery.chargeBufferWatts (legacy) or set inverterControl.batteryPowerFlowControl to false (use new battery control).'),
+);
+
+export type Config = v.InferOutput<typeof configSchema>;
 
 export type SetpointKeys = keyof Config['setpoints'];
 
@@ -440,16 +556,18 @@ export function getConfig() {
     const configJson = (() => {
         try {
             return readFileSync(getConfigPath(), 'utf8');
-        } catch {
-            throw new Error(`Error reading ./config/config.json`);
+        } catch (error) {
+            throw new Error(`Error reading ./config/config.json`, {
+                cause: error,
+            });
         }
     })();
 
-    const result = configSchema.safeParse(JSON.parse(configJson));
+    const result = v.safeParse(configSchema, JSON.parse(configJson));
 
     if (!result.success) {
         throw new Error(`config.json is not valid`);
     }
 
-    return result.data;
+    return result.output;
 }

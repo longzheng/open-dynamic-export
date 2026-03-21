@@ -1,19 +1,21 @@
+import * as v from 'valibot';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
-import { z } from 'zod';
 
-export const powerFactorSchema = z
-    .object({
-        displacement: z.number(),
-        multiplier: z
-            .number()
-            .describe('Specifies exponent of uom. power of ten multiplier'),
-    })
-    .describe(
+export const powerFactorSchema = v.pipe(
+    v.object({
+        displacement: v.number(),
+        multiplier: v.pipe(
+            v.number(),
+            v.description('Specifies exponent of uom. power of ten multiplier'),
+        ),
+    }),
+    v.description(
         'Specifies a setpoint for Displacement Power Factor, the ratio between apparent and active powers at the fundamental frequency (e.g. 60 Hz).',
-    );
+    ),
+);
 
-export type PowerFactor = z.infer<typeof powerFactorSchema>;
+export type PowerFactor = v.InferOutput<typeof powerFactorSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parsePowerFactorXmlObject(xmlObject: any): PowerFactor {

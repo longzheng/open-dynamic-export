@@ -1,14 +1,14 @@
-import { type Client } from 'openapi-fetch';
+import type { Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
-import { type paths } from './api.js';
-import { type SetpointType } from '../../setpoint.js';
-import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import { type Logger } from 'pino';
+import type { Logger } from 'pino';
+import type { SetpointType } from '../../setpoint.js';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import { pinoLogger } from '../../../helpers/logger.js';
 import {
     writeAmberPrice,
     writeControlLimit,
 } from '../../../helpers/influxdb.js';
+import type { paths } from './api.js';
 
 type Interval = {
     start: Date;

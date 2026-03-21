@@ -1,6 +1,6 @@
-import { type InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import { type SetpointType } from '../setpoint.js';
-import { type Config } from '../../helpers/config.js';
+import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
+import type { SetpointType } from '../setpoint.js';
+import type { Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 
 type FixedSetpointConfig = NonNullable<Config['setpoints']['fixed']>;

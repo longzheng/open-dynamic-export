@@ -106,3 +106,10 @@ The project is a full-stack application with:
 - Certificate-based authentication required for SEP2/CSIP-AUS integration
 - InfluxDB integration for metrics storage and monitoring
 - Production deployment via Docker with docker-compose configuration
+
+## Development workflow
+
+Before pushing changes, always lint, build, and test the project to ensure there are no errors.
+1. Run `npm run lint` to check for lint errors.
+2. Run `npm run build` to check for build errors.
+3. Run `npm test` to execute unit tests.

@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import { stringHexToEnumType } from '../../helpers/enum.js';
 import { assertString } from '../helpers/assert.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
@@ -5,16 +6,18 @@ import {
     responseRequiredTypeSchema,
     type ResponseRequiredType,
 } from './responseRequired.js';
-import { z } from 'zod';
 
-export const respondableResourceSchema = z
-    .object({
-        replyToHref: z.string().optional(),
+export const respondableResourceSchema = v.intersect([
+    v.object({
+        replyToHref: v.optional(v.string()),
         responseRequired: responseRequiredTypeSchema,
-    })
-    .merge(resourceSchema);
+    }),
+    resourceSchema,
+]);
 
-export type RespondableResource = z.infer<typeof respondableResourceSchema>;
+export type RespondableResource = v.InferOutput<
+    typeof respondableResourceSchema
+>;
 
 export function parseRespondableResourceXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

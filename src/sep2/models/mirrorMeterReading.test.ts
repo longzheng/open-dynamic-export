@@ -1,5 +1,6 @@
 import { it, expect } from 'vitest';
 import { objectToXml } from '../helpers/xml.js';
+import { validateXml } from '../helpers/xsdValidator.js';
 import {
     generateMirrorMeterReadingResponse,
     generateMirrorMeterReadingObject,
@@ -11,7 +12,6 @@ import { DataQualifierType } from './dataQualifierType.js';
 import { FlowDirectionType } from './flowDirectionType.js';
 import { PhaseCode } from './phaseCode.js';
 import { UomType } from './uomType.js';
-import { validateXml } from '../helpers/xsdValidator.js';
 
 it('should generate MirrorMeterReading XML', () => {
     const response = generateMirrorMeterReadingResponse({

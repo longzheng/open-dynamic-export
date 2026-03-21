@@ -1,10 +1,10 @@
-import { type Logger } from 'pino';
-import { pinoLogger } from '../helpers/logger.js';
 import EventEmitter from 'node:events';
-import { type SiteSample } from './siteSample.js';
+import type { Logger } from 'pino';
+import { pinoLogger } from '../helpers/logger.js';
 import { tryCatchResult } from '../helpers/result.js';
 import { writeLatency } from '../helpers/influxdb.js';
 import { withRetry } from '../helpers/withRetry.js';
+import type { SiteSample } from './siteSample.js';
 
 export abstract class SiteSamplePollerBase extends EventEmitter<{
     data: [

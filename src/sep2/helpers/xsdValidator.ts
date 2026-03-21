@@ -1,6 +1,6 @@
+import fs from 'node:fs';
 import { XmlDocument, XsdValidator } from 'libxml2-wasm';
 import { xmlRegisterFsInputProviders } from 'libxml2-wasm/lib/nodejs.mjs';
-import fs from 'node:fs';
 
 // allow XML include to work in Node.js environment
 // https://jameslan.github.io/libxml2-wasm/v0.5/documents/Parsing_and_Serializing.html#nodejs

@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+
 // 0 = Not Applicable (default, if not specified)
 // 1 = Electricity secondary metered value (a premises meter is typically on the low voltage, or secondary, side of a service transformer)
 // 2 = Electricity primary metered value (measured on the high voltage, or primary, side of the service transformer)
@@ -26,4 +27,4 @@ export enum CommodityType {
     CoolingFluid = '13',
 }
 
-export const commodityTypeSchema = z.nativeEnum(CommodityType);
+export const commodityTypeSchema = v.enum(CommodityType);

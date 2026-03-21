@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { safeParseIntString } from '../../helpers/number.js';
 import { assertString } from '../helpers/assert.js';
 import { stringIntToDate } from '../helpers/date.js';
@@ -6,20 +7,21 @@ import { parsePollRateXmlObject, pollRateSchema } from './pollRate.js';
 import { parseResourceXmlObject, resourceSchema } from './resource.js';
 import { timeQualitySchema } from './timeQuality.js';
 
-export const timeSchema = z
-    .object({
+export const timeSchema = v.intersect([
+    v.object({
         pollRate: pollRateSchema,
-        currentTime: z.coerce.date(),
-        dstEndTime: z.coerce.date(),
-        dstOffset: z.number(),
-        dstStartTime: z.coerce.date(),
-        localTime: z.coerce.date().optional(),
+        currentTime: coerceDateSchema,
+        dstEndTime: coerceDateSchema,
+        dstOffset: v.number(),
+        dstStartTime: coerceDateSchema,
+        localTime: v.optional(coerceDateSchema),
         quality: timeQualitySchema,
-        tzOffset: z.number(),
-    })
-    .merge(resourceSchema);
+        tzOffset: v.number(),
+    }),
+    resourceSchema,
+]);
 
-export type Time = z.infer<typeof timeSchema>;
+export type Time = v.InferOutput<typeof timeSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseTimeXml(xml: any): Time {
@@ -41,7 +43,8 @@ export function parseTimeXml(xml: any): Time {
     const localTime = xml['Time']['localTime']
         ? stringIntToDate(assertString(xml['Time']['localTime'][0]))
         : undefined;
-    const quality = timeQualitySchema.parse(
+    const quality = v.parse(
+        timeQualitySchema,
         assertString(xml['Time']['quality'][0]),
     );
     const tzOffset = safeParseIntString(

@@ -1,17 +1,17 @@
-import { type Logger } from 'pino';
-import { type SEP2Client } from '../client.js';
-import { type DERControl } from '../models/derControl.js';
-import { type DERProgram } from '../models/derProgram.js';
-import { type FunctionSetAssignments } from '../models/functionSetAssignments.js';
-import { type FunctionSetAssignmentsListData } from './functionSetAssignmentsList.js';
-import { pinoLogger } from '../../helpers/logger.js';
-import { type DefaultDERControl } from '../models/defaultDerControl.js';
 import EventEmitter from 'events';
-import { DerControlResponseHelper } from './derControlResponse.js';
-import { getDerControlEndDate, sortByProgramPrimacy } from './derControl.js';
-import { type FallbackControl } from './fallbackControl.js';
+import type { Logger } from 'pino';
+import type { SEP2Client } from '../client.js';
+import type { DERControl } from '../models/derControl.js';
+import type { DERProgram } from '../models/derProgram.js';
+import type { FunctionSetAssignments } from '../models/functionSetAssignments.js';
+import { pinoLogger } from '../../helpers/logger.js';
+import type { DefaultDERControl } from '../models/defaultDerControl.js';
 import { CurrentStatus } from '../models/currentStatus.js';
 import { ResponseStatus } from '../models/responseStatus.js';
+import type { FunctionSetAssignmentsListData } from './functionSetAssignmentsList.js';
+import { DerControlResponseHelper } from './derControlResponse.js';
+import { getDerControlEndDate, sortByProgramPrimacy } from './derControl.js';
+import type { FallbackControl } from './fallbackControl.js';
 
 export type MergedControlsData = {
     fsa: FunctionSetAssignments;

@@ -1,4 +1,3 @@
-import { SEP2Client } from './client.js';
 import {
     beforeAll,
     it,
@@ -9,10 +8,11 @@ import {
     beforeEach,
     afterEach,
 } from 'vitest';
-import { RoleFlagsType } from './models/roleFlagsType.js';
-import { mockCert, mockKey } from '../../tests/sep2/cert.js';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
+import { mockCert, mockKey } from '../../tests/sep2/cert.js';
+import { RoleFlagsType } from './models/roleFlagsType.js';
+import { SEP2Client } from './client.js';
 
 let sep2Client: SEP2Client;
 

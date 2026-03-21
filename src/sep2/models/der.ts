@@ -1,20 +1,21 @@
+import * as v from 'valibot';
 import { linkSchema, parseLinkXmlObject } from './link.js';
 import {
     parseSubscribableResourceXmlObject,
     subscribableResourceSchema,
 } from './subscribableResource.js';
-import { z } from 'zod';
 
-export const derSchema = z
-    .object({
-        derAvailabilityLink: linkSchema.optional(),
-        derCapabilityLink: linkSchema.optional(),
-        derSettingsLink: linkSchema.optional(),
-        derStatusLink: linkSchema.optional(),
-    })
-    .merge(subscribableResourceSchema);
+export const derSchema = v.intersect([
+    v.object({
+        derAvailabilityLink: v.optional(linkSchema),
+        derCapabilityLink: v.optional(linkSchema),
+        derSettingsLink: v.optional(linkSchema),
+        derStatusLink: v.optional(linkSchema),
+    }),
+    subscribableResourceSchema,
+]);
 
-export type DER = z.infer<typeof derSchema>;
+export type DER = v.InferOutput<typeof derSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerXmlObject(xmlObject: any): DER {

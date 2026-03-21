@@ -1,17 +1,17 @@
 import mqtt from 'mqtt';
-import { type InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
-import { type SetpointType } from '../setpoint.js';
-import { type Config } from '../../helpers/config.js';
+import * as v from 'valibot';
+import type { Logger } from 'pino';
+import type { InverterControlLimit } from '../../coordinator/helpers/inverterController.js';
+import type { SetpointType } from '../setpoint.js';
+import type { Config } from '../../helpers/config.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
-import { z } from 'zod';
-import { type Logger } from 'pino';
 import { pinoLogger } from '../../helpers/logger.js';
 
 type MqttSetpointConfig = NonNullable<Config['setpoints']['mqtt']>;
 
 export class MqttSetpoint implements SetpointType {
     private client: mqtt.MqttClient;
-    private cachedMessage: z.infer<typeof mqttSchema> | null = null;
+    private cachedMessage: v.InferOutput<typeof mqttSchema> | null = null;
     private logger: Logger;
 
     constructor({ config }: { config: MqttSetpointConfig }) {
@@ -29,14 +29,14 @@ export class MqttSetpoint implements SetpointType {
         this.client.on('message', (_topic, message) => {
             const data = message.toString();
 
-            const result = mqttSchema.safeParse(JSON.parse(data));
+            const result = v.safeParse(mqttSchema, JSON.parse(data));
 
             if (!result.success) {
                 this.logger.error({ message: 'Invalid MQTT message', data });
                 return;
             }
 
-            this.cachedMessage = result.data;
+            this.cachedMessage = result.output;
         });
     }
 
@@ -82,24 +82,24 @@ export class MqttSetpoint implements SetpointType {
     }
 }
 
-const mqttSchema = z.object({
-    opModConnect: z.boolean().optional(),
-    opModEnergize: z.boolean().optional(),
-    opModExpLimW: z.number().optional(),
-    opModGenLimW: z.number().optional(),
-    opModImpLimW: z.number().optional(),
-    opModLoadLimW: z.number().optional(),
-    batteryChargeRatePercent: z.number().optional(),
-    batteryDischargeRatePercent: z.number().optional(),
-    batteryStorageMode: z.number().optional(),
-    batteryTargetSocPercent: z.number().optional(),
-    batteryImportTargetWatts: z.number().optional(),
-    batteryExportTargetWatts: z.number().optional(),
-    batterySocMinPercent: z.number().optional(),
-    batterySocMaxPercent: z.number().optional(),
-    batteryChargeMaxWatts: z.number().optional(),
-    batteryDischargeMaxWatts: z.number().optional(),
-    batteryPriorityMode: z.enum(['export_first', 'battery_first']).optional(),
-    batteryGridChargingEnabled: z.boolean().optional(),
-    batteryGridChargingMaxWatts: z.number().optional(),
+const mqttSchema = v.object({
+    opModConnect: v.optional(v.boolean()),
+    opModEnergize: v.optional(v.boolean()),
+    opModExpLimW: v.optional(v.number()),
+    opModGenLimW: v.optional(v.number()),
+    opModImpLimW: v.optional(v.number()),
+    opModLoadLimW: v.optional(v.number()),
+    batteryChargeRatePercent: v.optional(v.number()),
+    batteryDischargeRatePercent: v.optional(v.number()),
+    batteryStorageMode: v.optional(v.number()),
+    batteryTargetSocPercent: v.optional(v.number()),
+    batteryImportTargetWatts: v.optional(v.number()),
+    batteryExportTargetWatts: v.optional(v.number()),
+    batterySocMinPercent: v.optional(v.number()),
+    batterySocMaxPercent: v.optional(v.number()),
+    batteryChargeMaxWatts: v.optional(v.number()),
+    batteryDischargeMaxWatts: v.optional(v.number()),
+    batteryPriorityMode: v.optional(v.picklist(['export_first', 'battery_first'])),
+    batteryGridChargingEnabled: v.optional(v.boolean()),
+    batteryGridChargingMaxWatts: v.optional(v.number()),
 });

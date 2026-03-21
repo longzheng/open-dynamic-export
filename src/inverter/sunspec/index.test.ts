@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
+import { PVConn } from '../../connections/sunspec/models/status.js';
 import {
     getGenConnectStatusFromPVConn,
     generateInverterDataStorage,
 } from './index.js';
-import { PVConn } from '../../connections/sunspec/models/status.js';
 import {
     ChaSt,
     ChaGriSet,

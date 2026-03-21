@@ -34,7 +34,7 @@ The battery power flow control system provides comprehensive, intelligent batter
 
 Enable battery power flow control in `config.json`:
 
-```json
+```jsonc
 {
     "inverterControl": {
         "enabled": true,
@@ -159,7 +159,7 @@ The system automatically uses the battery to offset grid imports, reducing energ
 
 Battery parameters can be changed dynamically via MQTT:
 
-```json
+```jsonc
 {
     "batterySocTargetPercent": 100,
     "batteryPriorityMode": "battery_first",
@@ -206,7 +206,7 @@ In export limited scenarios, a "solar soaking" battery may not be able to charge
 
 To configure a charge buffer, add the following property to `config.json`:
 
-```json
+```jsonc
 {
     "battery": {
         "chargeBufferWatts": 100
@@ -236,7 +236,7 @@ The controller does not have direct control of batteries (especially batteries w
 If you're currently using `battery.chargeBufferWatts`, migrate to power flow control:
 
 **Before:**
-```json
+```jsonc
 {
     "battery": {
         "chargeBufferWatts": 500
@@ -248,7 +248,7 @@ If you're currently using `battery.chargeBufferWatts`, migrate to power flow con
 ```
 
 **After:**
-```json
+```jsonc
 {
     "inverterControl": {
         "enabled": true,
@@ -278,7 +278,7 @@ If you're currently using `battery.chargeBufferWatts`, migrate to power flow con
 
 The system will reject configurations that use both methods:
 
-```json
+```jsonc
 {
     "battery": {
         "chargeBufferWatts": 500  // Error: Cannot use with batteryPowerFlowControl
@@ -302,7 +302,7 @@ power flow control. If you need the legacy behavior, either remove battery.charg
 ### Battery Control Not Working
 
 1. **Verify battery control is enabled:**
-   ```json
+   ```jsonc
    "inverterControl": { "batteryControlEnabled": true, "batteryPowerFlowControl": true }
    ```
 
@@ -311,7 +311,7 @@ power flow control. If you need the legacy behavior, either remove battery.charg
    - If you see: `Inverter does not have battery storage capability` - the inverter lacks SunSpec Model 124
 
 3. **Verify per-inverter setting:**
-   ```json
+   ```jsonc
    "inverters": [{ "batteryControlEnabled": true, ... }]
    ```
 
@@ -339,7 +339,7 @@ power flow control. If you need the legacy behavior, either remove battery.charg
 
 Goal: Charge battery to 80% SOC, export surplus only
 
-```json
+```jsonc
 {
     "inverterControl": {
         "enabled": true,
@@ -367,7 +367,7 @@ Goal: Charge battery to 80% SOC, export surplus only
 
 Goal: Maximize export, charge battery with surplus, discharge during imports
 
-```json
+```jsonc
 {
     "setpoints": {
         "fixed": {
@@ -386,7 +386,7 @@ Goal: Maximize export, charge battery with surplus, discharge during imports
 
 Goal: Two inverters, one with battery, intelligent aggregation
 
-```json
+```jsonc
 {
     "inverters": [
         {

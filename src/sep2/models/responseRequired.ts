@@ -1,4 +1,4 @@
-import { zodBitwiseEnumSchema } from '../../helpers/zod.js';
+import { bitwiseEnumSchema } from '../../helpers/valibot.js';
 
 // 0 - End device shall indicate that message was received
 // 1 - End device shall indicate specific response.
@@ -10,4 +10,4 @@ export enum ResponseRequiredType {
 }
 
 export const responseRequiredTypeSchema =
-    zodBitwiseEnumSchema(ResponseRequiredType);
+    bitwiseEnumSchema(ResponseRequiredType);

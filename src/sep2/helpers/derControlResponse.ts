@@ -1,13 +1,13 @@
-import { type Logger } from 'pino';
-import { type SEP2Client } from '../client.js';
+import type { Logger } from 'pino';
+import deepEqual from 'fast-deep-equal';
+import type { AxiosRequestConfig } from 'axios';
+import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { generateDerControlResponse } from '../models/derControlResponse.js';
-import { objectToXml } from './xml.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
-import deepEqual from 'fast-deep-equal';
 import { ResponseStatus } from '../models/responseStatus.js';
-import { type AxiosRequestConfig } from 'axios';
+import { objectToXml } from './xml.js';
 
 type HistoryKey = {
     mRID: string;

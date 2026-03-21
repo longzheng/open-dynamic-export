@@ -1,7 +1,7 @@
 import { afterEach, type MockInstance } from 'vitest';
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { SEP2Client } from '../client.js';
-import { type List } from '../models/list.js';
+import type { List } from '../models/list.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
 import { getListAll } from './pagination.js';
 

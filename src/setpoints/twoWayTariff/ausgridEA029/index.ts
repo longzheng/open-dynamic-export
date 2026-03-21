@@ -1,6 +1,6 @@
-import { type Logger } from 'pino';
-import { type InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
-import { type SetpointType } from '../../setpoint.js';
+import type { Logger } from 'pino';
+import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
+import type { SetpointType } from '../../setpoint.js';
 import { writeControlLimit } from '../../../helpers/influxdb.js';
 import { pinoLogger } from '../../../helpers/logger.js';
 

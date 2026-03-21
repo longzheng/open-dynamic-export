@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import {
     derControlBaseSchema,
     parseDERControlBaseXmlObject,
@@ -6,15 +7,15 @@ import {
     parseRandomizableEventXmlObject,
     randomizableEventSchema,
 } from './randomizableEvent.js';
-import { z } from 'zod';
 
-export const derControlSchema = z
-    .object({
+export const derControlSchema = v.intersect([
+    v.object({
         derControlBase: derControlBaseSchema,
-    })
-    .merge(randomizableEventSchema);
+    }),
+    randomizableEventSchema,
+]);
 
-export type DERControl = z.infer<typeof derControlSchema>;
+export type DERControl = v.InferOutput<typeof derControlSchema>;
 
 export function parseDERControlXmlObject(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,23 +1,23 @@
+import type { Logger } from 'pino';
+import deepEqual from 'fast-deep-equal';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
-import { type DER } from '../models/der.js';
-import { type DERCapability } from '../models/derCapability.js';
+import type { DER } from '../models/der.js';
+import type { DERCapability } from '../models/derCapability.js';
 import { generateDerCapability } from '../models/derCapability.js';
-import { type DERSettings } from '../models/derSettings.js';
+import type { DERSettings } from '../models/derSettings.js';
 import { generateDerSettingsResponse } from '../models/derSettings.js';
 import {
     generateDerStatusResponse,
     type DERStatus,
 } from '../models/derStatus.js';
-import { objectToXml } from './xml.js';
 import { pinoLogger } from '../../helpers/logger.js';
-import { type Logger } from 'pino';
-import { type PollRate } from '../models/pollRate.js';
-import deepEqual from 'fast-deep-equal';
-import { type RampRateHelper } from './rampRate.js';
+import type { PollRate } from '../models/pollRate.js';
 import { DERControlType } from '../models/derControlType.js';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
-import { type DerSample } from '../../coordinator/helpers/derSample.js';
+import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import type { RampRateHelper } from './rampRate.js';
+import { objectToXml } from './xml.js';
 
 type Config = {
     der: DER;
@@ -140,8 +140,6 @@ export class DerHelper {
         derCapability: DERCapability;
     }) {
         if (!this.config?.der) {
-            this.logger.warn('DER not initialised, skipping postDerCapability');
-
             return;
         }
 
@@ -169,8 +167,6 @@ export class DerHelper {
         derSettings: DERSettings;
     }) {
         if (!this.config?.der) {
-            this.logger.warn('DER not initialised, skipping postDerSettings');
-
             return;
         }
 
@@ -194,8 +190,6 @@ export class DerHelper {
 
     private async putDerStatus({ derStatus }: { derStatus: DERStatus }) {
         if (!this.config?.der) {
-            this.logger.warn('DER not initialised, skipping postDerStatus');
-
             return;
         }
 

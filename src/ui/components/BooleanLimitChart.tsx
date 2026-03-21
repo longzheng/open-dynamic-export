@@ -1,15 +1,11 @@
 import { Card, CardHeader, CardBody } from '@heroui/card';
-import {
-    type ChartDataset,
-    type ChartOptions,
-    type TooltipItem,
-} from 'chart.js';
+import type { ChartDataset, ChartOptions, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
-import { type AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import { type components } from '../gen/api';
+import type { components } from '@/gen/api';
 
 Chart.register(annotationPlugin);
 

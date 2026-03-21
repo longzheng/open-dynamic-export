@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type ActiveInverterControlLimit } from './inverterController.js';
+import type { ActiveInverterControlLimit } from './inverterController.js';
 import {
     adjustActiveInverterControlForBatteryCharging,
     calculateTargetSolarPowerRatio,

@@ -1,12 +1,13 @@
+import * as v from 'valibot';
+import { coerceDateSchema } from '../../helpers/valibot.js';
 import { dateToStringSeconds } from '../helpers/date.js';
 import { xmlns } from '../helpers/namespace.js';
-import { z } from 'zod';
 
-export const derAvailabilitySchema = z.object({
-    readingTime: z.coerce.date(),
+export const derAvailabilitySchema = v.object({
+    readingTime: coerceDateSchema,
 });
 
-export type DERAvailability = z.infer<typeof derAvailabilitySchema>;
+export type DERAvailability = v.InferOutput<typeof derAvailabilitySchema>;
 
 export function generateDerAvailabilityResponse({
     readingTime,
