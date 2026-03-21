@@ -38,13 +38,13 @@ The project supports comprehensive battery control with SoC (state of charge) aw
 
 ### Battery Power Flow Control vs Legacy Charge Buffer
 
-The system provides two battery control mechanisms:
+The project provides two battery control mechanisms:
 
 - **Battery Power Flow Control** (Recommended): Intelligent control with SoC awareness, configurable priority modes, and multi-inverter support
 - **Legacy Charge Buffer**: Simple override ensuring minimum charging headroom
 
 > [!IMPORTANT]
-> These mechanisms are **mutually exclusive**. The system will reject configurations that attempt to use both `battery.chargeBufferWatts` and `inverterControl.batteryPowerFlowControl` simultaneously.
+> These mechanisms are **mutually exclusive**. Configurations that attempt to use both `battery.chargeBufferWatts` and `inverterControl.batteryPowerFlowControl` simultaneously will be rejected.
 
 See the [Battery Configuration Guide](./battery.md) for migration steps and detailed feature comparisons.
 

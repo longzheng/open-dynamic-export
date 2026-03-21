@@ -6,13 +6,13 @@ An **optional** battery can be configured to adjust the controller behaviour. Th
 
 ## Overview
 
-The system provides two battery control mechanisms:
+The project provides two battery control mechanisms:
 
 1. **Legacy Charge Buffer** (Simple): A basic override that ensures minimum charging headroom
 2. **Battery Power Flow Control** (Recommended): Intelligent control with SoC awareness, priority modes, and multi-inverter support
 
 > [!IMPORTANT]
-> These two mechanisms are **mutually exclusive**. The system will reject configurations that attempt to use both simultaneously.
+> These two mechanisms are **mutually exclusive**. Configurations that attempt to use both simultaneously will be rejected.
 
 ## Battery Power Flow Control (Recommended)
 
@@ -146,7 +146,7 @@ Aggregated values:
 
 #### Design Decisions
 
-**Why average SoC?** When multiple batteries exist, the system calculates the average SoC rather than min/max because it encourages fair, balanced charging across all batteries and provides a single representative value for power flow calculations.
+**Why average SoC?** When multiple batteries exist, the project calculates the average SoC rather than min/max because it encourages fair, balanced charging across all batteries and provides a single representative value for power flow calculations.
 
 **Why send the same command to all inverters?** The same battery control configuration is sent to all inverters for simplicity and safety. Each inverter's capability detection independently determines whether to execute battery commands, so inverters without storage silently ignore them. This avoids complex per-inverter scheduling while remaining extensible for future per-inverter control if needed.
 
@@ -159,7 +159,7 @@ Battery discharges to reduce grid import:
 dischargePower = min(importPower, batteryDischargeMaxWatts, available_battery_power)
 ```
 
-The system automatically uses the battery to offset grid imports, reducing energy costs.
+The project automatically uses the battery to offset grid imports, reducing energy costs.
 
 ### MQTT Dynamic Control
 
@@ -201,8 +201,8 @@ Battery control uses **SunSpec Model 124** (Battery Storage):
 
 The legacy charge buffer is a simple mechanism that ensures a minimum amount of power is available for battery charging, even when export limits would otherwise prevent it.
 
-> [!WARNING]
-> This is a **legacy feature**. New deployments should use **Battery Power Flow Control** instead, which provides much more sophisticated control.
+> [!NOTE]
+> This is a **legacy feature**. New deployments should use **Battery Power Flow Control** instead if they are SunSpec compatible, which provides much more sophisticated control.
 
 ### How It Works
 
@@ -282,7 +282,7 @@ If you're currently using `battery.chargeBufferWatts`, migrate to power flow con
 
 ### Configuration Validation
 
-The system will reject configurations that use both methods:
+The project will reject configurations that use both methods:
 
 ```jsonc
 {
