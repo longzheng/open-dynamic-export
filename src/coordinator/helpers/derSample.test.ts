@@ -237,6 +237,7 @@ describe('derSampleDataSchema', () => {
             genConnectStatus: ConnectStatusValue.Connected,
         },
         invertersCount: 1,
+        battery: null,
     };
 
     it('should accept operationalModeStatus enum number values', () => {

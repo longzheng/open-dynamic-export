@@ -5,6 +5,7 @@ import {
     perPhaseNetMeasurementSchema,
 } from '../../helpers/measurement.js';
 import {
+    averageNumbersArray,
     averageNumbersNullableArray,
     sumNumbersArray,
     sumNumbersNullableArray,

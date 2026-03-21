@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import * as v from 'valibot';
 import { configSchema } from './config.js';
 
 describe('Config Validation - Battery Control Conflicts', () => {
@@ -41,7 +42,7 @@ describe('Config Validation - Battery Control Conflicts', () => {
             },
         };
 
-        expect(() => configSchema.parse(config)).not.toThrow();
+        expect(() => v.parse(configSchema, config)).not.toThrow();
     });
 
     it('should accept configuration with only new battery power flow control', () => {
@@ -60,13 +61,13 @@ describe('Config Validation - Battery Control Conflicts', () => {
             ],
         };
 
-        expect(() => configSchema.parse(config)).not.toThrow();
+        expect(() => v.parse(configSchema, config)).not.toThrow();
     });
 
     it('should accept configuration with neither battery control method', () => {
         const config = createValidBaseConfig();
 
-        expect(() => configSchema.parse(config)).not.toThrow();
+        expect(() => v.parse(configSchema, config)).not.toThrow();
     });
 
     it('should reject configuration with both legacy charge buffer and new power flow control', () => {
@@ -82,7 +83,7 @@ describe('Config Validation - Battery Control Conflicts', () => {
             },
         };
 
-        expect(() => configSchema.parse(config)).toThrow(
+        expect(() => v.parse(configSchema, config)).toThrow(
             /Cannot use both legacy battery\.chargeBufferWatts and new inverterControl\.batteryPowerFlowControl/,
         );
     });
@@ -101,7 +102,7 @@ describe('Config Validation - Battery Control Conflicts', () => {
         };
 
         try {
-            configSchema.parse(config);
+            v.parse(configSchema, config);
             expect.fail('Should have thrown validation error');
         } catch (error: unknown) {
             const errorMessage = (error as Error).message;
@@ -125,7 +126,7 @@ describe('Config Validation - Battery Control Conflicts', () => {
             },
         };
 
-        expect(() => configSchema.parse(config)).not.toThrow();
+        expect(() => v.parse(configSchema, config)).not.toThrow();
     });
 
     it('should allow legacy charge buffer when batteryPowerFlowControl is undefined (default)', () => {
@@ -142,6 +143,6 @@ describe('Config Validation - Battery Control Conflicts', () => {
             },
         };
 
-        expect(() => configSchema.parse(config)).not.toThrow();
+        expect(() => v.parse(configSchema, config)).not.toThrow();
     });
 });
