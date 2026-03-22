@@ -189,8 +189,8 @@ describe('calculateBatteryPowerFlow', () => {
         });
     });
 
-    describe('SOC constraints', () => {
-        it('should not charge when battery is at max SOC', () => {
+    describe('SoC constraints', () => {
+        it('should not charge when battery is at max SoC', () => {
             const input: BatteryPowerFlowInput = {
                 solarWatts: 10000,
                 siteWatts: -8000,
@@ -213,7 +213,7 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetExportWatts).toBe(8000);
         });
 
-        it('should not discharge when battery is at min SOC', () => {
+        it('should not discharge when battery is at min SoC', () => {
             const input: BatteryPowerFlowInput = {
                 solarWatts: 1000,
                 siteWatts: 2000, // Importing 2000W
@@ -231,16 +231,16 @@ describe('calculateBatteryPowerFlow', () => {
 
             const result = calculateBatteryPowerFlow(input);
 
-            // Can't discharge, at min SOC
+            // Can't discharge, at min SoC
             expect(result.batteryMode).toBe('idle');
             expect(result.targetBatteryPowerWatts).toBe(0);
         });
 
-        it('should handle unknown SOC gracefully', () => {
+        it('should handle unknown SoC gracefully', () => {
             const input: BatteryPowerFlowInput = {
                 solarWatts: 10000,
                 siteWatts: -8000,
-                batterySocPercent: null, // Unknown SOC
+                batterySocPercent: null, // Unknown SoC
                 batteryTargetSocPercent: 80,
                 batterySocMinPercent: 20,
                 batterySocMaxPercent: 100,
@@ -254,7 +254,7 @@ describe('calculateBatteryPowerFlow', () => {
 
             const result = calculateBatteryPowerFlow(input);
 
-            // Should assume battery can charge when SOC unknown
+            // Should assume battery can charge when SoC unknown
             expect(result.batteryMode).toBe('charge');
             expect(result.targetBatteryPowerWatts).toBe(5000);
         });
@@ -377,7 +377,7 @@ describe('calculateBatteryPowerFlow', () => {
 
             const result = calculateBatteryPowerFlow(input);
 
-            // Should use defaults (0-100% SOC, unlimited charge power)
+            // Should use defaults (0-100% SoC, unlimited charge power)
             expect(result.batteryMode).toBe('charge');
             expect(result.targetBatteryPowerWatts).toBeGreaterThan(0);
         });

@@ -343,8 +343,8 @@ export class InverterController {
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
 
-        // Extract battery SOC from most recent DER sample
-        // Average SOC across all batteries (if multiple batteries present)
+        // Extract battery SoC from most recent DER sample
+        // Average SoC across all batteries (if multiple batteries present)
         const batterySocPercent: number | null = (() => {
             const mostRecentSample =
                 recentDerSamples[recentDerSamples.length - 1];

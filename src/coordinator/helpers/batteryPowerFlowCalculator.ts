@@ -21,11 +21,11 @@ export type BatteryPowerFlowInput = {
     siteWatts: number;
     // Current battery state of charge percentage (0-100)
     batterySocPercent: number | null;
-    // Target SOC percentage for battery charging
+    // Target SoC percentage for battery charging
     batteryTargetSocPercent: number | undefined;
-    // Minimum SOC percentage - don't discharge below this
+    // Minimum SoC percentage - don't discharge below this
     batterySocMinPercent: number | undefined;
-    // Maximum SOC percentage - don't charge above this
+    // Maximum SoC percentage - don't charge above this
     batterySocMaxPercent: number | undefined;
     // Maximum battery charging power in watts
     batteryChargeMaxWatts: number | undefined;
@@ -80,12 +80,12 @@ export function calculateBatteryPowerFlow(
     // If siteWatts is positive (importing), we're consuming more than generating
     const availablePower = -siteWatts; // Can be negative (importing) or positive (exporting)
 
-    // Determine battery SOC constraints
+    // Determine battery SoC constraints
     const minSoc = batterySocMinPercent ?? 0;
     const maxSoc = batterySocMaxPercent ?? 100;
     const targetSoc = batteryTargetSocPercent ?? maxSoc;
 
-    // Check if battery can charge or discharge based on SOC
+    // Check if battery can charge or discharge based on SoC
     const canCharge = batterySocPercent === null || batterySocPercent < maxSoc;
     const canDischarge =
         batterySocPercent === null || batterySocPercent > minSoc;
@@ -214,7 +214,7 @@ export function calculateBatteryPowerFlow(
 }
 
 /**
- * Calculate how much power the battery needs to reach target SOC.
+ * Calculate how much power the battery needs to reach target SoC.
  * This is a simplified calculation - actual implementation would need
  * battery capacity and charging efficiency data.
  */
@@ -228,7 +228,7 @@ function calculateBatteryNeedWatts({
     maxChargePower: number;
 }): number {
     if (batterySocPercent === null) {
-        // Unknown SOC - assume battery can accept full charge power
+        // Unknown SoC - assume battery can accept full charge power
         return maxChargePower;
     }
 

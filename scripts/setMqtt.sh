@@ -34,8 +34,8 @@ MQTT_TOPIC="setpoints"
 # batteryTargetSocPercent: (number) Target State of Charge percentage
 # batteryImportTargetWatts: (number) Target import power for battery charging
 # batteryExportTargetWatts: (number) Target export power for battery discharging
-# batterySocMinPercent: (number) Minimum SOC percentage limit
-# batterySocMaxPercent: (number) Maximum SOC percentage limit
+# batterySocMinPercent: (number) Minimum SoC percentage limit
+# batterySocMaxPercent: (number) Maximum SoC percentage limit
 # batteryChargeMaxWatts: (number) Maximum charging power in watts
 # batteryDischargeMaxWatts: (number) Maximum discharging power in watts
 # batteryPriorityMode: (string) Either "export_first" or "battery_first"

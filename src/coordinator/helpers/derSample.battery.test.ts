@@ -116,7 +116,7 @@ describe('generateDerSample - Battery Aggregation', () => {
 
         const result = generateDerSample({ invertersData });
 
-        // Average SOC: (80 + 60) / 2 = 70
+        // Average SoC: (80 + 60) / 2 = 70
         // Total energy: 10000 + 8000 = 18000
         // Total max charge: 5000 + 3000 = 8000
         // Total max discharge: 4000 + 3000 = 7000
@@ -129,11 +129,11 @@ describe('generateDerSample - Battery Aggregation', () => {
         });
     });
 
-    it('should handle null SOC values gracefully', () => {
+    it('should handle null SoC values gracefully', () => {
         const invertersData: InverterData[] = [
             createMockInverterData({
                 storage: {
-                    stateOfChargePercent: null, // SOC not available
+                    stateOfChargePercent: null, // SoC not available
                     availableEnergyWh: 10000,
                     batteryVoltage: 400,
                     chargeStatus: ChaSt.HOLDING,
@@ -150,7 +150,7 @@ describe('generateDerSample - Battery Aggregation', () => {
         const result = generateDerSample({ invertersData });
 
         expect(result.battery).toEqual({
-            averageSocPercent: null, // No SOC values to average
+            averageSocPercent: null, // No SoC values to average
             totalAvailableEnergyWh: 10000,
             totalMaxChargeRateWatts: 5000,
             totalMaxDischargeRateWatts: 5000,
@@ -158,7 +158,7 @@ describe('generateDerSample - Battery Aggregation', () => {
         });
     });
 
-    it('should average only available SOC values when some are null', () => {
+    it('should average only available SoC values when some are null', () => {
         const invertersData: InverterData[] = [
             createMockInverterData({
                 storage: {
@@ -176,7 +176,7 @@ describe('generateDerSample - Battery Aggregation', () => {
             }),
             createMockInverterData({
                 storage: {
-                    stateOfChargePercent: null, // SOC not available
+                    stateOfChargePercent: null, // SoC not available
                     availableEnergyWh: 8000,
                     batteryVoltage: 380,
                     chargeStatus: ChaSt.HOLDING,
@@ -206,7 +206,7 @@ describe('generateDerSample - Battery Aggregation', () => {
 
         const result = generateDerSample({ invertersData });
 
-        // Average SOC of available values: (80 + 60) / 2 = 70
+        // Average SoC of available values: (80 + 60) / 2 = 70
         // Total energy: 10000 + 8000 + 12000 = 30000
         expect(result.battery).toEqual({
             averageSocPercent: 70,

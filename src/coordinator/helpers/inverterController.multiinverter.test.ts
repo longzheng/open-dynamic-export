@@ -29,7 +29,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
     });
 
     describe('Single inverter with battery', () => {
-        it('should use battery SOC when available', () => {
+        it('should use battery SoC when available', () => {
             const activeLimit = createBasicActiveLimit({
                 batteryTargetSocPercent: { value: 80, source: 'mqtt' },
                 batterySocMinPercent: { value: 20, source: 'mqtt' },
@@ -46,7 +46,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 nameplateMaxW: 12000,
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
-                batterySocPercent: 50, // Battery at 50% SOC
+                batterySocPercent: 50, // Battery at 50% SoC
             });
 
             expect(result.type).toBe('limit');
@@ -56,7 +56,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
             }
         });
 
-        it('should handle null battery SOC gracefully', () => {
+        it('should handle null battery SoC gracefully', () => {
             const activeLimit = createBasicActiveLimit({
                 batteryTargetSocPercent: { value: 80, source: 'mqtt' },
                 batterySocMinPercent: { value: 20, source: 'mqtt' },
@@ -73,12 +73,12 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 nameplateMaxW: 12000,
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
-                batterySocPercent: null, // SOC unknown
+                batterySocPercent: null, // SoC unknown
             });
 
             expect(result.type).toBe('limit');
             if (result.type === 'limit') {
-                // Should still try to charge battery when SOC is unknown
+                // Should still try to charge battery when SoC is unknown
                 expect(result.batteryControl).toBeDefined();
             }
         });
@@ -96,7 +96,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
             });
 
             // Scenario: 2 inverters total, only one has battery
-            // Average SOC is from the single battery
+            // Average SoC is from the single battery
             const result = calculateInverterConfiguration({
                 activeInverterControlLimit: activeLimit,
                 siteWatts: -15000, // Exporting 15kW
@@ -104,7 +104,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 nameplateMaxW: 20000, // 10kW per inverter
                 maxInvertersCount: 2,
                 batteryPowerFlowControlEnabled: true,
-                batterySocPercent: 60, // Average SOC (from 1 battery)
+                batterySocPercent: 60, // Average SoC (from 1 battery)
             });
 
             expect(result.type).toBe('limit');
@@ -116,7 +116,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
             }
         });
 
-        it('should handle multiple batteries with different SOC levels (averaged)', () => {
+        it('should handle multiple batteries with different SoC levels (averaged)', () => {
             const activeLimit = createBasicActiveLimit({
                 batteryTargetSocPercent: { value: 80, source: 'mqtt' },
                 batterySocMinPercent: { value: 20, source: 'mqtt' },

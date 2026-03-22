@@ -438,7 +438,7 @@ describe('getActiveInverterControlLimit', () => {
             });
         });
 
-        it('should merge battery SOC min using maximum value (most restrictive)', () => {
+        it('should merge battery SoC min using maximum value (most restrictive)', () => {
             const result = getActiveInverterControlLimit([
                 {
                     source: 'fixed',
@@ -492,7 +492,7 @@ describe('getActiveInverterControlLimit', () => {
             });
         });
 
-        it('should merge battery SOC max using minimum value (most restrictive)', () => {
+        it('should merge battery SoC max using minimum value (most restrictive)', () => {
             const result = getActiveInverterControlLimit([
                 {
                     source: 'fixed',
