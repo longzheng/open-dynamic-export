@@ -202,6 +202,11 @@
             "topic": {
               "type": "string",
               "description": "The topic to pull control limits from"
+            },
+            "stalenessTimeoutSeconds": {
+              "type": "number",
+              "minimum": 0,
+              "description": "If set, MQTT setpoints are discarded if no message is received within this many seconds. Falls back to fixed setpoints. Acts as a dead-man switch for external automation."
             }
           },
           "required": [

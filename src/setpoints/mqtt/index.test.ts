@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import EventEmitter from 'events';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { MqttSetpoint } from './index.js';
 
 // Mock mqtt module
 const mockClient = new EventEmitter() as EventEmitter & {
@@ -28,8 +29,6 @@ vi.mock('../../helpers/influxdb', () => ({
     writeControlLimit: vi.fn(),
 }));
 
-import { MqttSetpoint } from './index.js';
-
 function createSetpoint(stalenessTimeoutSeconds?: number) {
     return new MqttSetpoint({
         config: {
@@ -41,7 +40,11 @@ function createSetpoint(stalenessTimeoutSeconds?: number) {
 }
 
 function simulateMessage(message: Record<string, unknown>) {
-    mockClient.emit('message', 'test/topic', Buffer.from(JSON.stringify(message)));
+    mockClient.emit(
+        'message',
+        'test/topic',
+        Buffer.from(JSON.stringify(message)),
+    );
 }
 
 describe('MqttSetpoint staleness timeout', () => {

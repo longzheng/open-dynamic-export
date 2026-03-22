@@ -256,9 +256,7 @@ const configObjectSchema = v.object({
                             ),
                         ),
                         stalenessTimeoutSeconds: v.pipe(
-                            v.optional(
-                                v.pipe(v.number(), v.minValue(0)),
-                            ),
+                            v.optional(v.pipe(v.number(), v.minValue(0))),
                             v.description(
                                 'If set, MQTT setpoints are discarded if no message is received within this many seconds. Falls back to fixed setpoints. Acts as a dead-man switch for external automation.',
                             ),
