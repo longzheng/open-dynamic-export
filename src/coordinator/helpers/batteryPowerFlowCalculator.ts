@@ -191,13 +191,15 @@ export function calculateBatteryPowerFlow(
     }
 
     // Calculate target solar watts (for curtailment)
-    // We need to adjust solar to meet the export limit
-    // targetSolar = current solar - amount to curtail
-    // The curtailment is calculated to ensure: export = solar - load - batteryCharge
+    // Uses exportLimitWatts (the configured limit) rather than targetExportWatts
+    // (capped at current available power). Using targetExportWatts would create a
+    // self-referential feedback loop: targetSolar = solarWatts, which locks the
+    // inverter at its current output via the power ratio. Using the limit allows
+    // the inverter to ramp up when not export-constrained (ratio → 1.0).
     const targetSolarWatts = calculateTargetSolarWatts({
         solarWatts,
         siteWatts,
-        targetExportWatts,
+        targetExportWatts: exportLimitWatts,
         targetBatteryPowerWatts,
     });
 

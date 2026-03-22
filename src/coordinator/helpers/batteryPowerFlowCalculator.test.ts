@@ -334,6 +334,59 @@ describe('calculateBatteryPowerFlow', () => {
         });
     });
 
+    describe('unlimited export should not curtail solar', () => {
+        it('should allow full solar production when export is unlimited and battery is idle', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 1700,
+                siteWatts: -1400, // Exporting 1400W (load = 300W)
+                batterySocPercent: 93,
+                batteryTargetSocPercent: 80, // Above target — battery idle
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 95,
+                batteryChargeMaxWatts: undefined,
+                batteryDischargeMaxWatts: undefined,
+                exportLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+            // targetSolarWatts must be much larger than current solarWatts
+            // so the power ratio → 1.0, allowing the inverter to ramp up
+            expect(result.targetSolarWatts).toBeGreaterThan(input.solarWatts);
+            expect(result.targetSolarWatts).toBeGreaterThan(100000);
+        });
+
+        it('should allow full solar production when export is unlimited and battery is charging', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5000,
+                siteWatts: -3000, // Exporting 3000W (load = 2000W)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(3000);
+            // With unlimited export, inverter should not be curtailed
+            expect(result.targetSolarWatts).toBeGreaterThan(input.solarWatts);
+            expect(result.targetSolarWatts).toBeGreaterThan(100000);
+        });
+    });
+
     describe('default values', () => {
         it('should default to battery_first when priority mode not specified', () => {
             const input: BatteryPowerFlowInput = {
