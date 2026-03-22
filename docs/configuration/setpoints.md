@@ -66,8 +66,8 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
             "batterySocTargetPercent": 80, // (number) optional: target state of charge (0-100)
             "batterySocMinPercent": 20, // (number) optional: minimum SoC, no discharge below this
             "batterySocMaxPercent": 95, // (number) optional: maximum SoC, no charge above this
-            "batteryChargeMaxWatts": 5000, // (number) optional: maximum charging power
-            "batteryDischargeMaxWatts": 5000, // (number) optional: maximum discharging power
+            "batteryChargeMaxWatts": 5000, // (number) optional: maximum charging power. If omitted, the inverter's hardware limit applies
+            "batteryDischargeMaxWatts": 5000, // (number) optional: maximum discharging power. If omitted, the inverter's hardware limit applies
             "batteryPriorityMode": "battery_first" // (string) optional: "battery_first" or "export_first"
         }
     }

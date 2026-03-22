@@ -58,10 +58,10 @@ Enable battery power flow control in `config.json`:
             "batterySocTargetPercent": 80,
             "batterySocMinPercent": 20,
             "batterySocMaxPercent": 95,
-            "batteryChargeMaxWatts": 5000,
-            "batteryDischargeMaxWatts": 5000,
             "batteryPriorityMode": "battery_first"
-            // "exportLimitWatts": 5000 // (number) optional: the maximum export limit in watts. If omitted, all surplus is exported
+            // "batteryChargeMaxWatts": 5000, // (number) optional: if omitted, the inverter's hardware limit applies
+            // "batteryDischargeMaxWatts": 5000, // (number) optional: if omitted, the inverter's hardware limit applies
+            // "exportLimitWatts": 5000 // (number) optional: if omitted, all surplus is exported
         }
     }
 }
@@ -89,8 +89,8 @@ Enable battery power flow control in `config.json`:
 | `batterySocTargetPercent` | number | - | Target SoC for charging (0-100) |
 | `batterySocMinPercent` | number | - | Minimum SoC, no discharge below this level |
 | `batterySocMaxPercent` | number | - | Maximum SoC, no charge above this level |
-| `batteryChargeMaxWatts` | number | - | Maximum charging power (watts) |
-| `batteryDischargeMaxWatts` | number | - | Maximum discharging power (watts) |
+| `batteryChargeMaxWatts` | number | unlimited | Maximum charging power (watts). If omitted, the inverter's hardware limit applies |
+| `batteryDischargeMaxWatts` | number | unlimited | Maximum discharging power (watts). If omitted, the inverter's hardware limit applies |
 | `batteryPriorityMode` | string | - | `"battery_first"` or `"export_first"` |
 | `batteryGridChargingEnabled` | boolean | false | Allow charging battery from grid when solar is insufficient |
 | `batteryGridChargingMaxWatts` | number | - | Maximum power drawn from grid for battery charging (watts) |
@@ -307,8 +307,7 @@ Goal: Charge battery to 80% SoC, export surplus
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 80,
-            "batteryPriorityMode": "battery_first",
-            "batteryChargeMaxWatts": 5000
+            "batteryPriorityMode": "battery_first"
         }
     }
 }
@@ -325,9 +324,9 @@ Goal: Maximize export, charge battery with surplus, discharge during imports
             "batterySocTargetPercent": 50,
             "batterySocMinPercent": 20,
             "batteryPriorityMode": "export_first",
-            "batteryChargeMaxWatts": 3000,
-            "batteryDischargeMaxWatts": 3000,
-            "exportLimitWatts": 5000
+            "batteryChargeMaxWatts": 3000, // optional: cap charge rate to protect battery
+            "batteryDischargeMaxWatts": 3000, // optional: cap discharge rate
+            "exportLimitWatts": 5000 // optional: cap export to 5kW
         }
     }
 }
@@ -357,7 +356,7 @@ Goal: Two inverters, one with battery, intelligent aggregation
         "fixed": {
             "batterySocTargetPercent": 90,
             "batteryPriorityMode": "battery_first",
-            "batteryChargeMaxWatts": 8000,
+            "batteryChargeMaxWatts": 8000, // optional: combined limit for both inverters
             "exportLimitWatts": 0
         }
     }
@@ -391,8 +390,8 @@ Goal: Charge battery from grid during off-peak hours, controlled by external aut
         "fixed": {
             "batterySocTargetPercent": 50,
             "batteryPriorityMode": "battery_first",
-            "batteryChargeMaxWatts": 5000,
-            "batteryDischargeMaxWatts": 5000,
+            "batteryChargeMaxWatts": 5000, // optional: cap charge rate
+            "batteryDischargeMaxWatts": 5000, // optional: cap discharge rate
             "exportLimitWatts": 0
         }
     }
@@ -482,9 +481,9 @@ If you're currently using `battery.chargeBufferWatts`, migrate to power flow con
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 80,
-            "batteryChargeMaxWatts": 5000,
-            "batteryPriorityMode": "battery_first",
-            "exportLimitWatts": 0
+            "batteryPriorityMode": "battery_first"
+            // "batteryChargeMaxWatts": 5000, // optional: if omitted, the inverter's hardware limit applies
+            // "exportLimitWatts": 5000 // optional: if omitted, all surplus is exported
         }
     }
 }
