@@ -60,8 +60,8 @@ Enable battery power flow control in `config.json`:
             "batterySocMaxPercent": 95,
             "batteryChargeMaxWatts": 5000,
             "batteryDischargeMaxWatts": 5000,
-            "batteryPriorityMode": "battery_first",
-            "exportLimitWatts": 0
+            "batteryPriorityMode": "battery_first"
+            // "exportLimitWatts": 5000 // (number) optional: the maximum export limit in watts. If omitted, all surplus is exported
         }
     }
 }
@@ -289,7 +289,7 @@ Key log messages for diagnosing battery issues:
 
 #### Example 1: Simple Battery Charging
 
-Goal: Charge battery to 80% SoC, export surplus only
+Goal: Charge battery to 80% SoC, export surplus
 
 ```jsonc
 {
@@ -308,8 +308,7 @@ Goal: Charge battery to 80% SoC, export surplus only
         "fixed": {
             "batterySocTargetPercent": 80,
             "batteryPriorityMode": "battery_first",
-            "batteryChargeMaxWatts": 5000,
-            "exportLimitWatts": 0
+            "batteryChargeMaxWatts": 5000
         }
     }
 }
