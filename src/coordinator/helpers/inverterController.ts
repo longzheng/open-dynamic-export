@@ -424,14 +424,10 @@ export class InverterController {
                         return configuration;
                     }
 
-                    // max 10% change
+                    // max 10% absolute change on the power ratio (0-1 range)
+                    // only the ratio is ramped as it directly controls WMaxLimPct
+                    // targetSolarWatts is not ramped - it reflects the true calculated target
                     const maxChange = 0.1;
-
-                    const rampedTargetSolarWatts = cappedChange({
-                        previousValue: previousTarget.targetSolarWatts,
-                        targetValue: configuration.targetSolarWatts,
-                        maxChange,
-                    });
 
                     const rampedTargetSolarPowerRatio = cappedChange({
                         previousValue: previousTarget.targetSolarPowerRatio,
@@ -442,7 +438,7 @@ export class InverterController {
                     return {
                         type: 'limit',
                         invertersCount: configuration.invertersCount,
-                        targetSolarWatts: rampedTargetSolarWatts,
+                        targetSolarWatts: configuration.targetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
                         // Preserve battery control configuration from the calculated configuration
                         batteryControl: configuration.batteryControl,

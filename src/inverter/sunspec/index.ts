@@ -157,6 +157,13 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                     writeControlsModel,
                 );
 
+                this.logger.info(
+                    {
+                        writeControlsModel,
+                    },
+                    'Wrote inverter controls',
+                );
+
                 // Write battery controls if present and battery control is enabled
                 if (
                     this.batteryControlEnabled &&

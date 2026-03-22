@@ -128,7 +128,7 @@ export function generateDerSample({
                 DERType.NotApplicable,
             ) satisfies DERType,
             maxW: sumNumbersArray(
-                invertersData.map((data) => data.nameplate.maxVA),
+                invertersData.map((data) => data.nameplate.maxW),
             ),
             maxVA: sumNumbersArray(
                 invertersData.map((data) => data.nameplate.maxVA),
