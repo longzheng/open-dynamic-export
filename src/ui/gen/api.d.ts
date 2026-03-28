@@ -2149,8 +2149,6 @@ export interface components {
         };
         BatteryControlConfiguration: {
             /** Format: double */
-            storageMode: number;
-            /** Format: double */
             dischargeRatePercent?: number;
             /** Format: double */
             chargeRatePercent?: number;
