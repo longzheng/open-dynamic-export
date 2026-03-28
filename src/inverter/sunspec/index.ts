@@ -517,10 +517,18 @@ export function generateStorageModelWriteFromBatteryControl({
         dischargePercent * Math.pow(10, -inOutWRteSF),
     );
 
+    // For idle mode, release storage control (StorCtl_Mod=0) instead of
+    // constraining with a zero-width power window (StorCtl_Mod=3, InWRte=0,
+    // OutWRte=0). On Fronius Gen24 hybrid inverters, the zero-width window
+    // also curtails PV output to local consumption, preventing grid export.
+    const storCtlMod =
+        batteryControl.mode === 'idle'
+            ? 0
+            : StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE;
+
     return {
         ...storageModel,
-        // Both bits set: constrain both charge and discharge directions
-        StorCtl_Mod: StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE,
+        StorCtl_Mod: storCtlMod,
         // Pass through existing ramp rates unchanged
         // (WChaGra/WDisChaGra are rate-of-change limits in %/sec, not setpoints)
         WChaGra: storageModel.WChaGra,
