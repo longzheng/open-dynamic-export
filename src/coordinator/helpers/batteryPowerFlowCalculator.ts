@@ -19,6 +19,10 @@ export type BatteryPowerFlowInput = {
     // positive = importing from grid (load > generation)
     // negative = exporting to grid (generation > load)
     siteWatts: number;
+    // Current battery power from previous control cycle (positive = charging, negative = discharging)
+    // On hybrid inverters, battery charge power is consumed inside the inverter before the AC output,
+    // so siteWatts doesn't reflect the full available solar power. This value compensates for that.
+    currentBatteryPowerWatts: number;
     // Current battery state of charge percentage (0-100)
     batterySocPercent: number | null;
     // Target SoC percentage for battery charging
@@ -61,6 +65,7 @@ export function calculateBatteryPowerFlow(
     const {
         solarWatts,
         siteWatts,
+        currentBatteryPowerWatts,
         batterySocPercent,
         batteryTargetSocPercent,
         batterySocMinPercent,
@@ -75,10 +80,19 @@ export function calculateBatteryPowerFlow(
 
     logger.trace({ input }, 'Calculating battery power flow');
 
-    // Calculate available power for battery/export
-    // If siteWatts is negative (exporting), we have excess power
-    // If siteWatts is positive (importing), we're consuming more than generating
-    const availablePower = -siteWatts; // Can be negative (importing) or positive (exporting)
+    // Calculate available power for battery/export.
+    //
+    // On hybrid inverters (PV + battery in one unit), solarWatts comes from the
+    // SunSpec Model 103 W register which reports net AC output: PV minus battery
+    // charging. So battery charge power is invisible to siteWatts — it's consumed
+    // inside the inverter before reaching the AC bus.
+    //
+    // To get the TRUE available power (total PV minus load), we add back the
+    // current battery power: availablePower = -siteWatts + currentBatteryPowerWatts
+    //
+    // This breaks the feedback loop where limiting battery charge → lower AC output
+    // → lower apparent available power → even lower battery charge target.
+    const availablePower = -siteWatts + currentBatteryPowerWatts;
 
     // Determine battery SoC constraints
     const minSoc = batterySocMinPercent ?? 0;

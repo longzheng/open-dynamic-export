@@ -18,6 +18,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -44,6 +45,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -69,6 +71,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -95,6 +98,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -123,6 +127,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -149,6 +154,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -174,6 +180,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 3000,
                 batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -202,6 +209,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -225,6 +233,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -248,6 +257,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -273,6 +283,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -297,6 +308,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 4000, // Limited to 4000W
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -322,6 +334,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -347,6 +360,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: undefined,
                 exportLimitWatts: Number.MAX_SAFE_INTEGER,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -373,6 +387,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: Number.MAX_SAFE_INTEGER,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -400,6 +415,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: undefined,
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -424,6 +440,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: undefined,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -449,6 +466,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -472,6 +490,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 2000,
             };
@@ -494,6 +513,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 5000,
             };
@@ -516,6 +536,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -538,6 +559,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -562,6 +584,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -585,6 +608,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -608,6 +632,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -632,6 +657,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -654,6 +680,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -677,6 +704,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: undefined,
                 batteryGridChargingMaxWatts: 3000,
             };
@@ -702,6 +730,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -724,6 +753,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -746,6 +776,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -768,6 +799,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };

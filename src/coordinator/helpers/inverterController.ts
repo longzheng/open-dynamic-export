@@ -376,6 +376,19 @@ export class InverterController {
         })();
 
         const rampedInverterConfiguration = ((): InverterConfiguration => {
+            // Get previous battery power from last applied configuration
+            // to compensate for battery charge hidden inside hybrid inverter AC output
+            const previousBatteryPowerWatts = (() => {
+                if (
+                    this.lastAppliedInverterConfiguration?.type === 'limit' &&
+                    this.lastAppliedInverterConfiguration.batteryControl
+                ) {
+                    return this.lastAppliedInverterConfiguration.batteryControl
+                        .targetPowerWatts;
+                }
+                return 0;
+            })();
+
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit: batteryAdjustedInverterControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
@@ -385,6 +398,7 @@ export class InverterController {
                 batteryPowerFlowControlEnabled:
                     this.batteryPowerFlowControlEnabled,
                 batterySocPercent,
+                currentBatteryPowerWatts: previousBatteryPowerWatts,
             });
 
             switch (configuration.type) {
@@ -468,6 +482,7 @@ export function calculateInverterConfiguration({
     maxInvertersCount,
     batteryPowerFlowControlEnabled,
     batterySocPercent,
+    currentBatteryPowerWatts,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
@@ -476,6 +491,7 @@ export function calculateInverterConfiguration({
     maxInvertersCount: number;
     batteryPowerFlowControlEnabled: boolean;
     batterySocPercent: number | null;
+    currentBatteryPowerWatts: number;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
         module: 'calculateInverterConfiguration',
@@ -515,6 +531,7 @@ export function calculateInverterConfiguration({
         const batteryFlowInput: BatteryPowerFlowInput = {
             solarWatts,
             siteWatts,
+            currentBatteryPowerWatts,
             batterySocPercent,
             batteryTargetSocPercent:
                 activeInverterControlLimit.batteryTargetSocPercent?.value,

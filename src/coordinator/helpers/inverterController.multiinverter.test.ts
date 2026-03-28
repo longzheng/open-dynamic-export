@@ -47,6 +47,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: 50, // Battery at 50% SoC
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('limit');
@@ -74,6 +75,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: null, // SoC unknown
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('limit');
@@ -105,6 +107,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 2,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: 60, // Average SoC (from 1 battery)
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('limit');
@@ -136,6 +139,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 2,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: 70, // Average of 80% and 60%
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('limit');
@@ -166,6 +170,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: false, // Feature disabled
                 batterySocPercent: 50,
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('limit');
@@ -185,6 +190,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: 50,
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('limit');
@@ -211,6 +217,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: 50,
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('disconnect');
@@ -230,6 +237,7 @@ describe('calculateInverterConfiguration - Multi-Inverter Battery Scenarios', ()
                 maxInvertersCount: 1,
                 batteryPowerFlowControlEnabled: true,
                 batterySocPercent: 50,
+                currentBatteryPowerWatts: 0,
             });
 
             expect(result.type).toBe('deenergize');
