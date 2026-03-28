@@ -708,7 +708,6 @@ export function calculateTargetSolarWatts({
     return solarTarget.toNumber();
 }
 
-
 export type ControlLimitsBySetpoint = Record<
     SetpointKeys,
     InverterControlLimit | null

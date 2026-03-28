@@ -512,9 +512,7 @@ export function generateStorageModelWriteFromBatteryControl({
 
     // Convert percentages to raw register values using scale factor
     // e.g., with SF=-2: 50% → raw 5000
-    const rawInWRte = Math.round(
-        chargePercent * Math.pow(10, -inOutWRteSF),
-    );
+    const rawInWRte = Math.round(chargePercent * Math.pow(10, -inOutWRteSF));
     const rawOutWRte = Math.round(
         dischargePercent * Math.pow(10, -inOutWRteSF),
     );

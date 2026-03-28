@@ -6,12 +6,12 @@ import {
     ChaGriSet,
     StorCtl_Mod,
 } from '../../connections/sunspec/models/storage.js';
+import type { StorageModel } from '../../connections/sunspec/models/storage.js';
 import {
     getGenConnectStatusFromPVConn,
     generateInverterDataStorage,
     generateStorageModelWriteFromBatteryControl,
 } from './index.js';
-import type { StorageModel } from '../../connections/sunspec/models/storage.js';
 
 describe('getGenConnectStatusFromPVConn', () => {
     it('should return 0 if inverter is disconnected', () => {
