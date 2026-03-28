@@ -688,4 +688,94 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetBatteryPowerWatts).toBe(-3000);
         });
     });
+
+    describe('deadband', () => {
+        it('should snap small charge to idle', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5000,
+                siteWatts: -30, // Exporting 30W — small excess
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+        });
+
+        it('should snap small discharge to idle', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 30, // Importing 30W — small deficit
+                batterySocPercent: 60,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+        });
+
+        it('should not apply deadband when charge power is above threshold', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5000,
+                siteWatts: -100, // Exporting 100W — above 50W deadband
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(100);
+        });
+
+        it('should not apply deadband when discharge power is above threshold', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 100, // Importing 100W — above 50W deadband
+                batterySocPercent: 60,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-100);
+        });
+    });
 });

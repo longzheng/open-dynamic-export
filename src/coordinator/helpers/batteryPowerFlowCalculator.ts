@@ -190,6 +190,14 @@ export function calculateBatteryPowerFlow(
         }
     }
 
+    // Deadband: snap to idle when target power is below a meaningful threshold.
+    // Prevents rapid charge/discharge mode oscillation when grid power hovers near zero.
+    const BATTERY_DEADBAND_WATTS = 50;
+    if (Math.abs(targetBatteryPowerWatts) < BATTERY_DEADBAND_WATTS) {
+        targetBatteryPowerWatts = 0;
+        batteryMode = 'idle';
+    }
+
     // Calculate target solar watts (for curtailment)
     // Uses exportLimitWatts (the configured limit) rather than targetExportWatts
     // (capped at current available power). Using targetExportWatts would create a
