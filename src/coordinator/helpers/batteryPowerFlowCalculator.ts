@@ -43,6 +43,10 @@ export type BatteryPowerFlowInput = {
     batteryGridChargingEnabled: boolean | undefined;
     // Maximum power to draw from grid for battery charging in watts
     batteryGridChargingMaxWatts: number | undefined;
+    // Target export power from battery discharge in watts.
+    // When set, the battery discharges enough to cover house load AND export this
+    // amount to the grid. When undefined/0, only self-consumption (zero grid import).
+    batteryExportTargetWatts?: number | undefined;
 };
 
 const logger: Logger = pinoLogger.child({
@@ -76,6 +80,7 @@ export function calculateBatteryPowerFlow(
         batteryPriorityMode,
         batteryGridChargingEnabled,
         batteryGridChargingMaxWatts,
+        batteryExportTargetWatts,
     } = input;
 
     logger.trace({ input }, 'Calculating battery power flow');
@@ -116,8 +121,28 @@ export function calculateBatteryPowerFlow(
     let targetExportWatts = 0;
     let batteryMode: 'charge' | 'discharge' | 'idle' = 'idle';
 
-    if (availablePower > 0) {
-        // We have excess power to allocate
+    // Battery export target: how much battery discharge power to export to grid.
+    // When 0/undefined, only self-consumption (discharge to zero grid import).
+    const exportTarget = batteryExportTargetWatts ?? 0;
+    const gridChargingActive = batteryGridChargingEnabled === true;
+
+    // How much battery discharge is needed to cover grid imports AND meet export target.
+    // When exportTarget = 0 and availablePower = -500, this is 500 (self-consumption).
+    // When exportTarget = 2000 and availablePower = -500, this is 2500 (cover deficit + export).
+    // When exportTarget = 2000 and availablePower = 1000, this is 1000 (solar covers part of target).
+    // When exportTarget = 0 and availablePower = 1000, this is 0 (surplus, no discharge needed).
+    const batteryDischargeNeeded = Math.max(0, exportTarget - availablePower);
+
+    if (batteryDischargeNeeded > 0 && canDischarge && !gridChargingActive) {
+        // Discharge battery: cover grid imports and/or meet battery export target
+        targetBatteryPowerWatts = -Math.min(
+            batteryDischargeNeeded,
+            maxDischargePower,
+        );
+        batteryMode = 'discharge';
+        targetExportWatts = Math.min(exportTarget, exportLimitWatts);
+    } else if (availablePower > 0) {
+        // We have excess solar power to allocate
         if (priorityMode === 'battery_first') {
             // Priority: consumption → battery → export
             const batteryNeedWatts = calculateBatteryNeedWatts({
@@ -163,12 +188,8 @@ export function calculateBatteryPowerFlow(
                 batteryMode = 'charge';
             }
         }
-    }
-
-    // Handle importing / balanced scenarios
-    if (availablePower <= 0) {
-        const gridChargingActive = batteryGridChargingEnabled === true;
-
+    } else {
+        // No surplus and no discharge needed: handle grid charging or idle
         const batteryNeedWatts = calculateBatteryNeedWatts({
             batterySocPercent,
             targetSocPercent: targetSoc,
@@ -194,12 +215,6 @@ export function calculateBatteryPowerFlow(
             // External tool disables grid charging when discharge should resume.
             targetBatteryPowerWatts = 0;
             batteryMode = 'idle';
-            targetExportWatts = 0;
-        } else if (availablePower < 0 && canDischarge) {
-            // Normal behavior: discharge battery to reduce grid imports
-            const importPower = Math.abs(availablePower);
-            targetBatteryPowerWatts = -Math.min(importPower, maxDischargePower);
-            batteryMode = 'discharge';
             targetExportWatts = 0;
         }
     }

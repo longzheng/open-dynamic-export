@@ -810,4 +810,241 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetBatteryPowerWatts).toBe(-100);
         });
     });
+
+    describe('battery export target', () => {
+        it('should discharge battery to export when importing (deficit + export target)', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing 3000W (load = 5000W)
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 2000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = -3000, exportTarget = 2000
+            // Discharge needed = 2000 - (-3000) = 5000W (cover 3000 deficit + 2000 export)
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-5000);
+            expect(result.targetExportWatts).toBe(2000);
+        });
+
+        it('should discharge battery to export when grid is balanced (no solar surplus)', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 500,
+                siteWatts: 0, // Balanced
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 2000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = 0, exportTarget = 2000
+            // Discharge needed = 2000 - 0 = 2000W
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-2000);
+            expect(result.targetExportWatts).toBe(2000);
+        });
+
+        it('should discharge partially when solar covers some of the export target', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5000,
+                siteWatts: -1000, // Exporting 1000W surplus (load = 4000W)
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = 1000 surplus, exportTarget = 3000
+            // Discharge needed = 3000 - 1000 = 2000W (solar covers 1000 of the target)
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-2000);
+            expect(result.targetExportWatts).toBe(3000);
+        });
+
+        it('should not discharge when solar surplus covers entire export target', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 10000,
+                siteWatts: -8000, // Exporting 8000W surplus
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = 8000, exportTarget = 3000
+            // Discharge needed = max(0, 3000 - 8000) = 0 (solar covers it)
+            // Falls through to normal surplus allocation (export_first)
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+            expect(result.targetExportWatts).toBe(8000);
+        });
+
+        it('should cap discharge at batteryDischargeMaxWatts', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 1000, // Importing 1000W
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 2000, // Limited
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = -1000, exportTarget = 3000
+            // Discharge needed = 3000 - (-1000) = 4000, capped at 2000
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-2000);
+        });
+
+        it('should cap targetExportWatts at exportLimitWatts', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 500, // Importing 500W
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 10000,
+                exportLimitWatts: 2000, // Export limit lower than target
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetExportWatts).toBe(2000);
+        });
+
+        it('should not discharge when battery at min SoC even with export target', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 500,
+                batterySocPercent: 20,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20, // At min
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Can't discharge — at min SoC
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+        });
+
+        it('should prefer grid charging over export target when grid charging is active', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 1000, // Importing
+                batterySocPercent: 30,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 3000,
+                batteryExportTargetWatts: 2000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Grid charging takes priority over export target
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(3000);
+        });
+
+        it('should behave as self-consumption when export target is 0', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 3000, // Importing 3000W
+                batterySocPercent: 60,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 0,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Same as no export target — discharge to cover imports only
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-3000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+    });
 });

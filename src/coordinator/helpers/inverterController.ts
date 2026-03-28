@@ -336,6 +336,13 @@ export class InverterController {
             })),
         );
 
+        // Use the most recent site reading for battery control so the battery
+        // responds immediately to load changes, rather than waiting for the
+        // time-weighted average to catch up.  Solar curtailment (WMaxLimPct)
+        // continues to use the averaged value to avoid rapid power swings.
+        const mostRecentSiteWatts =
+            recentSiteSamples[recentSiteSamples.length - 1]!.realPower.net;
+
         const maxInvertersCount = Math.max(
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
@@ -377,8 +384,9 @@ export class InverterController {
 
         const rampedInverterConfiguration = ((): InverterConfiguration => {
             // Get actual measured battery power from the most recent DER sample.
-            // This comes from MPPT Model 160 DC power on the battery channel,
-            // combined with ChaSt for direction (positive = discharging, negative = charging).
+            // MPPT measurement convention: positive = discharging, negative = charging.
+            // Battery flow calculator convention: positive = charging, negative = discharging.
+            // We negate the measured value to match the calculator's convention.
             // Falls back to the previous commanded target if measurement is unavailable.
             const currentBatteryPowerWatts = (() => {
                 const mostRecentSample =
@@ -388,7 +396,7 @@ export class InverterController {
                     null;
 
                 if (measured !== null) {
-                    return measured;
+                    return -measured;
                 }
 
                 // Fallback: use previous commanded target if no measurement available
@@ -406,6 +414,7 @@ export class InverterController {
                 activeInverterControlLimit: batteryAdjustedInverterControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
+                instantaneousSiteWatts: mostRecentSiteWatts,
                 solarWatts: averagedSolarWatts,
                 maxInvertersCount,
                 batteryPowerFlowControlEnabled:
@@ -490,6 +499,7 @@ export class InverterController {
 export function calculateInverterConfiguration({
     activeInverterControlLimit,
     siteWatts,
+    instantaneousSiteWatts,
     solarWatts,
     nameplateMaxW,
     maxInvertersCount,
@@ -499,6 +509,8 @@ export function calculateInverterConfiguration({
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
+    /** Most recent site reading for fast battery response. Falls back to averaged siteWatts. */
+    instantaneousSiteWatts?: number;
     solarWatts: number;
     nameplateMaxW: number;
     maxInvertersCount: number;
@@ -540,10 +552,12 @@ export function calculateInverterConfiguration({
     let finalTargetSolarWatts: number;
 
     if (batteryPowerFlowControlEnabled && !disconnect) {
-        // Use battery power flow calculator for intelligent battery control
+        // Use battery power flow calculator for intelligent battery control.
+        // Use instantaneous site reading so the battery responds immediately
+        // to load changes rather than waiting for the averaged value to catch up.
         const batteryFlowInput: BatteryPowerFlowInput = {
             solarWatts,
-            siteWatts,
+            siteWatts: instantaneousSiteWatts ?? siteWatts,
             currentBatteryPowerWatts,
             batterySocPercent,
             batteryTargetSocPercent:
@@ -563,6 +577,8 @@ export function calculateInverterConfiguration({
                 activeInverterControlLimit.batteryGridChargingEnabled?.value,
             batteryGridChargingMaxWatts:
                 activeInverterControlLimit.batteryGridChargingMaxWatts?.value,
+            batteryExportTargetWatts:
+                activeInverterControlLimit.batteryExportTargetWatts?.value,
         };
 
         const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);
