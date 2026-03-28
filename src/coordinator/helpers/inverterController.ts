@@ -21,7 +21,6 @@ import { cappedChange } from '../../helpers/math.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import type { ControlsModel } from '../../connections/sunspec/models/controls.js';
-import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
 import type { DerSample } from './derSample.js';
 import { Publish } from './publish.js';
 import {
@@ -76,12 +75,10 @@ export type BatteryControlConfiguration = {
     targetPowerWatts: number;
     // Battery operating mode
     mode: 'charge' | 'discharge' | 'idle';
-    // Charge rate as percentage (0-100)
+    // Charge rate cap as percentage (0-100) of WChaMax — optional user-configured limit
     chargeRatePercent?: number | undefined;
-    // Discharge rate as percentage (0-100)
+    // Discharge rate cap as percentage (0-100) of WChaMax — optional user-configured limit
     dischargeRatePercent?: number | undefined;
-    // SunSpec storage control mode (bitfield)
-    storageMode: number;
 };
 
 export type InverterConfiguration =
@@ -548,7 +545,6 @@ export function calculateInverterConfiguration({
                 activeInverterControlLimit.batteryChargeRatePercent?.value,
             dischargeRatePercent:
                 activeInverterControlLimit.batteryDischargeRatePercent?.value,
-            storageMode: determineStorageMode(batteryFlowResult.batteryMode),
         };
 
         finalTargetSolarWatts = Math.min(
@@ -695,19 +691,6 @@ export function calculateTargetSolarWatts({
     return solarTarget.toNumber();
 }
 
-/**
- * Convert battery mode to SunSpec StorCtl_Mod bitfield value
- */
-function determineStorageMode(mode: 'charge' | 'discharge' | 'idle'): number {
-    switch (mode) {
-        case 'charge':
-            return StorCtl_Mod.CHARGE;
-        case 'discharge':
-            return StorCtl_Mod.DISCHARGE;
-        case 'idle':
-            return 0; // No control mode
-    }
-}
 
 export type ControlLimitsBySetpoint = Record<
     SetpointKeys,

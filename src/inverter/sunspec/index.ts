@@ -34,6 +34,8 @@ import type {
     StorageModel,
     StorageModelWrite,
 } from '../../connections/sunspec/models/storage.js';
+import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
+import { numberWithPow10 } from '../../helpers/number.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';
 
@@ -453,27 +455,82 @@ export function generateStorageModelWriteFromBatteryControl({
     batteryControl: BatteryControlConfiguration;
     storageModel: StorageModel;
 }): StorageModelWrite {
-    // Convert target power to charge/discharge rates
-    const targetPower = Math.abs(batteryControl.targetPowerWatts);
+    // WChaMax is the reference power value (in watts, after applying scale factor)
+    // InWRte/OutWRte are the actual charge/discharge setpoints as percentages of WChaMax
+    // Per SunSpec Model 124:
+    //   - WChaGra/WDisChaGra are ramp rates (% WChaMax/sec), NOT power setpoints
+    //   - InWRte (% WChaMax) = charge rate setpoint
+    //   - OutWRte (% WDisChaMax) = discharge rate setpoint
+    //   - StorCtl_Mod bitfield: bit 0 = limit charge, bit 1 = limit discharge
+    // Setting both bits (StorCtl_Mod=3) with InWRte/OutWRte defines a power window
+
+    const wChaMaxWatts = numberWithPow10(
+        storageModel.WChaMax,
+        storageModel.WChaMax_SF,
+    );
+
+    // Scale factor for InWRte/OutWRte (default 0 if not available)
+    const inOutWRteSF = storageModel.InOutWRte_SF ?? 0;
+
+    // Convert target power from watts to percentage of WChaMax
+    const targetPercent =
+        wChaMaxWatts > 0
+            ? (Math.abs(batteryControl.targetPowerWatts) / wChaMaxWatts) * 100
+            : 0;
+
+    // Determine charge/discharge percentages based on mode,
+    // applying optional user-configured rate caps
+    let chargePercent: number;
+    let dischargePercent: number;
+
+    switch (batteryControl.mode) {
+        case 'charge': {
+            chargePercent =
+                batteryControl.chargeRatePercent !== undefined
+                    ? Math.min(targetPercent, batteryControl.chargeRatePercent)
+                    : targetPercent;
+            dischargePercent = 0;
+            break;
+        }
+        case 'discharge': {
+            chargePercent = 0;
+            dischargePercent =
+                batteryControl.dischargeRatePercent !== undefined
+                    ? Math.min(
+                          targetPercent,
+                          batteryControl.dischargeRatePercent,
+                      )
+                    : targetPercent;
+            break;
+        }
+        case 'idle': {
+            chargePercent = 0;
+            dischargePercent = 0;
+            break;
+        }
+    }
+
+    // Convert percentages to raw register values using scale factor
+    // e.g., with SF=-2: 50% → raw 5000
+    const rawInWRte = Math.round(
+        chargePercent * Math.pow(10, -inOutWRteSF),
+    );
+    const rawOutWRte = Math.round(
+        dischargePercent * Math.pow(10, -inOutWRteSF),
+    );
 
     return {
         ...storageModel,
-        StorCtl_Mod: batteryControl.storageMode,
-        // Set charge rate when charging
-        WChaGra:
-            batteryControl.mode === 'charge'
-                ? targetPower
-                : storageModel.WChaGra,
-        // Set discharge rate when discharging
-        WDisChaGra:
-            batteryControl.mode === 'discharge'
-                ? targetPower
-                : storageModel.WDisChaGra,
-        // Optional: set percentage rates if provided
-        InWRte: batteryControl.chargeRatePercent ?? storageModel.InWRte,
-        OutWRte: batteryControl.dischargeRatePercent ?? storageModel.OutWRte,
-        // Set revert timeout for safety (60 seconds)
-        // If connection is lost, battery control will revert to default
+        // Both bits set: constrain both charge and discharge directions
+        StorCtl_Mod: StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE,
+        // Pass through existing ramp rates unchanged
+        // (WChaGra/WDisChaGra are rate-of-change limits in %/sec, not setpoints)
+        WChaGra: storageModel.WChaGra,
+        WDisChaGra: storageModel.WDisChaGra,
+        // Charge/discharge setpoints as percentage of WChaMax
+        InWRte: rawInWRte,
+        OutWRte: rawOutWRte,
+        // Safety revert timeout — if ODE stops writing, inverter reverts to default
         InOutWRte_RvrtTms: 60,
     };
 }
