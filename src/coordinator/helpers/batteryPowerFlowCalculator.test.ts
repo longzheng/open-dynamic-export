@@ -1046,5 +1046,46 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetBatteryPowerWatts).toBe(-3000);
             expect(result.targetExportWatts).toBe(0);
         });
+
+        it('should not curtail solar when battery transitions from charge to discharge', () => {
+            // Scenario: battery is currently charging at 7500W from surplus PV.
+            // Export limit drops (e.g. via MQTT) to 4000W.
+            // The battery target will shift from charge to reduced charge or discharge,
+            // but targetSolarWatts must use the MEASURED battery power (still charging)
+            // to avoid a feedback spiral where curtailed solar → less surplus → more
+            // discharge → even more curtailment.
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 8700,
+                siteWatts: 0, // Balanced (PV covers load + battery charge)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 10000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 4000,
+                batteryPriorityMode: 'export_first',
+                // Battery is CURRENTLY charging at 7500W (measured from previous cycle)
+                currentBatteryPowerWatts: 7500,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 4000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = -0 + 7500 = 7500
+            // exportTarget = 4000, batteryDischargeNeeded = max(0, 4000 - 7500) = 0
+            // Falls to surplus allocation (export_first):
+            //   export 4000, charge remaining 3500
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(3500);
+            expect(result.targetExportWatts).toBe(4000);
+
+            // Critical: targetSolarWatts must use MEASURED battery (7500) not TARGET (3500)
+            // targetSolar = load(8700) + measuredBattery(7500) + exportLimit(4000) = 20200
+            // This keeps ratio ≈ 1.0, preventing premature PV curtailment
+            expect(result.targetSolarWatts).toBeGreaterThan(15000);
+        });
     });
 });

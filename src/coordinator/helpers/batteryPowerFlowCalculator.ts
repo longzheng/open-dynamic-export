@@ -233,11 +233,18 @@ export function calculateBatteryPowerFlow(
     // self-referential feedback loop: targetSolar = solarWatts, which locks the
     // inverter at its current output via the power ratio. Using the limit allows
     // the inverter to ramp up when not export-constrained (ratio → 1.0).
+    //
+    // Uses currentBatteryPowerWatts (measured) rather than targetBatteryPowerWatts
+    // (commanded) to avoid a second feedback loop: when battery transitions from
+    // charging to discharging, the target jumps negative immediately, which would
+    // curtail solar before the battery has physically ramped. The curtailed solar
+    // then confirms the discharge need, spiraling PV down to near-zero.
+    // Using the measured value lets solar adjust gradually as the battery actually ramps.
     const targetSolarWatts = calculateTargetSolarWatts({
         solarWatts,
         siteWatts,
         targetExportWatts: exportLimitWatts,
-        targetBatteryPowerWatts,
+        targetBatteryPowerWatts: currentBatteryPowerWatts,
     });
 
     const result: BatteryPowerFlowCalculation = {
