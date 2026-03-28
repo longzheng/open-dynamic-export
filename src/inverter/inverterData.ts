@@ -48,6 +48,8 @@ export const inverterDataSchema = v.object({
             maxDischargeRateWatts: v.number(),
             currentChargeRatePercent: v.nullable(v.number()),
             currentDischargeRatePercent: v.nullable(v.number()),
+            // Measured battery DC power from MPPT channel (positive = discharging, negative = charging)
+            currentBatteryPowerWatts: v.nullable(v.number()),
             // Control settings
             minReservePercent: v.nullable(v.number()),
             gridChargingPermitted: v.nullable(v.enum(ChaGriSet)),

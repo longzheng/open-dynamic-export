@@ -69,6 +69,8 @@ export const derSampleDataSchema = v.object({
             totalMaxChargeRateWatts: v.number(),
             // Total max discharge rate across all batteries
             totalMaxDischargeRateWatts: v.number(),
+            // Total measured battery power (positive = discharging, negative = charging, null = unavailable)
+            totalCurrentBatteryPowerWatts: v.nullable(v.number()),
             // Number of inverters with battery storage
             batteryCount: v.number(),
         }),
@@ -193,6 +195,11 @@ export function generateDerSample({
                 totalMaxDischargeRateWatts: sumNumbersArray(
                     batteriesData.map(
                         (battery) => battery.maxDischargeRateWatts,
+                    ),
+                ),
+                totalCurrentBatteryPowerWatts: sumNumbersNullableArray(
+                    batteriesData.map(
+                        (battery) => battery.currentBatteryPowerWatts,
                     ),
                 ),
                 batteryCount: batteriesData.length,

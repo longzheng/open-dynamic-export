@@ -376,9 +376,22 @@ export class InverterController {
         })();
 
         const rampedInverterConfiguration = ((): InverterConfiguration => {
-            // Get previous battery power from last applied configuration
-            // to compensate for battery charge hidden inside hybrid inverter AC output
-            const previousBatteryPowerWatts = (() => {
+            // Get actual measured battery power from the most recent DER sample.
+            // This comes from MPPT Model 160 DC power on the battery channel,
+            // combined with ChaSt for direction (positive = discharging, negative = charging).
+            // Falls back to the previous commanded target if measurement is unavailable.
+            const currentBatteryPowerWatts = (() => {
+                const mostRecentSample =
+                    recentDerSamples[recentDerSamples.length - 1];
+                const measured =
+                    mostRecentSample?.battery?.totalCurrentBatteryPowerWatts ??
+                    null;
+
+                if (measured !== null) {
+                    return measured;
+                }
+
+                // Fallback: use previous commanded target if no measurement available
                 if (
                     this.lastAppliedInverterConfiguration?.type === 'limit' &&
                     this.lastAppliedInverterConfiguration.batteryControl
@@ -398,7 +411,7 @@ export class InverterController {
                 batteryPowerFlowControlEnabled:
                     this.batteryPowerFlowControlEnabled,
                 batterySocPercent,
-                currentBatteryPowerWatts: previousBatteryPowerWatts,
+                currentBatteryPowerWatts,
             });
 
             switch (configuration.type) {

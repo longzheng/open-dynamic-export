@@ -30,10 +30,8 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     // note: if any other software also writes to the controls model for properties we don't care about, we will overwrite them
     private controlsModelCache: ControlsModel | null = null;
 
-    // this software expects to solely control the inverter
-    // cache the storage model once permanently to avoid unnecessary reads
-    // note: if any other software also writes to the storage model for properties we don't care about, we will overwrite them
-    private storageModelCache: StorageModel | null = null;
+    // Storage model is NOT cached because it contains dynamic measurement data
+    // (ChaState, ChaSt, InBatV) that must be read fresh each cycle
 
     async getInverterModel() {
         const modelAddressById = await this.getModelAddressById();
@@ -214,10 +212,6 @@ export class InverterSunSpecConnection extends SunSpecConnection {
     }
 
     async getStorageModel() {
-        if (this.storageModelCache) {
-            return this.storageModelCache;
-        }
-
         const modelAddressById = await this.getModelAddressById();
 
         const address = modelAddressById.get(124);
@@ -226,15 +220,11 @@ export class InverterSunSpecConnection extends SunSpecConnection {
             throw new Error('No SunSpec storage model address');
         }
 
-        const data = await storageModel.read({
+        return await storageModel.read({
             modbusConnection: this.modbusConnection,
             address,
             unitId: this.unitId,
         });
-
-        this.storageModelCache = data;
-
-        return data;
     }
 
     async writeStorageModel(values: StorageModelWrite) {

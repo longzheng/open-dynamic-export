@@ -63,6 +63,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 5000,
                     currentChargeRatePercent: 80,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 20,
                     gridChargingPermitted: ChaGriSet.GRID,
                 },
@@ -77,6 +78,7 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalAvailableEnergyWh: 10000,
             totalMaxChargeRateWatts: 5000,
             totalMaxDischargeRateWatts: 5000,
+            totalCurrentBatteryPowerWatts: null,
             batteryCount: 1,
         });
     });
@@ -93,6 +95,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 4000,
                     currentChargeRatePercent: 90,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 20,
                     gridChargingPermitted: ChaGriSet.GRID,
                 },
@@ -107,6 +110,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 3000,
                     currentChargeRatePercent: null,
                     currentDischargeRatePercent: 50,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 15,
                     gridChargingPermitted: ChaGriSet.PV,
                 },
@@ -125,6 +129,7 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalAvailableEnergyWh: 18000,
             totalMaxChargeRateWatts: 8000,
             totalMaxDischargeRateWatts: 7000,
+            totalCurrentBatteryPowerWatts: null,
             batteryCount: 2,
         });
     });
@@ -141,6 +146,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 5000,
                     currentChargeRatePercent: null,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 20,
                     gridChargingPermitted: ChaGriSet.GRID,
                 },
@@ -154,6 +160,7 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalAvailableEnergyWh: 10000,
             totalMaxChargeRateWatts: 5000,
             totalMaxDischargeRateWatts: 5000,
+            totalCurrentBatteryPowerWatts: null,
             batteryCount: 1,
         });
     });
@@ -170,6 +177,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 5000,
                     currentChargeRatePercent: 90,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 20,
                     gridChargingPermitted: ChaGriSet.GRID,
                 },
@@ -184,6 +192,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 3000,
                     currentChargeRatePercent: null,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 15,
                     gridChargingPermitted: ChaGriSet.PV,
                 },
@@ -198,6 +207,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 6000,
                     currentChargeRatePercent: null,
                     currentDischargeRatePercent: 70,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 25,
                     gridChargingPermitted: ChaGriSet.GRID,
                 },
@@ -213,6 +223,7 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalAvailableEnergyWh: 30000,
             totalMaxChargeRateWatts: 14000,
             totalMaxDischargeRateWatts: 14000,
+            totalCurrentBatteryPowerWatts: null,
             batteryCount: 3,
         });
     });
@@ -229,6 +240,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 5000,
                     currentChargeRatePercent: null,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 20,
                     gridChargingPermitted: ChaGriSet.GRID,
                 },
@@ -243,6 +255,7 @@ describe('generateDerSample - Battery Aggregation', () => {
                     maxDischargeRateWatts: 3000,
                     currentChargeRatePercent: null,
                     currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: null,
                     minReservePercent: 15,
                     gridChargingPermitted: ChaGriSet.PV,
                 },
@@ -256,6 +269,7 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalAvailableEnergyWh: 8000, // Only one valid energy value
             totalMaxChargeRateWatts: 8000,
             totalMaxDischargeRateWatts: 8000,
+            totalCurrentBatteryPowerWatts: null,
             batteryCount: 2,
         });
     });

@@ -35,6 +35,10 @@ import type {
     StorageModelWrite,
 } from '../../connections/sunspec/models/storage.js';
 import { StorCtl_Mod } from '../../connections/sunspec/models/storage.js';
+import type {
+    MpptModel,
+    MpptModuleModel,
+} from '../../connections/sunspec/models/mppt.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { PVConn } from '../../connections/sunspec/models/status.js';
 import { withAbortCheck } from '../../helpers/withAbortCheck.js';
@@ -120,6 +124,21 @@ export class SunSpecInverterDataPoller extends InverterDataPollerBase {
                                       'Inverter does not have battery storage capability',
                                   );
                               }
+                              return null;
+                          }
+                      },
+                  })
+                : null,
+            mppt: this.batteryControlEnabled
+                ? await withAbortCheck({
+                      signal: this.abortController.signal,
+                      fn: async () => {
+                          try {
+                              return await this.inverterConnection.getMpptModel();
+                          } catch {
+                              this.logger.warn(
+                                  'Failed to read MPPT model for battery power measurement',
+                              );
                               return null;
                           }
                       },
@@ -234,12 +253,14 @@ export function generateInverterData({
     settings,
     status,
     storage,
+    mppt,
 }: {
     inverter: InverterModel;
     nameplate: NameplateModel;
     settings: SettingsModel;
     status: StatusModel;
     storage: StorageModel | null;
+    mppt: (MpptModel & { modules: MpptModuleModel[] }) | null;
 }): InverterData {
     const inverterMetrics = getInverterMetrics(inverter);
     const nameplateMetrics = getNameplateMetrics(nameplate);
@@ -285,16 +306,23 @@ export function generateInverterData({
             status,
             inverterW: inverterMetrics.W,
         }),
-        storage: storage ? generateInverterDataStorage({ storage }) : undefined,
+        storage: storage
+            ? generateInverterDataStorage({ storage, mppt })
+            : undefined,
     };
 }
 
 export function generateInverterDataStorage({
     storage,
+    mppt,
 }: {
     storage: StorageModel;
+    mppt: (MpptModel & { modules: MpptModuleModel[] }) | null;
 }): NonNullable<InverterData['storage']> {
     const storageMetrics = getStorageMetrics(storage);
+
+    // Compute actual battery DC power from MPPT channels (auto-detected)
+    const currentBatteryPowerWatts = getBatteryPowerFromMppt({ mppt });
 
     return {
         stateOfChargePercent: storageMetrics.ChaState,
@@ -305,9 +333,68 @@ export function generateInverterDataStorage({
         maxDischargeRateWatts: storageMetrics.WDisChaGra,
         currentChargeRatePercent: storageMetrics.InWRte,
         currentDischargeRatePercent: storageMetrics.OutWRte,
+        currentBatteryPowerWatts,
         minReservePercent: storageMetrics.MinRsvPct,
         gridChargingPermitted: storageMetrics.ChaGriSet,
     };
+}
+
+/**
+ * Get actual battery DC power from MPPT Model 160 channels.
+ *
+ * NOTE: This auto-detection logic is Fronius-specific. Other SunSpec inverters
+ * may represent battery MPPT channels differently.
+ *
+ * Fronius Gen24 exposes battery as two MPPT channels (see register map
+ * Gen24_Primo_Symo_Inverter_Register_Map_Int&SF_storage_ROW.xlsx, mppt (160) sheet):
+ *   - Charge channel (IDStr starts with 'StCha'): DCW > 0 when charging, 0 when discharging
+ *   - Discharge channel (IDStr starts with 'StDisCha'): DCW > 0 when discharging, 0 when charging
+ *
+ * The N register = mppt trackers + 2 * battery inputs, so 2 MPPT + 1 battery = 4 modules.
+ *
+ * Returns positive for discharging, negative for charging, 0 for idle, null if unavailable.
+ */
+function getBatteryPowerFromMppt({
+    mppt,
+}: {
+    mppt: (MpptModel & { modules: MpptModuleModel[] }) | null;
+}): number | null {
+    if (!mppt || mppt.DCW_SF === null) {
+        return null;
+    }
+
+    // Auto-detect battery channels by IDStr prefix
+    let chargeWatts = 0;
+    let dischargeWatts = 0;
+    let foundBatteryChannel = false;
+
+    for (const module of mppt.modules) {
+        if (module.IDStr === null) {
+            continue;
+        }
+
+        const idStr = module.IDStr.trim();
+
+        // 'StDisCha' must be checked before 'StCha' since 'StDisCha' contains 'StCha'
+        if (idStr.startsWith('StDisCha')) {
+            foundBatteryChannel = true;
+            if (module.DCW !== null) {
+                dischargeWatts += numberWithPow10(module.DCW, mppt.DCW_SF);
+            }
+        } else if (idStr.startsWith('StCha')) {
+            foundBatteryChannel = true;
+            if (module.DCW !== null) {
+                chargeWatts += numberWithPow10(module.DCW, mppt.DCW_SF);
+            }
+        }
+    }
+
+    if (!foundBatteryChannel) {
+        return null;
+    }
+
+    // Positive = discharging (producing power), negative = charging (consuming power)
+    return dischargeWatts - chargeWatts;
 }
 
 export function generateInverterDataStatus({
@@ -485,22 +572,26 @@ export function generateStorageModelWriteFromBatteryControl({
 
     switch (batteryControl.mode) {
         case 'charge': {
-            chargePercent =
+            chargePercent = Math.min(
                 batteryControl.chargeRatePercent !== undefined
                     ? Math.min(targetPercent, batteryControl.chargeRatePercent)
-                    : targetPercent;
+                    : targetPercent,
+                100,
+            );
             dischargePercent = 0;
             break;
         }
         case 'discharge': {
             chargePercent = 0;
-            dischargePercent =
+            dischargePercent = Math.min(
                 batteryControl.dischargeRatePercent !== undefined
                     ? Math.min(
                           targetPercent,
                           batteryControl.dischargeRatePercent,
                       )
-                    : targetPercent;
+                    : targetPercent,
+                100,
+            );
             break;
         }
         case 'idle': {

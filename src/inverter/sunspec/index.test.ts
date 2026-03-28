@@ -95,7 +95,10 @@ describe('generateInverterDataStorage', () => {
             InOutWRte_SF: -2,
         };
 
-        const result = generateInverterDataStorage({ storage: storageModel });
+        const result = generateInverterDataStorage({
+            storage: storageModel,
+            mppt: null,
+        });
 
         expect(result).toEqual({
             stateOfChargePercent: 80, // 8000 * 10^-2
@@ -108,6 +111,7 @@ describe('generateInverterDataStorage', () => {
             currentDischargeRatePercent: 50, // 5000 * 10^-2
             minReservePercent: 20, // 2000 * 10^-2
             gridChargingPermitted: ChaGriSet.GRID,
+            currentBatteryPowerWatts: null,
         });
     });
 
@@ -141,7 +145,10 @@ describe('generateInverterDataStorage', () => {
             InOutWRte_SF: null,
         };
 
-        const result = generateInverterDataStorage({ storage: storageModel });
+        const result = generateInverterDataStorage({
+            storage: storageModel,
+            mppt: null,
+        });
 
         expect(result).toEqual({
             stateOfChargePercent: null,
@@ -154,6 +161,7 @@ describe('generateInverterDataStorage', () => {
             currentDischargeRatePercent: null,
             minReservePercent: null,
             gridChargingPermitted: null,
+            currentBatteryPowerWatts: null,
         });
     });
 
@@ -200,6 +208,8 @@ describe('generateInverterDataStorage', () => {
 
             const result = generateInverterDataStorage({
                 storage: storageModel,
+                mppt: null,
+                batteryMpptChannel: undefined,
             });
             expect(result.chargeStatus).toBe(status);
         });
@@ -240,6 +250,8 @@ describe('generateInverterDataStorage', () => {
 
             const result = generateInverterDataStorage({
                 storage: storageModel,
+                mppt: null,
+                batteryMpptChannel: undefined,
             });
             expect(result.gridChargingPermitted).toBe(mode);
         });
@@ -275,7 +287,10 @@ describe('generateInverterDataStorage', () => {
             InOutWRte_SF: -2,
         };
 
-        const result = generateInverterDataStorage({ storage: storageModel });
+        const result = generateInverterDataStorage({
+            storage: storageModel,
+            mppt: null,
+        });
 
         expect(result).toEqual({
             stateOfChargePercent: 65,
@@ -288,7 +303,290 @@ describe('generateInverterDataStorage', () => {
             currentDischargeRatePercent: null,
             minReservePercent: 15,
             gridChargingPermitted: ChaGriSet.PV,
+            currentBatteryPowerWatts: null,
         });
+    });
+});
+
+describe('getBatteryPowerFromMppt via generateInverterDataStorage', () => {
+    it('should compute battery power from Fronius MPPT charge/discharge channels', () => {
+        const storageModel = {
+            ID: 124 as const,
+            L: 26,
+            WChaMax: 35840,
+            WChaGra: 100,
+            WDisChaGra: 100,
+            StorCtl_Mod: 0 as StorCtl_Mod,
+            VAChaMax: null,
+            MinRsvPct: null,
+            ChaState: 9940,
+            StorAval: null,
+            InBatV: null,
+            ChaSt: ChaSt.CHARGING,
+            OutWRte: 0,
+            InWRte: 5000,
+            InOutWRte_WinTms: null,
+            InOutWRte_RvrtTms: 60,
+            InOutWRte_RmpTms: null,
+            ChaGriSet: null,
+            WChaMax_SF: 0,
+            WChaDisChaGra_SF: 0,
+            VAChaMax_SF: null,
+            MinRsvPct_SF: null,
+            ChaState_SF: -2,
+            StorAval_SF: null,
+            InBatV_SF: null,
+            InOutWRte_SF: -2,
+        };
+
+        // Fronius MPPT model with 2 PV strings + charge/discharge battery channels
+        const mppt = {
+            ID: 160 as const,
+            L: 88,
+            DCA_SF: -2,
+            DCV_SF: -1,
+            DCW_SF: -1,
+            DCWH_SF: 0,
+            Evt: null,
+            N: 4,
+            TmsPer: null,
+            modules: [
+                {
+                    ID: 1,
+                    IDStr: 'MPPT 1',
+                    DCA: 1200,
+                    DCV: 4000,
+                    DCW: 5000,
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 2,
+                    IDStr: 'MPPT 2',
+                    DCA: 1100,
+                    DCV: 3900,
+                    DCW: 4500,
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 3,
+                    IDStr: 'StCha 3',
+                    DCA: 500,
+                    DCV: 480,
+                    DCW: 2500, // 250W with SF=-1
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 4,
+                    IDStr: 'StDisCha 4',
+                    DCA: 0,
+                    DCV: 480,
+                    DCW: 0, // 0W — not discharging
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+            ],
+        };
+
+        const result = generateInverterDataStorage({
+            storage: storageModel,
+            mppt,
+        });
+
+        // Charging at 250W: discharge(0) - charge(250) = -250
+        expect(result.currentBatteryPowerWatts).toBe(-250);
+    });
+
+    it('should compute positive battery power when discharging', () => {
+        const storageModel = {
+            ID: 124 as const,
+            L: 26,
+            WChaMax: 35840,
+            WChaGra: 100,
+            WDisChaGra: 100,
+            StorCtl_Mod: 0 as StorCtl_Mod,
+            VAChaMax: null,
+            MinRsvPct: null,
+            ChaState: 5000,
+            StorAval: null,
+            InBatV: null,
+            ChaSt: ChaSt.DISCHARGING,
+            OutWRte: 5000,
+            InWRte: 0,
+            InOutWRte_WinTms: null,
+            InOutWRte_RvrtTms: 60,
+            InOutWRte_RmpTms: null,
+            ChaGriSet: null,
+            WChaMax_SF: 0,
+            WChaDisChaGra_SF: 0,
+            VAChaMax_SF: null,
+            MinRsvPct_SF: null,
+            ChaState_SF: -2,
+            StorAval_SF: null,
+            InBatV_SF: null,
+            InOutWRte_SF: -2,
+        };
+
+        const mppt = {
+            ID: 160 as const,
+            L: 88,
+            DCA_SF: -2,
+            DCV_SF: -1,
+            DCW_SF: -1,
+            DCWH_SF: 0,
+            Evt: null,
+            N: 4,
+            TmsPer: null,
+            modules: [
+                {
+                    ID: 1,
+                    IDStr: 'MPPT 1',
+                    DCA: 0,
+                    DCV: 0,
+                    DCW: 0,
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 2,
+                    IDStr: 'MPPT 2',
+                    DCA: 0,
+                    DCV: 0,
+                    DCW: 0,
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 3,
+                    IDStr: 'StCha 3',
+                    DCA: 0,
+                    DCV: 480,
+                    DCW: 0, // 0W — not charging
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 4,
+                    IDStr: 'StDisCha 4',
+                    DCA: 800,
+                    DCV: 480,
+                    DCW: 3800, // 380W with SF=-1
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+            ],
+        };
+
+        const result = generateInverterDataStorage({
+            storage: storageModel,
+            mppt,
+        });
+
+        // Discharging at 380W: discharge(380) - charge(0) = 380
+        expect(result.currentBatteryPowerWatts).toBe(380);
+    });
+
+    it('should return null when no battery MPPT channels found', () => {
+        const storageModel = {
+            ID: 124 as const,
+            L: 26,
+            WChaMax: 35840,
+            WChaGra: 100,
+            WDisChaGra: 100,
+            StorCtl_Mod: 0 as StorCtl_Mod,
+            VAChaMax: null,
+            MinRsvPct: null,
+            ChaState: null,
+            StorAval: null,
+            InBatV: null,
+            ChaSt: null,
+            OutWRte: null,
+            InWRte: null,
+            InOutWRte_WinTms: null,
+            InOutWRte_RvrtTms: null,
+            InOutWRte_RmpTms: null,
+            ChaGriSet: null,
+            WChaMax_SF: 0,
+            WChaDisChaGra_SF: 0,
+            VAChaMax_SF: null,
+            MinRsvPct_SF: null,
+            ChaState_SF: null,
+            StorAval_SF: null,
+            InBatV_SF: null,
+            InOutWRte_SF: null,
+        };
+
+        // MPPT with only PV strings, no battery channels
+        const mppt = {
+            ID: 160 as const,
+            L: 48,
+            DCA_SF: -2,
+            DCV_SF: -1,
+            DCW_SF: -1,
+            DCWH_SF: 0,
+            Evt: null,
+            N: 2,
+            TmsPer: null,
+            modules: [
+                {
+                    ID: 1,
+                    IDStr: 'MPPT 1',
+                    DCA: 1200,
+                    DCV: 4000,
+                    DCW: 5000,
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+                {
+                    ID: 2,
+                    IDStr: 'MPPT 2',
+                    DCA: 1100,
+                    DCV: 3900,
+                    DCW: 4500,
+                    DCWH: null,
+                    Tms: null,
+                    Tmp: null,
+                    DCSt: null,
+                    DcEvt: null,
+                },
+            ],
+        };
+
+        const result = generateInverterDataStorage({
+            storage: storageModel,
+            mppt,
+        });
+
+        expect(result.currentBatteryPowerWatts).toBeNull();
     });
 });
 
@@ -360,8 +658,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
             storageModel: baseStorageModel,
         });
 
-        expect(result.StorCtl_Mod).toBe(0,
-        );
+        expect(result.StorCtl_Mod).toBe(0);
     });
 
     it('should convert charge watts to InWRte percentage with scale factor', () => {
@@ -505,6 +802,35 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
         });
 
         expect(result.InWRte).toBe(14);
+    });
+
+    it('should clamp charge percent to 100% when targetPowerWatts exceeds WChaMax', () => {
+        // 577992W >> 35840W WChaMax → would be 1612% unclamped, must clamp to 100%
+        // With SF=-2: 100% → raw 10000
+        const result = generateStorageModelWriteFromBatteryControl({
+            batteryControl: {
+                targetPowerWatts: 577992,
+                mode: 'charge',
+            },
+            storageModel: baseStorageModel,
+        });
+
+        expect(result.InWRte).toBe(10000);
+        expect(result.OutWRte).toBe(0);
+    });
+
+    it('should clamp discharge percent to 100% when targetPowerWatts exceeds WChaMax', () => {
+        // Same for discharge direction
+        const result = generateStorageModelWriteFromBatteryControl({
+            batteryControl: {
+                targetPowerWatts: -577992,
+                mode: 'discharge',
+            },
+            storageModel: baseStorageModel,
+        });
+
+        expect(result.InWRte).toBe(0);
+        expect(result.OutWRte).toBe(10000);
     });
 
     it('should handle null InOutWRte_SF (defaults to 0)', () => {
