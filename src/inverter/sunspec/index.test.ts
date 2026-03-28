@@ -209,7 +209,6 @@ describe('generateInverterDataStorage', () => {
             const result = generateInverterDataStorage({
                 storage: storageModel,
                 mppt: null,
-                batteryMpptChannel: undefined,
             });
             expect(result.chargeStatus).toBe(status);
         });
@@ -251,7 +250,6 @@ describe('generateInverterDataStorage', () => {
             const result = generateInverterDataStorage({
                 storage: storageModel,
                 mppt: null,
-                batteryMpptChannel: undefined,
             });
             expect(result.gridChargingPermitted).toBe(mode);
         });
