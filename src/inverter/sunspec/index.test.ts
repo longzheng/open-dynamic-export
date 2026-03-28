@@ -351,7 +351,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
         );
     });
 
-    it('should set StorCtl_Mod=3 (both bits) for idle mode', () => {
+    it('should set StorCtl_Mod=0 (release control) for idle mode', () => {
         const result = generateStorageModelWriteFromBatteryControl({
             batteryControl: {
                 targetPowerWatts: 0,
@@ -360,8 +360,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
             storageModel: baseStorageModel,
         });
 
-        expect(result.StorCtl_Mod).toBe(
-            StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE,
+        expect(result.StorCtl_Mod).toBe(0,
         );
     });
 
