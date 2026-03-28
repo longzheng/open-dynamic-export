@@ -677,6 +677,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
     it('should convert discharge watts to OutWRte percentage with scale factor', () => {
         // 3000W out of 35840W = 8.37%
         // With SF=-2, raw = 8.37 * 100 = 837
+        // InWRte = -OutWRte to force discharge (Fronius power window)
         const result = generateStorageModelWriteFromBatteryControl({
             batteryControl: {
                 targetPowerWatts: -3000,
@@ -685,7 +686,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
             storageModel: baseStorageModel,
         });
 
-        expect(result.InWRte).toBe(0);
+        expect(result.InWRte).toBe(-837);
         expect(result.OutWRte).toBe(837);
     });
 
@@ -827,7 +828,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
             storageModel: baseStorageModel,
         });
 
-        expect(result.InWRte).toBe(0);
+        expect(result.InWRte).toBe(-10000);
         expect(result.OutWRte).toBe(10000);
     });
 

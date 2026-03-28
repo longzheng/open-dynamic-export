@@ -582,7 +582,6 @@ export function generateStorageModelWriteFromBatteryControl({
             break;
         }
         case 'discharge': {
-            chargePercent = 0;
             dischargePercent = Math.min(
                 batteryControl.dischargeRatePercent !== undefined
                     ? Math.min(
@@ -592,6 +591,16 @@ export function generateStorageModelWriteFromBatteryControl({
                     : targetPercent,
                 100,
             );
+            // On Fronius Gen24, InWRte/OutWRte define a power WINDOW:
+            //   InWRte = max charge rate, OutWRte = max discharge rate
+            //   "Every rate between these two limits is allowed."
+            // Setting InWRte=0, OutWRte=X only ALLOWS discharge but doesn't
+            // force it — the battery idles if PV covers the load.
+            // A negative InWRte means "minimum discharge rate", forcing the
+            // battery to discharge even when surplus PV is available (for grid export).
+            // Fronius validation: (-1)*InWRte must not exceed OutWRte, so we
+            // set InWRte = -OutWRte to create a fixed-point window.
+            chargePercent = -dischargePercent;
             break;
         }
         case 'idle': {
