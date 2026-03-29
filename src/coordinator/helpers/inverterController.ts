@@ -423,7 +423,7 @@ export class InverterController {
             const rawExportTarget =
                 batteryAdjustedInverterControlLimit.batteryExportTargetWatts
                     ?.value ?? 0;
-            const maxExportTargetChange = 500; // watts per cycle (~500W/s)
+            const maxExportTargetChange = 1000; // watts per cycle (~1kW/s)
             this.rampedBatteryExportTargetWatts = cappedChange({
                 previousValue: this.rampedBatteryExportTargetWatts,
                 targetValue: rawExportTarget,
