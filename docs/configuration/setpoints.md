@@ -59,7 +59,7 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
             "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
             "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
             "generationLimitWatts": 10000, // (number) optional: the maximum generation limit in watts
-            "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (not currently used)
+            "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (constrains battery grid charging)
             "loadLimitWatts": 10000, // (number) optional: the maximum load limit in watts (not currently used)
             
             // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true)
@@ -130,6 +130,7 @@ The MQTT topic must contain a JSON message that meets the following schema
     // batteryPriorityMode: "battery_first" | "export_first" (optional)
     // batteryGridChargingEnabled: boolean (optional)
     // batteryGridChargingMaxWatts: number (optional)
+    // batteryExportTargetWatts: number (optional) - site-level export target in watts; battery fills what PV doesn't cover
 }
 ```
 

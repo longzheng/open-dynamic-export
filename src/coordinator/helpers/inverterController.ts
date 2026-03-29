@@ -604,6 +604,9 @@ export function calculateInverterConfiguration({
             batteryDischargeMaxWatts:
                 activeInverterControlLimit.batteryDischargeMaxWatts?.value,
             exportLimitWatts,
+            importLimitWatts:
+                activeInverterControlLimit.opModImpLimW?.value ??
+                defaultValues.opModImpLimW,
             batteryPriorityMode:
                 activeInverterControlLimit.batteryPriorityMode?.value,
             batteryGridChargingEnabled:

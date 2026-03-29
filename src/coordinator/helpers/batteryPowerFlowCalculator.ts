@@ -35,8 +35,10 @@ export type BatteryPowerFlowInput = {
     batteryChargeMaxWatts: number | undefined;
     // Maximum battery discharging power in watts
     batteryDischargeMaxWatts: number | undefined;
-    // Maximum allowed export to grid in watts
+    // Maximum allowed export to grid in watts (opModExpLimW)
     exportLimitWatts: number;
+    // Maximum allowed import from grid in watts (opModImpLimW)
+    importLimitWatts: number;
     // Battery priority mode
     batteryPriorityMode: 'export_first' | 'battery_first' | undefined;
     // Whether grid charging is enabled
@@ -77,6 +79,7 @@ export function calculateBatteryPowerFlow(
         batteryChargeMaxWatts,
         batteryDischargeMaxWatts,
         exportLimitWatts,
+        importLimitWatts,
         batteryPriorityMode,
         batteryGridChargingEnabled,
         batteryGridChargingMaxWatts,
@@ -126,16 +129,25 @@ export function calculateBatteryPowerFlow(
     const exportTarget = batteryExportTargetWatts ?? 0;
     const gridChargingActive = batteryGridChargingEnabled === true;
 
-    // Battery discharge needed: self-consumption (cover imports) PLUS battery export target.
-    // The export target is ADDITIVE — it means "discharge this much from battery for export"
-    // regardless of any PV surplus. PV surplus exports separately via the grid.
+    // Battery export target uses gap-filling semantics: PV surplus counts toward
+    // the target, battery only discharges the difference. This ensures:
+    // 1. Battery preserves capacity when PV already covers the export target
+    // 2. Total site export (PV + battery) never exceeds exportLimitWatts (DOE compliance)
     //
-    // When exportTarget = 0 and availablePower = -500: 0 + 500 = 500 (self-consumption only).
-    // When exportTarget = 0 and availablePower = 1000: 0 + 0 = 0 (surplus, no discharge).
-    // When exportTarget = 2000 and availablePower = -500: 2000 + 500 = 2500 (export + deficit).
-    // When exportTarget = 2000 and availablePower = 5000: 2000 + 0 = 2000 (export despite surplus).
+    // When exportTarget = 0 and availablePower = -500: need 0, self-consumption 500 → discharge 500.
+    // When exportTarget = 0 and availablePower = 1000: need 0, self-consumption 0 → no discharge.
+    // When exportTarget = 2000 and availablePower = -500: need 2000, self-consumption 500 → discharge 2500.
+    // When exportTarget = 2000 and availablePower = 5000: need 0 (PV covers it) → no discharge.
+    // When exportTarget = 5000 and availablePower = 2000: need 3000 (battery fills gap) → discharge 3000.
+    const pvSurplus = Math.max(0, availablePower);
+    const batteryExportNeeded = Math.max(0, exportTarget - pvSurplus);
+
+    // Hard-cap at DOE export headroom: how much more can be exported beyond PV
+    const exportHeadroom = Math.max(0, exportLimitWatts - pvSurplus);
+    const effectiveExportTarget = Math.min(batteryExportNeeded, exportHeadroom);
+
     const selfConsumptionDischarge = Math.max(0, -availablePower);
-    const batteryDischargeNeeded = exportTarget + selfConsumptionDischarge;
+    const batteryDischargeNeeded = effectiveExportTarget + selfConsumptionDischarge;
 
     if (batteryDischargeNeeded > 0 && canDischarge && !gridChargingActive) {
         // Discharge battery: cover grid imports and/or meet battery export target
@@ -144,7 +156,7 @@ export function calculateBatteryPowerFlow(
             maxDischargePower,
         );
         batteryMode = 'discharge';
-        targetExportWatts = Math.min(exportTarget, exportLimitWatts);
+        targetExportWatts = effectiveExportTarget;
     } else if (availablePower > 0) {
         // We have excess solar power to allocate
         if (priorityMode === 'battery_first') {
@@ -201,13 +213,17 @@ export function calculateBatteryPowerFlow(
         });
 
         if (gridChargingActive && canCharge && batteryNeedWatts > 0) {
-            // Grid charging: charge battery from grid, capped at gridChargingMaxWatts
+            // Grid charging: charge battery from grid, capped at gridChargingMaxWatts.
+            // Also respect import limit (grid charge + house load must not exceed opModImpLimW).
             const gridChargeLimit =
                 batteryGridChargingMaxWatts ?? maxChargePower;
+            const currentImport = Math.max(0, siteWatts);
+            const importHeadroom = Math.max(0, importLimitWatts - currentImport);
             const gridChargePower = Math.min(
                 gridChargeLimit,
                 maxChargePower,
                 batteryNeedWatts,
+                importHeadroom,
             );
 
             targetBatteryPowerWatts = gridChargePower;

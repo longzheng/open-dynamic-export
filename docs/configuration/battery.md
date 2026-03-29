@@ -94,6 +94,7 @@ Enable battery power flow control in `config.json`:
 | `batteryPriorityMode` | string | - | `"battery_first"` or `"export_first"` |
 | `batteryGridChargingEnabled` | boolean | false | Allow charging battery from grid when solar is insufficient |
 | `batteryGridChargingMaxWatts` | number | - | Maximum power drawn from grid for battery charging (watts) |
+| `batteryExportTargetWatts` | number | 0 | Site-level export target (watts). Battery discharges to fill the gap between PV surplus and this target. See [Battery Export Target](#battery-export-target) |
 
 ### Priority Modes
 
@@ -169,9 +170,11 @@ When `batteryGridChargingEnabled` is `true` and the battery is below its target 
 Grid charging behavior:
 1. Solar charges battery first (existing behavior applies when excess solar)
 2. When solar is insufficient, grid tops up:
-   gridChargePower = min(batteryGridChargingMaxWatts, batteryChargeMaxWatts, batteryNeedWatts)
+   gridChargePower = min(batteryGridChargingMaxWatts, batteryChargeMaxWatts, batteryNeedWatts, importHeadroom)
 3. Battery discharge is suppressed while grid charging is enabled
 ```
+
+Grid charging respects the site import limit (`opModImpLimW` / `importLimitWatts`): the charge power is capped so that total site import (house load + battery charging) does not exceed the import limit.
 
 > [!IMPORTANT]
 > When grid charging is active, the battery does **not** discharge to reduce imports. These are conflicting goals — one pulls power from the grid to charge, the other discharges to reduce grid pull. When the battery reaches its target SoC, it holds idle until the external controller disables grid charging.
@@ -199,6 +202,46 @@ Grid charging is designed to be controlled by external automation tools via MQTT
 }
 ```
 
+### Battery Export Target
+
+When `batteryExportTargetWatts` is set, the battery discharges to achieve a target level of grid export. This uses **gap-filling semantics**: PV surplus counts toward the target, and the battery only discharges the difference.
+
+```
+Battery discharge for export = max(0, batteryExportTargetWatts - PV surplus)
+```
+
+| Scenario | PV surplus | Target | Battery discharge for export |
+|----------|-----------|--------|------------------------------|
+| PV exceeds target | 5000W | 3000W | 0W (PV already covers it) |
+| PV partially covers | 1000W | 3000W | 2000W (battery fills the gap) |
+| No PV (night) | 0W | 3000W | 3000W (full battery discharge) |
+
+The battery export is also hard-capped at the DOE export limit headroom: if the export limit is 5000W and PV is already exporting 4000W, the battery can only add 1000W regardless of the export target.
+
+In addition to export, the battery always covers self-consumption (reducing grid imports) when not grid-charging.
+
+> [!IMPORTANT]
+> `batteryExportTargetWatts` is a site-level target, not a battery-only target. PV generation counts toward it. If PV surplus alone exceeds the target, the battery will idle rather than discharge unnecessarily. This preserves battery capacity for when PV is insufficient.
+
+**Example: MQTT-controlled battery export for time-of-use tariffs**
+
+```jsonc
+// Peak export period: discharge battery to export 3kW
+{
+    "batteryExportTargetWatts": 3000,
+    "batteryPriorityMode": "export_first",
+    "batterySocMinPercent": 20
+}
+
+// Off-peak: stop battery export, charge from grid
+{
+    "batteryExportTargetWatts": 0,
+    "batteryGridChargingEnabled": true,
+    "batteryGridChargingMaxWatts": 3000,
+    "batterySocTargetPercent": 100
+}
+```
+
 ### MQTT Dynamic Control
 
 Battery parameters can be changed dynamically via MQTT:
@@ -209,6 +252,7 @@ Battery parameters can be changed dynamically via MQTT:
     "batteryPriorityMode": "battery_first",
     "batteryGridChargingEnabled": true,
     "batteryGridChargingMaxWatts": 3000,
+    "batteryExportTargetWatts": 0,
     "exportLimitWatts": 0
 }
 ```
