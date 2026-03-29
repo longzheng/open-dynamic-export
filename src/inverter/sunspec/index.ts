@@ -591,15 +591,15 @@ export function generateStorageModelWriteFromBatteryControl({
                     : targetPercent,
                 100,
             );
-            // On Fronius Gen24, InWRte/OutWRte define a power WINDOW:
+            // Per SunSpec Model 124, InWRte/OutWRte define a power WINDOW:
             //   InWRte = max charge rate, OutWRte = max discharge rate
             //   "Every rate between these two limits is allowed."
             // Setting InWRte=0, OutWRte=X only ALLOWS discharge but doesn't
             // force it — the battery idles if PV covers the load.
             // A negative InWRte means "minimum discharge rate", forcing the
             // battery to discharge even when surplus PV is available (for grid export).
-            // Fronius validation: (-1)*InWRte must not exceed OutWRte, so we
-            // set InWRte = -OutWRte to create a fixed-point window.
+            // Validation (e.g. Fronius): (-1)*InWRte must not exceed OutWRte,
+            // so we set InWRte = -OutWRte to create a fixed-point window.
             chargePercent = -dischargePercent;
             break;
         }

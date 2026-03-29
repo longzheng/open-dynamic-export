@@ -129,6 +129,11 @@ export class InverterController {
     private abortController: AbortController;
     private batteryChargeBufferWatts: number | null = null;
     private batteryPowerFlowControlEnabled: boolean;
+    // Ramped battery export target — smooths transitions when MQTT changes
+    // the export target (e.g. 0 → 3000W), preventing abrupt battery swings
+    // that cause hybrid inverters (e.g. Fronius) to curtail PV to protect the DC bus.
+    // Load-driven discharge is unaffected since it uses self-consumption path.
+    private rampedBatteryExportTargetWatts: number = 0;
 
     constructor({
         config,
@@ -410,8 +415,35 @@ export class InverterController {
                 return 0;
             })();
 
+            // Ramp the battery export target to prevent abrupt battery swings
+            // when MQTT changes it (e.g. 0 → 3000W).  This smooths the
+            // charge→discharge transition so the inverter's DC bus/MPPT can adjust
+            // gradually.  Load-driven discharge (self-consumption) is unaffected
+            // since it uses the separate selfConsumptionDischarge path.
+            const rawExportTarget =
+                batteryAdjustedInverterControlLimit.batteryExportTargetWatts
+                    ?.value ?? 0;
+            const maxExportTargetChange = 500; // watts per cycle (~500W/s)
+            this.rampedBatteryExportTargetWatts = cappedChange({
+                previousValue: this.rampedBatteryExportTargetWatts,
+                targetValue: rawExportTarget,
+                maxChange: maxExportTargetChange,
+            });
+
+            const rampedControlLimit = {
+                ...batteryAdjustedInverterControlLimit,
+                batteryExportTargetWatts:
+                    this.rampedBatteryExportTargetWatts > 0
+                        ? {
+                              source: batteryAdjustedInverterControlLimit
+                                  .batteryExportTargetWatts?.source ?? 'mqtt',
+                              value: this.rampedBatteryExportTargetWatts,
+                          }
+                        : undefined,
+            };
+
             const configuration = calculateInverterConfiguration({
-                activeInverterControlLimit: batteryAdjustedInverterControlLimit,
+                activeInverterControlLimit: rampedControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
                 instantaneousSiteWatts: mostRecentSiteWatts,
@@ -473,7 +505,6 @@ export class InverterController {
                         invertersCount: configuration.invertersCount,
                         targetSolarWatts: configuration.targetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
-                        // Preserve battery control configuration from the calculated configuration
                         batteryControl: configuration.batteryControl,
                     };
                 }

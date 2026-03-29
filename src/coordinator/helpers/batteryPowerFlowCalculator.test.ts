@@ -887,13 +887,15 @@ describe('calculateBatteryPowerFlow', () => {
             const result = calculateBatteryPowerFlow(input);
 
             // availablePower = 1000 surplus, exportTarget = 3000
-            // Discharge needed = 3000 - 1000 = 2000W (solar covers 1000 of the target)
+            // Battery export is additive: 3000W from battery + PV surplus exported separately
+            // Self-consumption discharge = max(0, -1000) = 0
+            // Total discharge = 3000 + 0 = 3000W
             expect(result.batteryMode).toBe('discharge');
-            expect(result.targetBatteryPowerWatts).toBe(-2000);
+            expect(result.targetBatteryPowerWatts).toBe(-3000);
             expect(result.targetExportWatts).toBe(3000);
         });
 
-        it('should not discharge when solar surplus covers entire export target', () => {
+        it('should still discharge when solar surplus covers export target (additive)', () => {
             const input: BatteryPowerFlowInput = {
                 solarWatts: 10000,
                 siteWatts: -8000, // Exporting 8000W surplus
@@ -913,12 +915,12 @@ describe('calculateBatteryPowerFlow', () => {
 
             const result = calculateBatteryPowerFlow(input);
 
-            // availablePower = 8000, exportTarget = 3000
-            // Discharge needed = max(0, 3000 - 8000) = 0 (solar covers it)
-            // Falls through to normal surplus allocation (export_first)
-            expect(result.batteryMode).toBe('idle');
-            expect(result.targetBatteryPowerWatts).toBe(0);
-            expect(result.targetExportWatts).toBe(8000);
+            // availablePower = 8000 surplus, but battery export is additive:
+            // Battery discharges 3000W regardless of PV surplus
+            // Total export = PV surplus + battery = 8000 + 3000 = 11000W
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-3000);
+            expect(result.targetExportWatts).toBe(3000);
         });
 
         it('should cap discharge at batteryDischargeMaxWatts', () => {
@@ -1075,14 +1077,14 @@ describe('calculateBatteryPowerFlow', () => {
             const result = calculateBatteryPowerFlow(input);
 
             // availablePower = -0 + 7500 = 7500
-            // exportTarget = 4000, batteryDischargeNeeded = max(0, 4000 - 7500) = 0
-            // Falls to surplus allocation (export_first):
-            //   export 4000, charge remaining 3500
-            expect(result.batteryMode).toBe('charge');
-            expect(result.targetBatteryPowerWatts).toBe(3500);
+            // Battery export is additive: exportTarget = 4000, always discharge 4000W
+            // selfConsumptionDischarge = max(0, -7500) = 0
+            // batteryDischargeNeeded = 4000 + 0 = 4000
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-4000);
             expect(result.targetExportWatts).toBe(4000);
 
-            // Critical: targetSolarWatts must use MEASURED battery (7500) not TARGET (3500)
+            // Critical: targetSolarWatts must use MEASURED battery (7500) not TARGET (-4000)
             // targetSolar = load(8700) + measuredBattery(7500) + exportLimit(4000) = 20200
             // This keeps ratio ≈ 1.0, preventing premature PV curtailment
             expect(result.targetSolarWatts).toBeGreaterThan(15000);

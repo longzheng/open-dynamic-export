@@ -126,12 +126,16 @@ export function calculateBatteryPowerFlow(
     const exportTarget = batteryExportTargetWatts ?? 0;
     const gridChargingActive = batteryGridChargingEnabled === true;
 
-    // How much battery discharge is needed to cover grid imports AND meet export target.
-    // When exportTarget = 0 and availablePower = -500, this is 500 (self-consumption).
-    // When exportTarget = 2000 and availablePower = -500, this is 2500 (cover deficit + export).
-    // When exportTarget = 2000 and availablePower = 1000, this is 1000 (solar covers part of target).
-    // When exportTarget = 0 and availablePower = 1000, this is 0 (surplus, no discharge needed).
-    const batteryDischargeNeeded = Math.max(0, exportTarget - availablePower);
+    // Battery discharge needed: self-consumption (cover imports) PLUS battery export target.
+    // The export target is ADDITIVE — it means "discharge this much from battery for export"
+    // regardless of any PV surplus. PV surplus exports separately via the grid.
+    //
+    // When exportTarget = 0 and availablePower = -500: 0 + 500 = 500 (self-consumption only).
+    // When exportTarget = 0 and availablePower = 1000: 0 + 0 = 0 (surplus, no discharge).
+    // When exportTarget = 2000 and availablePower = -500: 2000 + 500 = 2500 (export + deficit).
+    // When exportTarget = 2000 and availablePower = 5000: 2000 + 0 = 2000 (export despite surplus).
+    const selfConsumptionDischarge = Math.max(0, -availablePower);
+    const batteryDischargeNeeded = exportTarget + selfConsumptionDischarge;
 
     if (batteryDischargeNeeded > 0 && canDischarge && !gridChargingActive) {
         // Discharge battery: cover grid imports and/or meet battery export target
