@@ -435,8 +435,10 @@ export class InverterController {
                 batteryExportTargetWatts:
                     this.rampedBatteryExportTargetWatts > 0
                         ? {
-                              source: batteryAdjustedInverterControlLimit
-                                  .batteryExportTargetWatts?.source ?? 'mqtt',
+                              source:
+                                  batteryAdjustedInverterControlLimit
+                                      .batteryExportTargetWatts?.source ??
+                                  'mqtt',
                               value: this.rampedBatteryExportTargetWatts,
                           }
                         : undefined,
