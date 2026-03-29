@@ -147,7 +147,8 @@ export function calculateBatteryPowerFlow(
     const effectiveExportTarget = Math.min(batteryExportNeeded, exportHeadroom);
 
     const selfConsumptionDischarge = Math.max(0, -availablePower);
-    const batteryDischargeNeeded = effectiveExportTarget + selfConsumptionDischarge;
+    const batteryDischargeNeeded =
+        effectiveExportTarget + selfConsumptionDischarge;
 
     if (batteryDischargeNeeded > 0 && canDischarge && !gridChargingActive) {
         // Discharge battery: cover grid imports and/or meet battery export target
@@ -218,7 +219,10 @@ export function calculateBatteryPowerFlow(
             const gridChargeLimit =
                 batteryGridChargingMaxWatts ?? maxChargePower;
             const currentImport = Math.max(0, siteWatts);
-            const importHeadroom = Math.max(0, importLimitWatts - currentImport);
+            const importHeadroom = Math.max(
+                0,
+                importLimitWatts - currentImport,
+            );
             const gridChargePower = Math.min(
                 gridChargeLimit,
                 maxChargePower,
