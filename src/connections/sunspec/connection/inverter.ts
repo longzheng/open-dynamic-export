@@ -8,7 +8,7 @@ import type { SettingsModel } from '../models/settings.js';
 import { settingsModel } from '../models/settings.js';
 import type { StatusModel } from '../models/status.js';
 import { statusModel } from '../models/status.js';
-import type { StorageModel, StorageModelWrite } from '../models/storage.js';
+import type { StorageModelWrite } from '../models/storage.js';
 import { storageModel } from '../models/storage.js';
 import { mpptModuleModel, type MpptModuleModel } from '../models/mppt.js';
 import { mpptModel } from '../models/mppt.js';

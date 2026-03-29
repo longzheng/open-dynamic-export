@@ -62,15 +62,18 @@ JSON
 
 preset_battery_export() {
     local export_watts="${1:-3000}"
+    # Note: opModExpLimW is deliberately NOT set — it stays at whatever
+    # CSIP-AUS (or other setpoint source) allows. Only batteryExportTargetWatts
+    # controls how much the battery exports.
     cat <<JSON
 {
   "opModEnergize": true,
-  "opModExpLimW": ${export_watts},
   "opModGenLimW": 20000,
   "batterySocMinPercent": 20,
   "batterySocMaxPercent": 100,
   "batteryDischargeMaxWatts": ${export_watts},
-  "batteryChargeMaxWatts": 5000,
+  "batteryChargeMaxWatts": 0,
+  "batteryExportTargetWatts": ${export_watts},
   "batteryPriorityMode": "export_first"
 }
 JSON

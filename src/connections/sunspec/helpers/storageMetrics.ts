@@ -26,17 +26,11 @@ export function getStorageMetrics(storage: StorageModel) {
                 : null,
         ChaState:
             storage.ChaState_SF !== null
-                ? numberNullableWithPow10(
-                      storage.ChaState,
-                      storage.ChaState_SF,
-                  )
+                ? numberNullableWithPow10(storage.ChaState, storage.ChaState_SF)
                 : null,
         StorAval:
             storage.StorAval_SF !== null
-                ? numberNullableWithPow10(
-                      storage.StorAval,
-                      storage.StorAval_SF,
-                  )
+                ? numberNullableWithPow10(storage.StorAval, storage.StorAval_SF)
                 : null,
         InBatV:
             storage.InBatV_SF !== null
@@ -45,17 +39,11 @@ export function getStorageMetrics(storage: StorageModel) {
         ChaSt: storage.ChaSt,
         OutWRte:
             storage.InOutWRte_SF !== null
-                ? numberNullableWithPow10(
-                      storage.OutWRte,
-                      storage.InOutWRte_SF,
-                  )
+                ? numberNullableWithPow10(storage.OutWRte, storage.InOutWRte_SF)
                 : null,
         InWRte:
             storage.InOutWRte_SF !== null
-                ? numberNullableWithPow10(
-                      storage.InWRte,
-                      storage.InOutWRte_SF,
-                  )
+                ? numberNullableWithPow10(storage.InWRte, storage.InOutWRte_SF)
                 : null,
         InOutWRte_WinTms: storage.InOutWRte_WinTms,
         InOutWRte_RvrtTms: storage.InOutWRte_RvrtTms,
