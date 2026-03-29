@@ -617,13 +617,12 @@ export function generateStorageModelWriteFromBatteryControl({
         dischargePercent * Math.pow(10, -inOutWRteSF),
     );
 
-    // For idle mode, release storage control (StorCtl_Mod=0) so the inverter
-    // manages the battery autonomously. Only set StorCtl_Mod=3 (charge +
-    // discharge control) when actively commanding a charge or discharge rate.
-    const storCtlMod =
-        batteryControl.mode === 'idle'
-            ? 0
-            : StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE;
+    // Always maintain storage control (StorCtl_Mod=3) when battery flow control
+    // is active. For idle mode, InWRte=0 + OutWRte=0 creates a [0,0] power
+    // window that holds the battery at 0W.  Releasing control (StorCtl_Mod=0)
+    // would let the inverter autonomously charge/discharge, defeating the
+    // calculator's intent (e.g., preventing charging during forced export).
+    const storCtlMod = StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE;
 
     return {
         ...storageModel,

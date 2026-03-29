@@ -647,7 +647,7 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
         );
     });
 
-    it('should set StorCtl_Mod=0 (release control) for idle mode', () => {
+    it('should maintain StorCtl_Mod=3 for idle mode (hold at 0W, not autonomous)', () => {
         const result = generateStorageModelWriteFromBatteryControl({
             batteryControl: {
                 targetPowerWatts: 0,
@@ -656,7 +656,14 @@ describe('generateStorageModelWriteFromBatteryControl', () => {
             storageModel: baseStorageModel,
         });
 
-        expect(result.StorCtl_Mod).toBe(0);
+        // StorCtl_Mod=3 with InWRte=0, OutWRte=0 holds battery at 0W.
+        // Releasing control (StorCtl_Mod=0) would let the inverter autonomously
+        // charge/discharge, defeating the calculator's intent.
+        expect(result.StorCtl_Mod).toBe(
+            StorCtl_Mod.CHARGE | StorCtl_Mod.DISCHARGE,
+        );
+        expect(result.InWRte).toBe(0);
+        expect(result.OutWRte).toBe(0);
     });
 
     it('should convert charge watts to InWRte percentage with scale factor', () => {
