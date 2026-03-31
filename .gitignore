@@ -138,3 +138,4 @@ docs/.vitepress/cache
 
 # TSOA generated files
 src/tsoa/
+src/ui/gen/api.d.ts
