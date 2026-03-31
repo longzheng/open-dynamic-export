@@ -444,6 +444,23 @@ export class InverterController {
                         : undefined,
             };
 
+            // Compute hybrid inverter headroom from the most recent DER sample.
+            // On hybrid inverters, PV and battery share the AC bus — cap discharge
+            // at (nameplate - PV) to prevent firmware curtailing PV.
+            const batteryInverterHeadroomWatts = (() => {
+                const mostRecentSample =
+                    recentDerSamples[recentDerSamples.length - 1];
+                const battery = mostRecentSample?.battery;
+                if (!battery) {
+                    return undefined;
+                }
+                return Math.max(
+                    0,
+                    battery.batteryInverterNameplateMaxW -
+                        battery.batteryInverterSolarW,
+                );
+            })();
+
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit: rampedControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
@@ -455,6 +472,7 @@ export class InverterController {
                     this.batteryPowerFlowControlEnabled,
                 batterySocPercent,
                 currentBatteryPowerWatts,
+                batteryInverterHeadroomWatts,
             });
 
             switch (configuration.type) {
@@ -502,12 +520,44 @@ export class InverterController {
                         maxChange,
                     });
 
+                    // Ramp battery discharge power to prevent DC bus slam.
+                    // The export target ramp (1kW/cycle) is insufficient because
+                    // gap-filling creates a positive feedback loop: discharge
+                    // reduces pvSurplus → larger gap → more discharge → etc.
+                    // This ramp caps the actual power change per cycle.
+                    const rampedBatteryControl = (() => {
+                        if (!configuration.batteryControl) {
+                            return configuration.batteryControl;
+                        }
+
+                        const previousBatteryPower =
+                            this.lastAppliedInverterConfiguration?.type ===
+                                'limit' &&
+                            this.lastAppliedInverterConfiguration.batteryControl
+                                ? this.lastAppliedInverterConfiguration
+                                      .batteryControl.targetPowerWatts
+                                : 0;
+
+                        const maxBatteryPowerChange = 1000; // watts per cycle
+                        const rampedPower = cappedChange({
+                            previousValue: previousBatteryPower,
+                            targetValue:
+                                configuration.batteryControl.targetPowerWatts,
+                            maxChange: maxBatteryPowerChange,
+                        });
+
+                        return {
+                            ...configuration.batteryControl,
+                            targetPowerWatts: rampedPower,
+                        };
+                    })();
+
                     return {
                         type: 'limit',
                         invertersCount: configuration.invertersCount,
                         targetSolarWatts: configuration.targetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
-                        batteryControl: configuration.batteryControl,
+                        batteryControl: rampedBatteryControl,
                     };
                 }
             }
@@ -539,6 +589,7 @@ export function calculateInverterConfiguration({
     batteryPowerFlowControlEnabled,
     batterySocPercent,
     currentBatteryPowerWatts,
+    batteryInverterHeadroomWatts,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
@@ -550,6 +601,8 @@ export function calculateInverterConfiguration({
     batteryPowerFlowControlEnabled: boolean;
     batterySocPercent: number | null;
     currentBatteryPowerWatts: number;
+    /** Hybrid inverter AC headroom (nameplate - PV) for battery discharge cap. */
+    batteryInverterHeadroomWatts?: number | undefined;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
         module: 'calculateInverterConfiguration',
@@ -615,6 +668,7 @@ export function calculateInverterConfiguration({
                 activeInverterControlLimit.batteryGridChargingMaxWatts?.value,
             batteryExportTargetWatts:
                 activeInverterControlLimit.batteryExportTargetWatts?.value,
+            batteryInverterHeadroomWatts,
         };
 
         const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);

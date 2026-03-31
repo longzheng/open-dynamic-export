@@ -73,6 +73,10 @@ export const derSampleDataSchema = v.object({
             totalCurrentBatteryPowerWatts: v.nullable(v.number()),
             // Number of inverters with battery storage
             batteryCount: v.number(),
+            // Nameplate max W of battery-hosting inverters (for hybrid inverter AC output constraint)
+            batteryInverterNameplateMaxW: v.number(),
+            // Current solar output of battery-hosting inverters (PV shares AC bus with battery)
+            batteryInverterSolarW: v.number(),
         }),
     ),
 });
@@ -166,16 +170,15 @@ export function generateDerSample({
         },
         invertersCount: invertersData.length,
         battery: (() => {
-            const batteriesData = invertersData
-                .map((data) => data.storage)
-                .filter(
-                    (storage): storage is NonNullable<typeof storage> =>
-                        storage !== undefined,
-                );
+            const batteryInverters = invertersData.filter(
+                (data) => data.storage !== undefined,
+            );
 
-            if (batteriesData.length === 0) {
+            if (batteryInverters.length === 0) {
                 return null;
             }
+
+            const batteriesData = batteryInverters.map((data) => data.storage!);
 
             const socValues = batteriesData
                 .map((battery) => battery.stateOfChargePercent)
@@ -202,7 +205,18 @@ export function generateDerSample({
                         (battery) => battery.currentBatteryPowerWatts,
                     ),
                 ),
-                batteryCount: batteriesData.length,
+                batteryCount: batteryInverters.length,
+                // Nameplate and solar output of battery-hosting inverters.
+                // On hybrid inverters, PV and battery share the AC output bus,
+                // so battery discharge must leave headroom for PV within the nameplate.
+                batteryInverterNameplateMaxW: sumNumbersArray(
+                    batteryInverters.map((data) => data.nameplate.maxW),
+                ),
+                batteryInverterSolarW: sumNumbersArray(
+                    batteryInverters.map((data) =>
+                        Math.max(0, data.inverter.realPower),
+                    ),
+                ),
             };
         })(),
     };
