@@ -137,4 +137,4 @@ docs/.vitepress/cache
 .DS_Store
 
 # TSOA generated files
-tsoa/
+src/tsoa/
