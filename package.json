@@ -4,12 +4,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "npm run routes:generate && tsc -p tsconfig.server.json && vite build",
-    "build:debug": "npm run routes:generate && tsc -p tsconfig.server.debug.json",
-    "lint": "tsc --noEmit && eslint . && npm run generate:config-json-schema",
+    "build": "pnpm run routes:generate && tsc -p tsconfig.server.json && vite build",
+    "build:debug": "pnpm run routes:generate && tsc -p tsconfig.server.debug.json",
+    "lint": "tsc --noEmit && eslint . && pnpm run generate:config-json-schema",
     "test": "vitest",
     "start": "NODE_ENV=production node dist/src/app.js",
-    "dev": "npm run routes:generate && tsx src/app.ts",
+    "dev": "pnpm run routes:generate && tsx src/app.ts",
     "routes:generate": "tsoa spec-and-routes && openapi-typescript ./dist/swagger.json -o ./src/ui/gen/api.d.ts",
     "debug:sunspec-discovery": "tsx scripts/debugSunspecDiscovery.ts",
     "cert:device-request": "tsx scripts/certDeviceRequest.ts",
@@ -118,5 +118,6 @@
     "vite-express": "^0.22.0",
     "valibot": "^1.2.0",
     "xml2js": "^0.6.2"
-  }
+  },
+  "packageManager": "pnpm@10.18.3"
 }

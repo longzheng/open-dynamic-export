@@ -13,20 +13,22 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 20
-        cache: 'npm'
+        cache: 'pnpm'
 
-    - run: npm ci
+    - run: corepack enable
+
+    - run: pnpm install --frozen-lockfile
 
     - name: Set up .env
       run: cp .env.example .env
 
-    - run: npm run routes:generate
+    - run: pnpm run routes:generate
 
-    - run: npm run lint
+    - run: pnpm run lint
     
-    - run: npm run build
+    - run: pnpm run build
 
     - name: Check for uncommitted files
       run: git diff --exit-code
 
-    - run: npm test
+    - run: pnpm test

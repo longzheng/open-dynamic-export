@@ -7,20 +7,21 @@ ARG DEBUG=false
 
 WORKDIR /app
 
+RUN corepack enable
+
 # Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
-# into this layer.
+# Leverage a cache mount to /pnpm/store to speed up subsequent builds.
+# Leverage bind mounts to package.json and pnpm-lock.yaml to avoid copying them into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci
+    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
+    --mount=type=cache,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy the rest of the source files into the image.
 COPY . .
 
 # Conditional debug build
-RUN if [ "$DEBUG" = "true" ]; then npm run build:debug; else npm run build; fi
+RUN if [ "$DEBUG" = "true" ]; then pnpm run build:debug; else pnpm run build; fi
 
 # Production
 FROM node:24-alpine AS production
@@ -29,20 +30,21 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
+RUN corepack enable
+
 COPY --from=build /app/dist ./dist
 
 COPY package.json .
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
-# into this layer.
+# Leverage a cache mount to /pnpm/store to speed up subsequent builds.
+# Leverage bind mounts to package.json and pnpm-lock.yaml to avoid copying them into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
+    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
+    --mount=type=cache,target=/pnpm/store \
+    pnpm install --frozen-lockfile --omit=dev
 
 EXPOSE 3000
 
 # Run the application.
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
