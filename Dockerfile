@@ -15,7 +15,7 @@ RUN corepack enable
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
     --mount=type=cache,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install
 
 # Copy the rest of the source files into the image.
 COPY . .
@@ -42,7 +42,7 @@ COPY package.json .
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
     --mount=type=cache,target=/pnpm/store \
-    pnpm install --frozen-lockfile --omit=dev
+    pnpm install --prod
 
 EXPOSE 3000
 
