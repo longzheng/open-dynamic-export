@@ -135,3 +135,6 @@ docs/.vitepress/cache
 
 # macOS files
 .DS_Store
+
+# TSOA generated files
+src/tsoa/
