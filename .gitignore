@@ -136,5 +136,8 @@ docs/.vitepress/cache
 # macOS files
 .DS_Store
 
+# TSOA generated files
+src/tsoa/
+
 # Custom docker-compose setups
 docker-compose.custom.yml
