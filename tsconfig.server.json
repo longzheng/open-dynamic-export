@@ -18,10 +18,6 @@
         "noUnusedLocals": false,
         "experimentalDecorators": true
     },
-    "include": [
-        "src/",
-        "scripts/",
-        "tests/",
-    ],
-    "exclude": ["src/ui/", "dist/"]
+    "include": ["src/"],
+    "exclude": ["src/ui/"]
 }

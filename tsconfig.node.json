@@ -25,6 +25,9 @@
         "vitest.config.ts",
         "eslint.config.mjs",
         "docs/.vitepress/config.ts",
-        "docs/.vitepress/theme/*.ts"
+        "docs/.vitepress/theme/*.ts",
+        "src/",
+        "tests/",
+        "scripts/"
     ]
 }
