@@ -134,6 +134,12 @@ export class InverterController {
     // that cause hybrid inverters (e.g. Fronius) to curtail PV to protect the DC bus.
     // Load-driven discharge is unaffected since it uses self-consumption path.
     private rampedBatteryExportTargetWatts: number = 0;
+    // Idle dwell counter for charge→discharge transitions on hybrid inverters.
+    // Some hybrid inverters (e.g. Fronius Gen24) disrupt the DC bus when the
+    // battery transitions from charge to discharge — MPPT loses tracking and
+    // PV crashes to near-zero. Holding at idle for several cycles lets the DC
+    // bus stabilise before discharge begins.
+    private batteryIdleDwellRemaining: number = 0;
 
     constructor({
         config,
@@ -525,6 +531,13 @@ export class InverterController {
                     // gap-filling creates a positive feedback loop: discharge
                     // reduces pvSurplus → larger gap → more discharge → etc.
                     // This ramp caps the actual power change per cycle.
+                    //
+                    // Additionally, some hybrid inverters (e.g. Fronius Gen24)
+                    // disrupt the DC bus when the battery transitions from
+                    // charge to discharge (MPPT loses tracking, PV crashes to
+                    // near-zero). An idle dwell period holds the battery at 0W
+                    // for several cycles to let the DC bus stabilise before
+                    // discharge begins.
                     const rampedBatteryControl = (() => {
                         if (!configuration.batteryControl) {
                             return configuration.batteryControl;
@@ -538,11 +551,29 @@ export class InverterController {
                                       .batteryControl.targetPowerWatts
                                 : 0;
 
+                        const targetPower =
+                            configuration.batteryControl.targetPowerWatts;
+
+                        // Detect charge→discharge transition and start idle dwell
+                        const IDLE_DWELL_CYCLES = 5;
+                        if (previousBatteryPower > 0 && targetPower < 0) {
+                            this.batteryIdleDwellRemaining = IDLE_DWELL_CYCLES;
+                        }
+
+                        // During dwell, hold at idle (0W)
+                        if (this.batteryIdleDwellRemaining > 0) {
+                            this.batteryIdleDwellRemaining--;
+                            return {
+                                ...configuration.batteryControl,
+                                targetPowerWatts: 0,
+                                mode: 'idle' as const,
+                            };
+                        }
+
                         const maxBatteryPowerChange = 1000; // watts per cycle
                         const rampedPower = cappedChange({
                             previousValue: previousBatteryPower,
-                            targetValue:
-                                configuration.batteryControl.targetPowerWatts,
+                            targetValue: targetPower,
                             maxChange: maxBatteryPowerChange,
                         });
 
