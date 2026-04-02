@@ -138,3 +138,6 @@ docs/.vitepress/cache
 
 # TSOA generated files
 src/tsoa/
+
+# Custom docker-compose setups
+docker-compose.custom.yml

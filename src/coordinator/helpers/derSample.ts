@@ -5,6 +5,7 @@ import {
     perPhaseNetMeasurementSchema,
 } from '../../helpers/measurement.js';
 import {
+    averageNumbersArray,
     averageNumbersNullableArray,
     sumNumbersArray,
     sumNumbersNullableArray,
@@ -57,6 +58,27 @@ export const derSampleDataSchema = v.object({
         genConnectStatus: v.number(),
     }),
     invertersCount: v.pipe(v.number(), v.minValue(0)),
+    // Battery aggregated data across all inverters with storage
+    battery: v.nullable(
+        v.object({
+            // Average state of charge across all batteries
+            averageSocPercent: v.nullable(v.number()),
+            // Total available energy across all batteries
+            totalAvailableEnergyWh: v.nullable(v.number()),
+            // Total max charge rate across all batteries
+            totalMaxChargeRateWatts: v.number(),
+            // Total max discharge rate across all batteries
+            totalMaxDischargeRateWatts: v.number(),
+            // Total measured battery power (positive = discharging, negative = charging, null = unavailable)
+            totalCurrentBatteryPowerWatts: v.nullable(v.number()),
+            // Number of inverters with battery storage
+            batteryCount: v.number(),
+            // Current solar output of battery-hosting inverters.
+            // On hybrid inverters, battery discharge can curtail PV entirely.
+            // Used to check if discharge would be a net loss (lose more PV than gained).
+            batteryInverterSolarW: v.number(),
+        }),
+    ),
 });
 
 export type DerSampleData = v.InferOutput<typeof derSampleDataSchema>;
@@ -112,7 +134,7 @@ export function generateDerSample({
                 DERType.NotApplicable,
             ) satisfies DERType,
             maxW: sumNumbersArray(
-                invertersData.map((data) => data.nameplate.maxVA),
+                invertersData.map((data) => data.nameplate.maxW),
             ),
             maxVA: sumNumbersArray(
                 invertersData.map((data) => data.nameplate.maxVA),
@@ -147,5 +169,49 @@ export function generateDerSample({
             ) satisfies ConnectStatusValue,
         },
         invertersCount: invertersData.length,
+        battery: (() => {
+            const batteryInverters = invertersData.filter(
+                (data) => data.storage !== undefined,
+            );
+
+            if (batteryInverters.length === 0) {
+                return null;
+            }
+
+            const batteriesData = batteryInverters.map((data) => data.storage!);
+
+            const socValues = batteriesData
+                .map((battery) => battery.stateOfChargePercent)
+                .filter((soc): soc is NonNullable<typeof soc> => soc !== null);
+
+            return {
+                averageSocPercent:
+                    socValues.length > 0
+                        ? averageNumbersArray(socValues)
+                        : null,
+                totalAvailableEnergyWh: sumNumbersNullableArray(
+                    batteriesData.map((battery) => battery.availableEnergyWh),
+                ),
+                totalMaxChargeRateWatts: sumNumbersArray(
+                    batteriesData.map((battery) => battery.maxChargeRateWatts),
+                ),
+                totalMaxDischargeRateWatts: sumNumbersArray(
+                    batteriesData.map(
+                        (battery) => battery.maxDischargeRateWatts,
+                    ),
+                ),
+                totalCurrentBatteryPowerWatts: sumNumbersNullableArray(
+                    batteriesData.map(
+                        (battery) => battery.currentBatteryPowerWatts,
+                    ),
+                ),
+                batteryCount: batteryInverters.length,
+                batteryInverterSolarW: sumNumbersArray(
+                    batteryInverters.map((data) =>
+                        Math.max(0, data.inverter.realPower),
+                    ),
+                ),
+            };
+        })(),
     };
 }

@@ -37,6 +37,8 @@ The SunSpec Modbus protocol is a widely adopted standard for communication for s
 
 The project requires SunSpec models `1`, `101` (or `102` or `103`), `120`, `121`, `122`, `123` to be supported.
 
+For battery control, the inverter must also support SunSpec model `124` (Battery Storage).
+
 ### config.json
 
 To configure a SunSpec inverter connection over TCP, add the following property to `config.json`
@@ -52,11 +54,16 @@ To configure a SunSpec inverter connection over TCP, add the following property 
                 "port": 502 // (number) required: the Modbus TCP port of the inverter
             },
             "unitId": 1, // (number) required: the Modbus unit ID of the inverter,
-            "pollingIntervalMs": 200 // (number) optional: the polling interval in milliseconds, default 200
+            "pollingIntervalMs": 200, // (number) optional: the polling interval in milliseconds, default 200
+            "batteryControlEnabled": false // (boolean) optional: enable battery control for this inverter, default false
         }
     ],
     ...
 }
+```
+
+> [!NOTE]
+> Battery control requires global `inverterControl.batteryControlEnabled` and per-inverter `batteryControlEnabled` to be set to `true`. Battery storage capability will be automatically detected/verified by checking if the inverter supports SunSpec Model 124. See [Battery Configuration](./battery.md) for more details.
 ```
 
 For SunSpec over RTU, you need to modify the `connection`
@@ -78,7 +85,7 @@ To enable SunSpec/Modbus on Fronius inverters, you'll need to access the inverte
 > [!WARNING]
 > The MQTT inverter configuration does not support control. It is designed for systems which will monitor the API or "publish" active limit output to apply inverter control externally.
 
-A MQTT topic can be read to get the inveter measurements.
+A MQTT topic can be read to get the inverter measurements.
 
 To configure a MQTT inverter connection, add the following property to `config.json`
 
