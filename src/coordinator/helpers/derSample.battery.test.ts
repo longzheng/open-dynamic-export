@@ -80,7 +80,6 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalMaxDischargeRateWatts: 5000,
             totalCurrentBatteryPowerWatts: null,
             batteryCount: 1,
-            batteryInverterNameplateMaxW: 10000,
             batteryInverterSolarW: 5000,
         });
     });
@@ -133,7 +132,6 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalMaxDischargeRateWatts: 7000,
             totalCurrentBatteryPowerWatts: null,
             batteryCount: 2,
-            batteryInverterNameplateMaxW: 20000,
             batteryInverterSolarW: 10000,
         });
     });
@@ -166,7 +164,6 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalMaxDischargeRateWatts: 5000,
             totalCurrentBatteryPowerWatts: null,
             batteryCount: 1,
-            batteryInverterNameplateMaxW: 10000,
             batteryInverterSolarW: 5000,
         });
     });
@@ -231,7 +228,6 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalMaxDischargeRateWatts: 14000,
             totalCurrentBatteryPowerWatts: null,
             batteryCount: 3,
-            batteryInverterNameplateMaxW: 30000,
             batteryInverterSolarW: 15000,
         });
     });
@@ -279,7 +275,6 @@ describe('generateDerSample - Battery Aggregation', () => {
             totalMaxDischargeRateWatts: 8000,
             totalCurrentBatteryPowerWatts: null,
             batteryCount: 2,
-            batteryInverterNameplateMaxW: 20000,
             batteryInverterSolarW: 10000,
         });
     });

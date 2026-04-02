@@ -73,9 +73,9 @@ export const derSampleDataSchema = v.object({
             totalCurrentBatteryPowerWatts: v.nullable(v.number()),
             // Number of inverters with battery storage
             batteryCount: v.number(),
-            // Nameplate max W of battery-hosting inverters (for hybrid inverter AC output constraint)
-            batteryInverterNameplateMaxW: v.number(),
-            // Current solar output of battery-hosting inverters (PV shares AC bus with battery)
+            // Current solar output of battery-hosting inverters.
+            // On hybrid inverters, battery discharge can curtail PV entirely.
+            // Used to check if discharge would be a net loss (lose more PV than gained).
             batteryInverterSolarW: v.number(),
         }),
     ),
@@ -206,12 +206,6 @@ export function generateDerSample({
                     ),
                 ),
                 batteryCount: batteryInverters.length,
-                // Nameplate and solar output of battery-hosting inverters.
-                // On hybrid inverters, PV and battery share the AC output bus,
-                // so battery discharge must leave headroom for PV within the nameplate.
-                batteryInverterNameplateMaxW: sumNumbersArray(
-                    batteryInverters.map((data) => data.nameplate.maxW),
-                ),
                 batteryInverterSolarW: sumNumbersArray(
                     batteryInverters.map((data) =>
                         Math.max(0, data.inverter.realPower),

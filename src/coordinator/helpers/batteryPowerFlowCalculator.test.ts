@@ -18,7 +18,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -47,7 +47,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -75,7 +75,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -104,7 +104,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -135,7 +135,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -164,7 +164,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -192,7 +192,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 3000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -223,7 +223,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -249,7 +249,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -275,7 +275,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -303,7 +303,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -330,7 +330,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 4000, // Limited to 4000W
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -358,7 +358,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -386,7 +386,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: undefined,
                 exportLimitWatts: Number.MAX_SAFE_INTEGER,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -415,7 +415,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: Number.MAX_SAFE_INTEGER,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -445,7 +445,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: undefined,
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -472,7 +472,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: undefined,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -500,7 +500,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -526,7 +526,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -551,7 +551,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -576,7 +576,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -601,7 +601,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -628,7 +628,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -654,7 +654,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -680,7 +680,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -707,7 +707,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -732,7 +732,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -758,7 +758,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: undefined,
@@ -786,7 +786,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -811,7 +811,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -836,7 +836,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -861,7 +861,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -888,7 +888,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -917,7 +917,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -946,7 +946,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -979,7 +979,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1010,7 +1010,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 2000, // Limited
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1038,7 +1038,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 10000,
                 exportLimitWatts: 2000, // Export limit lower than target
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1064,7 +1064,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1091,7 +1091,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -1118,7 +1118,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1152,7 +1152,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 10000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 // Battery is CURRENTLY charging at 2000W (measured from previous cycle)
                 currentBatteryPowerWatts: 2000,
@@ -1194,7 +1194,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 3000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1226,7 +1226,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 0,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1255,7 +1255,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 0,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1283,7 +1283,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: 6000,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -1310,7 +1310,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 5000,
                 importLimitWatts: 6000,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: true,
@@ -1339,7 +1339,7 @@ describe('calculateBatteryPowerFlow', () => {
                 batteryDischargeMaxWatts: 5000,
                 exportLimitWatts: 3000,
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
-                batteryInverterHeadroomWatts: undefined,
+                batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'export_first',
                 currentBatteryPowerWatts: 0,
                 batteryGridChargingEnabled: false,
@@ -1356,6 +1356,164 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.batteryMode).toBe('discharge');
             expect(result.targetBatteryPowerWatts).toBe(-2000);
             expect(result.targetExportWatts).toBe(2000);
+        });
+    });
+
+    describe('hybrid inverter PV-loss check', () => {
+        it('should discharge when export gain exceeds hybrid PV loss', () => {
+            // PLUS PV=2770, NONPLUS PV=2833, load=1100, export target=15000
+            // Site: solarWatts=5603, siteWatts=-4503 (exporting)
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5603,
+                siteWatts: -4503,
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 8500,
+                exportLimitWatts: 20000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: 2770,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 15000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 4503, batteryExportNeeded = max(0, 15000 - 4503) = 10497
+            // hybridPvLoss = 2770, 10497 > 2770 → net positive, discharge allowed
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBeLessThan(0);
+            expect(result.targetExportWatts).toBeGreaterThan(0);
+        });
+
+        it('should not discharge when gap-filling already says PV covers target', () => {
+            // Both inverters generating well, target fully covered by PV
+            // PLUS PV=3000, NONPLUS PV=3000, load=1000, export target=5000
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 6000,
+                siteWatts: -5000, // exporting 5000W
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 8500,
+                exportLimitWatts: 20000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: 3000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 5000, batteryExportNeeded = max(0, 5000 - 5000) = 0
+            // Gap-filling already prevents discharge, PV-loss check not needed
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+        });
+
+        it('should skip discharge when hybrid PV loss exceeds export gain', () => {
+            // PLUS PV=4000, NONPLUS PV=1000, load=1000, export target=6000
+            // Discharging 2kW would lose 4kW PLUS PV = net -2kW loss
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 5000,
+                siteWatts: -4000, // exporting 4000W
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 8500,
+                exportLimitWatts: 20000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: 4000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 6000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 4000, batteryExportNeeded = max(0, 6000 - 4000) = 2000
+            // hybridPvLoss = 4000, 2000 > 4000 → false, discharge is net loss
+            // System exports 4kW PV-only instead of worse 3kW (2kW bat + 1kW nonplus)
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+            // targetExportWatts reflects PV export (falls through to PV surplus path)
+            expect(result.targetExportWatts).toBe(4000);
+        });
+
+        it('should still discharge for self-consumption even when hybrid PV loss blocks export', () => {
+            // No PV surplus, house importing, export target blocked by PV-loss check
+            // Battery should still cover house load (self-consumption)
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 1000,
+                siteWatts: 2000, // importing 2000W
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 8500,
+                exportLimitWatts: 20000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: 1000,
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 0 (importing), batteryExportNeeded = max(0, 3000 - 0) = 3000
+            // hybridPvLoss = 1000, 3000 > 1000 → true, export allowed
+            // selfConsumptionDischarge = 2000
+            // batteryDischargeNeeded = 3000 + 2000 = 5000
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-5000);
+        });
+
+        it('should allow self-consumption discharge with zero export target and hybrid PV', () => {
+            // No export target, just self-consumption — PV-loss check should not block
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: 1000, // importing 1000W (load > PV)
+                batterySocPercent: 60,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 5000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: 2000,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 0,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // exportTarget = 0 → batteryExportNeeded = 0 → hybridPvLoss irrelevant
+            // selfConsumptionDischarge = max(0, -(-1000 + 0)) = 1000
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetBatteryPowerWatts).toBe(-1000);
+            expect(result.targetExportWatts).toBe(0);
         });
     });
 });

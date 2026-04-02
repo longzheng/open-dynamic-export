@@ -35,10 +35,10 @@ export type BatteryPowerFlowInput = {
     batteryChargeMaxWatts: number | undefined;
     // Maximum battery discharging power in watts
     batteryDischargeMaxWatts: number | undefined;
-    // Maximum battery discharge before PV curtailment on hybrid inverter (nameplate - solar).
-    // On hybrid inverters, PV and battery share the AC output bus. Discharging beyond
-    // this limit forces the inverter firmware to curtail PV to stay within the nameplate.
-    batteryInverterHeadroomWatts: number | undefined;
+    // Current solar output of battery-hosting inverters (watts).
+    // On some hybrid inverters, any battery discharge curtails PV entirely on that
+    // inverter. Discharge is only worthwhile when it exceeds this value (net gain).
+    batteryInverterSolarW: number | undefined;
     // Maximum allowed export to grid in watts (opModExpLimW)
     exportLimitWatts: number;
     // Maximum allowed import from grid in watts (opModImpLimW)
@@ -88,7 +88,7 @@ export function calculateBatteryPowerFlow(
         batteryGridChargingEnabled,
         batteryGridChargingMaxWatts,
         batteryExportTargetWatts,
-        batteryInverterHeadroomWatts,
+        batteryInverterSolarW,
     } = input;
 
     logger.trace({ input }, 'Calculating battery power flow');
@@ -117,14 +117,10 @@ export function calculateBatteryPowerFlow(
     const canDischarge =
         batterySocPercent === null || batterySocPercent > minSoc;
 
-    // Determine actual battery limits.
-    // On hybrid inverters, discharge is also constrained by the inverter's AC
-    // output headroom (nameplate - current PV) to avoid firmware curtailing PV.
+    // Determine actual battery limits
     const maxChargePower = batteryChargeMaxWatts ?? Number.MAX_SAFE_INTEGER;
-    const maxDischargePower = Math.min(
-        batteryDischargeMaxWatts ?? Number.MAX_SAFE_INTEGER,
-        batteryInverterHeadroomWatts ?? Number.MAX_SAFE_INTEGER,
-    );
+    const maxDischargePower =
+        batteryDischargeMaxWatts ?? Number.MAX_SAFE_INTEGER;
 
     // Default to battery_first if not specified
     const priorityMode = batteryPriorityMode ?? 'battery_first';
@@ -153,7 +149,17 @@ export function calculateBatteryPowerFlow(
 
     // Hard-cap at DOE export headroom: how much more can be exported beyond PV
     const exportHeadroom = Math.max(0, exportLimitWatts - pvSurplus);
-    const effectiveExportTarget = Math.min(batteryExportNeeded, exportHeadroom);
+
+    // On some hybrid inverters, any battery discharge curtails PV entirely on
+    // that inverter. Only discharge for export when the export gain exceeds the
+    // PV that would be lost — otherwise total export actually decreases.
+    // Self-consumption discharge is unaffected (it doesn't compete with PV export).
+    const hybridPvLoss = batteryInverterSolarW ?? 0;
+    const dischargeNetPositive =
+        hybridPvLoss === 0 || batteryExportNeeded > hybridPvLoss;
+    const effectiveExportTarget = dischargeNetPositive
+        ? Math.min(batteryExportNeeded, exportHeadroom)
+        : 0;
 
     const selfConsumptionDischarge = Math.max(0, -availablePower);
     const batteryDischargeNeeded =
