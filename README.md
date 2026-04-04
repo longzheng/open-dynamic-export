@@ -48,11 +48,11 @@ Use Node or Docker to run the project.
 ### Node
 You can run the Node project directly with the Node.js runtime.
 
-1. Install dependencies with `npm install`
+1. Install dependencies with `pnpm install`
 
-2. Build the project with `npm run build`
+2. Build the project with `pnpm run build`
 
-3. Run the project with `npm start`
+3. Run the project with `pnpm start`
 
 ### Docker compose
 
@@ -81,7 +81,7 @@ As a direct client, there needs to be two certificates, one for the "manufacture
 To generate a device certificate key and certificate signing request.
 
 ```bash
-npm run cert:device-request
+pnpm run cert:device-request
 ```
 
 For local testing, generate a valid self signed certificate using
@@ -93,7 +93,7 @@ openssl req -x509 -new -key key.pem -out cert.pem -sha256 -days 3650 -nodes -sub
 For live testing, generate a valid device certificate by signing it with the manufacturer certificate.
 
 ```bash
-npm run cert:device-generate
+pnpm run cert:device-generate
 ```
 
 To view the device certificate LFDI

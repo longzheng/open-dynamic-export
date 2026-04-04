@@ -4,12 +4,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "npm run routes:generate && tsc -p tsconfig.server.json && vite build",
-    "build:debug": "npm run routes:generate && tsc -p tsconfig.server.debug.json",
-    "lint": "tsc --noEmit && eslint . && npm run generate:config-json-schema",
+    "build": "pnpm run routes:generate && tsc -p tsconfig.server.json && vite build",
+    "build:debug": "pnpm run routes:generate && tsc -p tsconfig.server.debug.json",
+    "lint": "pnpm run routes:generate && tsc --noEmit && eslint . && pnpm run generate:config-json-schema",
     "test": "vitest",
     "start": "NODE_ENV=production node dist/app.js",
-    "dev": "npm run routes:generate && tsx src/app.ts",
+    "dev": "pnpm run routes:generate && tsx src/app.ts",
     "routes:generate": "tsoa spec-and-routes && openapi-typescript ./src/tsoa/swagger.json -o ./src/ui/gen/api.d.ts",
     "debug:sunspec-discovery": "tsx scripts/debugSunspecDiscovery.ts",
     "cert:device-request": "tsx scripts/certDeviceRequest.ts",
@@ -85,6 +85,7 @@
     "@react-aria/visually-hidden": "3.8.29",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-router": "^1.157.14",
+    "@tsoa/runtime": "7.0.0-alpha.0",
     "async-mutex": "^0.5.0",
     "axios": "1.12.2",
     "axios-retry": "^4.5.0",
@@ -119,5 +120,6 @@
     "valibot": "^1.2.0",
     "vite-express": "^0.22.0",
     "xml2js": "^0.6.2"
-  }
+  },
+  "packageManager": "pnpm@10.18.3"
 }

@@ -17,7 +17,7 @@ describe('AusgridEA029Setpoint', () => {
     });
 
     it('should return correct control limit during charge window', () => {
-        process.env.TZ = 'Australia/Adelaide';
+        process.env['TZ'] = 'Australia/Adelaide';
         vi.setSystemTime(new Date('2024-01-01T10:30:00'));
 
         const result = sapnRELE2WSetpoint.getInverterControlLimit();
@@ -34,7 +34,7 @@ describe('AusgridEA029Setpoint', () => {
     });
 
     it('should return no control limit outside of charge window', () => {
-        process.env.TZ = 'Australia/Adelaide';
+        process.env['TZ'] = 'Australia/Adelaide';
         vi.setSystemTime(new Date('2024-01-01T08:00:00'));
 
         const result = sapnRELE2WSetpoint.getInverterControlLimit();
@@ -51,7 +51,7 @@ describe('AusgridEA029Setpoint', () => {
     });
 
     it('should throw exception when timezone is not NSW', () => {
-        process.env.TZ = 'Australia/Perth';
+        process.env['TZ'] = 'Australia/Perth';
         vi.setSystemTime(new Date('2024-01-01T08:00:00'));
 
         expect(() => sapnRELE2WSetpoint.getInverterControlLimit()).toThrow(
