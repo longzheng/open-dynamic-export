@@ -1,6 +1,7 @@
 import type { Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
 import type { Logger } from 'pino';
+import { AxiosError } from 'axios';
 import type { SetpointType } from '../../setpoint.js';
 import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import { pinoLogger } from '../../../helpers/logger.js';
@@ -8,6 +9,7 @@ import {
     writeAmberPrice,
     writeControlLimit,
 } from '../../../helpers/influxdb.js';
+import { sanitizeAxiosError } from '../../../helpers/sanitizeAxiosError.js';
 import type { paths } from './api.js';
 
 type Interval = {
@@ -173,7 +175,10 @@ export class AmberSetpoint implements SetpointType {
         try {
             await this.getSiteFeedInPrices();
         } catch (error) {
-            this.logger.error(error, 'Failed to poll Amber API');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Failed to poll Amber API',
+            );
         } finally {
             if (!this.abortController.signal.aborted) {
                 this.pricePollTimer = setTimeout(

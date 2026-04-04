@@ -4,6 +4,7 @@ import type { AxiosRequestConfig, AxiosInstance } from 'axios';
 import axios, { AxiosError } from 'axios';
 import * as v from 'valibot';
 import { pinoLogger } from '../../helpers/logger.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import {
     meterAggregatesSchema,
     metersSiteSchema,
@@ -93,13 +94,19 @@ export class Powerwall2Client {
 
                         return token;
                     } catch (error) {
-                        this.logger.error(error, 'Powerwall2 login error');
+                        this.logger.error(
+                            {
+                                error:
+                                    error instanceof AxiosError
+                                        ? sanitizeAxiosError(error)
+                                        : error,
+                            },
+                            'Powerwall2 login error',
+                        );
 
                         this.token = { type: 'none' };
 
-                        throw new Error(`Powerwall2 get token error`, {
-                            cause: error,
-                        });
+                        throw new Error(`Powerwall2 get token error`);
                     }
                 })();
 

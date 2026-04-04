@@ -1,12 +1,13 @@
 import type { Logger } from 'pino';
 import deepEqual from 'fast-deep-equal';
-import type { AxiosRequestConfig } from 'axios';
+import { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { generateDerControlResponse } from '../models/derControlResponse.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { ResponseStatus } from '../models/responseStatus.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import { objectToXml } from './xml.js';
 
 type HistoryKey = {
@@ -93,7 +94,10 @@ export class DerControlResponseHelper {
         } catch (error) {
             this.logger.error(
                 {
-                    error,
+                    error:
+                        error instanceof AxiosError
+                            ? sanitizeAxiosError(error)
+                            : error,
                     mRID,
                     status,
                     response,

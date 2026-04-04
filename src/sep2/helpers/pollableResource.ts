@@ -1,7 +1,9 @@
 import EventEmitter from 'events';
+import { AxiosError } from 'axios';
 import type { PollRate } from '../models/pollRate.js';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 
 export abstract class PollableResource<
     ResponseType extends { pollRate: PollRate },
@@ -53,7 +55,12 @@ export abstract class PollableResource<
                     signal: this.abortController.signal,
                 });
             } catch (error) {
-                pinoLogger.error(error, 'Failed to poll resource');
+                pinoLogger.error(
+                    error instanceof AxiosError
+                        ? sanitizeAxiosError(error)
+                        : error,
+                    'Failed to poll resource',
+                );
 
                 return null;
             }
