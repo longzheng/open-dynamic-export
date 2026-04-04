@@ -41,7 +41,10 @@ export class Powerwall2Client {
             timeout: timeoutSeconds * 1000,
         });
 
-        void this.getToken();
+        // prefetch token
+        void this.getToken().catch(() => {
+            // noop, will retry on next request
+        });
     }
 
     public async getMeterAggregates({ signal }: { signal: AbortSignal }) {
