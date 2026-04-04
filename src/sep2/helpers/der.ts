@@ -1,5 +1,6 @@
 import type { Logger } from 'pino';
 import deepEqual from 'fast-deep-equal';
+import { AxiosError } from 'axios';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
 import type { DER } from '../models/der.js';
 import type { DERCapability } from '../models/derCapability.js';
@@ -16,6 +17,7 @@ import { DERControlType } from '../models/derControlType.js';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import type { RampRateHelper } from './rampRate.js';
 import { objectToXml } from './xml.js';
 
@@ -128,7 +130,7 @@ export class DerHelper {
             await this.putDerStatus({ derStatus: this.lastSentDerStatus });
         } catch (error) {
             this.logger.error(
-                error,
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
                 'Error updating DER status during scheduled poll',
             );
         }
@@ -157,7 +159,10 @@ export class DerHelper {
 
             this.lastSentDerCapability = derCapability;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER capability');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Error updating DER capability',
+            );
         }
     }
 
@@ -184,7 +189,10 @@ export class DerHelper {
 
             this.lastSentDerSettings = derSettings;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER settings');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Error updating DER settings',
+            );
         }
     }
 
@@ -207,7 +215,10 @@ export class DerHelper {
 
             this.lastSentDerStatus = derStatus;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER status');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Error updating DER status',
+            );
         }
     }
 

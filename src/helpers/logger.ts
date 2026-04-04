@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { pino, stdTimeFunctions, stdSerializers } from 'pino';
+import { sanitizeAxiosError } from './sanitizeAxiosError.js';
 
 export const pinoLogger = pino({
     level: 'trace',
@@ -9,30 +10,7 @@ export const pinoLogger = pino({
         ...stdSerializers,
         err: (error) => {
             if (error instanceof AxiosError) {
-                const { config, response } = error;
-
-                return {
-                    response: response
-                        ? {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: response.headers,
-                              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                              data: response.data,
-                          }
-                        : undefined,
-                    config: config
-                        ? {
-                              headers: config.headers,
-                              baseURL: config.baseURL,
-                              method: config.method,
-                              url: config.url,
-                              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                              data: config.data,
-                              'axios-retry': config['axios-retry'],
-                          }
-                        : undefined,
-                };
+                return sanitizeAxiosError(error);
             }
 
             if (error instanceof Error) {
