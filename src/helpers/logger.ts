@@ -1,26 +1,10 @@
-import { AxiosError } from 'axios';
 import { pino, stdTimeFunctions, stdSerializers } from 'pino';
-import { sanitizeAxiosError } from './sanitizeAxiosError.js';
 
 export const pinoLogger = pino({
     level: 'trace',
     base: null, // disable PID and hostname
     timestamp: stdTimeFunctions.isoTime, // write ISO time to log file
-    serializers: {
-        ...stdSerializers,
-        err: (error) => {
-            if (error instanceof AxiosError) {
-                return sanitizeAxiosError(error);
-            }
-
-            if (error instanceof Error) {
-                return stdSerializers.err(error);
-            }
-
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return error;
-        },
-    },
+    serializers: stdSerializers,
     transport: {
         targets: [
             {

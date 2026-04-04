@@ -21,8 +21,7 @@ export function sanitizeAxiosError(error: AxiosError) {
                   baseURL: config.baseURL,
                   method: config.method,
                   url: config.url,
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  data: config.data,
+                  data: config.data as unknown,
                   'axios-retry': config['axios-retry'],
               }
             : undefined,
