@@ -145,18 +145,18 @@ export class DerHelper {
             return;
         }
 
+        if (!this.config.der.derCapabilityLink) {
+            return;
+        }
+
+        this.lastSentDerCapability = derCapability;
+
         this.logger.info({ derCapability }, 'Sending DER capability');
 
         const response = generateDerCapability(derCapability);
         const xml = objectToXml(response);
 
-        this.lastSentDerCapability = derCapability;
-
         try {
-            if (!this.config.der.derCapabilityLink) {
-                return;
-            }
-
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
         } catch (error) {
             this.logger.error(
@@ -178,18 +178,18 @@ export class DerHelper {
             return;
         }
 
+        if (!this.config.der.derSettingsLink) {
+            return;
+        }
+
+        this.lastSentDerSettings = derSettings;
+
         this.logger.info({ derSettings }, 'Sending DER settings');
 
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
 
-        this.lastSentDerSettings = derSettings;
-
         try {
-            if (!this.config.der.derSettingsLink) {
-                return;
-            }
-
             await this.client.put(this.config.der.derSettingsLink.href, xml);
         } catch (error) {
             this.logger.error(
@@ -207,18 +207,18 @@ export class DerHelper {
             return;
         }
 
+        if (!this.config.der.derStatusLink) {
+            return;
+        }
+
+        this.lastSentDerStatus = derStatus;
+
         this.logger.info({ derStatus }, 'Sending DER status');
 
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);
 
-        this.lastSentDerStatus = derStatus;
-
         try {
-            if (!this.config.der.derStatusLink) {
-                return;
-            }
-
             await this.client.put(this.config.der.derStatusLink.href, xml);
         } catch (error) {
             this.logger.error(
