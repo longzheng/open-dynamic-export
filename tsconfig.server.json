@@ -5,10 +5,12 @@
     ],
     "compilerOptions": {
         "target": "ESNext",
+        "lib": ["ESNext"],
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "outDir": "dist",
         "rootDir": "./src",
+        "types": ["node"],
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
