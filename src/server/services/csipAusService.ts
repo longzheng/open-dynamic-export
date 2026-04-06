@@ -1,28 +1,25 @@
-import { getSep2Certificate } from '../../helpers/sep2Cert.js';
-import {
-    getCertificateFingerprint,
-    getCertificateLfdi,
-    getCertificateSfdi,
-} from '../../sep2/helpers/cert.js';
 import type { ResponseRequiredType } from '../../sep2/models/responseRequired.js';
 import type { SupportedControlTypes } from '../../coordinator/helpers/inverterController.js';
 import { coordinatorService } from './coordinatorService.js';
 
-type CertificateIds = {
-    lfdi: string;
-    sfdi: string;
+export type CsipAusStatus = {
+    connected: boolean;
+    lfdi: string | null;
+    sfdi: string | null;
 };
 
-export function getCertificateIds(): CertificateIds {
-    const sep2Certificate = getSep2Certificate();
-    const fingerprint = getCertificateFingerprint(sep2Certificate.cert);
-    const lfdi = getCertificateLfdi(fingerprint);
-    const sfdi = getCertificateSfdi(fingerprint);
+export function getCsipAusStatus(): CsipAusStatus {
+    const csipAusSetpoint = coordinatorService.getSetpoints().csipAus;
 
-    return {
-        lfdi,
-        sfdi,
-    };
+    if (!csipAusSetpoint) {
+        return {
+            connected: false,
+            lfdi: null,
+            sfdi: null,
+        };
+    }
+
+    return csipAusSetpoint.getStatus();
 }
 
 export function getCsipLimitSchedule(

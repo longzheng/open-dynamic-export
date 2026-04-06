@@ -9,6 +9,7 @@ export abstract class PollableResource<
     ResponseType extends { pollRate: PollRate },
 > extends EventEmitter<{
     data: [ResponseType];
+    pollError: [unknown];
 }> {
     private client: SEP2Client;
     private url: string;
@@ -55,12 +56,17 @@ export abstract class PollableResource<
                     signal: this.abortController.signal,
                 });
             } catch (error) {
+                if (this.abortController.signal.aborted) {
+                    return null;
+                }
+
                 pinoLogger.error(
                     error instanceof AxiosError
                         ? sanitizeAxiosError(error)
                         : error,
                     'Failed to poll resource',
                 );
+                this.emit('pollError', error);
 
                 return null;
             }

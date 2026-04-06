@@ -164,14 +164,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/csipAus/id": {
+    "/api/csipAus/status": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Get CSIP-AUS device certificate LFID and SFDI */
+        /** @description Get CSIP-AUS connection status and device certificate IDs */
         get: operations["csipAusStatus"];
         put?: never;
         post?: never;
@@ -1806,9 +1806,10 @@ export interface components {
              */
             ID: number | null;
         };
-        CertificateIds: {
-            sfdi: string;
-            lfdi: string;
+        CsipAusStatus: {
+            sfdi: string | null;
+            lfdi: string | null;
+            connected: boolean;
         };
         DERControlBase: {
             /** Format: double */
@@ -2839,7 +2840,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CertificateIds"];
+                    "application/json": components["schemas"]["CsipAusStatus"];
                 };
             };
         };

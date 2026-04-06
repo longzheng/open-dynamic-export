@@ -1,4 +1,6 @@
+import { Card, CardBody, CardHeader } from '@heroui/card';
 import { createFileRoute } from '@tanstack/react-router';
+import { clsx } from 'clsx';
 import { PowerLimitChart } from '../components/PowerLimitChart';
 import { BooleanLimitChart } from '../components/BooleanLimitChart';
 import { $api } from '@/client';
@@ -10,12 +12,80 @@ export const Route = createFileRoute('/limits')({
 function Limits() {
     return (
         <div className="grid gap-4">
+            <CsipAusStatus />
             <ConnectionLimit />
             <EnergizeLimit />
             <ExportLimit />
             <GenerationLimit />
             <ImportLimit />
             <LoadLimit />
+        </div>
+    );
+}
+
+function CsipAusStatus() {
+    const { data: status } = $api.useQuery(
+        'get',
+        '/api/csipAus/status',
+        undefined,
+        {
+            refetchInterval: 10_000,
+        },
+    );
+
+    const connected = status?.connected ?? false;
+
+    return (
+        <Card>
+            <CardHeader className="border-b border-gray-700/40">
+                <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-xl font-semibold text-gray-100">
+                            Device status
+                        </h1>
+                    </div>
+                    <span
+                        className={clsx(
+                            'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide',
+                            connected
+                                ? 'bg-green-500/15 text-green-300'
+                                : 'bg-red-500/15 text-red-300',
+                        )}
+                    >
+                        {connected ? 'Connected' : 'Disconnected'}
+                    </span>
+                </div>
+            </CardHeader>
+            <CardBody className="grid gap-4 sm:grid-cols-3">
+                <StatusField label="LFDI" value={status?.lfdi} mono />
+                <StatusField label="SFDI" value={status?.sfdi} mono />
+            </CardBody>
+        </Card>
+    );
+}
+
+function StatusField({
+    label,
+    value,
+    mono = false,
+}: {
+    label: string;
+    value: string | null | undefined;
+    mono?: boolean;
+}) {
+    return (
+        <div className="space-y-1">
+            <p className="text-tiny font-bold uppercase tracking-wide text-white/40">
+                {label}
+            </p>
+            <p
+                className={clsx(
+                    'text-sm text-white',
+                    mono ? 'break-all font-mono text-xs sm:text-sm' : null,
+                )}
+            >
+                {value ?? '-'}
+            </p>
         </div>
     );
 }
