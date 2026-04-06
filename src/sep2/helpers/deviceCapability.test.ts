@@ -45,6 +45,7 @@ describe('DeviceCapabilityHelper', () => {
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
         vi.useRealTimers();
     });
 
@@ -76,5 +77,23 @@ describe('DeviceCapabilityHelper', () => {
 
         // called once on init, then twice after polling
         expect(eventSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it('should emit pollError event on polling error', async () => {
+        const mockError = new Error('boom');
+        vi.spyOn(sep2Client, 'get').mockRejectedValueOnce(mockError);
+        const errorSpy = vi.fn();
+
+        const helper = new DeviceCapabilityHelper({
+            client: sep2Client,
+            href: '/dcap',
+        }).on('pollError', errorSpy);
+
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(errorSpy).toHaveBeenCalledOnce();
+        expect(errorSpy).toHaveBeenCalledWith(mockError);
+
+        helper.destroy();
     });
 });

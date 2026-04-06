@@ -1,6 +1,6 @@
 import { Controller, Get, OperationId, Route, Tags } from 'tsoa';
 import {
-    getCertificateIds,
+    getCsipAusStatus,
     getCsipLimitSchedule,
 } from '../services/csipAusService.js';
 
@@ -8,12 +8,12 @@ import {
 @Route('api/csipAus')
 export class CsipAusController extends Controller {
     /**
-     * Get CSIP-AUS device certificate LFID and SFDI
+     * Get CSIP-AUS connection status and device certificate IDs
      **/
-    @Get('id')
+    @Get('status')
     @OperationId('csipAusStatus')
     public status() {
-        return getCertificateIds();
+        return getCsipAusStatus();
     }
 
     @Get('exportLimitSchedule')

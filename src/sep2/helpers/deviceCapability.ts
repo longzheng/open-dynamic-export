@@ -8,6 +8,7 @@ import { PollableResource } from './pollableResource.js';
 
 export class DeviceCapabilityHelper extends EventEmitter<{
     data: [DeviceCapability];
+    pollError: [unknown];
 }> {
     private deviceCapabilityPollableResource: DeviceCapabilityPollableResource | null =
         null;
@@ -21,9 +22,13 @@ export class DeviceCapabilityHelper extends EventEmitter<{
                 url: href,
                 defaultPollRateSeconds:
                     defaultPollPushRates.deviceCapabilityPoll,
-            }).on('data', (data) => {
-                this.emit('data', data);
-            });
+            })
+                .on('data', (data) => {
+                    this.emit('data', data);
+                })
+                .on('pollError', (error) => {
+                    this.emit('pollError', error);
+                });
     }
 
     destroy() {

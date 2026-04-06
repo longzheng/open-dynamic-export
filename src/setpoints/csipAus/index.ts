@@ -61,6 +61,7 @@ export class CsipAusSetpoint implements SetpointType {
     private derControlsHelper: DerControlsHelper;
     private deviceCapabilityHelper: DeviceCapabilityHelper;
     private rampRateHelper: RampRateHelper;
+    private connected = false;
 
     constructor({
         csipAusConfig,
@@ -250,28 +251,42 @@ export class CsipAusSetpoint implements SetpointType {
         this.deviceCapabilityHelper = new DeviceCapabilityHelper({
             client: this.sep2Client,
             href: this.csipAusConfig.dcapUri,
-        }).on('data', (deviceCapability) => {
-            this.logger.debug(
-                { deviceCapability },
-                'Received SEP2 device capability',
-            );
+        })
+            .on('data', (deviceCapability) => {
+                this.updateConnected(true);
 
-            this.timeHelper.updateHref({
-                href: deviceCapability.timeLink.href,
-            });
+                this.logger.debug(
+                    { deviceCapability },
+                    'Received SEP2 device capability',
+                );
 
-            this.endDeviceListHelper.updateHref({
-                href: deviceCapability.endDeviceListLink.href,
-            });
+                this.timeHelper.updateHref({
+                    href: deviceCapability.timeLink.href,
+                });
 
-            this.mirrorUsagePointListHelper.updateHref({
-                href: deviceCapability.mirrorUsagePointListLink.href,
+                this.endDeviceListHelper.updateHref({
+                    href: deviceCapability.endDeviceListLink.href,
+                });
+
+                this.mirrorUsagePointListHelper.updateHref({
+                    href: deviceCapability.mirrorUsagePointListLink.href,
+                });
+            })
+            .on('pollError', () => {
+                this.updateConnected(false);
             });
-        });
     }
 
     getSchedulerByControlType() {
         return this.schedulerByControlType;
+    }
+
+    getStatus() {
+        return {
+            connected: this.connected,
+            lfdi: this.sep2Client.lfdi,
+            sfdi: this.sep2Client.sfdi,
+        };
     }
 
     updateSep2ControlsData(data: DerControlsHelperChangedData) {
@@ -508,5 +523,14 @@ export class CsipAusSetpoint implements SetpointType {
         this.functionSetAssignmentsListHelper.destroy();
         this.mirrorUsagePointListHelper.destroy();
         this.derControlsHelper.destroy();
+    }
+
+    private updateConnected(connected: boolean) {
+        if (this.connected === connected) {
+            return;
+        }
+
+        this.connected = connected;
+        this.logger.info({ connected }, 'CSIP-AUS connected state changed');
     }
 }
