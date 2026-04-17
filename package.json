@@ -50,6 +50,7 @@
     "openapi-typescript": "^7.6.1",
     "oxfmt": "^0.44.0",
     "oxlint": "^1.59.0",
+    "oxlint-tsgolint": "^0.21.0",
     "postcss": "^8.4.47",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.0",
