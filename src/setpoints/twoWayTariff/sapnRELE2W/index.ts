@@ -66,7 +66,7 @@ const chargeWindow: Window = {
 
 // In the summer peak of November to March, 5pm – 9pm, customers are encouraged to export into the distribution network to access a credit.
 // TODO: reduce load or export battery during reward window
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// oxlint-disable-next-line @typescript-eslint/no-unused-vars
 const rewardWindow: {
     months: number[];
     hourOfDay: Window;

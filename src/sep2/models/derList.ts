@@ -17,13 +17,13 @@ export const derListSchema = v.intersect([
 
 export type DERList = v.InferOutput<typeof derListSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerListXml(xml: any): DERList {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const list = parseListXmlObject(xml['DERList']);
     const pollRate = parsePollRateXmlObject(xml['DERList']);
     const derArray = assertArray(xml['DERList']['DER']);
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     const ders = derArray.map((derXmlObject) =>
         parseDerXmlObject(derXmlObject),

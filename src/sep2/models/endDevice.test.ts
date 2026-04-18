@@ -8,7 +8,7 @@ import { generateEndDeviceResponse, parseEndDeviceXml } from './endDevice.js';
 
 describe('parseEndDeviceXml', () => {
     it('should parse end device DER with XML', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await parseStringPromise(
             getMockFile('getEdev__EQLDEV3.xml'),
         );
@@ -35,7 +35,7 @@ describe('parseEndDeviceXml', () => {
     });
 
     it('should parse end device aggregator with XML', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await parseStringPromise(
             getMockFile('getEdev_E-AGGREQL.xml'),
         );
@@ -62,7 +62,7 @@ describe('parseEndDeviceXml', () => {
     });
 
     it('should parse end device with csipaus:ConnectionPointLink', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await parseStringPromise(
             getMockFile('getEdev_csipaus_edev1.xml'),
         );

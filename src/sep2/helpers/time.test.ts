@@ -63,7 +63,7 @@ describe('TimeHelper', () => {
     it('should not should if clock is in sync', async () => {
         const time = new TimeHelper({ client: sep2Client });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
 
         time.updateHref({
@@ -87,7 +87,7 @@ describe('TimeHelper', () => {
 
         const time = new TimeHelper({ client: sep2Client });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
 
         time.updateHref({
@@ -107,7 +107,7 @@ describe('TimeHelper', () => {
     it('should not change pollable resource if initialised again with same URL', async () => {
         const time = new TimeHelper({ client: sep2Client });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
 
         time.updateHref({
@@ -133,7 +133,7 @@ describe('TimeHelper', () => {
     it('should change pollable resource if initialised again with different URL', async () => {
         const time = new TimeHelper({ client: sep2Client });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line @typescript-eslint/no-explicit-any
         const assertTimeSpy = vi.spyOn(time, 'assertTime' as any);
 
         time.updateHref({

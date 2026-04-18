@@ -4,7 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseDeviceCapabilityXml } from './deviceCapability.js';
 
 it('should parse device capability XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getDcap.xml'));
 
     const { timeLink, endDeviceListLink, mirrorUsagePointListLink } =

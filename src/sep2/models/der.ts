@@ -17,9 +17,9 @@ export const derSchema = v.intersect([
 
 export type DER = v.InferOutput<typeof derSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDerXmlObject(xmlObject: any): DER {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const derAvailabilityLink = xmlObject['DERAvailabilityLink']
         ? parseLinkXmlObject(xmlObject['DERAvailabilityLink'][0])
@@ -33,7 +33,7 @@ export function parseDerXmlObject(xmlObject: any): DER {
     const derStatusLink = xmlObject['DERStatusLink']
         ? parseLinkXmlObject(xmlObject['DERStatusLink'][0])
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

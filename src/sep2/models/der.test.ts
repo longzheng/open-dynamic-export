@@ -4,14 +4,14 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseDerXmlObject } from './der.js';
 
 it('should parse DER XML object', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_der.xml'),
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERList']['DER'][0];
 
     const der = parseDerXmlObject(derXmlObject);

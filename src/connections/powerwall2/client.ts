@@ -90,7 +90,7 @@ export class Powerwall2Client {
                             },
                         );
 
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         const token = response.data.token as string;
 
                         this.token = { type: 'cached', token };

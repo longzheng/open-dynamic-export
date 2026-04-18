@@ -37,10 +37,10 @@ export const defaultDERControlSchema = v.intersect([
 export type DefaultDERControl = v.InferOutput<typeof defaultDERControlSchema>;
 
 export function parseDefaultDERControlXml(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xml: any,
 ): DefaultDERControl {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(
         xml['DefaultDERControl'],
     );
@@ -60,7 +60,7 @@ export function parseDefaultDERControlXml(
               assertString(xml['DefaultDERControl']['setSoftGradW'][0]),
           )
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

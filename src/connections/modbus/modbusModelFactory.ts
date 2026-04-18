@@ -4,7 +4,7 @@ import type { ModelAddress } from '../sunspec/connection/base.js';
 import type { ModbusConnection } from './connection/base.js';
 
 export type Mapping<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     Model extends Record<string, any>,
     WriteableKeys extends keyof Model,
 > = {
@@ -19,7 +19,7 @@ export type Mapping<
 };
 
 export function modbusModelFactory<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     Model extends Record<string, any>,
     WriteableKeys extends keyof Model = never,
 >(config: {

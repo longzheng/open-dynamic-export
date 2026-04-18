@@ -1,6 +1,6 @@
 // the server might send XML namespace with a different prefix
 // strip the prefix from all the property keys
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function stripNamespacePrefix(obj: any): any {
     if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
         return obj;

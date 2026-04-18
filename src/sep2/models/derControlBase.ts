@@ -38,14 +38,14 @@ export const derControlBaseSchema = v.object({
 
 export type DERControlBase = v.InferOutput<typeof derControlBaseSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
     // the server might send CSIP-AUS namespace with a different prefix
     // strip the prefix from all the property keys
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xmlObjectWithoutPrefix = stripNamespacePrefix(xmlObject);
 
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const opModImpLimW = parseLimitWattsXmlObjectOptional(
         xmlObjectWithoutPrefix['opModImpLimW'],
     );
@@ -67,7 +67,7 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
     const rampTms = xmlObject['rampTms']
         ? safeParseIntString(assertString(xmlObject['rampTms'][0]))
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         opModImpLimW,
@@ -81,9 +81,9 @@ export function parseDERControlBaseXmlObject(xmlObject: any): DERControlBase {
 }
 
 function parseLimitWattsXmlObjectOptional(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): ActivePower | undefined {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
     return xmlObject ? parseActivePowerXmlObject(xmlObject[0]) : undefined;
 }

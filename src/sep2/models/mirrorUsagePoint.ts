@@ -24,12 +24,12 @@ export const mirrorUsagePointSchema = v.intersect([
 export type MirrorUsagePoint = v.InferOutput<typeof mirrorUsagePointSchema>;
 
 export function parseMirrorUsagePointXml(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xml: any,
 ): MirrorUsagePoint {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const xmlObject = parseMirrorUsagePointXmlObject(xml['MirrorUsagePoint']);
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...xmlObject,
@@ -37,14 +37,14 @@ export function parseMirrorUsagePointXml(
 }
 
 export function parseMirrorUsagePointXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     mirrorUsagePointObject: any,
 ): MirrorUsagePoint {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const usagePointBase = parseUsagePointBaseXmlObject(mirrorUsagePointObject);
     const postRate = parsePostRateXmlObject(mirrorUsagePointObject);
     const deviceLFDI = assertString(mirrorUsagePointObject['deviceLFDI'][0]);
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...usagePointBase,

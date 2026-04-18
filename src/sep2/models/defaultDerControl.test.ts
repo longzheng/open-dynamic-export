@@ -4,7 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseDefaultDERControlXml } from './defaultDerControl.js';
 
 it('should parse Default DER Control XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_dderc.xml'),
     );
@@ -19,7 +19,7 @@ it('should parse Default DER Control XML', async () => {
 });
 
 it('should parse Default DER Control XML with SAPN CSIP-AUS namespace', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getDerp_dderc_sapn.xml'));
 
     const defaultDerControl = parseDefaultDERControlXml(xml);

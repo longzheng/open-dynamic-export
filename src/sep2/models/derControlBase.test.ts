@@ -4,13 +4,13 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseDERControlBaseXmlObject } from './derControlBase.js';
 
 it('should parse DERControlBase XML from DefaultDERControl', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_dderc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlBaseXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DefaultDERControl']['DERControlBase'][0];
 
     const derControlBase = parseDERControlBaseXmlObject(
@@ -26,13 +26,13 @@ it('should parse DERControlBase XML from DefaultDERControl', async () => {
 });
 
 it('should parse DERControlBase XML from DERControlList', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlBaseXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList']['DERControl'][0]['DERControlBase'][0];
 
     const derControlBase = parseDERControlBaseXmlObject(
@@ -48,11 +48,11 @@ it('should parse DERControlBase XML from DERControlList', async () => {
 });
 
 it('should parse DERControlBase XML from DERControlList with SAPN CSIP-AUS namespace', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getDerp_derc_sapn.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlBaseXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList']['DERControl'][0]['DERControlBase'][0];
 
     const derControlBase = parseDERControlBaseXmlObject(

@@ -4,13 +4,13 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseActivePowerXmlObject } from './activePower.js';
 
 it('should parse active power XML with multiplier 2', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_dderc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const limitWattsXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DefaultDERControl']['DERControlBase'][0]['ns2:opModExpLimW'][0];
 
     const link = parseActivePowerXmlObject(limitWattsXmlObject);
@@ -20,13 +20,13 @@ it('should parse active power XML with multiplier 2', async () => {
 });
 
 it('should parse active power XML with multiplier 0', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const limitWattsXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList']['DERControl'][0]['DERControlBase'][0][
             'ns2:opModExpLimW'
         ][0];

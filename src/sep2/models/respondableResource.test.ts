@@ -5,13 +5,13 @@ import { parseRespondableResourceXmlObject } from './respondableResource.js';
 import { ResponseRequiredType } from './responseRequired.js';
 
 it('should parse respondable resource XML object', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const respondableResourceXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList']['DERControl'][0];
 
     const respondableResource = parseRespondableResourceXmlObject(

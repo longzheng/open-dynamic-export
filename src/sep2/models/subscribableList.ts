@@ -13,7 +13,7 @@ export const subscribableListSchema = v.intersect([
 export type SubscribableList = v.InferOutput<typeof subscribableListSchema>;
 
 export function parseSubscribableListXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): SubscribableList {
     const list = parseListXmlObject(xmlObject);

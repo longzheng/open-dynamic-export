@@ -17,14 +17,14 @@ export const activePowerSchema = v.pipe(
 
 export type ActivePower = v.InferOutput<typeof activePowerSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseActivePowerXmlObject(xmlObject: any): ActivePower {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const value = safeParseIntString(assertString(xmlObject['value'][0]));
     const multiplier = safeParseIntString(
         assertString(xmlObject['multiplier'][0]),
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         value,
