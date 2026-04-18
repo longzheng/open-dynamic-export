@@ -1,69 +1,69 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn"],
-  "categories": {
-    "correctness": "error",
-    "suspicious": "error"
-  },
-  "options": {
-    "typeAware": true
-  },
-  "env": {
-    "builtin": true
-  },
-  "ignorePatterns": [
-    "src/setpoints/negativeFeedIn/amber/api.d.ts",
-    "docs/babel.config.js"
-  ],
-  "rules": {
-    "typescript/ban-ts-comment": "error",
-    "typescript/consistent-type-imports": [
-      "error",
-      {
-        "prefer": "type-imports"
-      }
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "plugins": ["typescript", "unicorn"],
+    "categories": {
+        "correctness": "error",
+        "suspicious": "error"
+    },
+    "options": {
+        "typeAware": true
+    },
+    "env": {
+        "builtin": true
+    },
+    "ignorePatterns": [
+        "src/setpoints/negativeFeedIn/amber/api.d.ts",
+        "docs/babel.config.js"
     ],
-    "typescript/no-import-type-side-effects": "error",
-    "typescript/no-unnecessary-condition": "error",
-    "typescript/switch-exhaustiveness-check": "error",
-    "typescript/no-meaningless-void-operator": "off",
-    "typescript/no-unnecessary-boolean-literal-compare": "off",
-    "typescript/no-unnecessary-template-expression": "off",
-    "typescript/require-array-sort-compare": "off",
-    "no-control-regex": "off",
-    "no-shadow": "off",
-    "no-unexpected-multiline": "off",
-    "no-unassigned-import": "off",
-    "preserve-caught-error": "off",
-    "import/no-unassigned-import": "off",
-    "no-useless-rename": "error",
-    "object-shorthand": "error",
-    "unicorn/no-array-sort": "off",
-    "unicorn/consistent-function-scoping": "off",
-    "unicorn/no-useless-spread": "off",
-    "typescript/consistent-return": "off",
-    "typescript/no-unsafe-type-assertion": "off"
-  },
-  "overrides": [
-    {
-      "files": ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
-      "rules": {
-        "react/no-unsafe": "off",
-        "react/react-in-jsx-scope": "off",
-        "import/namespace": "off",
-        "import/default": "off",
-        "import/no-named-as-default": "warn",
-        "import/no-named-as-default-member": "off",
-        "import/no-duplicates": "warn",
+    "rules": {
+        "typescript/ban-ts-comment": "error",
+        "typescript/consistent-type-imports": [
+            "error",
+            {
+                "prefer": "type-imports"
+            }
+        ],
+        "typescript/no-import-type-side-effects": "error",
+        "typescript/no-unnecessary-condition": "error",
+        "typescript/switch-exhaustiveness-check": "error",
+        "typescript/no-meaningless-void-operator": "off",
+        "typescript/no-unnecessary-boolean-literal-compare": "off",
+        "typescript/no-unnecessary-template-expression": "off",
+        "typescript/require-array-sort-compare": "off",
+        "no-control-regex": "off",
+        "no-shadow": "off",
+        "no-unexpected-multiline": "off",
+        "no-unassigned-import": "off",
+        "preserve-caught-error": "off",
         "import/no-unassigned-import": "off",
-        "@tanstack/router/create-route-property-order": "warn",
-        "@tanstack/router/route-param-names": "error",
-        "react/rules-of-hooks": "error",
-        "react/exhaustive-deps": "warn",
-        "import/first": "error"
-      },
-      "plugins": ["react", "import"],
-      "jsPlugins": ["@tanstack/eslint-plugin-router"]
-    }
-  ]
+        "no-useless-rename": "error",
+        "object-shorthand": "error",
+        "unicorn/no-array-sort": "off",
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/no-useless-spread": "off",
+        "typescript/consistent-return": "off",
+        "typescript/no-unsafe-type-assertion": "off"
+    },
+    "overrides": [
+        {
+            "files": ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
+            "rules": {
+                "react/no-unsafe": "off",
+                "react/react-in-jsx-scope": "off",
+                "import/namespace": "off",
+                "import/default": "off",
+                "import/no-named-as-default": "warn",
+                "import/no-named-as-default-member": "off",
+                "import/no-duplicates": "warn",
+                "import/no-unassigned-import": "off",
+                "@tanstack/router/create-route-property-order": "warn",
+                "@tanstack/router/route-param-names": "error",
+                "react/rules-of-hooks": "error",
+                "react/exhaustive-deps": "warn",
+                "import/first": "error"
+            },
+            "plugins": ["react", "import"],
+            "jsPlugins": ["@tanstack/eslint-plugin-router"]
+        }
+    ]
 }

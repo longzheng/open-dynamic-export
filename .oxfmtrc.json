@@ -1,18 +1,18 @@
 {
-  "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "tabWidth": 4,
-  "singleQuote": true,
-  "trailingComma": "all",
-  "arrowParens": "always",
-  "printWidth": 80,
-  "sortPackageJson": false,
-  "ignorePatterns": [
-    "src/routeTree.gen.ts",
-    "src/ui/routeTree.gen.ts",
-    "src/ui/gen/api.d.ts",
-    "src/setpoints/negativeFeedIn/amber/api.d.ts",
-    "src/tsoa/routes.ts",
-    "src/tsoa/swagger.json",
-    "tests/**/*.json"
-  ]
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
+    "tabWidth": 4,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "arrowParens": "always",
+    "printWidth": 80,
+    "sortPackageJson": false,
+    "ignorePatterns": [
+        "src/routeTree.gen.ts",
+        "src/ui/routeTree.gen.ts",
+        "src/ui/gen/api.d.ts",
+        "src/setpoints/negativeFeedIn/amber/api.d.ts",
+        "src/tsoa/routes.ts",
+        "src/tsoa/swagger.json",
+        "tests/**/*.json"
+    ]
 }
