@@ -4,13 +4,13 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parsePollRateXmlObject } from './pollRate.js';
 
 it('should parse poll rate with value XML object', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_fsa_1_derp.xml'),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const pollRateXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERProgramList'];
 
     const pollRate = parsePollRateXmlObject(pollRateXmlObject);
@@ -19,11 +19,11 @@ it('should parse poll rate with value XML object', async () => {
 });
 
 it('should parse poll rate without value XML object', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getDcap.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const pollRateXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DeviceCapability'];
 
     const pollRate = parsePollRateXmlObject(pollRateXmlObject);

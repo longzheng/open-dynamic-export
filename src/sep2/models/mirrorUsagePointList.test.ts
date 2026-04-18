@@ -4,7 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseMirrorUsagePointListXml } from './mirrorUsagePointList.js';
 
 it('should parse end device list XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getMup.xml'));
 
     const mirrorUsagePointList = parseMirrorUsagePointListXml(xml);

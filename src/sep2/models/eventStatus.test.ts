@@ -5,14 +5,14 @@ import { parseEventStatusXmlObject } from './eventStatus.js';
 import { CurrentStatus } from './currentStatus.js';
 
 it('should parse event status XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList']['DERControl'][0]['EventStatus'][0];
 
     const eventStatus = parseEventStatusXmlObject(xmlObject);

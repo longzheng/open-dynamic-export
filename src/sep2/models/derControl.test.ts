@@ -5,14 +5,14 @@ import { parseDERControlXmlObject } from './derControl.js';
 import { CurrentStatus } from './currentStatus.js';
 
 it('should parse DER Control XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControlList']['DERControl'][0];
 
     const derControl = parseDERControlXmlObject(derControlXmlObject);
@@ -35,7 +35,7 @@ it('should parse DER Control XML', async () => {
 });
 
 it('should parse DER Control XML with randomization', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         `<DERControl subscribable="0" replyTo="/api/v2/rsps/res-ms/rsp" responseRequired="03" href="/api/v2/derp/TESTPRG3/derc/ABCDEF0123456789">
     <mRID>ABCDEF0123456789</mRID>
@@ -65,9 +65,9 @@ it('should parse DER Control XML with randomization', async () => {
 </DERControl>`,
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const derControlXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DERControl'];
 
     const derControl = parseDERControlXmlObject(derControlXmlObject);

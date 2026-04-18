@@ -7,11 +7,11 @@ export const linkSchema = v.object({
 
 export type Link = v.InferOutput<typeof linkSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseLinkXmlObject(xmlObject: any): Link {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const linkHref = assertString(xmlObject['$']['href']);
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         href: linkHref,

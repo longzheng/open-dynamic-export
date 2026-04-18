@@ -31,7 +31,7 @@
             "skipFiles": [
                 // Node.js internal core modules
                 "<node_internals>/**",
-                 "${workspaceFolder}/node_modules/**"
+                "${workspaceFolder}/node_modules/**"
             ],
             "sourceMaps": true
         }

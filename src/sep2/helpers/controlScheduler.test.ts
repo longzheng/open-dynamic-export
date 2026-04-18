@@ -21,7 +21,7 @@ import type {
 } from './controlScheduler.js';
 
 vi.mock('node:crypto', async (importOriginal) => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    // oxlint-disable-next-line @typescript-eslint/consistent-type-imports
     const actual = await importOriginal<typeof import('node:crypto')>();
     return {
         ...actual,

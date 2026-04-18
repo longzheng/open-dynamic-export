@@ -21,10 +21,10 @@ export const usagePointBaseSchema = v.intersect([
 export type UsagePointBase = v.InferOutput<typeof usagePointBaseSchema>;
 
 export function parseUsagePointBaseXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): UsagePointBase {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
     const roleFlags = stringHexToEnumType<RoleFlagsType>(
         assertString(xmlObject['roleFlags'][0]),
@@ -38,7 +38,7 @@ export function parseUsagePointBaseXmlObject(
         usagePointBaseStatusSchema,
         assertString(xmlObject['status'][0]),
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...identifiedObject,

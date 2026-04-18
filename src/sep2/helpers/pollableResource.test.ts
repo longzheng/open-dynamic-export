@@ -34,7 +34,7 @@ describe('PollableResource', () => {
         };
 
         class MockPollableResource extends PollableResource<MockResponse> {
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             async get(): Promise<MockResponse> {
                 return mockResponse;
             }
@@ -67,7 +67,7 @@ describe('PollableResource', () => {
         };
 
         class MockPollableResource extends PollableResource<MockResponse> {
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             async get(): Promise<MockResponse> {
                 return mockResponse;
             }
@@ -100,7 +100,7 @@ describe('PollableResource', () => {
         };
 
         class MockPollableResource extends PollableResource<MockResponse> {
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             async get(): Promise<MockResponse> {
                 return mockResponse;
             }

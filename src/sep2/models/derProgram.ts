@@ -25,9 +25,9 @@ export const derProgramSchema = v.intersect([
 
 export type DERProgram = v.InferOutput<typeof derProgramSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
     const defaultDerControlLink = xmlObject['DefaultDERControlLink']
@@ -40,7 +40,7 @@ export function parseDERProgramXmlObject(xmlObject: any): DERProgram {
         ? parseListLinkXmlObject(xmlObject['DERCurveListLink'][0])
         : undefined;
     const primacy = safeParseIntString(assertString(xmlObject['primacy'][0]));
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

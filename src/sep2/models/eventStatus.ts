@@ -16,10 +16,10 @@ export const eventStatusSchema = v.object({
 export type EventStatus = v.InferOutput<typeof eventStatusSchema>;
 
 export function parseEventStatusXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): EventStatus {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const currentStatus = v.parse(
         currentStatusSchema,
         assertString(xmlObject['currentStatus'][0]),
@@ -36,7 +36,7 @@ export function parseEventStatusXmlObject(
     const reason = xmlObject['reason']
         ? assertString(xmlObject['reason'][0])
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         currentStatus,

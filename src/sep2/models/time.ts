@@ -23,9 +23,9 @@ export const timeSchema = v.intersect([
 
 export type Time = v.InferOutput<typeof timeSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseTimeXml(xml: any): Time {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const resource = parseResourceXmlObject(xml['Time']);
     const pollRate = parsePollRateXmlObject(xml['Time']);
     const currentTime = stringIntToDate(
@@ -50,7 +50,7 @@ export function parseTimeXml(xml: any): Time {
     const tzOffset = safeParseIntString(
         assertString(xml['Time']['tzOffset'][0]),
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...resource,

@@ -18,13 +18,13 @@ export const dateTimeIntervalSchema = v.object({
 export type DateTimeInterval = v.InferOutput<typeof dateTimeIntervalSchema>;
 
 export function parseDateTimeIntervalXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): DateTimeInterval {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const start = stringIntToDate(assertString(xmlObject['start'][0]));
     const duration = safeParseIntString(assertString(xmlObject['duration'][0]));
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         start,

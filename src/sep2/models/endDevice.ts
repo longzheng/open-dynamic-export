@@ -34,18 +34,18 @@ export type EndDeviceResponse = Pick<
     'lFDI' | 'sFDI' | 'changedTime' | 'enabled'
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceXml(xml: any): EndDevice {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const object = xml['EndDevice'];
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
     return parseEndDeviceObject(object);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribeableResource =
         parseSubscribableResourceXmlObject(endDeviceObject);
     const lFDI = endDeviceObject['lFDI']
@@ -81,7 +81,7 @@ export function parseEndDeviceObject(endDeviceObject: any): EndDevice {
     const connectionPointLink = endDeviceObject['csipaus:ConnectionPointLink']
         ? parseLinkXmlObject(endDeviceObject['csipaus:ConnectionPointLink'][0])
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribeableResource,

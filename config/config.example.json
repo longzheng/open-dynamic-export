@@ -1,6 +1,5 @@
 {
-    "setpoints": {
-    },
+    "setpoints": {},
     "inverters": [
         {
             "type": "sunspec",

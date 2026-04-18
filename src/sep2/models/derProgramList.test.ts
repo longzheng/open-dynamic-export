@@ -4,7 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseDerProgramListXml } from './derProgramList.js';
 
 it('should parse DERProgramList XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_fsa_1_derp.xml'),
     );

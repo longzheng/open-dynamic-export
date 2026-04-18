@@ -1,10 +1,10 @@
 services:
-  open-dynamic-export:
-    build:
-      args:
-        DEBUG: "true"
-    environment:
-      NODE_ENV: development
-    ports:
-      - 9229:9229
-    command: ["node", "--inspect=0.0.0.0:9229", "dist/app.js"]
+    open-dynamic-export:
+        build:
+            args:
+                DEBUG: 'true'
+        environment:
+            NODE_ENV: development
+        ports:
+            - 9229:9229
+        command: ['node', '--inspect=0.0.0.0:9229', 'dist/app.js']

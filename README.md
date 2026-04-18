@@ -3,36 +3,38 @@
 ## About
 
 This project aims to implement dynamic export control/solar curtailment of inverters using Node.js/TypeScript to satisfy
+
 - dynamic connection requirements (CSIP-AUS/SEP2/IEEE 2030.5) of various Australian energy distributors (DNSPs)
-  - certified by SA Power Networks (1/10/2024)
+    - certified by SA Power Networks (1/10/2024)
 - fixed/zero export limitations (e.g. 1.5kW export limit)
 - two-way tariffs (e.g.time based) export limitation
 - negative feed-in (e.g. Amber) export limitation
 
 ## Documentation
+
 [View documentation](https://opendynamicexport.com/guide/)
 
 ## Features
 
 - [x] Limits control
-  - [x] Fixed limits
-  - [x] Dynamic negative feed-in
-  - [x] Two-way tariffs
-  - [x] CSIP-AUS
+    - [x] Fixed limits
+    - [x] Dynamic negative feed-in
+    - [x] Two-way tariffs
+    - [x] CSIP-AUS
 - [x] Inverter integration
-  - [x] SunSpec Modbus TCP
-  - [x] SunSpec Modbus RTU
+    - [x] SunSpec Modbus TCP
+    - [x] SunSpec Modbus RTU
 - [x] Meter integration
-  - [x] SunSpec Modbus TCP
-  - [x] SunSpec Modbus RTU
-  - [x] Tesla Powerwall
+    - [x] SunSpec Modbus TCP
+    - [x] SunSpec Modbus RTU
+    - [x] Tesla Powerwall
 - [x] CSIP-AUS/SEP2/IEEE 2030.5 client
-  - [x] Discovery and scheduled entity polling
-  - [x] ConnectionPoint in-band registration
-  - [x] DER status/capability/settings reporting
-  - [x] DER control scheduling and default DER control fallback
-  - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
-  - [x] Software-based limit ramping (`setGradW` or `rampTms`)
+    - [x] Discovery and scheduled entity polling
+    - [x] ConnectionPoint in-band registration
+    - [x] DER status/capability/settings reporting
+    - [x] DER control scheduling and default DER control fallback
+    - [x] Site/DER "mirror usage point" "mirror meter reading" reporting
+    - [x] Software-based limit ramping (`setGradW` or `rampTms`)
 - [x] Metrics logging in InfluxDB
 
 ## Install
@@ -46,6 +48,7 @@ This project aims to implement dynamic export control/solar curtailment of inver
 Use Node or Docker to run the project.
 
 ### Node
+
 You can run the Node project directly with the Node.js runtime.
 
 1. Install dependencies with `pnpm install`
@@ -61,9 +64,11 @@ You can run the Node project directly with the Node.js runtime.
 2. Optionally uncomment the `influxdb` service in the `docker-compose.yml` file to enable logging to InfluxDB
 
 ### Web UI
+
 You can view the dashboard at `http://localhost:3000` (or the server port you specified in the `.env` file).
 
 ## Debug
+
 ### VSCode
 
 Run debug configuration "Docker: Build and attach to Node".

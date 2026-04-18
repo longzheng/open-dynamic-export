@@ -4,14 +4,14 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseFunctionSetAssignmentsXmlObject } from './functionSetAssignments.js';
 
 it('should parse FunctionSetAssignmentsList XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_fsa.xml'),
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const functionSetAssignmentsXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['FunctionSetAssignmentsList']['FunctionSetAssignments'][0];
 
     const functionSetAssignments = parseFunctionSetAssignmentsXmlObject(

@@ -101,7 +101,7 @@ describe('modbusModelFactory', () => {
 
         // intercept SunSpecConnection scanModelAddresses to prevent actual scanning
         vi.spyOn(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // oxlint-disable-next-line @typescript-eslint/no-explicit-any
             SunSpecConnection.prototype as any,
             'scanModelAddresses',
         ).mockResolvedValue(new Map());

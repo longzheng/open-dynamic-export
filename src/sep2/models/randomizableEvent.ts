@@ -24,10 +24,10 @@ export const randomizableEventSchema = v.intersect([
 export type RandomizableEvent = v.InferOutput<typeof randomizableEventSchema>;
 
 export function parseRandomizableEventXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): RandomizableEvent {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const event = parseEventXmlObject(xmlObject);
     const randomizeStart = xmlObject['randomizeStart']
         ? safeParseIntString(assertString(xmlObject['randomizeStart'][0]))
@@ -35,7 +35,7 @@ export function parseRandomizableEventXmlObject(
     const randomizeDuration = xmlObject['randomizeDuration']
         ? safeParseIntString(assertString(xmlObject['randomizeDuration'][0]))
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...event,

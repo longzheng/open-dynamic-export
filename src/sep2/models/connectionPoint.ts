@@ -8,24 +8,24 @@ export const connectionPointSchema = v.object({
 
 export type ConnectionPoint = v.InferOutput<typeof connectionPointSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseConnectionPointXml(xml: any): ConnectionPoint {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const object = xml['csipaus:ConnectionPoint'];
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
     return parseConnectionPointXmlObject(object);
 }
 
 export function parseConnectionPointXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): ConnectionPoint {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const connectionPointId = xmlObject['csipaus:connectionPointId']
         ? assertString(xmlObject['csipaus:connectionPointId'][0])
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         connectionPointId,

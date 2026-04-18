@@ -17,16 +17,16 @@ export const powerFactorSchema = v.pipe(
 
 export type PowerFactor = v.InferOutput<typeof powerFactorSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parsePowerFactorXmlObject(xmlObject: any): PowerFactor {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const displacement = safeParseIntString(
         assertString(xmlObject['displacement'][0]),
     );
     const multiplier = safeParseIntString(
         assertString(xmlObject['multiplier'][0]),
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         displacement,

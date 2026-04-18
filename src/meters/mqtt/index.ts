@@ -47,7 +47,7 @@ export class MqttSiteSamplePoller extends SiteSamplePollerBase {
         void this.startPolling();
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
+    // oxlint-disable-next-line @typescript-eslint/require-await
     override async getSiteSample(): Promise<SiteSample> {
         if (!this.cachedMessage) {
             throw new Error('No site sample data on MQTT');
