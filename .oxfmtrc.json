@@ -7,6 +7,7 @@
     "printWidth": 80,
     "sortPackageJson": false,
     "ignorePatterns": [
+        "config.schema.json",
         "src/routeTree.gen.ts",
         "src/ui/routeTree.gen.ts",
         "src/ui/gen/api.d.ts",
