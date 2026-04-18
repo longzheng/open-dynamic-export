@@ -10,6 +10,9 @@
     "src/routeTree.gen.ts",
     "src/ui/routeTree.gen.ts",
     "src/ui/gen/api.d.ts",
-    "src/setpoints/negativeFeedIn/amber/api.d.ts"
+    "src/setpoints/negativeFeedIn/amber/api.d.ts",
+    "src/tsoa/routes.ts",
+    "src/tsoa/swagger.json",
+    "tests/**/*.json"
   ]
 }

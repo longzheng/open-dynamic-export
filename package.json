@@ -6,8 +6,8 @@
   "scripts": {
     "build": "pnpm run routes:generate && tsc -p tsconfig.server.json && vite build",
     "build:debug": "pnpm run routes:generate && tsc -p tsconfig.server.debug.json",
-    "lint": "pnpm run routes:generate && oxlint . && oxfmt --check \"src/**/*.{ts,tsx,js,jsx,mjs,cjs}\" \"scripts/**/*.{ts,tsx,js,jsx,mjs,cjs}\" \"tests/**/*.{ts,tsx,js,jsx,mjs,cjs}\" && pnpm run generate:config-json-schema",
-    "format": "oxfmt \"src/**/*.{ts,tsx,js,jsx,mjs,cjs}\" \"scripts/**/*.{ts,tsx,js,jsx,mjs,cjs}\" \"tests/**/*.{ts,tsx,js,jsx,mjs,cjs}\"",
+    "lint": "pnpm run routes:generate && oxlint . && oxfmt --check src scripts tests && pnpm run generate:config-json-schema",
+    "format": "oxfmt src scripts tests",
     "test": "vitest",
     "start": "NODE_ENV=production node dist/app.js",
     "dev": "pnpm run routes:generate && tsx src/app.ts",
