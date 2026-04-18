@@ -154,7 +154,7 @@ describe('convertNumberToBaseAndPow10Exponent', () => {
 
     it('should convert number divisible by 10 and decimal number with trailing zeros', () => {
         // eslint-disable-next-line prettier/prettier
-        const result = convertNumberToBaseAndPow10Exponent(50.1);
+        const result = convertNumberToBaseAndPow10Exponent(50.100000);
         expect(result).toEqual({ base: 501, pow10: -1 });
     });
 
