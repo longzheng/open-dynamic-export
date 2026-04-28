@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardBody } from '@heroui/card';
-import type { ChartDataset, ChartOptions } from 'chart.js';
+import type { ChartDataset, ChartOptions, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
 import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
@@ -208,10 +208,7 @@ export function PowerLimitChart({
                     cornerRadius: 4,
                     displayColors: true,
                     callbacks: {
-                        label(tooltipItem: {
-                            dataset: { label?: string };
-                            parsed: { y: number };
-                        }) {
+                        label(tooltipItem: TooltipItem<'line'>) {
                             return ` ${tooltipItem.dataset.label || ''}: ${
                                 tooltipItem.parsed.y
                             } W`;
