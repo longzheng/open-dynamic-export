@@ -507,10 +507,19 @@ export class InverterController {
                         return configuration;
                     }
 
-                    // max 10% absolute change on the power ratio (0-1 range)
+                    // max 5% absolute change on the power ratio (0-1 range)
                     // only the ratio is ramped as it directly controls WMaxLimPct
                     // targetSolarWatts is not ramped - it reflects the true calculated target
-                    const maxChange = 0.1;
+                    //
+                    // 5%/cycle (≈20s for full 100→0% ramp) is slower than the
+                    // initial 10%/cycle to give hybrid inverter MPPT time to
+                    // follow the falling limit. On Fronius Gen24, a faster ramp
+                    // caused all strings to de-load (>450V) and stay there for
+                    // 30+ minutes after WMaxLimPct returned to 100% — observed
+                    // multiple times per day during Amber-driven curtailment.
+                    // Stays well within the 30s event-start notice window
+                    // (CSIP-AUS handbook §9), so DOE response remains compliant.
+                    const maxChange = 0.05;
 
                     const rampedTargetSolarPowerRatio = cappedChange({
                         previousValue: previousTarget.targetSolarPowerRatio,
