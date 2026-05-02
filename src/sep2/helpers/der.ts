@@ -1,5 +1,6 @@
 import type { Logger } from 'pino';
 import deepEqual from 'fast-deep-equal';
+import { AxiosError } from 'axios';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
 import type { DER } from '../models/der.js';
 import type { DERCapability } from '../models/derCapability.js';
@@ -16,6 +17,7 @@ import { DERControlType } from '../models/derControlType.js';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import type { RampRateHelper } from './rampRate.js';
 import { objectToXml } from './xml.js';
 
@@ -128,7 +130,7 @@ export class DerHelper {
             await this.putDerStatus({ derStatus: this.lastSentDerStatus });
         } catch (error) {
             this.logger.error(
-                error,
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
                 'Error updating DER status during scheduled poll',
             );
         }
@@ -143,21 +145,27 @@ export class DerHelper {
             return;
         }
 
+        if (!this.config.der.derCapabilityLink) {
+            return;
+        }
+
+        this.lastSentDerCapability = derCapability;
+
         this.logger.info({ derCapability }, 'Sending DER capability');
 
         const response = generateDerCapability(derCapability);
         const xml = objectToXml(response);
 
         try {
-            if (!this.config.der.derCapabilityLink) {
-                return;
-            }
-
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
-
-            this.lastSentDerCapability = derCapability;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER capability');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Error updating DER capability',
+            );
+
+            // reset cached DER capability so that we attempt to resend
+            this.lastSentDerCapability = null;
         }
     }
 
@@ -170,21 +178,27 @@ export class DerHelper {
             return;
         }
 
+        if (!this.config.der.derSettingsLink) {
+            return;
+        }
+
+        this.lastSentDerSettings = derSettings;
+
         this.logger.info({ derSettings }, 'Sending DER settings');
 
         const response = generateDerSettingsResponse(derSettings);
         const xml = objectToXml(response);
 
         try {
-            if (!this.config.der.derSettingsLink) {
-                return;
-            }
-
             await this.client.put(this.config.der.derSettingsLink.href, xml);
-
-            this.lastSentDerSettings = derSettings;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER settings');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Error updating DER settings',
+            );
+
+            // reset cached DER settings so that we attempt to resend
+            this.lastSentDerSettings = null;
         }
     }
 
@@ -193,21 +207,27 @@ export class DerHelper {
             return;
         }
 
+        if (!this.config.der.derStatusLink) {
+            return;
+        }
+
+        this.lastSentDerStatus = derStatus;
+
         this.logger.info({ derStatus }, 'Sending DER status');
 
         const response = generateDerStatusResponse(derStatus);
         const xml = objectToXml(response);
 
         try {
-            if (!this.config.der.derStatusLink) {
-                return;
-            }
-
             await this.client.put(this.config.der.derStatusLink.href, xml);
-
-            this.lastSentDerStatus = derStatus;
         } catch (error) {
-            this.logger.error(error, 'Error updating DER status');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Error updating DER status',
+            );
+
+            // reset cached DER status so that we attempt to resend
+            this.lastSentDerStatus = null;
         }
     }
 

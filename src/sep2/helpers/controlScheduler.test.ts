@@ -1,11 +1,14 @@
 import { randomInt } from 'crypto';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
+import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
+import { SEP2Client } from '../client.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import type { MergedControlsData } from './derControls.js';
 import {
+    ControlSchedulerHelper,
     generateControlsSchedule,
     filterControlsOfType,
     getSortedUniqueDatetimesFromControls,
@@ -28,6 +31,10 @@ vi.mock('node:crypto', async (importOriginal) => {
 
 beforeEach(() => {
     vi.restoreAllMocks();
+});
+
+afterEach(() => {
+    vi.useRealTimers();
 });
 
 describe('filterControlsOfType', () => {
@@ -410,6 +417,70 @@ describe('generateControlsSchedule', () => {
         expect(result[4]?.endExclusive).toStrictEqual(
             new Date('2024-01-01T00:00:10Z'),
         );
+    });
+});
+
+describe('ControlSchedulerHelper', () => {
+    it('should dedupe DERControl start responses across control-type schedulers', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-01-01T00:00:10Z'));
+
+        const sep2Client = new SEP2Client({
+            host: 'http://example.com',
+            cert: mockCert,
+            key: mockKey,
+            pen: '12345',
+        });
+
+        const postSpy = vi
+            .spyOn(sep2Client, 'post')
+            .mockResolvedValue({} as never);
+
+        const controlData: MergedControlsData = {
+            fsa: generateMockFunctionSetAssignments({}),
+            program: generateMockDERProgram({}),
+            control: generateMockDERControl({
+                interval: {
+                    start: new Date('2024-01-01T00:00:00Z'),
+                    duration: 60,
+                },
+                derControlBase: {
+                    opModExpLimW: {
+                        value: 1,
+                        multiplier: 0,
+                    },
+                    opModGenLimW: {
+                        value: 2,
+                        multiplier: 0,
+                    },
+                },
+            }),
+        };
+
+        const exportLimitScheduler = new ControlSchedulerHelper({
+            client: sep2Client,
+            controlType: 'opModExpLimW',
+        });
+
+        const generationLimitScheduler = new ControlSchedulerHelper({
+            client: sep2Client,
+            controlType: 'opModGenLimW',
+        });
+
+        exportLimitScheduler.updateControlsData({
+            activeOrScheduledControls: [controlData],
+            fallbackControl: { type: 'none' },
+        });
+
+        generationLimitScheduler.updateControlsData({
+            activeOrScheduledControls: [controlData],
+            fallbackControl: { type: 'none' },
+        });
+
+        exportLimitScheduler.getActiveScheduleDerControlBaseValue();
+        generationLimitScheduler.getActiveScheduleDerControlBaseValue();
+
+        expect(postSpy).toHaveBeenCalledTimes(1);
     });
 });
 

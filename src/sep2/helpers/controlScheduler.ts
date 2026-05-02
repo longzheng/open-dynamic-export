@@ -129,50 +129,61 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     }
 
     public getActiveScheduleDerControlBaseValue(): DERControlBaseValueOfType<ControlKey> {
+        const now = new Date();
+
         // calculate the active control schedule from the schedule
-        const newActiveControlSchedule = this.findActiveControlScheduleForNow();
+        const newActiveControlSchedule =
+            this.findActiveControlScheduleForNow(now);
 
         if (
             this.activeControlSchedule?.mRID !== newActiveControlSchedule?.mRID
         ) {
-            this.handleActiveControlScheduleChange(newActiveControlSchedule);
+            this.handleActiveControlScheduleChange({
+                newActiveControlSchedule,
+                now,
+            });
         }
 
         return this.getCurrentControlBaseValue();
     }
 
-    private handleActiveControlScheduleChange(
-        newActiveControlSchedule: RandomizedControlSchedule | null,
-    ) {
-        const now = new Date();
+    private handleActiveControlScheduleChange({
+        newActiveControlSchedule,
+        now,
+    }: {
+        newActiveControlSchedule: RandomizedControlSchedule | null;
+        now: Date;
+    }) {
+        const previousActiveControlSchedule = this.activeControlSchedule;
+        this.activeControlSchedule = newActiveControlSchedule;
 
         // if the schedule should be changed
-        if (this.activeControlSchedule) {
+        if (previousActiveControlSchedule) {
             const activeControlScheduleEnd =
-                this.activeControlSchedule.effectiveEndExclusive;
+                previousActiveControlSchedule.effectiveEndExclusive;
             const activeControlScheduleEndedSuccessfully =
                 activeControlScheduleEnd <= now;
 
             if (activeControlScheduleEndedSuccessfully) {
                 this.logger.info(
                     {
-                        activeControlSchedule: this.activeControlSchedule,
+                        activeControlSchedule: previousActiveControlSchedule,
                         now,
                     },
                     'Active control schedule completed',
                 );
 
                 void this.derControlResponseHelper.respondDerControl({
-                    mRID: this.activeControlSchedule.mRID,
-                    replyToHref: this.activeControlSchedule.replyToHref,
+                    mRID: previousActiveControlSchedule.mRID,
+                    replyToHref: previousActiveControlSchedule.replyToHref,
                     responseRequired:
-                        this.activeControlSchedule.responseRequired,
+                        previousActiveControlSchedule.responseRequired,
                     status: ResponseStatus.EventCompleted,
                 });
             } else {
                 this.logger.warn(
                     {
-                        activeControlSchedule: this.activeControlSchedule,
+                        activeControlSchedule: previousActiveControlSchedule,
                         now,
                     },
                     'Active control schedule aborted before end time',
@@ -182,7 +193,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
             // remove the active control schedule from the schedule list
             this.controlSchedules = this.controlSchedules.filter(
                 (schedule) =>
-                    schedule.mRID !== this.activeControlSchedule?.mRID,
+                    schedule.mRID !== previousActiveControlSchedule.mRID,
             );
         }
 
@@ -216,9 +227,6 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 'Default control started',
             );
         }
-
-        // set the new active control schedule
-        this.activeControlSchedule = newActiveControlSchedule;
     }
 
     private getCurrentControlBaseValue(): DERControlBaseValueOfType<ControlKey> {
@@ -253,11 +261,13 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         }
     }
 
-    private findActiveControlScheduleForNow(): RandomizedControlSchedule | null {
+    private findActiveControlScheduleForNow(
+        now: Date,
+    ): RandomizedControlSchedule | null {
         const nowSchedules = this.controlSchedules.filter(
             (control) =>
-                control.effectiveStartInclusive <= new Date() &&
-                control.effectiveEndExclusive > new Date(),
+                control.effectiveStartInclusive <= now &&
+                control.effectiveEndExclusive > now,
         );
 
         if (nowSchedules.length === 0) {

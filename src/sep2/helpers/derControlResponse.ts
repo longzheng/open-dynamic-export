@@ -1,12 +1,13 @@
 import type { Logger } from 'pino';
 import deepEqual from 'fast-deep-equal';
-import type { AxiosRequestConfig } from 'axios';
+import { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { generateDerControlResponse } from '../models/derControlResponse.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { ResponseStatus } from '../models/responseStatus.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import { objectToXml } from './xml.js';
 
 type HistoryKey = {
@@ -14,19 +15,36 @@ type HistoryKey = {
     status: ResponseStatus;
 };
 
+const responseHistoryStacks = new WeakMap<
+    SEP2Client,
+    CappedArrayStack<HistoryKey>
+>();
+
 export class DerControlResponseHelper {
     private client: SEP2Client;
     private logger: Logger;
 
     // to simplify responding to DERControl events, we don't want to write complex logic to figure out if the schedule has changed or not (to handle complex changes like event superseded)
     // instead we'll just keep a history of all the recent Responses we've sent and deduplicate them
-    private responseHistoryStack = new CappedArrayStack<HistoryKey>({
-        limit: 1000,
-    });
+    private responseHistoryStack: CappedArrayStack<HistoryKey>;
 
     constructor({ client }: { client: SEP2Client }) {
         this.client = client;
         this.logger = pinoLogger.child({ module: 'DerControlResponseHelper' });
+
+        const existingResponseHistoryStack = responseHistoryStacks.get(client);
+
+        if (existingResponseHistoryStack) {
+            this.responseHistoryStack = existingResponseHistoryStack;
+            return;
+        }
+
+        const responseHistoryStack = new CappedArrayStack<HistoryKey>({
+            limit: 1000,
+        });
+
+        this.responseHistoryStack = responseHistoryStack;
+        responseHistoryStacks.set(client, responseHistoryStack);
     }
 
     public async respondDerControl({
@@ -93,7 +111,10 @@ export class DerControlResponseHelper {
         } catch (error) {
             this.logger.error(
                 {
-                    error,
+                    error:
+                        error instanceof AxiosError
+                            ? sanitizeAxiosError(error)
+                            : error,
                     mRID,
                     status,
                     response,

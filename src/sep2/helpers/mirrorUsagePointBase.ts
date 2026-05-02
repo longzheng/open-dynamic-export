@@ -1,5 +1,6 @@
 import type { Logger } from 'pino';
 import { isNetworkError, isRetryableError } from 'axios-retry';
+import { AxiosError } from 'axios';
 import {
     getMillisecondsToNextUtcIntervalTick,
     getUtcTickStart,
@@ -21,6 +22,7 @@ import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { UsagePointBaseStatus } from '../models/usagePointBaseStatus.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import { objectToXml } from './xml.js';
 
 export type MirrorMeterReadingDefinitions = Required<
@@ -180,7 +182,10 @@ export abstract class MirrorUsagePointHelperBase<
 
             this.queueMirrorMeterReadingPost();
         } catch (error) {
-            this.logger.debug(error, 'Failed to create MirrorUsagePoint');
+            this.logger.debug(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Failed to create MirrorUsagePoint',
+            );
             this.state = { type: 'none' };
         }
     }
@@ -405,7 +410,12 @@ export abstract class MirrorUsagePointHelperBase<
                 });
                 successCount++;
             } catch (error) {
-                this.logger.debug(error, 'Failed to post MirrorMeterReading');
+                this.logger.debug(
+                    error instanceof AxiosError
+                        ? sanitizeAxiosError(error)
+                        : error,
+                    'Failed to post MirrorMeterReading',
+                );
                 failCount++;
                 this.mirrorMeterReadingsBuffer.push(reading);
 

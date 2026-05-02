@@ -329,9 +329,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Common
+        /**
+         * @description Common
          *
-         *     All SunSpec compliant devices must include this as the first model */
+         *     All SunSpec compliant devices must include this as the first model
+         */
         CommonModel: {
             /**
              * Format: double
@@ -342,25 +344,35 @@ export interface components {
              *     This point is mandatory for all SunSpec RTU devices and, for those devices, they must support values from 1-247.
              */
             DA: number | null;
-            /** @description Serial Number
+            /**
+             * @description Serial Number
              *
-             *     Manufacturer specific value (32 chars) */
+             *     Manufacturer specific value (32 chars)
+             */
             SN: string;
-            /** @description Version
+            /**
+             * @description Version
              *
-             *     Manufacturer specific value (16 chars) */
+             *     Manufacturer specific value (16 chars)
+             */
             Vr: string | null;
-            /** @description Options
+            /**
+             * @description Options
              *
-             *     Manufacturer specific value (16 chars) */
+             *     Manufacturer specific value (16 chars)
+             */
             Opt: string | null;
-            /** @description Model
+            /**
+             * @description Model
              *
-             *     Manufacturer specific value (32 chars) */
+             *     Manufacturer specific value (32 chars)
+             */
             Md: string;
-            /** @description Manufacturer
+            /**
+             * @description Manufacturer
              *
-             *     Well known value registered with SunSpec for compliance */
+             *     Well known value registered with SunSpec for compliance
+             */
             Mn: string;
             /**
              * Format: double
@@ -384,13 +396,17 @@ export interface components {
          * @enum {number}
          */
         MeterEvent: 4 | 8 | 16 | 32 | 64 | 128 | 65536 | 131072 | 262144 | 524288 | 1048576 | 2097152 | 4194304 | 8388608 | 16777216 | 33554432 | 67108864 | 134217728 | 268435456 | 536870912 | 1073741824;
-        /** @description Meter (Single Phase, Split-Phase, Three Phase)
+        /**
+         * @description Meter (Single Phase, Split-Phase, Three Phase)
          *
-         *     A combination of the three models for single phase, split-phase, and three phase meters */
+         *     A combination of the three models for single phase, split-phase, and three phase meters
+         */
         MeterModel: {
-            /** @description Evt
+            /**
+             * @description Evt
              *
-             *     Meter Event Flags. */
+             *     Meter Event Flags.
+             */
             Evt: components["schemas"]["MeterEvent"];
             /**
              * Format: double
@@ -918,9 +934,11 @@ export interface components {
          * @enum {number}
          */
         InverterEvent1: 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768;
-        /** @description Inverter (Single Phase, Split-Phase, Three Phase)
+        /**
+         * @description Inverter (Single Phase, Split-Phase, Three Phase)
          *
-         *     A combination of the three models for single phase, split-phase, and three phase inverters */
+         *     A combination of the three models for single phase, split-phase, and three phase inverters
+         */
         InverterModel: {
             /**
              * Format: double
@@ -957,9 +975,11 @@ export interface components {
              *     Reserved for future use
              */
             Evt2: number;
-            /** @description Event1
+            /**
+             * @description Event1
              *
-             *     Bitmask value. Event fields */
+             *     Bitmask value. Event fields
+             */
             Evt1: components["schemas"]["InverterEvent1"];
             /**
              * Format: double
@@ -968,9 +988,11 @@ export interface components {
              *     Vendor specific operating state code
              */
             StVnd: number | null;
-            /** @description Operating State
+            /**
+             * @description Operating State
              *
-             *     Enumerated value. Operating state */
+             *     Enumerated value. Operating state
+             */
             St: components["schemas"]["InverterState"];
             /**
              * Format: double
@@ -1215,9 +1237,11 @@ export interface components {
          * @enum {number}
          */
         DERTyp: 4 | 82;
-        /** @description Nameplate
+        /**
+         * @description Nameplate
          *
-         *     Inverter Controls Nameplate Ratings */
+         *     Inverter Controls Nameplate Ratings
+         */
         NameplateModel: {
             /**
              * Format: double
@@ -1387,9 +1411,11 @@ export interface components {
              *     Continuous power output capability of the inverter.
              */
             WRtg: number;
-            /** @description Type of DER device
+            /**
+             * @description Type of DER device
              *
-             *     Type of DER device. Default value is 4 to indicate PV device. */
+             *     Type of DER device. Default value is 4 to indicate PV device.
+             */
             DERTyp: components["schemas"]["DERTyp"];
             /**
              * Format: double
@@ -1427,9 +1453,11 @@ export interface components {
          * @enum {number}
          */
         ConnPh: 1 | 2 | 3;
-        /** @description Settings
+        /**
+         * @description Settings
          *
-         *     Inverter Controls Basic Settings */
+         *     Inverter Controls Basic Settings
+         */
         SettingsModel: {
             /**
              * Format: double
@@ -1501,9 +1529,11 @@ export interface components {
              *     Scale factor for real power.
              */
             WMax_SF: number;
-            /** @description ConnPh
+            /**
+             * @description ConnPh
              *
-             *     Identity of connected phase for single phase inverters. A=1 B=2 C=3. */
+             *     Identity of connected phase for single phase inverters. A=1 B=2 C=3.
+             */
             ConnPh: components["schemas"]["ConnPh"] | null;
             /**
              * Format: double
@@ -1519,13 +1549,17 @@ export interface components {
              *     Setpoint for maximum ramp rate as percentage of nominal maximum ramp rate. This setting will limit the rate that watts delivery to the grid can increase or decrease in response to intermittent PV generation.
              */
             MaxRmpRte: number | null;
-            /** @description ClcTotVA
+            /**
+             * @description ClcTotVA
              *
-             *     Calculation method for total apparent power. 1=vector 2=arithmetic. */
+             *     Calculation method for total apparent power. 1=vector 2=arithmetic.
+             */
             ClcTotVA: components["schemas"]["ClcTotVA"] | null;
-            /** @description VArAct
+            /**
+             * @description VArAct
              *
-             *     VAR action on change between charging and discharging: 1=switch 2=maintain VAR characterization. */
+             *     VAR action on change between charging and discharging: 1=switch 2=maintain VAR characterization.
+             */
             VArAct: components["schemas"]["VArAct"] | null;
             /**
              * Format: double
@@ -1704,13 +1738,17 @@ export interface components {
          */
         MpptEvt: 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192 | 16384 | 32768 | 65536 | 131072 | 262144 | 524288 | 1048576 | 2097152 | 4194304;
         MpptModuleModel: {
-            /** @description DCEvt
+            /**
+             * @description DCEvt
              *
-             *     Module Events */
+             *     Module Events
+             */
             DcEvt: components["schemas"]["MpptEvt"] | null;
-            /** @description DCSt
+            /**
+             * @description DCSt
              *
-             *     Operating State */
+             *     Operating State
+             */
             DCSt: components["schemas"]["DcSt"] | null;
             /**
              * Format: double
@@ -1754,9 +1792,11 @@ export interface components {
              *     DC Current
              */
             DCA: number | null;
-            /** @description IDStr
+            /**
+             * @description IDStr
              *
-             *     Input ID String */
+             *     Input ID String
+             */
             IDStr: string | null;
             /**
              * Format: double

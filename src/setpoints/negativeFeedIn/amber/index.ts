@@ -1,6 +1,7 @@
 import type { Client } from 'openapi-fetch';
 import createClient from 'openapi-fetch';
 import type { Logger } from 'pino';
+import { AxiosError } from 'axios';
 import type { SetpointType } from '../../setpoint.js';
 import type { InverterControlLimit } from '../../../coordinator/helpers/inverterController.js';
 import { pinoLogger } from '../../../helpers/logger.js';
@@ -8,6 +9,7 @@ import {
     writeAmberPrice,
     writeControlLimit,
 } from '../../../helpers/influxdb.js';
+import { sanitizeAxiosError } from '../../../helpers/sanitizeAxiosError.js';
 import type { paths } from './api.js';
 
 type Interval = {
@@ -96,8 +98,15 @@ export class AmberSetpoint implements SetpointType {
                         siteId: this.siteId,
                     },
                     query: {
-                        // cache future prices for 2 hours (at 30 minute intervals)
-                        next: 2 * 2,
+                        // 12 forecast 5-minute intervals = 1 h of headroom
+                        // past the current interval, so a transient Amber
+                        // API outage doesn't drop us back to "no limit".
+                        // Amber's API now returns 5-min intervals to match
+                        // NEM dispatch — the `resolution` query param is
+                        // ignored regardless of value. Forecast accuracy
+                        // degrades further out (see `advancedPrice` spread),
+                        // so 1 h is a deliberate ceiling.
+                        next: 12,
                     },
                 },
                 signal: AbortSignal.any([
@@ -122,7 +131,16 @@ export class AmberSetpoint implements SetpointType {
                 (interval) =>
                     ({
                         start: new Date(interval.startTime),
-                        end: new Date(interval.endTime),
+                        // Amber returns adjacent intervals as e.g.
+                        // start=HH:MM:01 → end=HH:MM:00, leaving a 1-second
+                        // gap at every boundary where neither interval matches
+                        // `now`. Extend the end by 1s so the previous interval
+                        // covers that boundary second; the next interval still
+                        // matches at exactly its start (find() short-circuits
+                        // on the first hit, so no duplicate match).
+                        end: new Date(
+                            new Date(interval.endTime).getTime() + 1000,
+                        ),
                         price: interval.perKwh,
                     }) satisfies Interval,
             );
@@ -173,15 +191,20 @@ export class AmberSetpoint implements SetpointType {
         try {
             await this.getSiteFeedInPrices();
         } catch (error) {
-            this.logger.error(error, 'Failed to poll Amber API');
+            this.logger.error(
+                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                'Failed to poll Amber API',
+            );
         } finally {
             if (!this.abortController.signal.aborted) {
                 this.pricePollTimer = setTimeout(
                     () => {
                         void this.poll();
                     },
-                    // poll every 15 minutes
-                    15 * 60 * 1000,
+                    // poll every 5 minutes — matches the NEM 5-minute dispatch
+                    // interval so each new "current" 5-minute price is picked up
+                    // promptly, instead of falling back to the 30-minute forecast
+                    5 * 60 * 1000,
                 );
             }
         }

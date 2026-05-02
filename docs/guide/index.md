@@ -63,11 +63,11 @@ Use Node or Docker to run the project.
 ### Node
 You can run the Node project directly with the Node.js runtime.
 
-1. Install dependencies with `npm install`
+1. Install dependencies with `pnpm install`
 
-2. Build the project with `npm run build`
+2. Build the project with `pnpm run build`
 
-3. Run the project with `npm start`
+3. Run the project with `pnpm start`
 
 ### Docker compose
 
