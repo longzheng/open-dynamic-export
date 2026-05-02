@@ -131,7 +131,16 @@ export class AmberSetpoint implements SetpointType {
                 (interval) =>
                     ({
                         start: new Date(interval.startTime),
-                        end: new Date(interval.endTime),
+                        // Amber returns adjacent intervals as e.g.
+                        // start=HH:MM:01 → end=HH:MM:00, leaving a 1-second
+                        // gap at every boundary where neither interval matches
+                        // `now`. Extend the end by 1s so the previous interval
+                        // covers that boundary second; the next interval still
+                        // matches at exactly its start (find() short-circuits
+                        // on the first hit, so no duplicate match).
+                        end: new Date(
+                            new Date(interval.endTime).getTime() + 1000,
+                        ),
                         price: interval.perKwh,
                     }) satisfies Interval,
             );
