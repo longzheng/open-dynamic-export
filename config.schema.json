@@ -117,6 +117,7 @@
                 "export_first",
                 "battery_first"
               ],
+              "type": "string",
               "description": "Battery priority mode: export_first | battery_first"
             },
             "batteryGridChargingEnabled": {

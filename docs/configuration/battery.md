@@ -39,7 +39,7 @@ Enable battery power flow control in `config.json`:
     "inverterControl": {
         "enabled": true,
         "batteryControlEnabled": true,
-        "batteryPowerFlowControl": true
+        "batteryPowerFlowControl": true,
     },
     "inverters": [
         {
@@ -48,22 +48,22 @@ Enable battery power flow control in `config.json`:
             "connection": {
                 "type": "tcp",
                 "ip": "192.168.1.6",
-                "port": 502
+                "port": 502,
             },
-            "unitId": 1
-        }
+            "unitId": 1,
+        },
     ],
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 80,
             "batterySocMinPercent": 20,
             "batterySocMaxPercent": 95,
-            "batteryPriorityMode": "battery_first"
+            "batteryPriorityMode": "battery_first",
             // "batteryChargeMaxWatts": 5000, // (number) optional: if omitted, the inverter's hardware limit applies
             // "batteryDischargeMaxWatts": 5000, // (number) optional: if omitted, the inverter's hardware limit applies
             // "exportLimitWatts": 5000 // (number) optional: if omitted, all surplus is exported
-        }
-    }
+        },
+    },
 }
 ```
 
@@ -71,30 +71,30 @@ Enable battery power flow control in `config.json`:
 
 #### Global Settings (`inverterControl`)
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `batteryControlEnabled` | boolean | false | Enable battery control system |
-| `batteryPowerFlowControl` | boolean | false | Use intelligent power flow control |
+| Parameter                 | Type    | Default | Description                        |
+| ------------------------- | ------- | ------- | ---------------------------------- |
+| `batteryControlEnabled`   | boolean | false   | Enable battery control system      |
+| `batteryPowerFlowControl` | boolean | false   | Use intelligent power flow control |
 
 #### Per-Inverter Settings (`inverters[]`)
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `batteryControlEnabled` | boolean | false | Enable battery control for this inverter |
+| Parameter               | Type    | Default | Description                              |
+| ----------------------- | ------- | ------- | ---------------------------------------- |
+| `batteryControlEnabled` | boolean | false   | Enable battery control for this inverter |
 
 #### Setpoint Parameters (`setpoints.fixed` or MQTT)
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `batterySocTargetPercent` | number | - | Target SoC for charging (0-100) |
-| `batterySocMinPercent` | number | - | Minimum SoC, no discharge below this level |
-| `batterySocMaxPercent` | number | - | Maximum SoC, no charge above this level |
-| `batteryChargeMaxWatts` | number | unlimited | Maximum charging power (watts). If omitted, the inverter's hardware limit applies |
-| `batteryDischargeMaxWatts` | number | unlimited | Maximum discharging power (watts). If omitted, the inverter's hardware limit applies |
-| `batteryPriorityMode` | string | - | `"battery_first"` or `"export_first"` |
-| `batteryGridChargingEnabled` | boolean | false | Allow charging battery from grid when solar is insufficient |
-| `batteryGridChargingMaxWatts` | number | - | Maximum power drawn from grid for battery charging (watts) |
-| `batteryExportTargetWatts` | number | 0 | Site-level export target (watts). Battery discharges to fill the gap between PV surplus and this target. See [Battery Export Target](#battery-export-target) |
+| Parameter                     | Type    | Default   | Description                                                                                                                                                  |
+| ----------------------------- | ------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `batterySocTargetPercent`     | number  | -         | Target SoC for charging (0-100)                                                                                                                              |
+| `batterySocMinPercent`        | number  | -         | Minimum SoC, no discharge below this level                                                                                                                   |
+| `batterySocMaxPercent`        | number  | -         | Maximum SoC, no charge above this level                                                                                                                      |
+| `batteryChargeMaxWatts`       | number  | unlimited | Maximum charging power (watts). If omitted, the inverter's hardware limit applies                                                                            |
+| `batteryDischargeMaxWatts`    | number  | unlimited | Maximum discharging power (watts). If omitted, the inverter's hardware limit applies                                                                         |
+| `batteryPriorityMode`         | string  | -         | `"battery_first"` or `"export_first"`                                                                                                                        |
+| `batteryGridChargingEnabled`  | boolean | false     | Allow charging battery from grid when solar is insufficient                                                                                                  |
+| `batteryGridChargingMaxWatts` | number  | -         | Maximum power drawn from grid for battery charging (watts)                                                                                                   |
+| `batteryExportTargetWatts`    | number  | 0         | Site-level export target (watts). Battery discharges to fill the gap between PV surplus and this target. See [Battery Export Target](#battery-export-target) |
 
 ### Priority Modes
 
@@ -134,6 +134,7 @@ When multiple inverters have batteries:
 - **Graceful Handling**: Battery commands only sent to capable inverters
 
 **Example with 2 inverters:**
+
 ```
 Inverter 1: 80% SoC, 10kWh capacity, 5kW max charge/discharge
 Inverter 2: 60% SoC, 8kWh capacity, 3kW max charge/discharge
@@ -210,11 +211,11 @@ When `batteryExportTargetWatts` is set, the battery discharges to achieve a targ
 Battery discharge for export = max(0, batteryExportTargetWatts - PV surplus)
 ```
 
-| Scenario | PV surplus | Target | Battery discharge for export |
-|----------|-----------|--------|------------------------------|
-| PV exceeds target | 5000W | 3000W | 0W (PV already covers it) |
-| PV partially covers | 1000W | 3000W | 2000W (battery fills the gap) |
-| No PV (night) | 0W | 3000W | 3000W (full battery discharge) |
+| Scenario            | PV surplus | Target | Battery discharge for export   |
+| ------------------- | ---------- | ------ | ------------------------------ |
+| PV exceeds target   | 5000W      | 3000W  | 0W (PV already covers it)      |
+| PV partially covers | 1000W      | 3000W  | 2000W (battery fills the gap)  |
+| No PV (night)       | 0W         | 3000W  | 3000W (full battery discharge) |
 
 The battery export is also hard-capped at the DOE export limit headroom: if the export limit is 5000W and PV is already exporting 4000W, the battery can only add 1000W regardless of the export target.
 
@@ -253,11 +254,12 @@ Battery parameters can be changed dynamically via MQTT:
     "batteryGridChargingEnabled": true,
     "batteryGridChargingMaxWatts": 3000,
     "batteryExportTargetWatts": 0,
-    "exportLimitWatts": 0
+    "exportLimitWatts": 0,
 }
 ```
 
 This allows integration with:
+
 - Time-of-use tariffs
 - Weather forecasts
 - VPP programs
@@ -274,6 +276,7 @@ Battery control uses **SunSpec Model 124** (Battery Storage):
 - 60-second safety timeout for all commands
 
 **Supported Inverters:**
+
 - SunSpec-compliant inverters with Model 124 support
 - Tested with systems implementing storage control
 
@@ -287,28 +290,29 @@ Battery control uses **SunSpec Model 124** (Battery Storage):
 #### Battery Control Not Working
 
 1. **Verify battery control is enabled:**
-   ```jsonc
-   "inverterControl": { "batteryControlEnabled": true, "batteryPowerFlowControl": true }
-   ```
+
+    ```jsonc
+    "inverterControl": { "batteryControlEnabled": true, "batteryPowerFlowControl": true }
+    ```
 
 2. **Check inverter has battery capability:**
-   - Look for log message: `Inverter has battery storage capability`
-   - If you see: `Inverter does not have battery storage capability` - the inverter lacks SunSpec Model 124
+    - Look for log message: `Inverter has battery storage capability`
+    - If you see: `Inverter does not have battery storage capability` - the inverter lacks SunSpec Model 124
 
 3. **Verify per-inverter setting:**
-   ```jsonc
-   "inverters": [{ "batteryControlEnabled": true, ... }]
-   ```
+    ```jsonc
+    "inverters": [{ "batteryControlEnabled": true, ... }]
+    ```
 
 #### Log Messages
 
 Key log messages for diagnosing battery issues:
 
-| Message | Level | Meaning |
-|---------|-------|---------|
-| `Inverter has battery storage capability` | INFO | SunSpec Model 124 detected on inverter |
-| `Inverter does not have battery storage capability` | WARN | Inverter lacks Model 124 — battery commands will be skipped |
-| `Wrote battery controls` | INFO | Battery charge/discharge command written successfully |
+| Message                                                                              | Level | Meaning                                                                            |
+| ------------------------------------------------------------------------------------ | ----- | ---------------------------------------------------------------------------------- |
+| `Inverter has battery storage capability`                                            | INFO  | SunSpec Model 124 detected on inverter                                             |
+| `Inverter does not have battery storage capability`                                  | WARN  | Inverter lacks Model 124 — battery commands will be skipped                        |
+| `Wrote battery controls`                                                             | INFO  | Battery charge/discharge command written successfully                              |
 | `Battery control requested but inverter does not have storage capability - skipping` | DEBUG | Expected when a non-battery inverter is in the config with `batteryControlEnabled` |
 
 #### No SoC Data Available
@@ -340,20 +344,22 @@ Goal: Charge battery to 80% SoC, export surplus
     "inverterControl": {
         "enabled": true,
         "batteryControlEnabled": true,
-        "batteryPowerFlowControl": true
+        "batteryPowerFlowControl": true,
     },
-    "inverters": [{
-        "type": "sunspec",
-        "batteryControlEnabled": true,
-        "connection": { "type": "tcp", "ip": "192.168.1.6", "port": 502 },
-        "unitId": 1
-    }],
+    "inverters": [
+        {
+            "type": "sunspec",
+            "batteryControlEnabled": true,
+            "connection": { "type": "tcp", "ip": "192.168.1.6", "port": 502 },
+            "unitId": 1,
+        },
+    ],
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 80,
-            "batteryPriorityMode": "battery_first"
-        }
-    }
+            "batteryPriorityMode": "battery_first",
+        },
+    },
 }
 ```
 
@@ -370,9 +376,9 @@ Goal: Maximize export, charge battery with surplus, discharge during imports
             "batteryPriorityMode": "export_first",
             "batteryChargeMaxWatts": 3000, // optional: cap charge rate to protect battery
             "batteryDischargeMaxWatts": 3000, // optional: cap discharge rate
-            "exportLimitWatts": 5000 // optional: cap export to 5kW
-        }
-    }
+            "exportLimitWatts": 5000, // optional: cap export to 5kW
+        },
+    },
 }
 ```
 
@@ -387,27 +393,28 @@ Goal: Two inverters, one with battery, intelligent aggregation
             "type": "sunspec",
             "batteryControlEnabled": true,
             "connection": { "type": "tcp", "ip": "192.168.1.10", "port": 502 },
-            "unitId": 1
+            "unitId": 1,
         },
         {
             "type": "sunspec",
             "batteryControlEnabled": true,
             "connection": { "type": "tcp", "ip": "192.168.1.11", "port": 502 },
-            "unitId": 1
-        }
+            "unitId": 1,
+        },
     ],
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 90,
             "batteryPriorityMode": "battery_first",
             "batteryChargeMaxWatts": 8000, // optional: combined limit for both inverters
-            "exportLimitWatts": 0
-        }
-    }
+            "exportLimitWatts": 0,
+        },
+    },
 }
 ```
 
 Runtime behavior:
+
 - System detects Inverter 1 has battery, Inverter 2 does not
 - Battery commands sent only to Inverter 1
 - SoC and power limits from Inverter 1 used for calculations
@@ -422,27 +429,30 @@ Goal: Charge battery from grid during off-peak hours, controlled by external aut
     "inverterControl": {
         "enabled": true,
         "batteryControlEnabled": true,
-        "batteryPowerFlowControl": true
+        "batteryPowerFlowControl": true,
     },
-    "inverters": [{
-        "type": "sunspec",
-        "batteryControlEnabled": true,
-        "connection": { "type": "tcp", "ip": "192.168.1.6", "port": 502 },
-        "unitId": 1
-    }],
+    "inverters": [
+        {
+            "type": "sunspec",
+            "batteryControlEnabled": true,
+            "connection": { "type": "tcp", "ip": "192.168.1.6", "port": 502 },
+            "unitId": 1,
+        },
+    ],
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 50,
             "batteryPriorityMode": "battery_first",
             "batteryChargeMaxWatts": 5000, // optional: cap charge rate
             "batteryDischargeMaxWatts": 5000, // optional: cap discharge rate
-            "exportLimitWatts": 0
-        }
-    }
+            "exportLimitWatts": 0,
+        },
+    },
 }
 ```
 
 External automation (e.g., Home Assistant, EMHASS) publishes MQTT messages to control grid charging:
+
 - **Off-peak start**: `{"batteryGridChargingEnabled": true, "batteryGridChargingMaxWatts": 3000, "batterySocTargetPercent": 100}`
 - **Peak start**: `{"batteryGridChargingEnabled": false, "batteryPriorityMode": "export_first"}`
 
@@ -468,8 +478,8 @@ To configure a charge buffer, add the following property to `config.json`:
 ```jsonc
 {
     "battery": {
-        "chargeBufferWatts": 100
-    }
+        "chargeBufferWatts": 100,
+    },
 }
 ```
 
@@ -495,41 +505,43 @@ The controller does not have direct control of batteries (especially batteries w
 If you're currently using `battery.chargeBufferWatts`, migrate to power flow control:
 
 **Before:**
+
 ```jsonc
 {
     "battery": {
-        "chargeBufferWatts": 500
+        "chargeBufferWatts": 500,
     },
     "inverterControl": {
-        "enabled": true
-    }
+        "enabled": true,
+    },
 }
 ```
 
 **After:**
+
 ```jsonc
 {
     "inverterControl": {
         "enabled": true,
         "batteryControlEnabled": true,
-        "batteryPowerFlowControl": true
+        "batteryPowerFlowControl": true,
     },
     "inverters": [
         {
             "type": "sunspec",
             "batteryControlEnabled": true,
             "connection": { "type": "tcp", "ip": "192.168.1.6", "port": 502 },
-            "unitId": 1
-        }
+            "unitId": 1,
+        },
     ],
     "setpoints": {
         "fixed": {
             "batterySocTargetPercent": 80,
-            "batteryPriorityMode": "battery_first"
+            "batteryPriorityMode": "battery_first",
             // "batteryChargeMaxWatts": 5000, // optional: if omitted, the inverter's hardware limit applies
             // "exportLimitWatts": 5000 // optional: if omitted, all surplus is exported
-        }
-    }
+        },
+    },
 }
 ```
 
@@ -540,15 +552,16 @@ The project will reject configurations that use both methods:
 ```jsonc
 {
     "battery": {
-        "chargeBufferWatts": 500  // Error: Cannot use with batteryPowerFlowControl
+        "chargeBufferWatts": 500, // Error: Cannot use with batteryPowerFlowControl
     },
     "inverterControl": {
-        "batteryPowerFlowControl": true  // Error: Cannot use with chargeBufferWatts
-    }
+        "batteryPowerFlowControl": true, // Error: Cannot use with chargeBufferWatts
+    },
 }
 ```
 
 **Error message:**
+
 ```
 Cannot use both legacy battery.chargeBufferWatts and new inverterControl.batteryPowerFlowControl.
 Please use only the new batteryPowerFlowControl feature, which provides comprehensive battery

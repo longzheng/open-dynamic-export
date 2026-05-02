@@ -28,10 +28,10 @@ The project supports comprehensive battery control with SoC (state of charge) aw
 
 ### Configuration Options
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `batteryControlEnabled` | boolean | false | Enable battery control system globally |
-| `batteryPowerFlowControl` | boolean | false | Use intelligent power flow control (recommended) |
+| Parameter                 | Type    | Default | Description                                      |
+| ------------------------- | ------- | ------- | ------------------------------------------------ |
+| `batteryControlEnabled`   | boolean | false   | Enable battery control system globally           |
+| `batteryPowerFlowControl` | boolean | false   | Use intelligent power flow control (recommended) |
 
 > [!NOTE]
 > See [Battery Configuration](./battery.md) for detailed information about battery control features, priority modes, SoC management, and configuration examples.

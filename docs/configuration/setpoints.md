@@ -61,7 +61,7 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
             "generationLimitWatts": 10000, // (number) optional: the maximum generation limit in watts
             "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (constrains battery grid charging)
             "loadLimitWatts": 10000, // (number) optional: the maximum load limit in watts (not currently used)
-            
+
             // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true)
             "batterySocTargetPercent": 80, // (number) optional: target state of charge (0-100)
             "batterySocMinPercent": 20, // (number) optional: minimum SoC, no discharge below this
@@ -77,7 +77,8 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
 
 > [!NOTE]
 > Battery control parameters require `inverterControl.batteryPowerFlowControl` to be enabled. See [Battery Configuration](./battery.md) for detailed information.
-```
+
+````
 
 ## MQTT
 
@@ -94,7 +95,7 @@ To specify setpoint limits based on a MQTT topic, add the following property to 
     }
     ...
 }
-```
+````
 
 ### Staleness Timeout
 

@@ -64,7 +64,8 @@ To configure a SunSpec inverter connection over TCP, add the following property 
 
 > [!NOTE]
 > Battery control requires global `inverterControl.batteryControlEnabled` and per-inverter `batteryControlEnabled` to be set to `true`. Battery storage capability will be automatically detected/verified by checking if the inverter supports SunSpec Model 124. See [Battery Configuration](./battery.md) for more details.
-```
+
+````
 
 For SunSpec over RTU, you need to modify the `connection`
 
@@ -74,7 +75,7 @@ For SunSpec over RTU, you need to modify the `connection`
                 "path": "/dev/ttyUSB0",  // (string) required: the path to the serial port
                 "baudRate": 9600 // (number) required: the baud rate of the serial port
             },
-```
+````
 
 ### Fronius
 
