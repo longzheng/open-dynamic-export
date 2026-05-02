@@ -59,7 +59,7 @@ export class MqttInverterDataPoller extends InverterDataPollerBase {
         void this.startPolling();
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
+    // oxlint-disable-next-line @typescript-eslint/require-await
     override async getInverterData(): Promise<InverterData> {
         if (!this.cachedMessage) {
             throw new Error('No inverter data on MQTT');
@@ -72,7 +72,7 @@ export class MqttInverterDataPoller extends InverterDataPollerBase {
         this.client.end();
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
+    // oxlint-disable-next-line @typescript-eslint/require-await
     override async onControl(): Promise<void> {
         if (this.applyControl) {
             throw new Error('Unable to control MQTT inverter');

@@ -5,8 +5,11 @@ import {
     writeSiteSamplePoints,
 } from '../helpers/influxdb.js';
 import type { SiteSamplePollerBase } from '../meters/siteSamplePollerBase.js';
-import { destroySetpoints, type Setpoints } from '../setpoints/index.js';
-import { getSetpoints } from '../setpoints/index.js';
+import {
+    getSetpoints,
+    destroySetpoints,
+    type Setpoints,
+} from '../setpoints/index.js';
 import { InvertersPoller } from './helpers/inverterSample.js';
 import { getSiteSamplePollerInstance } from './helpers/siteSample.js';
 import { InverterController } from './helpers/inverterController.js';

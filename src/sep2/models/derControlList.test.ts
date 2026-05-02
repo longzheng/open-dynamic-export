@@ -4,7 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseDerControlListXml } from './derControlList.js';
 
 it('should parse DERControlList XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_TESTPROG3_derc.xml'),
     );
@@ -17,7 +17,7 @@ it('should parse DERControlList XML', async () => {
 });
 
 it('should parse DERControlList XML empty', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getDerp_P-EQLDEV3_derc.xml'),
     );
@@ -30,7 +30,7 @@ it('should parse DERControlList XML empty', async () => {
 });
 
 it('should parse DERControlList XML with SAPN CSIP-AUS namespace', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getDerp_derc_sapn.xml'));
 
     const endDeviceList = parseDerControlListXml(xml);

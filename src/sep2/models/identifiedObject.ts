@@ -15,10 +15,10 @@ export const identifiedObjectSchema = v.intersect([
 export type IdentifiedObject = v.InferOutput<typeof identifiedObjectSchema>;
 
 export function parseIdentifiedObjectXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): IdentifiedObject {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const resource = parseResourceXmlObject(xmlObject);
     const mRID = assertString(xmlObject['mRID'][0]);
     const description = xmlObject['description']
@@ -27,7 +27,7 @@ export function parseIdentifiedObjectXmlObject(
     const version = xmlObject['version']
         ? safeParseIntString(assertString(xmlObject['version'][0]))
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...resource,

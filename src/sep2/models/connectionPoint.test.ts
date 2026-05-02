@@ -10,7 +10,7 @@ import {
 
 describe('parseConnectionPointXml', () => {
     it('should parse connection point XML', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const xml = await parseStringPromise(
             getMockFile('getEdev_cp_csipaus.xml'),
         );

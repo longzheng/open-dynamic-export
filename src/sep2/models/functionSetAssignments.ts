@@ -25,10 +25,10 @@ export type FunctionSetAssignments = v.InferOutput<
 >;
 
 export function parseFunctionSetAssignmentsXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): FunctionSetAssignments {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const subscribableResource = parseSubscribableResourceXmlObject(xmlObject);
     const identifiedObject = parseIdentifiedObjectXmlObject(xmlObject);
     const derProgramListLink = xmlObject['DERProgramListLink']
@@ -40,7 +40,7 @@ export function parseFunctionSetAssignmentsXmlObject(
     const timeLink = xmlObject['TimeLink']
         ? parseLinkXmlObject(xmlObject['TimeLink'][0])
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...subscribableResource,

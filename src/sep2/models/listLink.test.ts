@@ -4,11 +4,11 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseListLinkXmlObject } from './listLink.js';
 
 it('should parse list link XML object', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getDcap.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const listXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['DeviceCapability']['EndDeviceListLink'][0];
 
     const listLinkObject = parseListLinkXmlObject(listXmlObject);
@@ -18,13 +18,13 @@ it('should parse list link XML object', async () => {
 });
 
 it('should parse list link XML object with optional all', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         `<EndDeviceListLink href="/api/v2/edev"/>`,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const listXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['EndDeviceListLink'];
 
     const listLinkObject = parseListLinkXmlObject(listXmlObject);

@@ -10,8 +10,11 @@ import type { StatusModel } from '../models/status.js';
 import { statusModel } from '../models/status.js';
 import type { StorageModelWrite } from '../models/storage.js';
 import { storageModel } from '../models/storage.js';
-import { mpptModuleModel, type MpptModuleModel } from '../models/mppt.js';
-import { mpptModel } from '../models/mppt.js';
+import {
+    mpptModel,
+    mpptModuleModel,
+    type MpptModuleModel,
+} from '../models/mppt.js';
 import { SunSpecConnection } from './base.js';
 
 export class InverterSunSpecConnection extends SunSpecConnection {

@@ -1,115 +1,147 @@
 ## Project Overview
 
-This is a Node.js/TypeScript application for dynamic export control/solar curtailment of inverters. It implements CSIP-AUS/SEP2/IEEE 2030.5 standards for Australian energy distributors, provides fixed/zero export limitations, two-way tariffs, and negative feed-in export limitation.
+This repository is a full-stack Node.js/TypeScript application for dynamic export control and solar curtailment of inverters. It is designed around Australian DNSP requirements and supports:
 
-The project is a full-stack application with:
-- Express.js backend with TypeScript
-- React frontend with Vite
-- SunSpec Modbus integration for inverters/meters
-- SEP2/IEEE 2030.5 client implementation
-- InfluxDB metrics logging
-- Real-time data coordination and control
+- CSIP-AUS / SEP2 / IEEE 2030.5 dynamic export control
+- Fixed and zero-export limits
+- Two-way tariff export limitation
+- Negative feed-in export limitation via Amber
+- Site-level monitoring, coordinated control, and optional telemetry publishing/logging
+
+The app is currently built as:
+
+- Express 5 backend with TypeScript and TSOA-generated APIs
+- React 18 frontend bundled with Vite and served through `vite-express`
+- SunSpec Modbus TCP/RTU, SMA Core1, MQTT, and Tesla Powerwall 2 integrations
+- SEP2 client implementation with certificate-based authentication
+- Optional InfluxDB metrics logging and MQTT publishing of active limits
+
+## Current Tooling
+
+- Package manager: `pnpm`
+- Runtime module system: ESM (`"type": "module"`)
+- Node target in CI: Node 24
+- Validation/schema: `valibot` plus generated `config.schema.json`
+- Lint/format: `oxlint` and `oxfmt`
+- Tests: `vitest`
 
 ## Development Commands
 
-### Building and Running
-- `npm run build` - Full production build (generates routes, compiles TypeScript, builds Vite frontend)
-- `npm run build:debug` - Debug build with source maps
-- `npm run dev` - Development server with hot reload
-- `npm start` - Start production server
+### Setup and Run
 
-### Code Quality
-- `npm run lint` - Run TypeScript compiler, ESLint, and generate config schema
-- `npm test` - Run Vitest tests
+- `pnpm install` - Install dependencies
+- `pnpm run dev` - Start the app in development mode via `tsx src/app.ts`
+- `pnpm run build` - Generate OpenAPI/routes, compile the server, and build the UI
+- `pnpm run build:debug` - Generate OpenAPI/routes and compile the debug server build
+- `pnpm start` - Start the production server from `dist/app.js`
 
-### API and Routes
-- `npm run routes:generate` - Generate TSOA routes and OpenAPI spec
-- `npm run generate:config-json-schema` - Generate JSON schema for configuration
+### Quality
 
-### Certificate Management (CSIP-AUS)
-- `npm run cert:device-request` - Generate device certificate request
-- `npm run cert:device-generate` - Generate device certificate
-- `npm run cert:lfdi` - View device certificate LFDI
+- `pnpm run lint` - Generate routes, run `oxlint`, run `oxfmt --check`, and regenerate `config.schema.json`
+- `pnpm run format` - Format the repo with `oxfmt`
+- `pnpm test` - Run Vitest
 
-### Debugging
-- `npm run debug:sunspec-discovery` - Debug SunSpec device discovery
+### Generated Artifacts
+
+- `pnpm run routes:generate` - Generate `src/tsoa/routes.ts`, `src/tsoa/swagger.json`, and `src/ui/gen/api.d.ts`
+- `pnpm run generate:config-json-schema` - Generate `config.schema.json`
+- `pnpm run generate:amber-api` - Regenerate the Amber OpenAPI types in `src/setpoints/negativeFeedIn/amber/api.d.ts`
+
+### Certificates and Debugging
+
+- `pnpm run cert:device-request` - Generate a device key and CSR for SEP2/CSIP-AUS
+- `pnpm run cert:device-generate` - Generate a device certificate from the manufacturer certificate
+- `pnpm run cert:lfdi` - Inspect the certificate LFDI
+- `pnpm run debug:sunspec-discovery` - Debug SunSpec discovery against a device
 
 ### Documentation
-- `npm run docs:dev` - Start VitePress docs development server
-- `npm run docs:build` - Build documentation
-- `npm run docs:preview` - Preview built documentation
+
+- `pnpm run docs:dev` - Start the VitePress docs site locally
+- `pnpm run docs:build` - Build the VitePress docs
+- `pnpm run docs:preview` - Preview the built docs
 
 ## Architecture Overview
 
-### Core Components
+### Application Entry
 
-1. **Coordinator** (`src/coordinator/`) - Central orchestrator that manages data flow between components:
-   - Coordinates inverter polling, site sampling, setpoint management
-   - Handles SEP2 client integration and InfluxDB logging
-   - Created via `createCoordinator()` factory function
+- `src/app.ts` wires Express middleware, ReDoc at `/api/docs`, TSOA routes, and the React app through `vite-express`
 
-2. **SEP2 Client** (`src/sep2/`) - IEEE 2030.5/CSIP-AUS protocol implementation:
-   - Full SEP2 model definitions in `models/` directory
-   - Client implementation with certificate-based PKI authentication
-   - DER control scheduling, mirror usage point reporting
-   - Extensive helper functions for protocol-specific operations
+### Coordinator
 
-3. **Inverter Integration** (`src/inverter/`, `src/connections/`) - Multiple inverter support:
-   - SunSpec Modbus TCP/RTU integration
-   - SMA proprietary Modbus models
-   - MQTT publishing capabilities
-   - Abstracted through connection interfaces
+- `src/coordinator/` is the central orchestration layer
+- `createCoordinator()` composes inverter polling, site sampling, setpoints, the inverter controller, InfluxDB writes, and teardown
+- `src/server/services/coordinatorService.ts` exposes coordinator state and start/stop controls to the API/UI
 
-4. **Meter Integration** (`src/meters/`) - Site power measurement:
-   - SunSpec Modbus meters
-   - Tesla Powerwall integration
-   - Site sampling and polling infrastructure
+### Control and Setpoints
 
-5. **Setpoints** (`src/setpoints/`) - Export limitation strategies:
-   - Fixed limits
-   - CSIP-AUS dynamic limits
-   - Negative feed-in (Amber API integration)
-   - Two-way tariff implementations (Ausgrid, SAPN)
-   - MQTT setpoint publishing
+- `src/setpoints/` contains the supported control sources:
+- Fixed limits
+- CSIP-AUS setpoints
+- MQTT setpoints
+- Amber negative feed-in setpoints
+- Two-way tariff setpoints for `ausgridEA029` and `sapnRELE2W`
+- `src/coordinator/helpers/inverterController.ts` merges those inputs into an active control limit and applies final inverter configuration
+- `battery.chargeBufferWatts` is handled in the inverter controller as an additional export-limit floor for battery charging, not as a standalone setpoint module
+- `src/coordinator/helpers/publish.ts` can publish the active control limit to MQTT
 
-6. **Web UI** (`src/ui/`) - React dashboard:
-   - TanStack Router for routing
-   - HeroUI component library
-   - Real-time data visualization with Chart.js
-   - TypeScript API client generation
+### Device Integrations
 
-### Configuration
+- `src/connections/` contains shared connection implementations
+- `src/inverter/` supports SunSpec, SMA Core1, and MQTT inverter data/control paths
+- `src/meters/` supports SunSpec, SMA Core1, MQTT, and Tesla Powerwall 2 site sampling
 
-- Main config in `/config/config.json` (copy from `config.example.json`)
-- Environment variables in `.env` (copy from `.env.example`)
-- JSON schema validation for configuration
-- Separate TypeScript configs for server (`tsconfig.server.json`) and UI (`tsconfig.ui.json`)
+### SEP2 / CSIP-AUS
 
-### Key Patterns
+- `src/sep2/` contains the IEEE 2030.5 / SEP2 models and helpers
+- The CSIP-AUS implementation supports discovery, in-band registration, DER status/capability/settings reporting, control scheduling, default control fallback, and mirror usage point reporting
 
-- **Factory Pattern**: Used extensively for creating inverter/meter connections
-- **Event-Driven**: Coordinator uses event emitters for data flow coordination
-- **Type-Safe APIs**: TSOA generates OpenAPI spec and routes from TypeScript decorators
-- **Zod Validation**: Runtime type validation throughout the application
-- **Modular Setpoints**: Plugin-style setpoint implementations
+### Server and UI
 
-### Testing
+- API controllers live in `src/server/controllers/` and currently expose `coordinator`, `data`, `sunspec`, and `csipAus` endpoints
+- The frontend lives in `src/ui/` and uses TanStack Router, TanStack Query, HeroUI, React Intl, and Chart.js
+- Main UI routes are `index`, `readings`, and `limits`
+- The frontend API types are generated from the TSOA OpenAPI spec into `src/ui/gen/api.d.ts`
 
-- Vitest for unit testing with extensive mocking
-- Mock data in `tests/` directory for SEP2, Amber API, Tesla Powerwall
-- Test files co-located with source code (`.test.ts` suffix)
+## Configuration
 
-## Important Notes
+- Environment variables live in `.env` and should be copied from `.env.example`
+- Main runtime config lives at `config/config.json`, usually copied from `config/config.example.json`
+- `CONFIG_DIR` controls where runtime config and certificate files are loaded from
+- Required environment variables are validated in `src/helpers/env.ts`
+- Optional InfluxDB environment variables enable metrics logging when present
+- Example deployment/config variants also exist under `config/`
 
-- The project uses ESM modules (`"type": "module"` in package.json)
-- Strict TypeScript configuration with `@tsconfig/strictest`
-- Certificate-based authentication required for SEP2/CSIP-AUS integration
-- InfluxDB integration for metrics storage and monitoring
-- Production deployment via Docker with docker-compose configuration
+Key config areas defined in `src/helpers/config.ts`:
 
-## Development workflow
+- `setpoints`
+- `inverters`
+- `inverterControl`
+- `meter`
+- `publish`
+- `battery`
 
-Before pushing changes, always lint, build, and test the project to ensure there are no errors.
-1. Run `npm run lint` to check for lint errors.
-2. Run `npm run build` to check for build errors.
-3. Run `npm test` to execute unit tests.
+## Generated Files and CI Expectations
+
+- Do not hand-edit generated files unless the workflow specifically requires it
+- Important generated outputs include:
+- `src/tsoa/routes.ts`
+- `src/tsoa/swagger.json`
+- `src/ui/gen/api.d.ts`
+- `config.schema.json`
+- CI in `.github/workflows/lint-test.yml` installs with `pnpm`, copies `.env.example` to `.env`, runs route generation, lint, build, checks for uncommitted generated changes, and then runs tests
+- Docs are deployed by `.github/workflows/docs-deployment.yaml`
+- Docker images are published by `.github/workflows/publish-docker.yml` on version tags
+
+## Testing
+
+- Vitest is used for unit tests
+- Test files are mostly co-located with source as `*.test.ts`
+- Additional SEP2 fixtures live under `tests/sep2/`
+
+## Development Workflow
+
+Before pushing changes, run the same core checks expected by CI:
+
+1. `pnpm run lint`
+2. `pnpm run build`
+3. `pnpm test`

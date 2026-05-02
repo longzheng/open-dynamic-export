@@ -4,11 +4,11 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseSubscribableListXmlObject } from './subscribableList.js';
 
 it('should parse subscribable list XML object', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getEdev.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['EndDeviceList'];
 
     const subscribableList = parseSubscribableListXmlObject(xmlObject);

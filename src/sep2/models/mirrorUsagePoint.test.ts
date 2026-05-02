@@ -19,11 +19,11 @@ import { UomType } from './uomType.js';
 import { UsagePointBaseStatus } from './usagePointBaseStatus.js';
 
 it('should parse end device DER with XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getMup.xml'));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const mirrorUsagePointXmlObject =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
         xml['MirrorUsagePointList']['MirrorUsagePoint'][0];
 
     const mirrorUsagePoint = parseMirrorUsagePointXmlObject(

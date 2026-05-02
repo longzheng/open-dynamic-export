@@ -64,7 +64,7 @@ describe('ModbusConnection', () => {
 
         const readHoldingRegistersMock = vi
             .spyOn(modbusConnection['client'], 'readHoldingRegisters')
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             .mockImplementation(async () => {
                 timestamps.push(performance.now());
                 return {
@@ -103,7 +103,7 @@ describe('ModbusConnection', () => {
 
         const writeRegistersMock = vi
             .spyOn(modbusConnection['client'], 'writeRegisters')
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             .mockImplementation(async () => {
                 timestamps.push(performance.now());
                 return {

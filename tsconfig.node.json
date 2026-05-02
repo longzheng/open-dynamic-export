@@ -6,8 +6,10 @@
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
         "target": "ESNext",
+        "lib": ["ESNext"],
         "module": "NodeNext",
         "noEmit": true,
+        "types": ["node"],
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,

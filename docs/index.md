@@ -3,28 +3,28 @@
 layout: home
 
 hero:
-  name: "Open Dynamic Export"
-  tagline: Free open source local solar inverter export control/curtailment
-  actions:
-    - theme: brand
-      text: User guide
-      link: /guide
-    - theme: alt
-      text: Source code
-      link: https://github.com/longzheng/open-dynamic-export
-  image:
-    src: /logo.svg
-    alt: Open Dynamic Export
+    name: 'Open Dynamic Export'
+    tagline: Free open source local solar inverter export control/curtailment
+    actions:
+        - theme: brand
+          text: User guide
+          link: /guide
+        - theme: alt
+          text: Source code
+          link: https://github.com/longzheng/open-dynamic-export
+    image:
+        src: /logo.svg
+        alt: Open Dynamic Export
 
 features:
-  - title: Dynamic/flexible export control
-    details: Certified CSIP-AUS/SEP2 client for Australian DNSP dynamic connections 
-  - title: Fixed/zero export
-    details: Load-following export control
-  - title: Two-way tarrifs/negative feed-in
-    details: Curtail export based on fixed schedules or dynamic pricing
-  - title: Intelligent battery control
-    details: SoC-aware battery management with configurable priority modes and multi-inverter support
+    - title: Dynamic/flexible export control
+      details: Certified CSIP-AUS/SEP2 client for Australian DNSP dynamic connections
+    - title: Fixed/zero export
+      details: Load-following export control
+    - title: Two-way tarrifs/negative feed-in
+      details: Curtail export based on fixed schedules or dynamic pricing
+    - title: Intelligent battery control
+      details: SoC-aware battery management with configurable priority modes and multi-inverter support
 ---
 
 <div class="img-dashboard">

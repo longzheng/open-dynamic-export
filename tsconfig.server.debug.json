@@ -1,7 +1,7 @@
 {
     "extends": "./tsconfig.server.json",
     "compilerOptions": {
-      "inlineSourceMap": true,
-      "inlineSources": true
+        "inlineSourceMap": true,
+        "inlineSources": true
     }
-  }
+}

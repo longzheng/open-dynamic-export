@@ -34,7 +34,7 @@ describe('PollableResource', () => {
         };
 
         class MockPollableResource extends PollableResource<MockResponse> {
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             async get(): Promise<MockResponse> {
                 return mockResponse;
             }
@@ -67,7 +67,7 @@ describe('PollableResource', () => {
         };
 
         class MockPollableResource extends PollableResource<MockResponse> {
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             async get(): Promise<MockResponse> {
                 return mockResponse;
             }
@@ -100,7 +100,7 @@ describe('PollableResource', () => {
         };
 
         class MockPollableResource extends PollableResource<MockResponse> {
-            // eslint-disable-next-line @typescript-eslint/require-await
+            // oxlint-disable-next-line @typescript-eslint/require-await
             async get(): Promise<MockResponse> {
                 return mockResponse;
             }
@@ -135,6 +135,44 @@ describe('PollableResource', () => {
         // Subsequent poll after 2 seconds
         await vi.advanceTimersByTimeAsync(2 * 1000);
         expect(dataHandler).toHaveBeenCalledTimes(3);
+        expect(dataHandler).toHaveBeenCalledWith(mockResponse);
+    });
+
+    it('should emit pollError event when poll fails', async () => {
+        const mockResponse: MockResponse = {
+            hello: 'world',
+            pollRate: 10,
+        };
+        const mockError = new Error('boom');
+        const getSpy = vi
+            .fn<() => Promise<MockResponse>>()
+            .mockRejectedValueOnce(mockError)
+            .mockResolvedValueOnce(mockResponse);
+
+        class MockPollableResource extends PollableResource<MockResponse> {
+            async get(): Promise<MockResponse> {
+                return getSpy();
+            }
+        }
+
+        const pollableResource = new MockPollableResource({
+            client: sep2Client,
+            url: 'http://example.com',
+            defaultPollRateSeconds: 5,
+        });
+
+        const dataHandler = vi.fn();
+        const errorHandler = vi.fn();
+        pollableResource.on('data', dataHandler);
+        pollableResource.on('pollError', errorHandler);
+
+        await vi.advanceTimersByTimeAsync(0);
+        expect(errorHandler).toHaveBeenCalledTimes(1);
+        expect(errorHandler).toHaveBeenCalledWith(mockError);
+        expect(dataHandler).not.toHaveBeenCalled();
+
+        await vi.advanceTimersByTimeAsync(5 * 1000);
+        expect(dataHandler).toHaveBeenCalledTimes(1);
         expect(dataHandler).toHaveBeenCalledWith(mockResponse);
     });
 

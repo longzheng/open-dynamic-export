@@ -11,14 +11,14 @@ export const listLinkSchema = v.intersect([
 ]);
 
 export type ListLink = v.InferOutput<typeof listLinkSchema>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseListLinkXmlObject(xmlObject: any): ListLink {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const link = parseLinkXmlObject(xmlObject);
     const all = xmlObject['$']['all']
         ? safeParseIntString(assertString(xmlObject['$']['all']))
         : undefined;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...link,

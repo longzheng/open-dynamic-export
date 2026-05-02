@@ -17,16 +17,16 @@ export const registrationSchema = v.intersect([
 
 export type Registration = v.InferOutput<typeof registrationSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseRegistrationXml(xml: any): Registration {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const resource = parseResourceXmlObject(xml['Registration']);
     const pollRate = parsePollRateXmlObject(xml['Registration']);
     const dateTimeRegistered = stringIntToDate(
         assertString(xml['Registration']['dateTimeRegistered'][0]),
     );
     const pIN = safeParseIntString(assertString(xml['Registration']['pIN'][0]));
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return {
         ...resource,

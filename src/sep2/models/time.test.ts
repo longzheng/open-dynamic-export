@@ -5,7 +5,7 @@ import { parseTimeXml } from './time.js';
 import { TimeQuality } from './timeQuality.js';
 
 it('should parse time XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(getMockFile('getTm.xml'));
 
     const time = parseTimeXml(xml);

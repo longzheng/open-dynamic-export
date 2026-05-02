@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* oxlint-disable @typescript-eslint/no-unused-vars */
 import { randomBytes, createHash, randomUUID } from 'crypto';
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from 'fs';
 import rs, { KEYUTIL, KJUR } from 'jsrsasign';

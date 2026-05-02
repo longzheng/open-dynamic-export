@@ -10,14 +10,14 @@ export const postRateSchema = v.pipe(
 export type PostRate = v.InferOutput<typeof postRateSchema>;
 
 export function parsePostRateXmlObject(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line @typescript-eslint/no-explicit-any
     xmlObject: any,
 ): PostRate {
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
     const postRate = xmlObject['postRate']
         ? safeParseIntString(assertString(xmlObject['postRate'][0]))
         : null;
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+    /* oxlint-enable @typescript-eslint/no-unsafe-member-access */
 
     return postRate;
 }

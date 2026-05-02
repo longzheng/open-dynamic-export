@@ -41,7 +41,7 @@ describe('DerControlsHelper', () => {
         });
 
         const respondDerControlSpy = vi.spyOn(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+            // oxlint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
             (derControlsHelper as any).derControlResponseHelper,
             'respondDerControl',
         );

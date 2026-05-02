@@ -4,7 +4,7 @@ import { getMockFile } from '../helpers/mocks.js';
 import { parseRegistrationXml } from './registration.js';
 
 it('should parse registration XML', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // oxlint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const xml = await parseStringPromise(
         getMockFile('getEdev__EQLDEV3_rg.xml'),
     );
