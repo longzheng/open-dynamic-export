@@ -98,8 +98,15 @@ export class AmberSetpoint implements SetpointType {
                         siteId: this.siteId,
                     },
                     query: {
-                        // cache future prices for 2 hours (at 30 minute intervals)
-                        next: 2 * 2,
+                        // 12 forecast 5-minute intervals = 1 h of headroom
+                        // past the current interval, so a transient Amber
+                        // API outage doesn't drop us back to "no limit".
+                        // Amber's API now returns 5-min intervals to match
+                        // NEM dispatch — the `resolution` query param is
+                        // ignored regardless of value. Forecast accuracy
+                        // degrades further out (see `advancedPrice` spread),
+                        // so 1 h is a deliberate ceiling.
+                        next: 12,
                     },
                 },
                 signal: AbortSignal.any([
@@ -185,8 +192,10 @@ export class AmberSetpoint implements SetpointType {
                     () => {
                         void this.poll();
                     },
-                    // poll every 15 minutes
-                    15 * 60 * 1000,
+                    // poll every 5 minutes — matches the NEM 5-minute dispatch
+                    // interval so each new "current" 5-minute price is picked up
+                    // promptly, instead of falling back to the 30-minute forecast
+                    5 * 60 * 1000,
                 );
             }
         }
