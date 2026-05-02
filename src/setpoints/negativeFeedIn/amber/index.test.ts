@@ -86,4 +86,34 @@ describe('AmberSetpoint', () => {
             opModLoadLimW: undefined,
         } satisfies typeof result);
     });
+
+    it('should hold previous-interval state across the 1s boundary gap', async () => {
+        // Amber returns adjacent intervals as e.g. HH:MM:01 → HH:MM:00,
+        // leaving a 1-second gap at every boundary where strict half-open
+        // matching would return no current interval. Each cached interval's
+        // `end` is extended by 1s so the previous interval covers the boundary
+        // second; verify at 500ms into a gap where the previous interval is
+        // positive-priced (curtail), so the post-fix behaviour is distinct
+        // from the pre-fix "no current interval → no curtail" branch.
+        //
+        // Mock fixture has adjacent feedIn intervals at this boundary:
+        //   2024-09-04T04:00:01Z → 04:30:00Z  perKwh = +2.09587 (curtail)
+        //   2024-09-04T04:30:01Z → 05:00:00Z  perKwh = −0.59540 (no curtail)
+        vi.setSystemTime(new Date('2024-09-04T04:30:00.500Z'));
+
+        // give the polling a chance to finish
+        await vi.advanceTimersToNextTimerAsync();
+
+        const result = amberControlLimit.getInverterControlLimit();
+
+        expect(result).toEqual({
+            source: 'negativeFeedIn',
+            opModConnect: undefined,
+            opModEnergize: undefined,
+            opModExpLimW: 0,
+            opModGenLimW: undefined,
+            opModImpLimW: undefined,
+            opModLoadLimW: undefined,
+        } satisfies typeof result);
+    });
 });
