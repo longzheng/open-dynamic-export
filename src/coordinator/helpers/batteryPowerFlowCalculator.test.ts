@@ -343,6 +343,48 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.batteryMode).toBe('discharge');
             expect(result.targetBatteryPowerWatts).toBe(-4000);
         });
+
+        it('should not curtail PV during self-consumption discharge with export blocked', () => {
+            // Regression: when negativeFeedIn (or any setpoint) sets exportLimit=0
+            // AND the battery is discharging to cover load, the PV target must NOT
+            // be reduced by the discharge amount. The previous formula
+            // (load + currentBatteryPowerWatts + exportLimit) curtailed PV by the
+            // measured discharge, creating a feedback spiral that drove the power
+            // ratio to ~0.04 even when sunny PV was available to cover load directly.
+            //
+            // User's logged scenario (cloudy, mid-spiral):
+            //   load=910 (under-reported by hybrid loadWatts bug), commanded
+            //   discharge=-860 to cover gap, exportLimit=0.
+            //   Old: targetSolar = 910 + currentBattery + 0 ≈ 490 (collapses)
+            //   New: targetSolar = 910 + max(0, -860) + 0 = 910 (stable)
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 470,
+                siteWatts: 440, // Importing 440W (load = 910 per current formula)
+                batterySocPercent: 90,
+                batteryTargetSocPercent: 100,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 5000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 0, // Export blocked by negativeFeedIn
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: -420, // Already discharging from previous cycle
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // Battery still covers self-consumption — that behaviour is unchanged
+            expect(result.batteryMode).toBe('discharge');
+            // selfConsumptionDischarge = max(0, -availablePower) = max(0, 860) = 860
+            expect(result.targetBatteryPowerWatts).toBe(-860);
+            // PV target = load (910) + max(0, -860) + exportLimit (0) = 910.
+            // Critically, the discharge does NOT subtract from the PV target.
+            expect(result.targetSolarWatts).toBe(910);
+        });
     });
 
     describe('no available power scenarios', () => {
@@ -1138,9 +1180,8 @@ describe('calculateBatteryPowerFlow', () => {
             // Scenario: battery is currently charging at 2000W from surplus PV.
             // An export target of 4000W arrives (e.g. via MQTT).
             // With gap-filling, battery needs to discharge (4000 - 1000 PV surplus = 3000W).
-            // targetSolarWatts must use the MEASURED battery power (still charging at 2000W)
-            // to avoid a feedback spiral where curtailed solar → less surplus → more
-            // discharge → even more curtailment.
+            // targetSolarWatts must remain large enough that the inverter is not curtailed
+            // during the charge→discharge transition — well above any reasonable nameplate.
             const input: BatteryPowerFlowInput = {
                 solarWatts: 4000,
                 siteWatts: -1000, // Exporting 1000W (load=3000, PV=4000, battery charging=2000 internal)
@@ -1174,10 +1215,12 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetBatteryPowerWatts).toBe(-1000);
             expect(result.targetExportWatts).toBe(1000);
 
-            // Critical: targetSolarWatts must use MEASURED battery (2000) not TARGET (-1000)
-            // targetSolar = load(4000 + (-1000)) + measuredBattery(2000) + exportLimit(10000) = 15000
-            // This keeps ratio > 1.0, preventing premature PV curtailment
-            expect(result.targetSolarWatts).toBe(15000);
+            // targetSolar uses commanded charge headroom (max(0, target) = 0 since target is
+            // a discharge), NOT subtracting the discharge.
+            // targetSolar = load(4000 + (-1000)) + max(0, -1000) + exportLimit(10000) = 13000
+            // 13000 is well above any realistic battery-inverter nameplate, so the ratio
+            // still caps at 1.0 — no curtailment during the transition.
+            expect(result.targetSolarWatts).toBe(13000);
         });
     });
 

@@ -266,24 +266,28 @@ export function calculateBatteryPowerFlow(
         batteryMode = 'idle';
     }
 
-    // Calculate target solar watts (for curtailment)
-    // Uses exportLimitWatts (the configured limit) rather than targetExportWatts
-    // (capped at current available power). Using targetExportWatts would create a
-    // self-referential feedback loop: targetSolar = solarWatts, which locks the
-    // inverter at its current output via the power ratio. Using the limit allows
-    // the inverter to ramp up when not export-constrained (ratio → 1.0).
+    // Calculate target solar watts (for curtailment).
     //
-    // Uses currentBatteryPowerWatts (measured) rather than targetBatteryPowerWatts
-    // (commanded) to avoid a second feedback loop: when battery transitions from
-    // charging to discharging, the target jumps negative immediately, which would
-    // curtail solar before the battery has physically ramped. The curtailed solar
-    // then confirms the discharge need, spiraling PV down to near-zero.
-    // Using the measured value lets solar adjust gradually as the battery actually ramps.
+    // PV is allowed to produce up to (load + commanded battery charge headroom +
+    // export limit). Only the POSITIVE part of targetBatteryPowerWatts contributes
+    // — i.e. charging adds headroom for PV; discharging does NOT subtract.
+    //
+    // Subtracting discharge (the previous formula, using currentBatteryPowerWatts
+    // measured) caused a feedback spiral when export was blocked: discharge for
+    // self-consumption → PV target dropped by the discharge amount → less PV →
+    // larger load gap → more discharge → spiral, settling at ~4% power ratio.
+    //
+    // The new formula breaks the coupling: when the battery discharges to cover
+    // load, PV is allowed to ramp up to load + exportLimit, which lets PV
+    // *eliminate* the need for discharge (in sunny conditions) or be safely
+    // light-limited below the target (in cloudy conditions). Either way, no
+    // spiral, and the commanded ratio reflects the system's true PV demand.
+    const loadWatts = solarWatts + siteWatts;
+    const targetBatteryChargeWatts = Math.max(0, targetBatteryPowerWatts);
     const targetSolarWatts = calculateTargetSolarWatts({
-        solarWatts,
-        siteWatts,
-        targetExportWatts: exportLimitWatts,
-        targetBatteryPowerWatts: currentBatteryPowerWatts,
+        loadWatts,
+        targetBatteryChargeWatts,
+        exportLimitWatts,
     });
 
     const result: BatteryPowerFlowCalculation = {
@@ -330,38 +334,31 @@ function calculateBatteryNeedWatts({
 }
 
 /**
- * Calculate target solar watts to meet export limit while accounting for battery charging.
+ * Calculate the target solar AC output: the headroom PV is allowed to fill.
  *
- * The relationship is:
- * - siteWatts = load - solar - batteryCharge (where batteryCharge > 0 means charging)
- * - export = -siteWatts (when siteWatts < 0)
+ *   targetSolar = loadWatts + targetBatteryChargeWatts + exportLimitWatts
  *
- * We want: export = targetExport
- * So: -siteWatts = targetExport
- * Therefore: siteWatts = -targetExport
+ * `targetBatteryChargeWatts` is the commanded charge rate (≥ 0). When the
+ * battery is idle or discharging, this term is 0 — PV can still produce up to
+ * (load + export limit) but isn't given extra headroom for the battery, since
+ * the battery isn't asking for any. Critically, discharge is NOT subtracted:
+ * doing so would curtail PV by the discharge amount and create a feedback
+ * spiral when export is blocked (PV drops → load gap grows → battery
+ * discharges more → PV target drops further).
  *
- * And: load - solar - batteryCharge = -targetExport
- * Solving for solar: solar = load + batteryCharge + targetExport
+ * The inverter naturally produces min(this_target, real_PV_available) — so when
+ * light is plentiful, the limit binds and PV is curtailed to (load + charge +
+ * export). When light is poor, the target is non-binding and PV produces what
+ * the panels can deliver.
  */
 function calculateTargetSolarWatts({
-    solarWatts,
-    siteWatts,
-    targetExportWatts,
-    targetBatteryPowerWatts,
+    loadWatts,
+    targetBatteryChargeWatts,
+    exportLimitWatts,
 }: {
-    solarWatts: number;
-    siteWatts: number;
-    targetExportWatts: number;
-    targetBatteryPowerWatts: number;
+    loadWatts: number;
+    targetBatteryChargeWatts: number;
+    exportLimitWatts: number;
 }): number {
-    // Current load = solar + siteWatts
-    // (when siteWatts > 0, we're importing to supplement solar)
-    // (when siteWatts < 0, we're exporting excess solar)
-    const loadWatts = solarWatts + siteWatts;
-
-    // Target solar to achieve desired export and battery charge
-    // solar = load + batteryCharge + export
-    const targetSolar = loadWatts + targetBatteryPowerWatts + targetExportWatts;
-
-    return targetSolar;
+    return loadWatts + targetBatteryChargeWatts + exportLimitWatts;
 }
