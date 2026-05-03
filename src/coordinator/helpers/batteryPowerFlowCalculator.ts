@@ -282,7 +282,17 @@ export function calculateBatteryPowerFlow(
     // *eliminate* the need for discharge (in sunny conditions) or be safely
     // light-limited below the target (in cloudy conditions). Either way, no
     // spiral, and the commanded ratio reflects the system's true PV demand.
-    const loadWatts = solarWatts + siteWatts;
+    //
+    // loadWatts must account for AC-side battery DISCHARGE: on a hybrid, when
+    // the battery sources to AC, that contribution is part of the load coverage
+    // and siteWatts is reduced accordingly. So load = solarWatts + siteWatts -
+    // dischargeAC. We use min(currentBatteryPowerWatts, 0) so that battery
+    // CHARGING (positive) — which on a hybrid is typically DC-from-PV and
+    // invisible to siteWatts (per the comment at line 96) — does not falsely
+    // subtract from load. This correction is what allows PV to ramp up to true
+    // load and exit the self-consumption discharge regime once light permits.
+    const dischargeContributionToAC = Math.min(currentBatteryPowerWatts, 0);
+    const loadWatts = solarWatts + siteWatts - dischargeContributionToAC;
     const targetBatteryChargeWatts = Math.max(0, targetBatteryPowerWatts);
     const targetSolarWatts = calculateTargetSolarWatts({
         loadWatts,

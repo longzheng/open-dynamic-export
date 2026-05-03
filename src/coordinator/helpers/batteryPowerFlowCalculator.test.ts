@@ -346,31 +346,41 @@ describe('calculateBatteryPowerFlow', () => {
 
         it('should not curtail PV during self-consumption discharge with export blocked', () => {
             // Regression: when negativeFeedIn (or any setpoint) sets exportLimit=0
-            // AND the battery is discharging to cover load, the PV target must NOT
-            // be reduced by the discharge amount. The previous formula
-            // (load + currentBatteryPowerWatts + exportLimit) curtailed PV by the
-            // measured discharge, creating a feedback spiral that drove the power
-            // ratio to ~0.04 even when sunny PV was available to cover load directly.
+            // AND the battery is discharging to cover load, PV must NOT be curtailed
+            // below the system's true load — otherwise PV stays light-throttled,
+            // battery permanently fills the gap, and the system settles into a
+            // bistable "burn battery cycles while cheap import is available"
+            // equilibrium. Two coupled defects had to be fixed:
             //
-            // User's logged scenario (cloudy, mid-spiral):
-            //   load=910 (under-reported by hybrid loadWatts bug), commanded
-            //   discharge=-860 to cover gap, exportLimit=0.
-            //   Old: targetSolar = 910 + currentBattery + 0 ≈ 490 (collapses)
-            //   New: targetSolar = 910 + max(0, -860) + 0 = 910 (stable)
+            // 1. Coupling discharge into the PV target via measured battery
+            //    (previous formula: targetSolar = load + currentBattery + export
+            //    became targetSolar = load - |discharge|, ~4% power ratio).
+            //
+            // 2. loadWatts under-reporting on hybrid inverters: solarWatts is
+            //    PV-only, so load = solarWatts + siteWatts - dischargeAC. Without
+            //    the discharge correction, load was reported as 910 (when the
+            //    real load was 1330), targetSolar was 910, PV stuck at 910, and
+            //    the battery had to keep covering 420W indefinitely.
+            //
+            // User's exact logged scenario (cloudy):
+            //   PV=470, siteWatts=+440 (importing), currentBattery=-420 (discharging).
+            //   True load (energy balance): 470 + 440 + 420 = 1330 W.
+            //   Old loadWatts: 470 + 440 = 910 (under by 420 = the discharge).
+            //   Corrected loadWatts: 470 + 440 - min(-420, 0) = 1330 ✓
             const input: BatteryPowerFlowInput = {
                 solarWatts: 470,
-                siteWatts: 440, // Importing 440W (load = 910 per current formula)
+                siteWatts: 440, // Importing 440W
                 batterySocPercent: 90,
                 batteryTargetSocPercent: 100,
                 batterySocMinPercent: 20,
                 batterySocMaxPercent: 100,
                 batteryChargeMaxWatts: 5000,
                 batteryDischargeMaxWatts: 5000,
-                exportLimitWatts: 0, // Export blocked by negativeFeedIn
+                exportLimitWatts: 0, // Export blocked by negativeFeedIn (or fixed setpoint)
                 importLimitWatts: Number.MAX_SAFE_INTEGER,
                 batteryInverterSolarW: undefined,
                 batteryPriorityMode: 'battery_first',
-                currentBatteryPowerWatts: -420, // Already discharging from previous cycle
+                currentBatteryPowerWatts: -420, // Already discharging
                 batteryGridChargingEnabled: false,
                 batteryGridChargingMaxWatts: undefined,
             };
@@ -380,10 +390,11 @@ describe('calculateBatteryPowerFlow', () => {
             // Battery still covers self-consumption — that behaviour is unchanged
             expect(result.batteryMode).toBe('discharge');
             // selfConsumptionDischarge = max(0, -availablePower) = max(0, 860) = 860
+            //   (availablePower = -siteWatts + currentBattery = -440 + (-420) = -860)
             expect(result.targetBatteryPowerWatts).toBe(-860);
-            // PV target = load (910) + max(0, -860) + exportLimit (0) = 910.
-            // Critically, the discharge does NOT subtract from the PV target.
-            expect(result.targetSolarWatts).toBe(910);
+            // PV target = trueLoad (1330) + max(0, -860) + exportLimit (0) = 1330.
+            // Both the discharge-coupling and loadWatts under-reporting are fixed.
+            expect(result.targetSolarWatts).toBe(1330);
         });
     });
 
