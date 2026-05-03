@@ -101,6 +101,26 @@ const defaultValues = {
     opModConnect: true,
 } as const satisfies Record<ControlType, unknown>;
 
+// Exponential moving average smoothing factor for the battery-flow
+// calculator's siteWatts and currentBatteryPowerWatts inputs.
+// At 1Hz cycles, alpha=0.4 gives a ~2.5-second time constant
+// (~95% step response in 8s), which damps the per-cycle oscillation
+// caused by battery-ramp / meter-reading coupling without significantly
+// slowing the response to genuine load changes. Tune lower (0.2-0.3)
+// for more damping, higher (0.5-0.7) for faster response.
+const BATTERY_FLOW_INPUT_EMA_ALPHA = 0.4;
+
+function applyEma(
+    previous: number | null,
+    current: number,
+    alpha: number,
+): number {
+    if (previous === null) {
+        return current;
+    }
+    return alpha * current + (1 - alpha) * previous;
+}
+
 export class InverterController {
     private publish: Publish;
     private cachedDerSample = new CappedArrayStack<DerSample>({ limit: 100 });
@@ -140,6 +160,18 @@ export class InverterController {
     // PV crashes to near-zero. Holding at idle for several cycles lets the DC
     // bus stabilise before discharge begins.
     private batteryIdleDwellRemaining: number = 0;
+    // Exponentially-smoothed siteWatts and currentBatteryPowerWatts for the
+    // battery-flow calculator. The calculator's `availablePower` formula
+    // (`-siteWatts + currentBatteryPowerWatts`) is naive proportional control
+    // — feeding it instantaneous values causes a 1Hz oscillation in commanded
+    // battery targets when the battery's own ramp dynamics couple back into
+    // the meter reading mid-cycle (observed up to ~3500W swings between
+    // adjacent cycles in trace logs). The hardware-side ramp limit
+    // (WDisChaGra) masks most of the impact in actual battery output, but
+    // the wasted control effort is real and worth damping. Reset to null
+    // when sample stream drops so we don't carry stale state through gaps.
+    private smoothedSiteWatts: number | null = null;
+    private smoothedCurrentBatteryPowerWatts: number | null = null;
 
     constructor({
         config,
@@ -325,6 +357,10 @@ export class InverterController {
 
         if (!recentDerSamples.length || !recentSiteSamples.length) {
             this.logger.warn('No recent DER or site samples');
+            // Reset EMA state when sample stream drops so we don't carry
+            // stale smoothed values across the gap.
+            this.smoothedSiteWatts = null;
+            this.smoothedCurrentBatteryPowerWatts = null;
             return null;
         }
 
@@ -459,17 +495,40 @@ export class InverterController {
                 return mostRecentSample?.battery?.batteryInverterSolarW;
             })();
 
+            // Damp the per-cycle noise on siteWatts and currentBatteryPowerWatts
+            // before they enter the battery-flow calculator. The calculator's
+            // `availablePower = -siteWatts + currentBatteryPowerWatts` formula
+            // is naive proportional control: feeding it instantaneous values
+            // produces 1Hz oscillation in commanded battery targets (observed
+            // up to ~3500W swings between adjacent cycles in trace logs)
+            // because the battery's physical ramp dynamics couple back into
+            // the meter reading mid-cycle. The hardware-side ramp limit
+            // (WDisChaGra) masks most of the impact in delivered power, but
+            // the wasted control effort is real. EMA smoothing here is
+            // applied to BOTH inputs symmetrically so the relationship
+            // between them stays consistent.
+            this.smoothedSiteWatts = applyEma(
+                this.smoothedSiteWatts,
+                mostRecentSiteWatts,
+                BATTERY_FLOW_INPUT_EMA_ALPHA,
+            );
+            this.smoothedCurrentBatteryPowerWatts = applyEma(
+                this.smoothedCurrentBatteryPowerWatts,
+                currentBatteryPowerWatts,
+                BATTERY_FLOW_INPUT_EMA_ALPHA,
+            );
+
             const configuration = calculateInverterConfiguration({
                 activeInverterControlLimit: rampedControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
-                instantaneousSiteWatts: mostRecentSiteWatts,
+                instantaneousSiteWatts: this.smoothedSiteWatts,
                 solarWatts: averagedSolarWatts,
                 maxInvertersCount,
                 batteryPowerFlowControlEnabled:
                     this.batteryPowerFlowControlEnabled,
                 batterySocPercent,
-                currentBatteryPowerWatts,
+                currentBatteryPowerWatts: this.smoothedCurrentBatteryPowerWatts,
                 batteryInverterSolarW,
             });
 
