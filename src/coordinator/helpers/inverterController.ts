@@ -23,6 +23,10 @@ import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';
 import type { ControlsModel } from '../../connections/sunspec/models/controls.js';
 import type { DerSample } from './derSample.js';
 import { Publish } from './publish.js';
+import {
+    calculateBatteryPowerFlow,
+    type BatteryPowerFlowInput,
+} from './batteryPowerFlowCalculator.js';
 
 export type SupportedControlTypes = Extract<
     ControlType,
@@ -50,6 +54,31 @@ export type InverterControlLimit = {
     opModExpLimW: number | undefined;
     opModImpLimW: number | undefined;
     opModLoadLimW: number | undefined;
+    // Battery control attributes (all optional for backward compatibility)
+    batteryChargeRatePercent?: number | undefined;
+    batteryDischargeRatePercent?: number | undefined;
+    batteryStorageMode?: number | undefined; // Maps to StorCtl_Mod
+    batteryTargetSocPercent?: number | undefined;
+    batteryImportTargetWatts?: number | undefined;
+    batteryExportTargetWatts?: number | undefined;
+    batterySocMinPercent?: number | undefined;
+    batterySocMaxPercent?: number | undefined;
+    batteryChargeMaxWatts?: number | undefined;
+    batteryDischargeMaxWatts?: number | undefined;
+    batteryPriorityMode?: 'export_first' | 'battery_first' | undefined;
+    batteryGridChargingEnabled?: boolean | undefined;
+    batteryGridChargingMaxWatts?: number | undefined;
+};
+
+export type BatteryControlConfiguration = {
+    // Target battery power: positive = charge, negative = discharge
+    targetPowerWatts: number;
+    // Battery operating mode
+    mode: 'charge' | 'discharge' | 'idle';
+    // Charge rate cap as percentage (0-100) of WChaMax — optional user-configured limit
+    chargeRatePercent?: number | undefined;
+    // Discharge rate cap as percentage (0-100) of WChaMax — optional user-configured limit
+    dischargeRatePercent?: number | undefined;
 };
 
 export type InverterConfiguration =
@@ -60,6 +89,7 @@ export type InverterConfiguration =
           invertersCount: number;
           targetSolarWatts: number;
           targetSolarPowerRatio: number;
+          batteryControl?: BatteryControlConfiguration | undefined;
       };
 
 const defaultValues = {
@@ -70,6 +100,26 @@ const defaultValues = {
     opModEnergize: true,
     opModConnect: true,
 } as const satisfies Record<ControlType, unknown>;
+
+// Exponential moving average smoothing factor for the battery-flow
+// calculator's siteWatts and currentBatteryPowerWatts inputs.
+// At 1Hz cycles, alpha=0.4 gives a ~2.5-second time constant
+// (~95% step response in 8s), which damps the per-cycle oscillation
+// caused by battery-ramp / meter-reading coupling without significantly
+// slowing the response to genuine load changes. Tune lower (0.2-0.3)
+// for more damping, higher (0.5-0.7) for faster response.
+const BATTERY_FLOW_INPUT_EMA_ALPHA = 0.4;
+
+function applyEma(
+    previous: number | null,
+    current: number,
+    alpha: number,
+): number {
+    if (previous === null) {
+        return current;
+    }
+    return alpha * current + (1 - alpha) * previous;
+}
 
 export class InverterController {
     private publish: Publish;
@@ -98,6 +148,30 @@ export class InverterController {
     private applyControlLoopTimer: NodeJS.Timeout | null = null;
     private abortController: AbortController;
     private batteryChargeBufferWatts: number | null = null;
+    private batteryPowerFlowControlEnabled: boolean;
+    // Ramped battery export target — smooths transitions when MQTT changes
+    // the export target (e.g. 0 → 3000W), preventing abrupt battery swings
+    // that cause hybrid inverters (e.g. Fronius) to curtail PV to protect the DC bus.
+    // Load-driven discharge is unaffected since it uses self-consumption path.
+    private rampedBatteryExportTargetWatts: number = 0;
+    // Idle dwell counter for charge→discharge transitions on hybrid inverters.
+    // Some hybrid inverters (e.g. Fronius Gen24) disrupt the DC bus when the
+    // battery transitions from charge to discharge — MPPT loses tracking and
+    // PV crashes to near-zero. Holding at idle for several cycles lets the DC
+    // bus stabilise before discharge begins.
+    private batteryIdleDwellRemaining: number = 0;
+    // Exponentially-smoothed siteWatts and currentBatteryPowerWatts for the
+    // battery-flow calculator. The calculator's `availablePower` formula
+    // (`-siteWatts + currentBatteryPowerWatts`) is naive proportional control
+    // — feeding it instantaneous values causes a 1Hz oscillation in commanded
+    // battery targets when the battery's own ramp dynamics couple back into
+    // the meter reading mid-cycle (observed up to ~3500W swings between
+    // adjacent cycles in trace logs). The hardware-side ramp limit
+    // (WDisChaGra) masks most of the impact in actual battery output, but
+    // the wasted control effort is real and worth damping. Reset to null
+    // when sample stream drops so we don't carry stale state through gaps.
+    private smoothedSiteWatts: number | null = null;
+    private smoothedCurrentBatteryPowerWatts: number | null = null;
 
     constructor({
         config,
@@ -115,6 +189,8 @@ export class InverterController {
         this.intervalSeconds = config.inverterControl.intervalSeconds;
         this.batteryChargeBufferWatts =
             config.battery?.chargeBufferWatts ?? null;
+        this.batteryPowerFlowControlEnabled =
+            config.inverterControl.batteryPowerFlowControl;
         this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
@@ -281,6 +357,10 @@ export class InverterController {
 
         if (!recentDerSamples.length || !recentSiteSamples.length) {
             this.logger.warn('No recent DER or site samples');
+            // Reset EMA state when sample stream drops so we don't carry
+            // stale smoothed values across the gap.
+            this.smoothedSiteWatts = null;
+            this.smoothedCurrentBatteryPowerWatts = null;
             return null;
         }
 
@@ -303,9 +383,24 @@ export class InverterController {
             })),
         );
 
+        // Use the most recent site reading for battery control so the battery
+        // responds immediately to load changes, rather than waiting for the
+        // time-weighted average to catch up.  Solar curtailment (WMaxLimPct)
+        // continues to use the averaged value to avoid rapid power swings.
+        const mostRecentSiteWatts =
+            recentSiteSamples[recentSiteSamples.length - 1]!.realPower.net;
+
         const maxInvertersCount = Math.max(
             ...recentDerSamples.map((sample) => sample.invertersCount),
         );
+
+        // Extract battery SoC from most recent DER sample
+        // Average SoC across all batteries (if multiple batteries present)
+        const batterySocPercent: number | null = (() => {
+            const mostRecentSample =
+                recentDerSamples[recentDerSamples.length - 1];
+            return mostRecentSample?.battery?.averageSocPercent ?? null;
+        })();
 
         const batteryAdjustedInverterControlLimit = (() => {
             const batteryChargeBufferWatts = this.batteryChargeBufferWatts;
@@ -335,12 +430,106 @@ export class InverterController {
         })();
 
         const rampedInverterConfiguration = ((): InverterConfiguration => {
+            // Get actual measured battery power from the most recent DER sample.
+            // MPPT measurement convention: positive = discharging, negative = charging.
+            // Battery flow calculator convention: positive = charging, negative = discharging.
+            // We negate the measured value to match the calculator's convention.
+            // Falls back to the previous commanded target if measurement is unavailable.
+            const currentBatteryPowerWatts = (() => {
+                const mostRecentSample =
+                    recentDerSamples[recentDerSamples.length - 1];
+                const measured =
+                    mostRecentSample?.battery?.totalCurrentBatteryPowerWatts ??
+                    null;
+
+                if (measured !== null) {
+                    return -measured;
+                }
+
+                // Fallback: use previous commanded target if no measurement available
+                if (
+                    this.lastAppliedInverterConfiguration?.type === 'limit' &&
+                    this.lastAppliedInverterConfiguration.batteryControl
+                ) {
+                    return this.lastAppliedInverterConfiguration.batteryControl
+                        .targetPowerWatts;
+                }
+                return 0;
+            })();
+
+            // Ramp the battery export target to prevent abrupt battery swings
+            // when MQTT changes it (e.g. 0 → 3000W).  This smooths the
+            // charge→discharge transition so the inverter's DC bus/MPPT can adjust
+            // gradually.  Load-driven discharge (self-consumption) is unaffected
+            // since it uses the separate selfConsumptionDischarge path.
+            const rawExportTarget =
+                batteryAdjustedInverterControlLimit.batteryExportTargetWatts
+                    ?.value ?? 0;
+            const maxExportTargetChange = 1000; // watts per cycle (~1kW/s)
+            this.rampedBatteryExportTargetWatts = cappedChange({
+                previousValue: this.rampedBatteryExportTargetWatts,
+                targetValue: rawExportTarget,
+                maxChange: maxExportTargetChange,
+            });
+
+            const rampedControlLimit = {
+                ...batteryAdjustedInverterControlLimit,
+                batteryExportTargetWatts:
+                    this.rampedBatteryExportTargetWatts > 0
+                        ? {
+                              source:
+                                  batteryAdjustedInverterControlLimit
+                                      .batteryExportTargetWatts?.source ??
+                                  'mqtt',
+                              value: this.rampedBatteryExportTargetWatts,
+                          }
+                        : undefined,
+            };
+
+            // Get the hybrid inverter's current PV output from the most recent
+            // DER sample. Used to check if battery discharge would be a net loss
+            // (some hybrid inverters curtail PV entirely when discharging).
+            const batteryInverterSolarW = (() => {
+                const mostRecentSample =
+                    recentDerSamples[recentDerSamples.length - 1];
+                return mostRecentSample?.battery?.batteryInverterSolarW;
+            })();
+
+            // Damp the per-cycle noise on siteWatts and currentBatteryPowerWatts
+            // before they enter the battery-flow calculator. The calculator's
+            // `availablePower = -siteWatts + currentBatteryPowerWatts` formula
+            // is naive proportional control: feeding it instantaneous values
+            // produces 1Hz oscillation in commanded battery targets (observed
+            // up to ~3500W swings between adjacent cycles in trace logs)
+            // because the battery's physical ramp dynamics couple back into
+            // the meter reading mid-cycle. The hardware-side ramp limit
+            // (WDisChaGra) masks most of the impact in delivered power, but
+            // the wasted control effort is real. EMA smoothing here is
+            // applied to BOTH inputs symmetrically so the relationship
+            // between them stays consistent.
+            this.smoothedSiteWatts = applyEma(
+                this.smoothedSiteWatts,
+                mostRecentSiteWatts,
+                BATTERY_FLOW_INPUT_EMA_ALPHA,
+            );
+            this.smoothedCurrentBatteryPowerWatts = applyEma(
+                this.smoothedCurrentBatteryPowerWatts,
+                currentBatteryPowerWatts,
+                BATTERY_FLOW_INPUT_EMA_ALPHA,
+            );
+
             const configuration = calculateInverterConfiguration({
-                activeInverterControlLimit: batteryAdjustedInverterControlLimit,
+                activeInverterControlLimit: rampedControlLimit,
                 nameplateMaxW: averagedNameplateMaxW,
                 siteWatts: averagedSiteWatts,
+                instantaneousSiteWatts: this.smoothedSiteWatts,
                 solarWatts: averagedSolarWatts,
                 maxInvertersCount,
+                batteryPowerFlowControlEnabled:
+                    this.batteryPowerFlowControlEnabled,
+                batterySocPercent,
+                currentBatteryPowerWatts: this.smoothedCurrentBatteryPowerWatts,
+                batteryInverterSolarW,
             });
 
             switch (configuration.type) {
@@ -377,14 +566,19 @@ export class InverterController {
                         return configuration;
                     }
 
-                    // max 10% change
-                    const maxChange = 0.1;
-
-                    const rampedTargetSolarWatts = cappedChange({
-                        previousValue: previousTarget.targetSolarWatts,
-                        targetValue: configuration.targetSolarWatts,
-                        maxChange,
-                    });
+                    // max 5% absolute change on the power ratio (0-1 range)
+                    // only the ratio is ramped as it directly controls WMaxLimPct
+                    // targetSolarWatts is not ramped - it reflects the true calculated target
+                    //
+                    // 5%/cycle (≈20s for full 100→0% ramp) is slower than the
+                    // initial 10%/cycle to give hybrid inverter MPPT time to
+                    // follow the falling limit. On Fronius Gen24, a faster ramp
+                    // caused all strings to de-load (>450V) and stay there for
+                    // 30+ minutes after WMaxLimPct returned to 100% — observed
+                    // multiple times per day during Amber-driven curtailment.
+                    // Stays well within the 30s event-start notice window
+                    // (CSIP-AUS handbook §9), so DOE response remains compliant.
+                    const maxChange = 0.05;
 
                     const rampedTargetSolarPowerRatio = cappedChange({
                         previousValue: previousTarget.targetSolarPowerRatio,
@@ -392,11 +586,69 @@ export class InverterController {
                         maxChange,
                     });
 
+                    // Ramp battery discharge power to prevent DC bus slam.
+                    // The export target ramp (1kW/cycle) is insufficient because
+                    // gap-filling creates a positive feedback loop: discharge
+                    // reduces pvSurplus → larger gap → more discharge → etc.
+                    // This ramp caps the actual power change per cycle.
+                    //
+                    // Additionally, some hybrid inverters (e.g. Fronius Gen24)
+                    // disrupt the DC bus when the battery transitions from
+                    // charge to discharge (MPPT loses tracking, PV crashes to
+                    // near-zero). An idle dwell period holds the battery at 0W
+                    // for several cycles to let the DC bus stabilise before
+                    // discharge begins.
+                    const rampedBatteryControl = (() => {
+                        if (!configuration.batteryControl) {
+                            return configuration.batteryControl;
+                        }
+
+                        const previousBatteryPower =
+                            this.lastAppliedInverterConfiguration?.type ===
+                                'limit' &&
+                            this.lastAppliedInverterConfiguration.batteryControl
+                                ? this.lastAppliedInverterConfiguration
+                                      .batteryControl.targetPowerWatts
+                                : 0;
+
+                        const targetPower =
+                            configuration.batteryControl.targetPowerWatts;
+
+                        // Detect charge→discharge transition and start idle dwell
+                        const IDLE_DWELL_CYCLES = 5;
+                        if (previousBatteryPower > 0 && targetPower < 0) {
+                            this.batteryIdleDwellRemaining = IDLE_DWELL_CYCLES;
+                        }
+
+                        // During dwell, hold at idle (0W)
+                        if (this.batteryIdleDwellRemaining > 0) {
+                            this.batteryIdleDwellRemaining--;
+                            return {
+                                ...configuration.batteryControl,
+                                targetPowerWatts: 0,
+                                mode: 'idle' as const,
+                            };
+                        }
+
+                        const maxBatteryPowerChange = 1000; // watts per cycle
+                        const rampedPower = cappedChange({
+                            previousValue: previousBatteryPower,
+                            targetValue: targetPower,
+                            maxChange: maxBatteryPowerChange,
+                        });
+
+                        return {
+                            ...configuration.batteryControl,
+                            targetPowerWatts: rampedPower,
+                        };
+                    })();
+
                     return {
                         type: 'limit',
                         invertersCount: configuration.invertersCount,
-                        targetSolarWatts: rampedTargetSolarWatts,
+                        targetSolarWatts: configuration.targetSolarWatts,
                         targetSolarPowerRatio: rampedTargetSolarPowerRatio,
+                        batteryControl: rampedBatteryControl,
                     };
                 }
             }
@@ -421,15 +673,27 @@ export class InverterController {
 export function calculateInverterConfiguration({
     activeInverterControlLimit,
     siteWatts,
+    instantaneousSiteWatts,
     solarWatts,
     nameplateMaxW,
     maxInvertersCount,
+    batteryPowerFlowControlEnabled,
+    batterySocPercent,
+    currentBatteryPowerWatts,
+    batteryInverterSolarW,
 }: {
     activeInverterControlLimit: ActiveInverterControlLimit;
     siteWatts: number;
+    /** Most recent site reading for fast battery response. Falls back to averaged siteWatts. */
+    instantaneousSiteWatts?: number;
     solarWatts: number;
     nameplateMaxW: number;
     maxInvertersCount: number;
+    batteryPowerFlowControlEnabled: boolean;
+    batterySocPercent: number | null;
+    currentBatteryPowerWatts: number;
+    /** Current PV output of battery-hosting inverters, for hybrid PV-loss check. */
+    batteryInverterSolarW?: number | undefined;
 }): InverterConfiguration {
     const logger = pinoLogger.child({
         module: 'calculateInverterConfiguration',
@@ -460,6 +724,83 @@ export function calculateInverterConfiguration({
         activeInverterControlLimit.opModGenLimW?.value ??
         defaultValues.opModGenLimW;
 
+    // Battery power flow control logic
+    let batteryControl: BatteryControlConfiguration | undefined;
+    let finalTargetSolarWatts: number;
+
+    if (batteryPowerFlowControlEnabled && !disconnect) {
+        // Use battery power flow calculator for intelligent battery control.
+        // Use instantaneous site reading so the battery responds immediately
+        // to load changes rather than waiting for the averaged value to catch up.
+        const batteryFlowInput: BatteryPowerFlowInput = {
+            solarWatts,
+            siteWatts: instantaneousSiteWatts ?? siteWatts,
+            currentBatteryPowerWatts,
+            batterySocPercent,
+            batteryTargetSocPercent:
+                activeInverterControlLimit.batteryTargetSocPercent?.value,
+            batterySocMinPercent:
+                activeInverterControlLimit.batterySocMinPercent?.value,
+            batterySocMaxPercent:
+                activeInverterControlLimit.batterySocMaxPercent?.value,
+            batteryChargeMaxWatts:
+                activeInverterControlLimit.batteryChargeMaxWatts?.value,
+            batteryDischargeMaxWatts:
+                activeInverterControlLimit.batteryDischargeMaxWatts?.value,
+            exportLimitWatts,
+            importLimitWatts:
+                activeInverterControlLimit.opModImpLimW?.value ??
+                defaultValues.opModImpLimW,
+            batteryPriorityMode:
+                activeInverterControlLimit.batteryPriorityMode?.value,
+            batteryGridChargingEnabled:
+                activeInverterControlLimit.batteryGridChargingEnabled?.value,
+            batteryGridChargingMaxWatts:
+                activeInverterControlLimit.batteryGridChargingMaxWatts?.value,
+            batteryExportTargetWatts:
+                activeInverterControlLimit.batteryExportTargetWatts?.value,
+            batteryInverterSolarW,
+        };
+
+        const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);
+
+        // Create battery control configuration
+        batteryControl = {
+            targetPowerWatts: batteryFlowResult.targetBatteryPowerWatts,
+            mode: batteryFlowResult.batteryMode,
+            chargeRatePercent:
+                activeInverterControlLimit.batteryChargeRatePercent?.value,
+            dischargeRatePercent:
+                activeInverterControlLimit.batteryDischargeRatePercent?.value,
+        };
+
+        finalTargetSolarWatts = Math.min(
+            batteryFlowResult.targetSolarWatts,
+            generationLimitWatts,
+        );
+
+        logger.trace(
+            {
+                batteryFlowInput,
+                batteryFlowResult,
+                batteryControl,
+            },
+            'Battery power flow calculation',
+        );
+    } else {
+        // Legacy mode: use simple export limit calculation
+        const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
+            exportLimitWatts,
+            siteWatts,
+            solarWatts,
+        });
+
+        finalTargetSolarWatts = Math.min(
+            exportLimitTargetSolarWatts,
+            generationLimitWatts,
+        );
+    }
+
     const exportLimitTargetSolarWatts = calculateTargetSolarWatts({
         exportLimitWatts,
         siteWatts,
@@ -468,10 +809,7 @@ export function calculateInverterConfiguration({
 
     // the limits need to be applied together
     // take the lesser of the export limit target solar watts or generation limit
-    const targetSolarWatts = Math.min(
-        exportLimitTargetSolarWatts,
-        generationLimitWatts,
-    );
+    const targetSolarWatts = finalTargetSolarWatts;
 
     const targetSolarPowerRatio = calculateTargetSolarPowerRatio({
         nameplateMaxW,
@@ -516,6 +854,7 @@ export function calculateInverterConfiguration({
         invertersCount: maxInvertersCount,
         targetSolarWatts,
         targetSolarPowerRatio: roundToDecimals(targetSolarPowerRatio, 4),
+        batteryControl,
     };
 }
 
@@ -621,6 +960,84 @@ export type ActiveInverterControlLimit = {
               source: InverterControlTypes;
           }
         | undefined;
+    batteryChargeRatePercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryDischargeRatePercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryStorageMode:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryTargetSocPercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryImportTargetWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryExportTargetWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batterySocMinPercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batterySocMaxPercent:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryChargeMaxWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryDischargeMaxWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryPriorityMode:
+        | {
+              value: 'export_first' | 'battery_first';
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryGridChargingEnabled:
+        | {
+              value: boolean;
+              source: InverterControlTypes;
+          }
+        | undefined;
+    batteryGridChargingMaxWatts:
+        | {
+              value: number;
+              source: InverterControlTypes;
+          }
+        | undefined;
 };
 
 export function getActiveInverterControlLimit(
@@ -632,6 +1049,32 @@ export function getActiveInverterControlLimit(
     let opModExpLimW: ActiveInverterControlLimit['opModExpLimW'] = undefined;
     let opModImpLimW: ActiveInverterControlLimit['opModImpLimW'] = undefined;
     let opModLoadLimW: ActiveInverterControlLimit['opModLoadLimW'] = undefined;
+    let batteryChargeRatePercent: ActiveInverterControlLimit['batteryChargeRatePercent'] =
+        undefined;
+    let batteryDischargeRatePercent: ActiveInverterControlLimit['batteryDischargeRatePercent'] =
+        undefined;
+    let batteryStorageMode: ActiveInverterControlLimit['batteryStorageMode'] =
+        undefined;
+    let batteryTargetSocPercent: ActiveInverterControlLimit['batteryTargetSocPercent'] =
+        undefined;
+    let batteryImportTargetWatts: ActiveInverterControlLimit['batteryImportTargetWatts'] =
+        undefined;
+    let batteryExportTargetWatts: ActiveInverterControlLimit['batteryExportTargetWatts'] =
+        undefined;
+    let batterySocMinPercent: ActiveInverterControlLimit['batterySocMinPercent'] =
+        undefined;
+    let batterySocMaxPercent: ActiveInverterControlLimit['batterySocMaxPercent'] =
+        undefined;
+    let batteryChargeMaxWatts: ActiveInverterControlLimit['batteryChargeMaxWatts'] =
+        undefined;
+    let batteryDischargeMaxWatts: ActiveInverterControlLimit['batteryDischargeMaxWatts'] =
+        undefined;
+    let batteryPriorityMode: ActiveInverterControlLimit['batteryPriorityMode'] =
+        undefined;
+    let batteryGridChargingEnabled: ActiveInverterControlLimit['batteryGridChargingEnabled'] =
+        undefined;
+    let batteryGridChargingMaxWatts: ActiveInverterControlLimit['batteryGridChargingMaxWatts'] =
+        undefined;
 
     for (const controlLimit of controlLimits) {
         if (!controlLimit) {
@@ -717,6 +1160,144 @@ export function getActiveInverterControlLimit(
                 };
             }
         }
+
+        // Battery control attributes - use most restrictive values
+        if (controlLimit.batteryChargeRatePercent !== undefined) {
+            if (
+                batteryChargeRatePercent === undefined ||
+                controlLimit.batteryChargeRatePercent <
+                    batteryChargeRatePercent.value
+            ) {
+                batteryChargeRatePercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryChargeRatePercent,
+                };
+            }
+        }
+
+        if (controlLimit.batteryDischargeRatePercent !== undefined) {
+            if (
+                batteryDischargeRatePercent === undefined ||
+                controlLimit.batteryDischargeRatePercent <
+                    batteryDischargeRatePercent.value
+            ) {
+                batteryDischargeRatePercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryDischargeRatePercent,
+                };
+            }
+        }
+
+        if (controlLimit.batteryStorageMode !== undefined) {
+            batteryStorageMode = {
+                source: controlLimit.source,
+                value: controlLimit.batteryStorageMode,
+            };
+        }
+
+        if (controlLimit.batteryTargetSocPercent !== undefined) {
+            batteryTargetSocPercent = {
+                source: controlLimit.source,
+                value: controlLimit.batteryTargetSocPercent,
+            };
+        }
+
+        if (controlLimit.batteryImportTargetWatts !== undefined) {
+            batteryImportTargetWatts = {
+                source: controlLimit.source,
+                value: controlLimit.batteryImportTargetWatts,
+            };
+        }
+
+        if (controlLimit.batteryExportTargetWatts !== undefined) {
+            batteryExportTargetWatts = {
+                source: controlLimit.source,
+                value: controlLimit.batteryExportTargetWatts,
+            };
+        }
+
+        if (controlLimit.batterySocMinPercent !== undefined) {
+            if (
+                batterySocMinPercent === undefined ||
+                controlLimit.batterySocMinPercent > batterySocMinPercent.value
+            ) {
+                batterySocMinPercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batterySocMinPercent,
+                };
+            }
+        }
+
+        if (controlLimit.batterySocMaxPercent !== undefined) {
+            if (
+                batterySocMaxPercent === undefined ||
+                controlLimit.batterySocMaxPercent < batterySocMaxPercent.value
+            ) {
+                batterySocMaxPercent = {
+                    source: controlLimit.source,
+                    value: controlLimit.batterySocMaxPercent,
+                };
+            }
+        }
+
+        if (controlLimit.batteryChargeMaxWatts !== undefined) {
+            if (
+                batteryChargeMaxWatts === undefined ||
+                controlLimit.batteryChargeMaxWatts < batteryChargeMaxWatts.value
+            ) {
+                batteryChargeMaxWatts = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryChargeMaxWatts,
+                };
+            }
+        }
+
+        if (controlLimit.batteryDischargeMaxWatts !== undefined) {
+            if (
+                batteryDischargeMaxWatts === undefined ||
+                controlLimit.batteryDischargeMaxWatts <
+                    batteryDischargeMaxWatts.value
+            ) {
+                batteryDischargeMaxWatts = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryDischargeMaxWatts,
+                };
+            }
+        }
+
+        if (controlLimit.batteryPriorityMode !== undefined) {
+            batteryPriorityMode = {
+                source: controlLimit.source,
+                value: controlLimit.batteryPriorityMode,
+            };
+        }
+
+        if (controlLimit.batteryGridChargingEnabled !== undefined) {
+            if (
+                batteryGridChargingEnabled === undefined ||
+                // false overrides true for safety
+                (batteryGridChargingEnabled.value === true &&
+                    controlLimit.batteryGridChargingEnabled === false)
+            ) {
+                batteryGridChargingEnabled = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryGridChargingEnabled,
+                };
+            }
+        }
+
+        if (controlLimit.batteryGridChargingMaxWatts !== undefined) {
+            if (
+                batteryGridChargingMaxWatts === undefined ||
+                controlLimit.batteryGridChargingMaxWatts <
+                    batteryGridChargingMaxWatts.value
+            ) {
+                batteryGridChargingMaxWatts = {
+                    source: controlLimit.source,
+                    value: controlLimit.batteryGridChargingMaxWatts,
+                };
+            }
+        }
     }
 
     return {
@@ -726,6 +1307,19 @@ export function getActiveInverterControlLimit(
         opModExpLimW,
         opModImpLimW,
         opModLoadLimW,
+        batteryChargeRatePercent,
+        batteryDischargeRatePercent,
+        batteryStorageMode,
+        batteryTargetSocPercent,
+        batteryImportTargetWatts,
+        batteryExportTargetWatts,
+        batterySocMinPercent,
+        batterySocMaxPercent,
+        batteryChargeMaxWatts,
+        batteryDischargeMaxWatts,
+        batteryPriorityMode,
+        batteryGridChargingEnabled,
+        batteryGridChargingMaxWatts,
     };
 }
 
