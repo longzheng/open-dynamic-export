@@ -200,6 +200,20 @@ describe('generateDerSample', () => {
             invertersCount: 2,
         } satisfies typeof result);
     });
+
+    it('should use finite status fallbacks when no inverters are connected', () => {
+        const now = new Date('2023-01-01T10:05:00Z');
+        vi.setSystemTime(now);
+
+        const result = generateDerSample({ invertersData: [] });
+
+        expect(result.status.operationalModeStatus).toBe(
+            OperationalModeStatusValue.Off,
+        );
+        expect(result.status.genConnectStatus).toBe(0);
+        expect(Number.isFinite(result.status.operationalModeStatus)).toBe(true);
+        expect(Number.isFinite(result.status.genConnectStatus)).toBe(true);
+    });
 });
 
 describe('derSampleDataSchema', () => {
