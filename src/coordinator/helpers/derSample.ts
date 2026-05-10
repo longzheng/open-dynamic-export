@@ -136,9 +136,9 @@ export function generateDerSample({
             operationalModeStatus: Math.max(
                 ...invertersData.map(
                     (data) => data.status.operationalModeStatus,
-                    // fallback to Off if no inverters are connected
-                    OperationalModeStatusValue.Off,
                 ),
+                // fallback to Off if no inverters are connected
+                OperationalModeStatusValue.Off,
             ) satisfies OperationalModeStatusValue,
             genConnectStatus: Math.max(
                 ...invertersData.map((data) => data.status.genConnectStatus),
