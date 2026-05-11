@@ -275,6 +275,10 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         }
 
         if (nowSchedules.length > 1) {
+            this.logger.error(
+                { nowSchedules, now },
+                'Multiple active control schedules found for the current time',
+            );
             throw new Error('Multiple schedules found');
         }
 
