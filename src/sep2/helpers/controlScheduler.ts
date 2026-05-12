@@ -1,6 +1,6 @@
 import { randomInt } from 'crypto';
 import type { Logger } from 'pino';
-import { addSeconds, isEqual, max } from 'date-fns';
+import { addSeconds, isEqual, max, min } from 'date-fns';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import type { DERControlBase } from '../models/derControlBase.js';
@@ -275,6 +275,10 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
         }
 
         if (nowSchedules.length > 1) {
+            this.logger.error(
+                { nowSchedules, now },
+                'Multiple active control schedules found for the current time',
+            );
             throw new Error('Multiple schedules found');
         }
 
@@ -461,6 +465,7 @@ export function applyRandomizationToControlSchedule({
     activeControlSchedule: RandomizedControlSchedule | null;
 }) {
     const randomizedControlSchedules: RandomizedControlSchedule[] = [];
+    let activeControlSchedulePreserved = false;
 
     for (const schedule of controlSchedules) {
         // do not change the currently active control schedule
@@ -468,9 +473,27 @@ export function applyRandomizationToControlSchedule({
         // assume it already has randomization applied so we'll keep both the start/duration randomization
         if (
             activeControlSchedule &&
+            !activeControlSchedulePreserved &&
             schedule.mRID === activeControlSchedule.mRID
         ) {
-            randomizedControlSchedules.push(activeControlSchedule);
+            activeControlSchedulePreserved = true;
+
+            const endWasShortened = !isEqual(
+                schedule.endExclusive,
+                activeControlSchedule.endExclusive,
+            );
+
+            randomizedControlSchedules.push({
+                ...schedule,
+                effectiveStartInclusive:
+                    activeControlSchedule.effectiveStartInclusive,
+                effectiveEndExclusive: endWasShortened
+                    ? min([
+                          activeControlSchedule.effectiveEndExclusive,
+                          schedule.endExclusive,
+                      ])
+                    : activeControlSchedule.effectiveEndExclusive,
+            });
             continue;
         }
 

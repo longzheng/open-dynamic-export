@@ -7,6 +7,7 @@ import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { CurrentStatus } from '../models/currentStatus.js';
+import { ResponseStatus } from '../models/responseStatus.js';
 import {
     DerControlsHelper,
     sortMergedControlsDataByStartTimeAscending,
@@ -40,11 +41,13 @@ describe('DerControlsHelper', () => {
             client: sep2Client,
         });
 
-        const respondDerControlSpy = vi.spyOn(
-            // oxlint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            (derControlsHelper as any).derControlResponseHelper,
-            'respondDerControl',
-        );
+        const respondDerControlSpy = vi
+            .spyOn(
+                // oxlint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+                (derControlsHelper as any).derControlResponseHelper,
+                'respondDerControl',
+            )
+            .mockResolvedValue(undefined);
 
         derControlsHelper.updateFsaData([
             {
@@ -67,6 +70,53 @@ describe('DerControlsHelper', () => {
         ]);
 
         expect(respondDerControlSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should respond to superseded DERControls without scheduling them', () => {
+        const derControlsHelper = new DerControlsHelper({
+            client: sep2Client,
+        });
+
+        const respondDerControlSpy = vi
+            .spyOn(
+                // oxlint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+                (derControlsHelper as any).derControlResponseHelper,
+                'respondDerControl',
+            )
+            .mockResolvedValue(undefined);
+        const dataSpy = vi.fn();
+        derControlsHelper.on('data', dataSpy);
+
+        const supersededControl = generateMockDERControl({
+            eventStatus: {
+                currentStatus: CurrentStatus.Superseded,
+            },
+            derControlBase: {},
+        });
+
+        derControlsHelper.updateFsaData([
+            {
+                functionSetAssignments: generateMockFunctionSetAssignments({}),
+                derProgramList: [
+                    {
+                        program: generateMockDERProgram({}),
+                        derControls: [supersededControl],
+                        defaultDerControl: undefined,
+                    },
+                ],
+            },
+        ]);
+
+        expect(respondDerControlSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                mRID: supersededControl.mRID,
+                status: ResponseStatus.EventSuperseded,
+            }),
+        );
+        expect(dataSpy).toHaveBeenCalledWith({
+            activeOrScheduledControls: [],
+            fallbackControl: { type: 'none' },
+        });
     });
 });
 

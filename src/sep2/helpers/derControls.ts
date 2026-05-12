@@ -116,10 +116,20 @@ export class DerControlsHelper extends EventEmitter<{
                     continue;
                 }
 
+                case CurrentStatus.Superseded: {
+                    void this.derControlResponseHelper.respondDerControl({
+                        mRID: controlData.control.mRID,
+                        replyToHref: controlData.control.replyToHref,
+                        responseRequired: controlData.control.responseRequired,
+                        status: ResponseStatus.EventSuperseded,
+                    });
+
+                    continue;
+                }
+
                 // control response handled by ControlScheduler logic
                 case CurrentStatus.Scheduled:
-                case CurrentStatus.Active:
-                case CurrentStatus.Superseded: {
+                case CurrentStatus.Active: {
                     break;
                 }
             }
