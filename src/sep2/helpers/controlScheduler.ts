@@ -3,6 +3,7 @@ import type { Logger } from 'pino';
 import { addSeconds, isEqual, max, min } from 'date-fns';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
+import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import type { DERControlBase } from '../models/derControlBase.js';
 import { writeControlSchedulerPoints } from '../../helpers/influxdb.js';
 import type { DERControl } from '../models/derControl.js';
@@ -56,6 +57,9 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
     };
     private controlSchedules: RandomizedControlSchedule[] = [];
     private activeControlSchedule: RandomizedControlSchedule | null = null;
+    private supersededControlMRIDs = new CappedArrayStack<string>({
+        limit: 1000,
+    });
 
     constructor({
         client,
@@ -96,6 +100,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
 
         const generatedControlSchedules = generateControlsSchedule({
             activeOrScheduledControlsOfType: controlsOfType,
+            supersededControlMRIDs: this.supersededControlMRIDs,
             onSupersededControl: ({
                 supersededControl,
                 supersedingControl,
@@ -306,10 +311,12 @@ export function filterControlsOfType<
 
 export function generateControlsSchedule({
     activeOrScheduledControlsOfType,
+    supersededControlMRIDs,
     onSupersededControl,
 }: {
     // assume only active or scheduled controls
     activeOrScheduledControlsOfType: MergedControlsData[];
+    supersededControlMRIDs: CappedArrayStack<string>;
     onSupersededControl?: (controls: {
         supersededControl: DERControl;
         supersedingControl: DERControl;
@@ -322,6 +329,7 @@ export function generateControlsSchedule({
         buildChunkedControlsScheduleByPriority({
             activeOrScheduledControls: activeOrScheduledControlsOfType,
             sortedDatetimes,
+            supersededControlMRIDs,
             onSupersededControl,
         });
 
@@ -359,10 +367,12 @@ export function getSortedUniqueDatetimesFromControls<
 function buildChunkedControlsScheduleByPriority({
     activeOrScheduledControls,
     sortedDatetimes,
+    supersededControlMRIDs,
     onSupersededControl,
 }: {
     activeOrScheduledControls: MergedControlsData[];
     sortedDatetimes: Date[];
+    supersededControlMRIDs: CappedArrayStack<string>;
     onSupersededControl?: (controls: {
         supersededControl: DERControl;
         supersedingControl: DERControl;
@@ -378,6 +388,10 @@ function buildChunkedControlsScheduleByPriority({
         // we don't need to worry about when the control ends because we assume the next datetimeEvent will handle that
         const controlsAtTime = activeOrScheduledControls.filter(
             (control) =>
+                !isControlSuperseded({
+                    control,
+                    supersededControlMRIDs,
+                }) &&
                 control.control.interval.start <= datetimeEvent &&
                 getDerControlEndDate(control.control) > datetimeEvent,
         );
@@ -399,6 +413,17 @@ function buildChunkedControlsScheduleByPriority({
             const supersededControls = sortedControls.slice(1);
 
             for (const supersededControl of supersededControls) {
+                if (
+                    isControlSuperseded({
+                        control: supersededControl,
+                        supersededControlMRIDs,
+                    })
+                ) {
+                    continue;
+                }
+
+                supersededControlMRIDs.push(supersededControl.control.mRID);
+
                 void onSupersededControl?.({
                     supersededControl: supersededControl.control,
                     supersedingControl: firstControl.control,
@@ -421,6 +446,16 @@ function buildChunkedControlsScheduleByPriority({
     }
 
     return controlsSchedules;
+}
+
+function isControlSuperseded({
+    control,
+    supersededControlMRIDs,
+}: {
+    control: Pick<MergedControlsData, 'control'>;
+    supersededControlMRIDs: CappedArrayStack<string>;
+}) {
+    return supersededControlMRIDs.get().includes(control.control.mRID);
 }
 
 // optimize chunked control schedules by joining consecutive schedules that have the same MRID
