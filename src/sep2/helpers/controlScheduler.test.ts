@@ -642,6 +642,72 @@ describe('applyRandomizationToControlSchedule', () => {
         );
     });
 
+    it('clips a preserved active schedule when a newer schedule splits it', () => {
+        const activeControlSchedule: RandomizedControlSchedule = {
+            mRID: 'controlA',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
+            startInclusive: new Date('2024-01-01T00:00:00Z'),
+            endExclusive: new Date('2024-01-01T00:20:00Z'),
+            randomizeStart: undefined,
+            randomizeDuration: undefined,
+            effectiveStartInclusive: new Date('2024-01-01T00:00:00Z'),
+            effectiveEndExclusive: new Date('2024-01-01T00:20:00Z'),
+        };
+
+        const controlABeforeSupersedingControl: ControlSchedule = {
+            ...activeControlSchedule,
+            endExclusive: new Date('2024-01-01T00:07:00Z'),
+        };
+
+        const controlB: ControlSchedule = {
+            mRID: 'controlB',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
+            startInclusive: new Date('2024-01-01T00:07:00Z'),
+            endExclusive: new Date('2024-01-01T00:12:00Z'),
+            randomizeStart: undefined,
+            randomizeDuration: undefined,
+        };
+
+        const controlAAfterSupersedingControl: ControlSchedule = {
+            ...activeControlSchedule,
+            startInclusive: new Date('2024-01-01T00:12:00Z'),
+        };
+
+        const result = applyRandomizationToControlSchedule({
+            controlSchedules: [
+                controlABeforeSupersedingControl,
+                controlB,
+                controlAAfterSupersedingControl,
+            ],
+            activeControlSchedule,
+        });
+
+        expect(result).toHaveLength(3);
+        expect(result[0]?.mRID).toBe('controlA');
+        expect(result[0]?.effectiveEndExclusive).toStrictEqual(
+            new Date('2024-01-01T00:07:00Z'),
+        );
+        expect(result[1]?.mRID).toBe('controlB');
+        expect(result[1]?.effectiveStartInclusive).toStrictEqual(
+            new Date('2024-01-01T00:07:00Z'),
+        );
+        expect(result[2]?.mRID).toBe('controlA');
+
+        const activeAtSupersedingControlStart = result.filter(
+            (control) =>
+                control.effectiveStartInclusive <=
+                    new Date('2024-01-01T00:08:00Z') &&
+                control.effectiveEndExclusive >
+                    new Date('2024-01-01T00:08:00Z'),
+        );
+
+        expect(activeAtSupersedingControlStart).toStrictEqual([result[1]]);
+    });
+
     it('non-successive events with randomization should not cause conflicts', () => {
         // override crypto.randomInt implementation to always return the max value
         vi.mocked(randomInt)
