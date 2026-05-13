@@ -129,9 +129,9 @@ export class DerHelper {
                 error instanceof AxiosError ? sanitizeAxiosError(error) : error,
                 'Error updating DER status during scheduled poll',
             );
-        } finally {
-            this.queueScheduledDerStatus();
         }
+
+        this.queueScheduledDerStatus();
     }
 
     private queueScheduledDerStatus() {
