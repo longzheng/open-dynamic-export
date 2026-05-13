@@ -489,6 +489,14 @@ export function scaleReadingValueToInt16({
     value: number;
     powerOfTenMultiplier?: number;
 }) {
+    if (!Number.isFinite(value)) {
+        throw new Error('Reading value must be a finite number');
+    }
+
+    if (!Number.isFinite(powerOfTenMultiplier)) {
+        throw new Error('powerOfTenMultiplier must be a finite number');
+    }
+
     let scaledPowerOfTenMultiplier = powerOfTenMultiplier;
     let scaledValue = scaleReadingValue({
         value,

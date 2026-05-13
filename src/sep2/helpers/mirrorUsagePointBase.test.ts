@@ -49,4 +49,23 @@ describe('scaleReadingValueToInt16', () => {
             powerOfTenMultiplier: 1,
         });
     });
+
+    it('should throw for non-finite reading values', () => {
+        expect(() =>
+            scaleReadingValueToInt16({
+                value: Number.POSITIVE_INFINITY,
+                powerOfTenMultiplier: 0,
+            }),
+        ).toThrow('Reading value must be a finite number');
+    });
+
+    it('should throw for non-finite multipliers', () => {
+        expect(() =>
+            scaleReadingValueToInt16({
+                value: 123,
+                powerOfTenMultiplier: Number.NaN,
+            }),
+        ).toThrow('powerOfTenMultiplier must be a finite number');
+    });
+
 });
