@@ -123,7 +123,7 @@ export class DerHelper {
 
         try {
             if (!this.lastSentDerStatus) {
-                throw new Error('DER status has not been cached');
+                return;
             }
 
             await this.putDerStatus({ derStatus: this.lastSentDerStatus });
