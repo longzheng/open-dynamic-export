@@ -67,5 +67,4 @@ describe('scaleReadingValueToInt16', () => {
             }),
         ).toThrow('powerOfTenMultiplier must be a finite number');
     });
-
 });
