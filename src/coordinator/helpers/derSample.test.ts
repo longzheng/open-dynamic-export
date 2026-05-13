@@ -34,7 +34,7 @@ describe('generateDerSample', () => {
                 },
                 nameplate: {
                     type: DERTyp.PV,
-                    maxW: 7000,
+                    maxW: 6000,
                     maxVA: 7000,
                     maxVar: 7000,
                 },
@@ -76,7 +76,7 @@ describe('generateDerSample', () => {
             nameplate: {
                 maxVA: 7000,
                 maxVar: 7000,
-                maxW: 7000,
+                maxW: 6000,
                 type: 4,
             },
             settings: {
@@ -113,7 +113,7 @@ describe('generateDerSample', () => {
                 },
                 nameplate: {
                     type: DERTyp.PV,
-                    maxW: 7000,
+                    maxW: 6000,
                     maxVA: 7000,
                     maxVar: 7000,
                 },
@@ -143,7 +143,7 @@ describe('generateDerSample', () => {
                 },
                 nameplate: {
                     type: DERTyp.PV,
-                    maxW: 7000,
+                    maxW: 6500,
                     maxVA: 7000,
                     maxVar: 7000,
                 },
@@ -181,7 +181,7 @@ describe('generateDerSample', () => {
             nameplate: {
                 maxVA: 14000,
                 maxVar: 14000,
-                maxW: 14000,
+                maxW: 12500,
                 type: 4,
             },
             settings: {

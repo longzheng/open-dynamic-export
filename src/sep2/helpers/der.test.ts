@@ -22,7 +22,7 @@ describe('getDerCapabilityResponse', () => {
         const derSample: Pick<DerSample, 'nameplate'> = {
             nameplate: {
                 type: DERTyp.PV,
-                maxW: 5000,
+                maxW: 4000,
                 maxVA: 5000,
                 maxVar: 5000,
             },
@@ -45,7 +45,7 @@ describe('getDerCapabilityResponse', () => {
                 multiplier: 3,
             },
             rtgMaxW: {
-                value: 5,
+                value: 4,
                 multiplier: 3,
             },
             rtgVNom: undefined,
