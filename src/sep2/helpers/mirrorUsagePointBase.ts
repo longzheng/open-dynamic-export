@@ -25,6 +25,10 @@ import { UsagePointBaseStatus } from '../models/usagePointBaseStatus.js';
 import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import { objectToXml } from './xml.js';
 
+const MIN_INT16 = -32768;
+const MAX_INT16 = 32767;
+const DEFAULT_POWER_OF_TEN_MULTIPLIER = 0;
+
 export type MirrorMeterReadingDefinitions = Required<
     Pick<MirrorMeterReading, 'description'> & {
         ReadingType: Required<
@@ -35,7 +39,6 @@ export type MirrorMeterReadingDefinitions = Required<
                 | 'dataQualifier'
                 | 'flowDirection'
                 | 'phase'
-                | 'powerOfTenMultiplier'
                 | 'uom'
             >
         >;
@@ -282,27 +285,29 @@ export abstract class MirrorUsagePointHelperBase<
                         return null;
                     }
 
+                    const readingDefinition =
+                        mirrorMeterReadingDefinitions[key];
+                    const scaledReadingValue = scaleReadingValueToInt16({
+                        value,
+                    });
+
                     return {
                         mRID: this.getReadingMrid(key),
-                        description:
-                            mirrorMeterReadingDefinitions[key].description,
+                        description: readingDefinition.description,
                         lastUpdateTime: interval.start,
                         nextUpdateTime: interval.end,
                         Reading: {
-                            // the value must not contain a decimal point
-                            // shift the base value by the power of 10 multiplier
-                            value: Math.round(
-                                numberWithPow10(
-                                    value,
-                                    -mirrorMeterReadingDefinitions[key]
-                                        .ReadingType.powerOfTenMultiplier,
-                                ),
-                            ),
+                            value: scaledReadingValue.value,
 
                             timePeriod: {
                                 start: interval.start,
                                 duration: interval.intervalSeconds,
                             },
+                        },
+                        ReadingType: {
+                            ...readingDefinition.ReadingType,
+                            powerOfTenMultiplier:
+                                scaledReadingValue.powerOfTenMultiplier,
                         },
                     };
                 })
@@ -340,7 +345,10 @@ export abstract class MirrorUsagePointHelperBase<
                 return {
                     mRID: this.getReadingMrid(key),
                     description: readingDefinition.description,
-                    ReadingType: readingDefinition.ReadingType,
+                    ReadingType: {
+                        ...readingDefinition.ReadingType,
+                        powerOfTenMultiplier: DEFAULT_POWER_OF_TEN_MULTIPLIER,
+                    },
                 };
             },
         );
@@ -472,4 +480,51 @@ export abstract class MirrorUsagePointHelperBase<
 
         return response;
     }
+}
+
+export function scaleReadingValueToInt16({
+    value,
+    powerOfTenMultiplier = DEFAULT_POWER_OF_TEN_MULTIPLIER,
+}: {
+    value: number;
+    powerOfTenMultiplier?: number;
+}) {
+    if (!Number.isFinite(value)) {
+        throw new Error('Reading value must be a finite number');
+    }
+
+    if (!Number.isFinite(powerOfTenMultiplier)) {
+        throw new Error('powerOfTenMultiplier must be a finite number');
+    }
+
+    let scaledPowerOfTenMultiplier = powerOfTenMultiplier;
+    let scaledValue = scaleReadingValue({
+        value,
+        powerOfTenMultiplier: scaledPowerOfTenMultiplier,
+    });
+
+    while (scaledValue < MIN_INT16 || scaledValue > MAX_INT16) {
+        scaledPowerOfTenMultiplier++;
+        scaledValue = scaleReadingValue({
+            value,
+            powerOfTenMultiplier: scaledPowerOfTenMultiplier,
+        });
+    }
+
+    return {
+        value: scaledValue,
+        powerOfTenMultiplier: scaledPowerOfTenMultiplier,
+    };
+}
+
+function scaleReadingValue({
+    value,
+    powerOfTenMultiplier,
+}: {
+    value: number;
+    powerOfTenMultiplier: number;
+}) {
+    // The Reading value must be an integer Int16. Shift the physical value by
+    // the ReadingType multiplier and round to the nearest representable value.
+    return Math.round(numberWithPow10(value, -powerOfTenMultiplier));
 }
