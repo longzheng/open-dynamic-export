@@ -54,18 +54,14 @@ export class DerHelper {
 
     configureDer(config: Config) {
         this.logger.debug({ config }, 'Updated DerHelper with config');
+        const previousPollRate = this.config?.pollRate;
         this.config = config;
 
-        if (!this.scheduledDerStatusTimer) {
-            this.scheduledDerStatusTimer = setTimeout(
-                () => {
-                    void this.scheduledDerStatus();
-                },
-                this.config.pollRate
-                    ? this.config.pollRate * 1000
-                    : // fallback to default poll rate for EndDeviceList
-                      defaultPollPushRates.endDeviceListPoll * 1000,
-            );
+        if (
+            !this.scheduledDerStatusTimer ||
+            previousPollRate !== config.pollRate
+        ) {
+            this.queueScheduledDerStatus();
         }
     }
 
@@ -121,10 +117,13 @@ export class DerHelper {
         }
     }
 
-    private async scheduledDerStatus() {
+    private async updateDerStatus() {
+        // don't wait for putDerStatus to complete, in case destroy is called while we're waiting
+        this.queueScheduledDerStatus();
+
         try {
             if (!this.lastSentDerStatus) {
-                throw new Error('DER status has not been cached');
+                return;
             }
 
             await this.putDerStatus({ derStatus: this.lastSentDerStatus });
@@ -134,6 +133,26 @@ export class DerHelper {
                 'Error updating DER status during scheduled poll',
             );
         }
+    }
+
+    private queueScheduledDerStatus() {
+        if (!this.config) {
+            throw new Error('DerHelper config is not set');
+        }
+
+        if (this.scheduledDerStatusTimer) {
+            clearTimeout(this.scheduledDerStatusTimer);
+        }
+
+        this.scheduledDerStatusTimer = setTimeout(
+            () => {
+                void this.updateDerStatus();
+            },
+            this.config.pollRate
+                ? this.config.pollRate * 1000
+                : // fallback to default poll rate for EndDeviceList
+                  defaultPollPushRates.endDeviceListPoll * 1000,
+        );
     }
 
     private async putDerCapability({
