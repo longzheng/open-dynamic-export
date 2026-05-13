@@ -118,6 +118,9 @@ export class DerHelper {
     }
 
     private async updateDerStatus() {
+        // don't wait for putDerStatus to complete, in case destroy is called while we're waiting
+        this.queueScheduledDerStatus();
+
         try {
             if (!this.lastSentDerStatus) {
                 throw new Error('DER status has not been cached');
@@ -130,8 +133,6 @@ export class DerHelper {
                 'Error updating DER status during scheduled poll',
             );
         }
-
-        this.queueScheduledDerStatus();
     }
 
     private queueScheduledDerStatus() {
