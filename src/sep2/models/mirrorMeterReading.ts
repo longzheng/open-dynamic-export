@@ -113,7 +113,7 @@ export function generateMirrorMeterReadingObject(
                           ? ReadingType.intervalLength
                           : undefined,
                   kind: ReadingType.kind,
-                  // the SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
+                  // the Energex SEP2 server can't seem to handle phase code 0 even though it is documented as a valid value
                   // conditionally set phase if it's not 0
                   phase:
                       ReadingType.phase !== PhaseCode.NotApplicable
