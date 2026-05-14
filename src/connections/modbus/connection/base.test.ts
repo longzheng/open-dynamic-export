@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ModbusSchema } from '../../../helpers/config.js';
+import type { ModbusSchema } from '../../../helpers/configSchema.js';
 import { ModbusConnection } from './base.js';
 
 vi.mock('modbus-serial');

@@ -4,7 +4,7 @@ import { ConnectStatusValue } from '../../sep2/models/connectStatus.js';
 import { OperationalModeStatusValue } from '../../sep2/models/operationModeStatus.js';
 import { InverterDataPollerBase } from '../inverterDataPollerBase.js';
 import type { InverterConfiguration } from '../../coordinator/helpers/inverterController.js';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { numberWithPow10 } from '../../helpers/number.js';
 import { SmaConnection } from '../../connections/modbus/connection/sma.js';
 import type { SmaCore1GridMsModels } from '../../connections/modbus/models/sma/core1/gridMs.js';

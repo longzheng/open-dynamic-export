@@ -1,5 +1,5 @@
 import mqtt from 'mqtt';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import type { ActiveInverterControlLimit } from './inverterController.js';
 
 export class Publish {

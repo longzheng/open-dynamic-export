@@ -1,7 +1,7 @@
 import type { InferOutput } from 'valibot';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { SiteSample } from '../siteSample.js';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { getPowerwall2Client } from '../../connections/powerwall2/getClient.js';
 import type { Powerwall2Client } from '../../connections/powerwall2/client.js';
 import type { metersSiteSchema } from '../../connections/powerwall2/api.js';
