@@ -7,7 +7,7 @@ import {
     getWMaxLimPctFromTargetSolarPowerRatio,
     type InverterConfiguration,
 } from '../../coordinator/helpers/inverterController.js';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { InverterSunSpecConnection } from '../../connections/sunspec/connection/inverter.js';
 import { getInverterMetrics } from '../../connections/sunspec/helpers/inverterMetrics.js';
 import { getNameplateMetrics } from '../../connections/sunspec/helpers/nameplateMetrics.js';

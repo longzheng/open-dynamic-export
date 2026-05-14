@@ -6,7 +6,7 @@ import { generateDerSample } from '../../coordinator/helpers/derSample.js';
 import type { InverterData } from '../../inverter/inverterData.js';
 import type { Result } from '../../helpers/result.js';
 import type { InverterDataPollerBase } from '../../inverter/inverterDataPollerBase.js';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { SunSpecInverterDataPoller } from '../../inverter/sunspec/index.js';
 import { SmaInverterDataPoller } from '../../inverter/sma/index.js';
 import { MqttInverterDataPoller } from '../../inverter/mqtt/index.js';

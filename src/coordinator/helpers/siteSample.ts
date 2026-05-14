@@ -1,4 +1,4 @@
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { MqttSiteSamplePoller } from '../../meters/mqtt/index.js';
 import { Powerwall2SiteSamplePoller } from '../../meters/powerwall2/index.js';
 import { SunSpecMeterSiteSamplePoller } from '../../meters/sunspec/index.js';

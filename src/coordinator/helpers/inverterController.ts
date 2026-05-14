@@ -16,7 +16,7 @@ import {
     objectEntriesWithType,
     objectFromEntriesWithType,
 } from '../../helpers/object.js';
-import type { Config, SetpointKeys } from '../../helpers/config.js';
+import type { Config, SetpointKeys } from '../../helpers/configSchema.js';
 import { cappedChange } from '../../helpers/math.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { timeWeightedAverage } from '../../helpers/timeWeightedAverage.js';

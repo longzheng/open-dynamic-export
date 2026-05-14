@@ -2,7 +2,7 @@ import type { SiteSample } from '../siteSample.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import { assertNonNull } from '../../helpers/null.js';
 import type { InvertersPoller } from '../../coordinator/helpers/inverterSample.js';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
 import { MeterSunSpecConnection } from '../../connections/sunspec/connection/meter.js';
 import { getMeterMetrics } from '../../connections/sunspec/helpers/meterMetrics.js';
