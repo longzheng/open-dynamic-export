@@ -4,6 +4,7 @@ import { generateMockDERControl } from '../../../tests/sep2/DERControl.js';
 import { generateMockDERProgram } from '../../../tests/sep2/DERProgram.js';
 import { generateMockFunctionSetAssignments } from '../../../tests/sep2/FunctionSetAssignments.js';
 import { mockCert, mockKey } from '../../../tests/sep2/cert.js';
+import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { SEP2Client } from '../client.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import type { MergedControlsData } from './derControls.js';
@@ -141,9 +142,15 @@ describe('generateControlsSchedule', () => {
         primacy: 2,
     });
 
+    const createSupersededControlMRIDs = () =>
+        new CappedArrayStack<string>({
+            limit: 1000,
+        });
+
     it('should generate schedule from no controls', () => {
         const result = generateControlsSchedule({
             activeOrScheduledControlsOfType: [],
+            supersededControlMRIDs: createSupersededControlMRIDs(),
         });
 
         expect(result).toStrictEqual([] satisfies ControlSchedule[]);
@@ -174,6 +181,7 @@ describe('generateControlsSchedule', () => {
 
         const result = generateControlsSchedule({
             activeOrScheduledControlsOfType: [controlA],
+            supersededControlMRIDs: createSupersededControlMRIDs(),
         });
 
         expect(result.length).toStrictEqual(1);
@@ -253,6 +261,7 @@ describe('generateControlsSchedule', () => {
 
         const result = generateControlsSchedule({
             activeOrScheduledControlsOfType: [controlA, controlB, controlC],
+            supersededControlMRIDs: createSupersededControlMRIDs(),
         });
 
         expect(result.length).toStrictEqual(3);
@@ -282,7 +291,7 @@ describe('generateControlsSchedule', () => {
         );
     });
 
-    it('should generate schedule from multiple overlapping control', () => {
+    it('should not resume superseded overlapping controls', () => {
         const controlA: MergedControlsData = {
             fsa,
             program: programPrimacy2,
@@ -374,9 +383,10 @@ describe('generateControlsSchedule', () => {
                 controlC,
                 controlD,
             ],
+            supersededControlMRIDs: createSupersededControlMRIDs(),
         });
 
-        expect(result.length).toStrictEqual(5);
+        expect(result.length).toStrictEqual(3);
 
         expect(result[0]?.mRID).toStrictEqual(controlA.control.mRID);
         expect(result[0]?.startInclusive).toStrictEqual(
@@ -401,22 +411,64 @@ describe('generateControlsSchedule', () => {
         expect(result[2]?.endExclusive).toStrictEqual(
             new Date('2024-01-01T00:00:06Z'),
         );
+    });
 
-        expect(result[3]?.mRID).toStrictEqual(controlD.control.mRID);
-        expect(result[3]?.startInclusive).toStrictEqual(
-            new Date('2024-01-01T00:00:06Z'),
-        );
-        expect(result[3]?.endExclusive).toStrictEqual(
-            new Date('2024-01-01T00:00:07Z'),
-        );
+    it('should remember superseded controls across schedule generation', () => {
+        const supersededControlMRIDs = createSupersededControlMRIDs();
 
-        expect(result[4]?.mRID).toStrictEqual(controlA.control.mRID);
-        expect(result[4]?.startInclusive).toStrictEqual(
-            new Date('2024-01-01T00:00:07Z'),
-        );
-        expect(result[4]?.endExclusive).toStrictEqual(
-            new Date('2024-01-01T00:00:10Z'),
-        );
+        const oldControl = {
+            fsa,
+            program: programPrimacy1,
+            control: generateMockDERControl({
+                creationTime: new Date('2024-01-01T00:00:00Z'),
+                interval: {
+                    start: new Date('2024-01-01T00:00:00Z'),
+                    duration: 20 * 60,
+                },
+                derControlBase: {
+                    opModExpLimW: {
+                        value: 200,
+                        multiplier: 0,
+                    },
+                },
+            }),
+        } satisfies MergedControlsData;
+
+        const supersedingControl = {
+            fsa,
+            program: programPrimacy1,
+            control: generateMockDERControl({
+                creationTime: new Date('2024-01-01T00:05:00Z'),
+                interval: {
+                    start: new Date('2024-01-01T00:05:00Z'),
+                    duration: 5 * 60,
+                },
+                derControlBase: {
+                    opModExpLimW: {
+                        value: 50,
+                        multiplier: 0,
+                    },
+                },
+            }),
+        } satisfies MergedControlsData;
+
+        const firstResult = generateControlsSchedule({
+            activeOrScheduledControlsOfType: [oldControl, supersedingControl],
+            supersededControlMRIDs,
+        });
+
+        expect(firstResult.map((schedule) => schedule.mRID)).toStrictEqual([
+            oldControl.control.mRID,
+            supersedingControl.control.mRID,
+        ]);
+        expect(supersededControlMRIDs.get()).toContain(oldControl.control.mRID);
+
+        const secondResult = generateControlsSchedule({
+            activeOrScheduledControlsOfType: [oldControl],
+            supersededControlMRIDs,
+        });
+
+        expect(secondResult).toStrictEqual([]);
     });
 });
 
@@ -640,6 +692,72 @@ describe('applyRandomizationToControlSchedule', () => {
         expect(result[2]?.effectiveEndExclusive).toStrictEqual(
             new Date('2024-01-01T00:00:30Z'),
         );
+    });
+
+    it('clips a preserved active schedule when a newer schedule splits it', () => {
+        const activeControlSchedule: RandomizedControlSchedule = {
+            mRID: 'controlA',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
+            startInclusive: new Date('2024-01-01T00:00:00Z'),
+            endExclusive: new Date('2024-01-01T00:20:00Z'),
+            randomizeStart: undefined,
+            randomizeDuration: undefined,
+            effectiveStartInclusive: new Date('2024-01-01T00:00:00Z'),
+            effectiveEndExclusive: new Date('2024-01-01T00:20:00Z'),
+        };
+
+        const controlABeforeSupersedingControl: ControlSchedule = {
+            ...activeControlSchedule,
+            endExclusive: new Date('2024-01-01T00:07:00Z'),
+        };
+
+        const controlB: ControlSchedule = {
+            mRID: 'controlB',
+            derControlBase: {},
+            replyToHref: '',
+            responseRequired: ResponseRequiredType.EndUserResponse,
+            startInclusive: new Date('2024-01-01T00:07:00Z'),
+            endExclusive: new Date('2024-01-01T00:12:00Z'),
+            randomizeStart: undefined,
+            randomizeDuration: undefined,
+        };
+
+        const controlAAfterSupersedingControl: ControlSchedule = {
+            ...activeControlSchedule,
+            startInclusive: new Date('2024-01-01T00:12:00Z'),
+        };
+
+        const result = applyRandomizationToControlSchedule({
+            controlSchedules: [
+                controlABeforeSupersedingControl,
+                controlB,
+                controlAAfterSupersedingControl,
+            ],
+            activeControlSchedule,
+        });
+
+        expect(result).toHaveLength(3);
+        expect(result[0]?.mRID).toBe('controlA');
+        expect(result[0]?.effectiveEndExclusive).toStrictEqual(
+            new Date('2024-01-01T00:07:00Z'),
+        );
+        expect(result[1]?.mRID).toBe('controlB');
+        expect(result[1]?.effectiveStartInclusive).toStrictEqual(
+            new Date('2024-01-01T00:07:00Z'),
+        );
+        expect(result[2]?.mRID).toBe('controlA');
+
+        const activeAtSupersedingControlStart = result.filter(
+            (control) =>
+                control.effectiveStartInclusive <=
+                    new Date('2024-01-01T00:08:00Z') &&
+                control.effectiveEndExclusive >
+                    new Date('2024-01-01T00:08:00Z'),
+        );
+
+        expect(activeAtSupersedingControlStart).toStrictEqual([result[1]]);
     });
 
     it('non-successive events with randomization should not cause conflicts', () => {

@@ -34,7 +34,7 @@ describe('generateDerSample', () => {
                 },
                 nameplate: {
                     type: DERTyp.PV,
-                    maxW: 7000,
+                    maxW: 6000,
                     maxVA: 7000,
                     maxVar: 7000,
                 },
@@ -76,7 +76,7 @@ describe('generateDerSample', () => {
             nameplate: {
                 maxVA: 7000,
                 maxVar: 7000,
-                maxW: 7000,
+                maxW: 6000,
                 type: 4,
             },
             settings: {
@@ -114,7 +114,7 @@ describe('generateDerSample', () => {
                 },
                 nameplate: {
                     type: DERTyp.PV,
-                    maxW: 7000,
+                    maxW: 6000,
                     maxVA: 7000,
                     maxVar: 7000,
                 },
@@ -144,7 +144,7 @@ describe('generateDerSample', () => {
                 },
                 nameplate: {
                     type: DERTyp.PV,
-                    maxW: 7000,
+                    maxW: 6500,
                     maxVA: 7000,
                     maxVar: 7000,
                 },
@@ -182,7 +182,7 @@ describe('generateDerSample', () => {
             nameplate: {
                 maxVA: 14000,
                 maxVar: 14000,
-                maxW: 14000,
+                maxW: 12500,
                 type: 4,
             },
             settings: {
@@ -201,6 +201,20 @@ describe('generateDerSample', () => {
             invertersCount: 2,
             battery: null,
         } satisfies typeof result);
+    });
+
+    it('should use finite status fallbacks when no inverters are connected', () => {
+        const now = new Date('2023-01-01T10:05:00Z');
+        vi.setSystemTime(now);
+
+        const result = generateDerSample({ invertersData: [] });
+
+        expect(result.status.operationalModeStatus).toBe(
+            OperationalModeStatusValue.Off,
+        );
+        expect(result.status.genConnectStatus).toBe(0);
+        expect(Number.isFinite(result.status.operationalModeStatus)).toBe(true);
+        expect(Number.isFinite(result.status.genConnectStatus)).toBe(true);
     });
 });
 
