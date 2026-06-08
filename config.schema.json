@@ -689,6 +689,10 @@
             "topic": {
               "type": "string",
               "description": "The topic to publish limits"
+            },
+            "csipAusControlSchedules": {
+              "type": "string",
+              "description": "The topic to publish CSIP-AUS control schedules. Defaults to \"<topic>/csipAus/schedules\"."
             }
           },
           "required": [
@@ -698,7 +702,7 @@
         }
       },
       "required": [],
-      "description": "Publish active control limits"
+      "description": "Publish active control limits and schedules"
     },
     "battery": {
       "type": "object",
