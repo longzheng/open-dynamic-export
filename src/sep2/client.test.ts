@@ -108,7 +108,7 @@ describe('generateMeterReadingMrid', () => {
     });
 });
 
-describe('axios-retry', () => {
+describe('fetch retry', () => {
     let failThreeRequestCount = 0;
 
     beforeEach(() => {

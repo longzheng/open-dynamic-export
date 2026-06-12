@@ -1,6 +1,5 @@
 import type { Logger } from 'pino';
-import { isNetworkError, isRetryableError } from 'axios-retry';
-import { AxiosError } from 'axios';
+import { FetchHttpError } from '../../helpers/fetch.js';
 import {
     getMillisecondsToNextUtcIntervalTick,
     getUtcTickStart,
@@ -22,7 +21,7 @@ import type { SampleBase } from '../../coordinator/helpers/sampleBase.js';
 import { objectEntriesWithType } from '../../helpers/object.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { UsagePointBaseStatus } from '../models/usagePointBaseStatus.js';
-import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
+import { sanitizeFetchError } from '../../helpers/sanitizeFetchError.js';
 import { objectToXml } from './xml.js';
 
 const MIN_INT16 = -32768;
@@ -186,7 +185,9 @@ export abstract class MirrorUsagePointHelperBase<
             this.queueMirrorMeterReadingPost();
         } catch (error) {
             this.logger.debug(
-                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                error instanceof FetchHttpError
+                    ? sanitizeFetchError(error)
+                    : error,
                 'Failed to create MirrorUsagePoint',
             );
             this.state = { type: 'none' };
@@ -419,8 +420,8 @@ export abstract class MirrorUsagePointHelperBase<
                 successCount++;
             } catch (error) {
                 this.logger.debug(
-                    error instanceof AxiosError
-                        ? sanitizeAxiosError(error)
+                    error instanceof FetchHttpError
+                        ? sanitizeFetchError(error)
                         : error,
                     'Failed to post MirrorMeterReading',
                 );
@@ -467,12 +468,9 @@ export abstract class MirrorUsagePointHelperBase<
             this.state.mirrorUsagePoint.href,
             xml,
             {
-                'axios-retry': {
-                    // by default axios-retry will not retry POST errors
+                retry: {
                     // we know these calls are idempotent so we can retry them
-                    retryCondition: (error) => {
-                        return isNetworkError(error) || isRetryableError(error);
-                    },
+                    retries: 5,
                 },
                 signal: this.abortController.signal,
             },

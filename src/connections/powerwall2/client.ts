@@ -1,10 +1,13 @@
-import * as https from 'node:https';
+import { Agent } from 'undici';
 import type { Logger } from 'pino';
-import type { AxiosRequestConfig, AxiosInstance } from 'axios';
-import axios, { AxiosError } from 'axios';
 import * as v from 'valibot';
 import { pinoLogger } from '../../helpers/logger.js';
-import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
+import {
+    FetchHttpError,
+    fetchWithError,
+    type FetchRequestConfig,
+} from '../../helpers/fetch.js';
+import { sanitizeFetchError } from '../../helpers/sanitizeFetchError.js';
 import {
     meterAggregatesSchema,
     metersSiteSchema,
@@ -13,7 +16,9 @@ import {
 
 export class Powerwall2Client {
     private logger: Logger;
-    private axiosInstance: AxiosInstance;
+    private baseUrl: string;
+    private dispatcher: Agent;
+    private timeoutMilliseconds: number;
     private password: string;
     private token:
         | { type: 'none' }
@@ -32,13 +37,12 @@ export class Powerwall2Client {
         this.password = password;
 
         this.logger = pinoLogger.child({ module: 'Powerwall2' });
-
-        this.axiosInstance = axios.create({
-            baseURL: `https://${ip}`,
-            httpsAgent: new https.Agent({
+        this.baseUrl = `https://${ip}`;
+        this.timeoutMilliseconds = timeoutSeconds * 1000;
+        this.dispatcher = new Agent({
+            connect: {
                 rejectUnauthorized: false,
-            }),
-            timeout: timeoutSeconds * 1000,
+            },
         });
 
         // prefetch token
@@ -71,6 +75,15 @@ export class Powerwall2Client {
         return data;
     }
 
+    private getSignal(signal?: AbortSignal) {
+        return signal
+            ? AbortSignal.any([
+                  AbortSignal.timeout(this.timeoutMilliseconds),
+                  signal,
+              ])
+            : AbortSignal.timeout(this.timeoutMilliseconds);
+    }
+
     private async getToken() {
         switch (this.token.type) {
             case 'cached':
@@ -80,18 +93,24 @@ export class Powerwall2Client {
             case 'none': {
                 const promise = (async () => {
                     try {
-                        const response = await this.axiosInstance.post(
-                            `/api/login/Basic`,
-                            {
+                        const response = await fetchWithError<{
+                            token: string;
+                        }>(`${this.baseUrl}/api/login/Basic`, {
+                            method: 'POST',
+                            dispatcher: this.dispatcher,
+                            signal: this.getSignal(),
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
                                 username: 'customer',
                                 // the email doesn't seem to actually matter when logging in as customer
                                 email: 'a@a.com',
                                 password: this.password,
-                            },
-                        );
+                            }),
+                        });
 
-                        // oxlint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                        const token = response.data.token as string;
+                        const token = response.data.token;
 
                         this.token = { type: 'cached', token };
 
@@ -100,8 +119,8 @@ export class Powerwall2Client {
                         this.logger.error(
                             {
                                 error:
-                                    error instanceof AxiosError
-                                        ? sanitizeAxiosError(error)
+                                    error instanceof FetchHttpError
+                                        ? sanitizeFetchError(error)
                                         : error,
                             },
                             'Powerwall2 login error',
@@ -122,12 +141,15 @@ export class Powerwall2Client {
 
     private async get(
         url: string,
-        options?: Omit<AxiosRequestConfig<never>, 'headers'>,
+        options?: Omit<FetchRequestConfig<never>, 'headers'>,
         retryCount = 0,
     ): Promise<unknown> {
         try {
-            const response = await this.axiosInstance.get<string>(url, {
+            const response = await fetchWithError(`${this.baseUrl}${url}`, {
                 ...options,
+                dispatcher: this.dispatcher,
+                signal: this.getSignal(options?.signal ?? undefined),
+                method: 'GET',
                 headers: {
                     Cookie: `AuthCookie=${await this.getToken()}`,
                 },
@@ -135,7 +157,7 @@ export class Powerwall2Client {
 
             return response.data;
         } catch (error) {
-            if (error instanceof AxiosError && error.response) {
+            if (error instanceof FetchHttpError && error.response) {
                 this.logger.error(error, 'Powerwall2 API get error');
 
                 // permissions error
