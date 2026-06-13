@@ -1,6 +1,6 @@
 import mqtt from 'mqtt';
 import * as v from 'valibot';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { SiteSamplePollerBase } from '../siteSamplePollerBase.js';
 import type { SiteSampleData, SiteSample } from '../siteSample.js';
 import { siteSampleDataSchema } from '../siteSample.js';

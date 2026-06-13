@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as v from 'valibot';
-import { configSchema } from './config.js';
+import { configSchema } from './configSchema.js';
 
 describe('Config Validation - Battery Control Conflicts', () => {
     const createValidBaseConfig = () => ({

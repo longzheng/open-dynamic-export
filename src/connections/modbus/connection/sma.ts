@@ -29,7 +29,7 @@ import {
     SmaCore1InverterControl2Model,
 } from '../models/sma/core1/inverterControl.js';
 import { getModbusConnection } from '../connections.js';
-import type { ModbusSchema } from '../../../helpers/config.js';
+import type { ModbusSchema } from '../../../helpers/configSchema.js';
 import type { ModbusConnection } from './base.js';
 
 export class SmaConnection {

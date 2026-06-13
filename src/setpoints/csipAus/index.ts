@@ -4,7 +4,7 @@ import type {
     SupportedControlTypes,
 } from '../../coordinator/helpers/inverterController.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
-import type { Config } from '../../helpers/config.js';
+import type { Config } from '../../helpers/configSchema.js';
 import { env } from '../../helpers/env.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { pinoLogger } from '../../helpers/logger.js';
