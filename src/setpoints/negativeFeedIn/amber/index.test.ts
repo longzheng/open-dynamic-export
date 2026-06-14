@@ -50,7 +50,8 @@ describe('AmberSetpoint', () => {
     });
 
     it('should return correct control limit when feed-in costs money', async () => {
-        vi.setSystemTime(new Date('2024-09-04T01:00:01Z'));
+        // feedIn interval 2026-06-04T03:35:01Z → 03:40:00Z, perKwh = +7.29877
+        vi.setSystemTime(new Date('2026-06-04T03:37:00Z'));
 
         // give the polling a chance to finish
         await vi.advanceTimersToNextTimerAsync();
@@ -69,7 +70,8 @@ describe('AmberSetpoint', () => {
     });
 
     it('should return no control limit when feed-in earns money', async () => {
-        vi.setSystemTime(new Date('2024-09-04T10:00:01Z'));
+        // feedIn interval 2026-06-04T08:00:01Z → 08:05:00Z, perKwh = -9.11103
+        vi.setSystemTime(new Date('2026-06-04T08:02:00Z'));
 
         // give the polling a chance to finish
         await vi.advanceTimersToNextTimerAsync();
@@ -97,9 +99,9 @@ describe('AmberSetpoint', () => {
         // from the pre-fix "no current interval → no curtail" branch.
         //
         // Mock fixture has adjacent feedIn intervals at this boundary:
-        //   2024-09-04T04:00:01Z → 04:30:00Z  perKwh = +2.09587 (curtail)
-        //   2024-09-04T04:30:01Z → 05:00:00Z  perKwh = −0.59540 (no curtail)
-        vi.setSystemTime(new Date('2024-09-04T04:30:00.500Z'));
+        //   2026-06-04T04:40:01Z → 04:45:00Z  perKwh = +0.30820 (curtail)
+        //   2026-06-04T04:45:01Z → 04:50:00Z  perKwh = −3.99000 (no curtail)
+        vi.setSystemTime(new Date('2026-06-04T04:45:00.500Z'));
 
         // give the polling a chance to finish
         await vi.advanceTimersToNextTimerAsync();
