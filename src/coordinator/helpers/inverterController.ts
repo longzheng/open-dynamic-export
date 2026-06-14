@@ -149,6 +149,7 @@ export class InverterController {
     private abortController: AbortController;
     private batteryChargeBufferWatts: number | null = null;
     private batteryPowerFlowControlEnabled: boolean;
+    private batteryAcceptanceHeadroomWatts: number;
     // Ramped battery export target — smooths transitions when MQTT changes
     // the export target (e.g. 0 → 3000W), preventing abrupt battery swings
     // that cause hybrid inverters (e.g. Fronius) to curtail PV to protect the DC bus.
@@ -191,6 +192,8 @@ export class InverterController {
             config.battery?.chargeBufferWatts ?? null;
         this.batteryPowerFlowControlEnabled =
             config.inverterControl.batteryPowerFlowControl;
+        this.batteryAcceptanceHeadroomWatts =
+            config.inverterControl.batteryAcceptanceHeadroomWatts;
         this.setpoints = setpoints;
         this.logger = pinoLogger.child({ module: 'InverterController' });
         this.abortController = new AbortController();
@@ -527,6 +530,8 @@ export class InverterController {
                 maxInvertersCount,
                 batteryPowerFlowControlEnabled:
                     this.batteryPowerFlowControlEnabled,
+                batteryAcceptanceHeadroomWatts:
+                    this.batteryAcceptanceHeadroomWatts,
                 batterySocPercent,
                 currentBatteryPowerWatts: this.smoothedCurrentBatteryPowerWatts,
                 batteryInverterSolarW,
@@ -678,6 +683,7 @@ export function calculateInverterConfiguration({
     nameplateMaxW,
     maxInvertersCount,
     batteryPowerFlowControlEnabled,
+    batteryAcceptanceHeadroomWatts,
     batterySocPercent,
     currentBatteryPowerWatts,
     batteryInverterSolarW,
@@ -690,6 +696,8 @@ export function calculateInverterConfiguration({
     nameplateMaxW: number;
     maxInvertersCount: number;
     batteryPowerFlowControlEnabled: boolean;
+    /** Slack above observed battery acceptance allowed by PV target when export is restricted. */
+    batteryAcceptanceHeadroomWatts?: number;
     batterySocPercent: number | null;
     currentBatteryPowerWatts: number;
     /** Current PV output of battery-hosting inverters, for hybrid PV-loss check. */
@@ -760,6 +768,7 @@ export function calculateInverterConfiguration({
             batteryExportTargetWatts:
                 activeInverterControlLimit.batteryExportTargetWatts?.value,
             batteryInverterSolarW,
+            batteryAcceptanceHeadroomWatts,
         };
 
         const batteryFlowResult = calculateBatteryPowerFlow(batteryFlowInput);

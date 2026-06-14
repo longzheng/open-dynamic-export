@@ -95,6 +95,7 @@ describe('DerHelper', () => {
                     ConnectStatusValue.Connected | ConnectStatusValue.Available,
             },
             invertersCount: 1,
+            battery: null,
         });
 
         await vi.advanceTimersByTimeAsync(2_000);

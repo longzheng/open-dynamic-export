@@ -1570,4 +1570,175 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetExportWatts).toBe(0);
         });
     });
+
+    describe('export-restricted cap on PV target', () => {
+        it('should cap PV target by observed acceptance + headroom when export is blocked and battery cannot accept full commanded charge', () => {
+            // High PV, modest load, exportLimit=0 (negativeFeedIn). ODE
+            // would command 12.5kW charge but the battery only accepts ~4kW
+            // (hard hardware ceiling, BMS protection, absorption, etc.).
+            // Without the cap PV is allowed up to load + 12500 + 0 and the
+            // unaccepted 8000W spills to grid despite the limit. With the
+            // cap PV is limited to load + (4000 + 250 headroom) + 0.
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 14000,
+                siteWatts: -8500, // exporting 8500W: load 1500W, battery only takes 4000W of the 13.5kW available
+                batterySocPercent: 98,
+                batteryTargetSocPercent: 100,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 15000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 0, // negativeFeedIn active
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 4000, // observed acceptance ceiling
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryAcceptanceHeadroomWatts: 250,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = -(-8500) + 4000 = 12500 → commanded charge 12500
+            // loadWatts = 14000 + (-8500) - min(4000, 0) = 5500
+            // exportRestricted: exportLimitWatts (0) < 500 → cap applies
+            // observedAcceptance = 4000, headroom = 250 → cap = 4250
+            // targetBatteryChargeWatts (for PV target) = min(12500, 4250) = 4250
+            // targetSolarWatts = 5500 + 4250 + 0 = 9750
+            //
+            // Without the cap targetSolarWatts would be 5500 + 12500 + 0 = 18000,
+            // which would over-export by ~8250W.
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetSolarWatts).toBe(9750);
+        });
+
+        it('should not cap PV target when export is allowed', () => {
+            // Same constrained acceptance as above, but exportLimitWatts is
+            // large. Surplus PV beyond battery acceptance should be allowed
+            // to export at the prevailing wholesale price.
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 14000,
+                siteWatts: -8500,
+                batterySocPercent: 98,
+                batteryTargetSocPercent: 100,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 15000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000, // export allowed
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 4000,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // exportLimitWatts (10000) >= 500 → no cap
+            // commanded charge = min(12500, maxChargePower 15000) = 12500
+            // loadWatts = 5500
+            // targetSolarWatts = 5500 + 12500 + 10000 = 28000
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetSolarWatts).toBe(28000);
+        });
+
+        it('should allow headroom for ramp-up from idle when export is blocked', () => {
+            // Battery idle (observed = 0) at the moment an export-restricted
+            // window begins. The headroom must let PV produce at least
+            // load + headroom so the battery has signal to start accepting —
+            // otherwise observed=0 would lock the cap at 0 forever.
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 6000,
+                siteWatts: -4500, // load = 1500, exporting 4500
+                batterySocPercent: 60,
+                batteryTargetSocPercent: 100,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 15000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 0,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0, // idle
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryAcceptanceHeadroomWatts: 250,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // observedAcceptance = 0, headroom = 250 → cap = 250
+            // commanded charge = 4500
+            // targetBatteryChargeWatts (for PV target) = min(4500, 250) = 250
+            // targetSolarWatts = load + 250 + 0 = 1750
+            expect(result.targetSolarWatts).toBe(1750);
+        });
+
+        it('should default to 100W headroom when batteryAcceptanceHeadroomWatts is not specified', () => {
+            // Same scenario as the first test but with the headroom field
+            // omitted — relies on the default.
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 14000,
+                siteWatts: -8500,
+                batterySocPercent: 98,
+                batteryTargetSocPercent: 100,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 15000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 0,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 4000,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                // batteryAcceptanceHeadroomWatts omitted → default 100W
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // observedAcceptance = 4000, default headroom = 100 → cap = 4100
+            // commanded charge = 12500
+            // loadWatts = 5500
+            // targetSolarWatts = 5500 + 4100 + 0 = 9600
+            expect(result.targetSolarWatts).toBe(9600);
+        });
+
+        it('should be a no-op when commanded charge is already at or below observed acceptance + headroom', () => {
+            // Small commanded charge (e.g., near-full battery, modest PV
+            // surplus). Observed acceptance covers commanded → cap doesn't
+            // bite, calculator behaves as if uncapped.
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 2000,
+                siteWatts: -100, // load = 1900, exporting 100
+                batterySocPercent: 99,
+                batteryTargetSocPercent: 100,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 15000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 0,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 600, // observed acceptance well above commanded
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = 100 + 600 = 700 → commanded charge 700
+            // observedAcceptance = 600, headroom = 250 → cap = 850
+            // min(700, 850) = 700 (no-op — cap is above commanded)
+            // loadWatts = 2000 + (-100) - 0 = 1900
+            // targetSolarWatts = 1900 + 700 + 0 = 2600
+            expect(result.targetSolarWatts).toBe(2600);
+        });
+    });
 });

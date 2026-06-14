@@ -53,6 +53,10 @@ export type BatteryPowerFlowInput = {
     // When set, the battery discharges enough to cover house load AND export this
     // amount to the grid. When undefined/0, only self-consumption (zero grid import).
     batteryExportTargetWatts?: number | undefined;
+    // Slack above recently-observed battery acceptance allowed by the PV target
+    // when export is restricted. See the cap logic below for the rationale.
+    // Defaults to 100W when undefined.
+    batteryAcceptanceHeadroomWatts?: number | undefined;
 };
 
 const logger: Logger = pinoLogger.child({
@@ -89,6 +93,7 @@ export function calculateBatteryPowerFlow(
         batteryGridChargingMaxWatts,
         batteryExportTargetWatts,
         batteryInverterSolarW,
+        batteryAcceptanceHeadroomWatts,
     } = input;
 
     logger.trace({ input }, 'Calculating battery power flow');
@@ -293,7 +298,42 @@ export function calculateBatteryPowerFlow(
     // load and exit the self-consumption discharge regime once light permits.
     const dischargeContributionToAC = Math.min(currentBatteryPowerWatts, 0);
     const loadWatts = solarWatts + siteWatts - dischargeContributionToAC;
-    const targetBatteryChargeWatts = Math.max(0, targetBatteryPowerWatts);
+
+    // When export is restricted (opModExpLimW small or zero — typically
+    // during negativeFeedIn or a tight DER limit), cap the PV-target's
+    // battery-charge headroom by recently-observed battery acceptance.
+    //
+    // Commanded charge can exceed what the battery+inverter system will
+    // actually absorb for several reasons: hard hardware charge ceilings,
+    // constant-voltage absorption near full SoC, BMS protection, thermal
+    // derating, etc. Using the commanded value as the PV ceiling lets the
+    // unaccepted surplus spill to the grid — and when export is blocked,
+    // that surplus is exported anyway, defeating the purpose of the limit.
+    //
+    // When export is allowed (normal operation), no cap is needed — any
+    // surplus PV beyond what the battery accepts simply exports at the
+    // prevailing wholesale price, which is the desired behaviour.
+    //
+    // A small constant headroom above observed acceptance lets an idle or
+    // freshly-started battery (observed ≈ 0) ramp up: each cycle the
+    // smoothed observed value rises toward the cap, the cap rises with it,
+    // and the system climbs into its true acceptance ceiling within a few
+    // EMA time constants.
+    const EXPORT_RESTRICTED_THRESHOLD_WATTS = 500;
+    const DEFAULT_ACCEPTANCE_HEADROOM_WATTS = 100;
+    const acceptanceHeadroomWatts =
+        batteryAcceptanceHeadroomWatts ?? DEFAULT_ACCEPTANCE_HEADROOM_WATTS;
+    const commandedBatteryChargeWatts = Math.max(0, targetBatteryPowerWatts);
+    const exportRestricted =
+        exportLimitWatts < EXPORT_RESTRICTED_THRESHOLD_WATTS;
+    const observedAcceptanceWatts = Math.max(0, currentBatteryPowerWatts);
+    const targetBatteryChargeWatts = exportRestricted
+        ? Math.min(
+              commandedBatteryChargeWatts,
+              observedAcceptanceWatts + acceptanceHeadroomWatts,
+          )
+        : commandedBatteryChargeWatts;
+
     const targetSolarWatts = calculateTargetSolarWatts({
         loadWatts,
         targetBatteryChargeWatts,

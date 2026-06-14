@@ -347,6 +347,12 @@ const configObjectSchema = v.object({
                 'Enable intelligent battery power flow control (consumption → battery → export). When disabled, uses simple battery charge buffer instead.',
             ),
         ),
+        batteryAcceptanceHeadroomWatts: v.pipe(
+            v.optional(v.pipe(v.number(), v.minValue(0)), 100),
+            v.description(
+                `When export is restricted (e.g., during negativeFeedIn or a tight DER limit), the PV target is capped at the battery's recently-observed acceptance plus this headroom. The headroom lets an idle battery ramp up to its true acceptance ceiling — but anything between observed acceptance and the cap can briefly leak to grid before the battery responds. Larger values ramp faster; smaller values are stricter about export compliance. Set to 0 for strict zero export (battery cannot charge from solar while opModExpLimW=0). Users on dynamic export connections should not set this high, as it may violate connection-agreement limits during the ramp window.`,
+            ),
+        ),
         sampleSeconds: v.pipe(
             v.optional(v.pipe(v.number(), v.minValue(0)), 5),
             v.description(
