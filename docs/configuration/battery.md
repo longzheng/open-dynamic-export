@@ -71,10 +71,11 @@ Enable battery power flow control in `config.json`:
 
 #### Global Settings (`inverterControl`)
 
-| Parameter                 | Type    | Default | Description                        |
-| ------------------------- | ------- | ------- | ---------------------------------- |
-| `batteryControlEnabled`   | boolean | false   | Enable battery control system      |
-| `batteryPowerFlowControl` | boolean | false   | Use intelligent power flow control |
+| Parameter                        | Type    | Default | Description                                                                                                |
+| -------------------------------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| `batteryControlEnabled`          | boolean | false   | Enable battery control system                                                                              |
+| `batteryPowerFlowControl`        | boolean | false   | Use intelligent power flow control                                                                         |
+| `batteryAcceptanceHeadroomWatts` | number  | 100     | Slack (watts) allowed above the battery's observed acceptance when export is restricted. See section below |
 
 #### Per-Inverter Settings (`inverters[]`)
 
@@ -242,6 +243,46 @@ In addition to export, the battery always covers self-consumption (reducing grid
     "batterySocTargetPercent": 100
 }
 ```
+
+### Battery Acceptance Headroom
+
+When export is restricted (for example, during an Amber `negativeFeedIn` window or a tight DER limit setting `opModExpLimW` near zero), the controller caps the PV target at the battery's recently-observed acceptance rate plus a small headroom. This prevents PV from over-producing relative to what the battery can actually absorb, which would otherwise spill the unaccepted surplus to the grid in violation of the export limit.
+
+The headroom is the slack above observed acceptance and is controlled by `inverterControl.batteryAcceptanceHeadroomWatts` (default `100`).
+
+#### Why headroom is needed
+
+The commanded battery charge rate can exceed what the battery + inverter system will actually absorb, for several reasons:
+
+- **Hardware ceilings** — most installations have a continuous-charge ceiling well below the inverter nameplate maximum (often dictated by the battery's continuous current rating or the inverter's DC port)
+- **Absorption near full SoC** — at high SoC the BMS holds actual acceptance below the commanded rate while voltage is held constant and current naturally falls
+- **BMS protection** — temperature, cell balance, or fault states can reduce acceptance transiently
+- **Thermal derating** — high-temperature operation reduces sustained charge power
+
+When export is allowed, this gap is harmless — surplus PV just exports at the prevailing wholesale price. When export is blocked or restricted, that same gap appears as unwanted grid export.
+
+A small headroom above observed acceptance lets an idle or freshly-started battery ramp up — the controller produces a little more PV than the battery currently absorbs, the battery sees the surplus and accepts more, the smoothed observed value rises, and the cap rises with it.
+
+#### Trade-off
+
+| Headroom | Ramp from idle to 9 kW acceptance | Steady-state residual leak (when export blocked) |
+| -------- | --------------------------------- | ------------------------------------------------ |
+| 0 W      | does not ramp from idle           | 0 W                                              |
+| 50 W     | ~7.5 minutes                      | up to 50 W                                       |
+| 100 W    | ~3.75 minutes                     | up to 100 W                                      |
+| 250 W    | ~1.5 minutes                      | up to 250 W                                      |
+| 500 W    | ~45 seconds                       | up to 500 W                                      |
+
+Smaller values are stricter about export compliance but ramp slower. Larger values ramp faster but allow more transient leakage during the ramp window and small steady-state leakage at the acceptance ceiling.
+
+Setting `0` disables the headroom entirely — under strict zero export the battery cannot start charging from solar at all (an idle battery sees zero PV surplus and never gets the chance to begin accepting). Use only if your DER agreement absolutely cannot tolerate any transient overshoot.
+
+> [!IMPORTANT]
+> Users on dynamic export connections should not set this high, as the headroom may exceed connection-agreement limits during the ramp window. The default `100` is a conservative starting point matching the legacy `chargeBufferWatts` convention.
+
+#### When the cap is active
+
+The cap only applies when `opModExpLimW` is below approximately `500W` (the "export restricted" threshold). When export is freely allowed, no cap is applied and the controller behaves as before — any surplus PV beyond battery acceptance is allowed to export.
 
 ### MQTT Dynamic Control
 
