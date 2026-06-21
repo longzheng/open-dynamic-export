@@ -43,9 +43,6 @@ describe('Publish', () => {
         expect(publishMock).toHaveBeenCalledWith(
             'limits/csipAus/schedules',
             JSON.stringify(emptySchedules),
-            {
-                retain: true,
-            },
         );
     });
 
@@ -69,13 +66,10 @@ describe('Publish', () => {
         expect(publishMock).toHaveBeenCalledWith(
             'csip/schedules',
             JSON.stringify(emptySchedules),
-            {
-                retain: true,
-            },
         );
     });
 
-    it('does not publish unchanged CSIP-AUS control schedules repeatedly', () => {
+    it('publishes unchanged CSIP-AUS control schedules repeatedly', () => {
         const publisher = new Publish({
             config: {
                 publish: {
@@ -94,10 +88,20 @@ describe('Publish', () => {
             schedules: emptySchedules,
         });
 
-        expect(publishMock).toHaveBeenCalledTimes(1);
+        expect(publishMock).toHaveBeenCalledTimes(2);
+        expect(publishMock).toHaveBeenNthCalledWith(
+            1,
+            'limits/csipAus/schedules',
+            JSON.stringify(emptySchedules),
+        );
+        expect(publishMock).toHaveBeenNthCalledWith(
+            2,
+            'limits/csipAus/schedules',
+            JSON.stringify(emptySchedules),
+        );
     });
 
-    it('does not publish unchanged active inverter control limits repeatedly', () => {
+    it('publishes unchanged active inverter control limits repeatedly', () => {
         const publisher = new Publish({
             config: {
                 publish: {
@@ -116,7 +120,17 @@ describe('Publish', () => {
             limit: { ...activeInverterControlLimit },
         });
 
-        expect(publishMock).toHaveBeenCalledTimes(1);
+        expect(publishMock).toHaveBeenCalledTimes(2);
+        expect(publishMock).toHaveBeenNthCalledWith(
+            1,
+            'limits',
+            JSON.stringify(activeInverterControlLimit),
+        );
+        expect(publishMock).toHaveBeenNthCalledWith(
+            2,
+            'limits',
+            JSON.stringify(activeInverterControlLimit),
+        );
     });
 });
 

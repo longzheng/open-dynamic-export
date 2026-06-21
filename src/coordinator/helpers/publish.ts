@@ -8,9 +8,7 @@ export class Publish {
         | {
               client: mqtt.MqttClient;
               activeInverterControlLimitTopic: string;
-              activeInverterControlLimitPayload: string | null;
               csipAusControlSchedulesTopic: string;
-              csipAusControlSchedulesPayload: string | null;
           }
         | undefined;
 
@@ -22,11 +20,9 @@ export class Publish {
                     password: config.publish.mqtt.password,
                 }),
                 activeInverterControlLimitTopic: config.publish.mqtt.topic,
-                activeInverterControlLimitPayload: null,
                 csipAusControlSchedulesTopic:
                     config.publish.mqtt.csipAusControlSchedules ??
                     `${config.publish.mqtt.topic}/csipAus/schedules`,
-                csipAusControlSchedulesPayload: null,
             };
         }
     }
@@ -39,18 +35,10 @@ export class Publish {
         if (this.mqtt) {
             const payload = JSON.stringify(limit);
 
-            if (payload === this.mqtt.activeInverterControlLimitPayload) {
-                return;
-            }
-
             this.mqtt.client.publish(
                 this.mqtt.activeInverterControlLimitTopic,
                 payload,
-                {
-                    retain: true,
-                },
             );
-            this.mqtt.activeInverterControlLimitPayload = payload;
         }
     }
 
@@ -62,18 +50,10 @@ export class Publish {
         if (this.mqtt) {
             const payload = JSON.stringify(schedules);
 
-            if (payload === this.mqtt.csipAusControlSchedulesPayload) {
-                return;
-            }
-
             this.mqtt.client.publish(
                 this.mqtt.csipAusControlSchedulesTopic,
                 payload,
-                {
-                    retain: true,
-                },
             );
-            this.mqtt.csipAusControlSchedulesPayload = payload;
         }
     }
 }
