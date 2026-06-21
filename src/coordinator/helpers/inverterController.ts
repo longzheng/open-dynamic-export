@@ -184,6 +184,12 @@ export class InverterController {
             limit: activeInverterControlLimit,
         });
 
+        if (this.setpoints.csipAus) {
+            this.publish.onCsipAusControlSchedules({
+                schedules: this.setpoints.csipAus.getControlSchedules(),
+            });
+        }
+
         this.controlLimitsCache = {
             controlLimitsBySetpoint,
             activeInverterControlLimit,

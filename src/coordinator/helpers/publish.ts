@@ -1,9 +1,16 @@
 import mqtt from 'mqtt';
 import type { Config } from '../../helpers/configSchema.js';
+import type { CsipAusControlSchedules } from '../../setpoints/csipAus/index.js';
 import type { ActiveInverterControlLimit } from './inverterController.js';
 
 export class Publish {
-    private mqtt: { client: mqtt.MqttClient; topic: string } | undefined;
+    private mqtt:
+        | {
+              client: mqtt.MqttClient;
+              activeInverterControlLimitTopic: string;
+              csipAusControlSchedulesTopic: string;
+          }
+        | undefined;
 
     constructor({ config }: { config: Pick<Config, 'publish'> }) {
         if (config.publish?.mqtt) {
@@ -12,7 +19,10 @@ export class Publish {
                     username: config.publish.mqtt.username,
                     password: config.publish.mqtt.password,
                 }),
-                topic: config.publish.mqtt.topic,
+                activeInverterControlLimitTopic: config.publish.mqtt.topic,
+                csipAusControlSchedulesTopic:
+                    config.publish.mqtt.csipAusControlSchedules ??
+                    `${config.publish.mqtt.topic}/csipAus/schedules`,
             };
         }
     }
@@ -23,7 +33,27 @@ export class Publish {
         limit: ActiveInverterControlLimit;
     }) {
         if (this.mqtt) {
-            this.mqtt.client.publish(this.mqtt.topic, JSON.stringify(limit));
+            const payload = JSON.stringify(limit);
+
+            this.mqtt.client.publish(
+                this.mqtt.activeInverterControlLimitTopic,
+                payload,
+            );
+        }
+    }
+
+    onCsipAusControlSchedules({
+        schedules,
+    }: {
+        schedules: CsipAusControlSchedules;
+    }) {
+        if (this.mqtt) {
+            const payload = JSON.stringify(schedules);
+
+            this.mqtt.client.publish(
+                this.mqtt.csipAusControlSchedulesTopic,
+                payload,
+            );
         }
     }
 }
