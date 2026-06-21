@@ -12,7 +12,9 @@ You can access the API documentation/OpenAPI schema at `http://<host>:3000/docs`
 
 ## MQTT
 
-Write active limits to a MQTT topic.
+Write active limits and CSIP-AUS control schedules to MQTT topics.
+Published MQTT messages use the retain flag, so new subscribers receive the
+latest active limit and control schedule payloads immediately after subscribing.
 
 To configure a MQTT output, add the following property to `config.json`
 
