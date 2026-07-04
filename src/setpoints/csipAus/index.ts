@@ -306,6 +306,10 @@ export class CsipAusSetpoint implements SetpointType {
         };
     }
 
+    getSetGradW(): number {
+        return this.rampRateHelper.getDerSettingsSetGradW();
+    }
+
     getStatus() {
         return {
             connected: this.connected,

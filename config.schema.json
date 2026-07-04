@@ -690,9 +690,9 @@
               "type": "string",
               "description": "The topic to publish limits"
             },
-            "csipAusControlSchedules": {
+            "csipAus": {
               "type": "string",
-              "description": "The topic to publish CSIP-AUS control schedules. Defaults to \"<topic>/csipAus/schedules\"."
+              "description": "The base topic to publish CSIP-AUS data. Defaults to \"<topic>/csipAus\"."
             }
           },
           "required": [
