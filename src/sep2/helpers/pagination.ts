@@ -1,11 +1,10 @@
-import type { AxiosRequestConfig } from 'axios';
-import type { SEP2Client } from '../client.js';
+import type { SEP2Client, SEP2RequestConfig } from '../client.js';
 import type { List } from '../models/list.js';
 
 export interface PaginationOptions<T extends List> {
     client: SEP2Client;
     url: string;
-    options?: Omit<AxiosRequestConfig<never>, 'params'>;
+    options?: Omit<SEP2RequestConfig<never>, 'params'>;
     parseXml: (xml: unknown) => T;
     getItems: (result: T) => unknown[];
     limit?: number;

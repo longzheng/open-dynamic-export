@@ -1,13 +1,16 @@
 import type { Logger } from 'pino';
 import deepEqual from 'fast-deep-equal';
-import { AxiosError, type AxiosRequestConfig } from 'axios';
+import {
+    FetchHttpError,
+    type FetchRequestConfig,
+} from '../../helpers/fetch.js';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { generateDerControlResponse } from '../models/derControlResponse.js';
 import { ResponseRequiredType } from '../models/responseRequired.js';
 import { CappedArrayStack } from '../../helpers/cappedArrayStack.js';
 import { ResponseStatus } from '../models/responseStatus.js';
-import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
+import { sanitizeFetchError } from '../../helpers/sanitizeFetchError.js';
 import { objectToXml } from './xml.js';
 
 type HistoryKey = {
@@ -58,7 +61,7 @@ export class DerControlResponseHelper {
         replyToHref: string | undefined;
         mRID: string;
         status: ResponseStatus;
-        requestConfig?: AxiosRequestConfig;
+        requestConfig?: FetchRequestConfig;
     }) {
         // if the DERControl does not require any response, we do not respond
         if (responseRequired === (0 as ResponseRequiredType)) {
@@ -112,8 +115,8 @@ export class DerControlResponseHelper {
             this.logger.error(
                 {
                     error:
-                        error instanceof AxiosError
-                            ? sanitizeAxiosError(error)
+                        error instanceof FetchHttpError
+                            ? sanitizeFetchError(error)
                             : error,
                     mRID,
                     status,

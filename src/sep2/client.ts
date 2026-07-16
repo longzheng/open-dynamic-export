@@ -1,10 +1,13 @@
-import * as https from 'node:https';
 import { createHash } from 'node:crypto';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import axios from 'axios';
+import { Agent } from 'undici';
 import { parseStringPromise } from 'xml2js';
-import axiosRetry, { exponentialDelay } from 'axios-retry';
 import { numberToHex } from '../helpers/number.js';
+import {
+    buildUrl,
+    fetchWithError,
+    type FetchClientResponse,
+    type FetchRequestConfig,
+} from '../helpers/fetch.js';
 import {
     getCertificateFingerprint,
     getCertificateLfdi,
@@ -14,12 +17,15 @@ import type { RoleFlagsType } from './models/roleFlagsType.js';
 
 const USER_AGENT = 'open-dynamic-export';
 
+export type SEP2RequestConfig<TBody = unknown> = FetchRequestConfig<TBody>;
+export type SEP2Response<TData = unknown> = FetchClientResponse<TData>;
+
 export class SEP2Client {
     private readonly host: string;
     public readonly pen: string;
     public readonly lfdi: string;
     public readonly sfdi: string;
-    private readonly axiosInstance: AxiosInstance;
+    private readonly dispatcher: Agent;
 
     constructor({
         host,
@@ -40,42 +46,48 @@ export class SEP2Client {
         this.lfdi = getCertificateLfdi(certificateFingerprint);
         this.sfdi = getCertificateSfdi(certificateFingerprint);
 
-        const axiosClient = axios.create({
-            baseURL: this.host,
-            headers: {
-                'User-Agent': USER_AGENT,
-                Accept: 'application/sep+xml',
-                'Content-Type': 'application/sep+xml',
-            },
-            httpsAgent: new https.Agent({
+        this.dispatcher = new Agent({
+            connect: {
                 cert,
                 key,
                 // the device certificate will have the full chain
                 ca: cert,
                 // ignore certificate errors
                 rejectUnauthorized: false,
-                // the IEEE2023.5 certifiate does not have the host name as the certificate altnames
+                // the IEEE2023.5 certificate does not have the host name as the certificate altnames
                 // bypass the server identity check
                 checkServerIdentity: () => undefined,
-            }),
+            },
         });
+    }
 
-        // exponential backoff retry
-        axiosRetry(axiosClient, {
-            retries: 5,
-            retryDelay: (retryCount, error) =>
-                exponentialDelay(retryCount, error, 100),
-        });
-
-        this.axiosInstance = axiosClient;
+    private getDefaultConfig<TBody>(): SEP2RequestConfig<TBody> {
+        return {
+            dispatcher: this.dispatcher,
+            headers: {
+                'User-Agent': USER_AGENT,
+                Accept: 'application/sep+xml',
+                'Content-Type': 'application/sep+xml',
+            },
+        };
     }
 
     async get(
         link: string,
-        options?: AxiosRequestConfig<never>,
+        options?: SEP2RequestConfig<never>,
     ): Promise<unknown> {
-        const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.get<string>(url, options);
+        const url = buildUrl(this.host, link);
+        const response = await fetchWithError<string, never>(url, {
+            ...this.getDefaultConfig(),
+            ...options,
+            headers: {
+                ...this.getDefaultConfig().headers,
+                ...options?.headers,
+            },
+            method: 'GET',
+            // exponential backoff retry
+            retry: options?.retry ?? { retries: 5 },
+        });
 
         return await parseStringPromise(response.data);
     }
@@ -83,22 +95,37 @@ export class SEP2Client {
     async post<T>(
         link: string,
         data: T,
-        options?: AxiosRequestConfig<T>,
-    ): Promise<AxiosResponse> {
-        const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.post(url, data, options);
-        return response;
+        options?: SEP2RequestConfig<T>,
+    ): Promise<SEP2Response> {
+        const url = buildUrl(this.host, link);
+        return await fetchWithError(url, {
+            ...this.getDefaultConfig<T>(),
+            ...options,
+            headers: {
+                ...this.getDefaultConfig().headers,
+                ...options?.headers,
+            },
+            method: 'POST',
+            body: data,
+        });
     }
 
     async put<T>(
         link: string,
         data: T,
-        options?: AxiosRequestConfig<T>,
-    ): Promise<AxiosResponse> {
-        const url = `${this.host}${link}`;
-        const response = await this.axiosInstance.put(url, data, options);
-
-        return response;
+        options?: SEP2RequestConfig<T>,
+    ): Promise<SEP2Response> {
+        const url = buildUrl(this.host, link);
+        return await fetchWithError(url, {
+            ...this.getDefaultConfig<T>(),
+            ...options,
+            headers: {
+                ...this.getDefaultConfig().headers,
+                ...options?.headers,
+            },
+            method: 'PUT',
+            body: data,
+        });
     }
 
     // From the SEP2 Client Handbook

@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import deepEqual from 'fast-deep-equal';
-import { AxiosError } from 'axios';
+import { FetchHttpError } from '../../helpers/fetch.js';
 import { defaultPollPushRates, type SEP2Client } from '../client.js';
 import type { DER } from '../models/der.js';
 import type { DERCapability } from '../models/derCapability.js';
@@ -17,7 +17,7 @@ import { DERControlType } from '../models/derControlType.js';
 import { convertNumberToBaseAndPow10Exponent } from '../../helpers/number.js';
 import { DOEControlType } from '../models/doeModesSupportedType.js';
 import type { DerSample } from '../../coordinator/helpers/derSample.js';
-import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
+import { sanitizeFetchError } from '../../helpers/sanitizeFetchError.js';
 import type { RampRateHelper } from './rampRate.js';
 import { objectToXml } from './xml.js';
 
@@ -129,7 +129,9 @@ export class DerHelper {
             await this.putDerStatus({ derStatus: this.lastSentDerStatus });
         } catch (error) {
             this.logger.error(
-                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                error instanceof FetchHttpError
+                    ? sanitizeFetchError(error)
+                    : error,
                 'Error updating DER status during scheduled poll',
             );
         }
@@ -179,7 +181,9 @@ export class DerHelper {
             await this.client.put(this.config.der.derCapabilityLink.href, xml);
         } catch (error) {
             this.logger.error(
-                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                error instanceof FetchHttpError
+                    ? sanitizeFetchError(error)
+                    : error,
                 'Error updating DER capability',
             );
 
@@ -212,7 +216,9 @@ export class DerHelper {
             await this.client.put(this.config.der.derSettingsLink.href, xml);
         } catch (error) {
             this.logger.error(
-                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                error instanceof FetchHttpError
+                    ? sanitizeFetchError(error)
+                    : error,
                 'Error updating DER settings',
             );
 
@@ -241,7 +247,9 @@ export class DerHelper {
             await this.client.put(this.config.der.derStatusLink.href, xml);
         } catch (error) {
             this.logger.error(
-                error instanceof AxiosError ? sanitizeAxiosError(error) : error,
+                error instanceof FetchHttpError
+                    ? sanitizeFetchError(error)
+                    : error,
                 'Error updating DER status',
             );
 

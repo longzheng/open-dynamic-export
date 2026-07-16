@@ -44,8 +44,6 @@
         "@tanstack/react-router": "^1.157.14",
         "@tsoa/runtime": "7.0.0-alpha.0",
         "async-mutex": "^0.5.0",
-        "axios": "1.12.2",
-        "axios-retry": "^4.5.0",
         "chart.js": "^4.5.1",
         "chartjs-adapter-date-fns": "^3.0.0",
         "chartjs-plugin-annotation": "^3.1.0",
@@ -74,6 +72,7 @@
         "tailwindcss": "3.4.13",
         "tsoa": "^6.6.0",
         "tsx": "^4.21.0",
+        "undici": "^6.21.3",
         "valibot": "^1.2.0",
         "vite-express": "^0.22.0",
         "xml2js": "^0.6.2"

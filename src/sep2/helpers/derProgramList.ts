@@ -1,7 +1,7 @@
 import EventEmitter from 'node:events';
 import * as v from 'valibot';
 import type { Logger } from 'pino';
-import { AxiosError } from 'axios';
+import { FetchHttpError } from '../../helpers/fetch.js';
 import type { SEP2Client } from '../client.js';
 import { defaultPollPushRates } from '../client.js';
 import {
@@ -16,7 +16,7 @@ import {
 import { parseDerControlListXml } from '../models/derControlList.js';
 import { derControlSchema } from '../models/derControl.js';
 import { pinoLogger } from '../../helpers/logger.js';
-import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
+import { sanitizeFetchError } from '../../helpers/sanitizeFetchError.js';
 import { getListAll } from './pagination.js';
 import { PollableResource } from './pollableResource.js';
 
@@ -121,8 +121,8 @@ export class DerProgramListHelper extends EventEmitter<{
                             this.emit('data', result);
                         } catch (error) {
                             this.logger.error(
-                                error instanceof AxiosError
-                                    ? sanitizeAxiosError(error)
+                                error instanceof FetchHttpError
+                                    ? sanitizeFetchError(error)
                                     : error,
                                 'Error processing DerProgramList data',
                             );
