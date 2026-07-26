@@ -73,9 +73,10 @@ export const derSampleDataSchema = v.object({
             totalCurrentBatteryPowerWatts: v.nullable(v.number()),
             // Number of inverters with battery storage
             batteryCount: v.number(),
-            // Current solar output of battery-hosting inverters.
-            // On hybrid inverters, battery discharge can curtail PV entirely.
-            // Used to check if discharge would be a net loss (lose more PV than gained).
+            // True PV output of battery-hosting inverters (battery AC
+            // contribution removed). On hybrid inverters, battery discharge can
+            // curtail PV entirely. Used to check if discharge would be a net
+            // loss (lose more PV than gained).
             batteryInverterSolarW: v.number(),
         }),
     ),
@@ -208,7 +209,18 @@ export function generateDerSample({
                 batteryCount: batteryInverters.length,
                 batteryInverterSolarW: sumNumbersArray(
                     batteryInverters.map((data) =>
-                        Math.max(0, data.inverter.realPower),
+                        // inverter.realPower is net AC (PV − battery charge, or
+                        // PV + battery discharge), so back out the battery's AC
+                        // contribution to recover true PV. Without this, at night
+                        // realPower is pure battery discharge and gets misread as
+                        // "solar", which makes the discharge-net-positive guard
+                        // oscillate. currentBatteryPowerWatts: positive =
+                        // discharging, negative = charging.
+                        Math.max(
+                            0,
+                            data.inverter.realPower -
+                                (data.storage?.currentBatteryPowerWatts ?? 0),
+                        ),
                     ),
                 ),
             };

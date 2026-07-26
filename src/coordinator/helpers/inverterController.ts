@@ -367,10 +367,18 @@ export class InverterController {
             return null;
         }
 
+        // The battery-flow calculator's loadWatts/targetSolar formulas assume
+        // solarWatts is PV-only. On a hybrid, realPower.net is net AC (PV −
+        // battery charge, or PV + battery discharge), so back out the battery's
+        // AC contribution to recover true PV. Otherwise loadWatts double-counts
+        // discharge (e.g. at night load was reported ~2x actual).
+        // totalCurrentBatteryPowerWatts: positive = discharging, negative = charging.
         const averagedSolarWatts = timeWeightedAverage(
             recentDerSamples.map((s) => ({
                 timestamp: s.date,
-                value: s.realPower.net,
+                value:
+                    s.realPower.net -
+                    (s.battery?.totalCurrentBatteryPowerWatts ?? 0),
             })),
         );
         const averagedSiteWatts = timeWeightedAverage(

@@ -1020,6 +1020,51 @@ describe('calculateBatteryPowerFlow', () => {
             expect(result.targetExportWatts).toBe(2000);
         });
 
+        it('should hold the export target steady at night with true (zero) PV', () => {
+            // Regression: at night the battery's own discharge AC output was
+            // misread as batteryInverterSolarW ("solar"), so the discharge-
+            // net-positive guard compared the export need against the battery's
+            // own output and flipped the export target 0↔3000 every cycle
+            // (observed ~2s bang-bang in the field). With true PV (≈0 at night)
+            // the guard's hybridPvLoss===0 short-circuit holds the target steady.
+            const nightInput: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 0, // battery covering load, grid balanced
+                batterySocPercent: 80,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 0,
+                batteryDischargeMaxWatts: 8500,
+                exportLimitWatts: Number.MAX_SAFE_INTEGER,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: 0, // true PV at night (post-fix)
+                batteryPriorityMode: 'export_first',
+                currentBatteryPowerWatts: -2000, // discharging to cover ~load
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryExportTargetWatts: 3000,
+            };
+
+            const result = calculateBatteryPowerFlow(nightInput);
+
+            // availablePower = -0 + (-2000) = -2000 → self-consumption 2000;
+            // export need 3000, guard passes (hybridPvLoss 0) → discharge 5000.
+            expect(result.batteryMode).toBe('discharge');
+            expect(result.targetExportWatts).toBe(3000);
+            expect(result.targetBatteryPowerWatts).toBe(-5000);
+
+            // Contrast — the pre-fix bug fed the discharge AC output as
+            // batteryInverterSolarW. With the export need (3000) below that
+            // phantom "PV" (3500), the guard zeroes the export target: the exact
+            // half of the 0↔3000 bang-bang.
+            const buggyResult = calculateBatteryPowerFlow({
+                ...nightInput,
+                batteryInverterSolarW: 3500,
+            });
+            expect(buggyResult.targetExportWatts).toBe(0);
+        });
+
         it('should not discharge when solar surplus already covers export target (gap-filling)', () => {
             const input: BatteryPowerFlowInput = {
                 solarWatts: 10000,

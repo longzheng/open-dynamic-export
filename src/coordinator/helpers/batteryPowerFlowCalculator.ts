@@ -98,15 +98,15 @@ export function calculateBatteryPowerFlow(
 
     logger.trace({ input }, 'Calculating battery power flow');
 
-    // Calculate available power for battery/export.
+    // Calculate available power for battery/export = PV generation minus load.
     //
-    // On hybrid inverters (PV + battery in one unit), solarWatts comes from the
-    // SunSpec Model 103 W register which reports net AC output: PV minus battery
-    // charging. So battery charge power is invisible to siteWatts — it's consumed
-    // inside the inverter before reaching the AC bus.
+    // On hybrid inverters (PV + battery in one unit), DC-coupled battery charge
+    // is consumed inside the inverter before the AC bus, so it's invisible to
+    // the site meter (siteWatts). To recover the TRUE available power (total PV
+    // minus load), we add back the current battery power:
+    // availablePower = -siteWatts + currentBatteryPowerWatts
     //
-    // To get the TRUE available power (total PV minus load), we add back the
-    // current battery power: availablePower = -siteWatts + currentBatteryPowerWatts
+    // (solarWatts is supplied as PV-only by the caller — see loadWatts below.)
     //
     // This breaks the feedback loop where limiting battery charge → lower AC output
     // → lower apparent available power → even lower battery charge target.

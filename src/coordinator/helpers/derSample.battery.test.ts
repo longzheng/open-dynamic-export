@@ -278,4 +278,77 @@ describe('generateDerSample - Battery Aggregation', () => {
             batteryInverterSolarW: 10000,
         });
     });
+
+    it('should exclude battery discharge from batteryInverterSolarW (true PV)', () => {
+        // On a hybrid, inverter.realPower is net AC. At night with no PV the
+        // battery's discharge shows up as positive realPower — it must NOT be
+        // counted as solar, otherwise the discharge-net-positive guard reads its
+        // own output as "PV" and oscillates.
+        const invertersData: InverterData[] = [
+            createMockInverterData({
+                inverter: {
+                    realPower: 2536, // net AC = pure battery discharge at night
+                    reactivePower: 0,
+                    voltagePhaseA: 240,
+                    voltagePhaseB: 240,
+                    voltagePhaseC: 240,
+                    frequency: 60,
+                },
+                storage: {
+                    stateOfChargePercent: 80,
+                    availableEnergyWh: 10000,
+                    batteryVoltage: 400,
+                    chargeStatus: ChaSt.DISCHARGING,
+                    maxChargeRateWatts: 5000,
+                    maxDischargeRateWatts: 5000,
+                    currentChargeRatePercent: null,
+                    currentDischargeRatePercent: 50,
+                    currentBatteryPowerWatts: 2462, // discharging (positive)
+                    minReservePercent: 20,
+                    gridChargingPermitted: ChaGriSet.PV,
+                },
+            }),
+        ];
+
+        const result = generateDerSample({ invertersData });
+
+        // realPower 2536 − discharge 2462 = 74 W of real PV (≈ 0 at night)
+        expect(result.battery?.batteryInverterSolarW).toBe(74);
+        expect(result.battery?.totalCurrentBatteryPowerWatts).toBe(2462);
+    });
+
+    it('should add back battery charge to batteryInverterSolarW (true PV)', () => {
+        // When charging, net AC understates PV (charge is consumed before the AC
+        // bus), so true PV = realPower + chargePower.
+        const invertersData: InverterData[] = [
+            createMockInverterData({
+                inverter: {
+                    realPower: 3000, // net AC = PV(5000) − charge(2000)
+                    reactivePower: 0,
+                    voltagePhaseA: 240,
+                    voltagePhaseB: 240,
+                    voltagePhaseC: 240,
+                    frequency: 60,
+                },
+                storage: {
+                    stateOfChargePercent: 50,
+                    availableEnergyWh: 8000,
+                    batteryVoltage: 400,
+                    chargeStatus: ChaSt.CHARGING,
+                    maxChargeRateWatts: 5000,
+                    maxDischargeRateWatts: 5000,
+                    currentChargeRatePercent: 40,
+                    currentDischargeRatePercent: null,
+                    currentBatteryPowerWatts: -2000, // charging (negative)
+                    minReservePercent: 20,
+                    gridChargingPermitted: ChaGriSet.PV,
+                },
+            }),
+        ];
+
+        const result = generateDerSample({ invertersData });
+
+        // realPower 3000 − (−2000) = 5000 W of real PV
+        expect(result.battery?.batteryInverterSolarW).toBe(5000);
+    });
 });
