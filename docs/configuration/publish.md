@@ -12,7 +12,9 @@ You can access the API documentation/OpenAPI schema at `http://<host>:3000/docs`
 
 ## MQTT
 
-Write active limits to a MQTT topic.
+Write active limits and CSIP-AUS data to MQTT topics.
+Published MQTT messages are not retained. Each update is published even if the
+payload has not changed.
 
 To configure a MQTT output, add the following property to `config.json`
 
@@ -23,14 +25,15 @@ To configure a MQTT output, add the following property to `config.json`
             "host": "mqtt://192.168.1.2", // (string) required: the MQTT broker host
             "username": "user", // (string) optional: the MQTT broker username
             "password": "password", // (string) optional: the MQTT broker password
-            "topic": "limits" // (string) required: the MQTT topic to write
+            "topic": "limits", // (string) required: the MQTT topic to write active limits to
+            "csipAus": "limits/csipAus" // (string) optional: the MQTT base topic to write CSIP-AUS data to
         }
     }
     ...
 }
 ```
 
-The MQTT topic will contain a JSON message that meets the following schema
+The active limits MQTT topic will contain a JSON message that meets the following schema
 
 ```jsonc
 {
@@ -74,6 +77,53 @@ The MQTT topic will contain a JSON message that meets the following schema
     "opModLoadLimW": {
         "value": 3000,
         "source": "batteryChargeBuffer",
+    },
+}
+```
+
+The CSIP-AUS base topic defaults to `<topic>/csipAus`.
+It contains a JSON message with the current CSIP-AUS inverter control limit,
+DERSettings `setGradW` value, and latest scheduled controls:
+
+```jsonc
+{
+    "limit": {
+        "source": "csipAus",
+        "opModEnergize": true,
+        "opModConnect": true,
+        "opModGenLimW": 5000,
+        "opModExpLimW": 5000,
+        "opModImpLimW": undefined,
+        "opModLoadLimW": undefined,
+    },
+    // DERSettings setGradW in hundredths of a percent per second.
+    // 28 means a 0.28% per second active power ramp rate.
+    "setGradW": 28,
+    "schedules": {
+        "opModExpLimW": [
+            {
+                "startInclusive": "2026-01-01T00:00:00.000Z",
+                "endExclusive": "2026-01-01T01:00:00.000Z",
+                "effectiveStartInclusive": "2026-01-01T00:00:00.000Z",
+                "effectiveEndExclusive": "2026-01-01T01:00:00.000Z",
+                "randomizeStart": undefined,
+                "randomizeDuration": undefined,
+                "mRID": "control-1",
+                "derControlBase": {
+                    "opModExpLimW": {
+                        "value": 5000,
+                        "multiplier": 0,
+                    },
+                },
+                "responseRequired": "00",
+                "replyToHref": "/edev/1/rsps",
+            },
+        ],
+        "opModGenLimW": [],
+        "opModImpLimW": [],
+        "opModLoadLimW": [],
+        "opModEnergize": [],
+        "opModConnect": [],
     },
 }
 ```

@@ -16,7 +16,10 @@ import {
     ControlLimitRampHelper,
     type ControlLimitRampTarget,
 } from '../../sep2/helpers/controlLimitRamp.js';
-import { ControlSchedulerHelper } from '../../sep2/helpers/controlScheduler.js';
+import {
+    ControlSchedulerHelper,
+    type RandomizedControlSchedule,
+} from '../../sep2/helpers/controlScheduler.js';
 import {
     DerControlsHelper,
     type DerControlsHelperChangedData,
@@ -38,6 +41,11 @@ import {
 } from '../../sep2/models/endDevice.js';
 import type { EndDeviceList } from '../../sep2/models/endDeviceList.js';
 import type { SetpointType } from '../setpoint.js';
+
+export type CsipAusControlSchedules = Record<
+    SupportedControlTypes,
+    RandomizedControlSchedule[]
+>;
 
 export class CsipAusSetpoint implements SetpointType {
     private schedulerByControlType: {
@@ -279,6 +287,27 @@ export class CsipAusSetpoint implements SetpointType {
 
     getSchedulerByControlType() {
         return this.schedulerByControlType;
+    }
+
+    getControlSchedules(): CsipAusControlSchedules {
+        return {
+            opModExpLimW:
+                this.schedulerByControlType.opModExpLimW.getControlSchedules(),
+            opModGenLimW:
+                this.schedulerByControlType.opModGenLimW.getControlSchedules(),
+            opModImpLimW:
+                this.schedulerByControlType.opModImpLimW.getControlSchedules(),
+            opModLoadLimW:
+                this.schedulerByControlType.opModLoadLimW.getControlSchedules(),
+            opModEnergize:
+                this.schedulerByControlType.opModEnergize.getControlSchedules(),
+            opModConnect:
+                this.schedulerByControlType.opModConnect.getControlSchedules(),
+        };
+    }
+
+    getSetGradW(): number {
+        return this.rampRateHelper.getDerSettingsSetGradW();
     }
 
     getStatus() {

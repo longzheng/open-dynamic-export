@@ -263,6 +263,14 @@ export class InverterController {
             limit: activeInverterControlLimit,
         });
 
+        if (this.setpoints.csipAus && controlLimitsBySetpoint.csipAus) {
+            this.publish.onCsipAus({
+                limit: controlLimitsBySetpoint.csipAus,
+                setGradW: this.setpoints.csipAus.getSetGradW(),
+                schedules: this.setpoints.csipAus.getControlSchedules(),
+            });
+        }
+
         this.controlLimitsCache = {
             controlLimitsBySetpoint,
             activeInverterControlLimit,

@@ -473,11 +473,17 @@ A longer time will smooth out load changes but may result in overshoot.`,
                             v.string(),
                             v.description('The topic to publish limits'),
                         ),
+                        csipAus: v.pipe(
+                            v.optional(v.string()),
+                            v.description(
+                                'The base topic to publish CSIP-AUS data. Defaults to "<topic>/csipAus".',
+                            ),
+                        ),
                     }),
                 ),
             }),
         ),
-        v.description('Publish active control limits'),
+        v.description('Publish active control limits and schedules'),
     ),
     battery: v.pipe(
         v.optional(
