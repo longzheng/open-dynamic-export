@@ -44,7 +44,7 @@ const modbusSchema = v.object({
 
 export type ModbusSchema = v.InferOutput<typeof modbusSchema>;
 
-export const configSchema = v.object({
+const configObjectSchema = v.object({
     setpoints: v.pipe(
         v.object({
             csipAus: v.pipe(
@@ -125,6 +125,76 @@ export const configSchema = v.object({
                             v.optional(v.pipe(v.number(), v.minValue(0))),
                             v.description('The load limit in watts'),
                         ),
+                        exportTargetWatts: v.pipe(
+                            v.optional(v.number()),
+                            v.description(
+                                'Desired export when no solar (from battery)',
+                            ),
+                        ),
+                        importTargetWatts: v.pipe(
+                            v.optional(v.number()),
+                            v.description(
+                                'Desired import for battery charging from grid',
+                            ),
+                        ),
+                        batterySocTargetPercent: v.pipe(
+                            v.optional(
+                                v.pipe(
+                                    v.number(),
+                                    v.minValue(0),
+                                    v.maxValue(100),
+                                ),
+                            ),
+                            v.description('Target state of charge %'),
+                        ),
+                        batterySocMinPercent: v.pipe(
+                            v.optional(
+                                v.pipe(
+                                    v.number(),
+                                    v.minValue(0),
+                                    v.maxValue(100),
+                                ),
+                            ),
+                            v.description('Minimum reserve %'),
+                        ),
+                        batterySocMaxPercent: v.pipe(
+                            v.optional(
+                                v.pipe(
+                                    v.number(),
+                                    v.minValue(0),
+                                    v.maxValue(100),
+                                ),
+                            ),
+                            v.description('Maximum charge %'),
+                        ),
+                        batteryChargeMaxWatts: v.pipe(
+                            v.optional(v.pipe(v.number(), v.minValue(0))),
+                            v.description(
+                                'Maximum charge rate (can override SunSpec)',
+                            ),
+                        ),
+                        batteryDischargeMaxWatts: v.pipe(
+                            v.optional(v.pipe(v.number(), v.minValue(0))),
+                            v.description(
+                                'Maximum discharge rate (can override SunSpec)',
+                            ),
+                        ),
+                        batteryPriorityMode: v.pipe(
+                            v.optional(
+                                v.picklist(['export_first', 'battery_first']),
+                            ),
+                            v.description(
+                                'Battery priority mode: export_first | battery_first',
+                            ),
+                        ),
+                        batteryGridChargingEnabled: v.pipe(
+                            v.optional(v.boolean()),
+                            v.description('Allow charging battery from grid'),
+                        ),
+                        batteryGridChargingMaxWatts: v.pipe(
+                            v.optional(v.pipe(v.number(), v.minValue(0))),
+                            v.description('Maximum grid charging rate'),
+                        ),
                     }),
                 ),
                 v.description('If defined, limits by manual configuration'),
@@ -183,6 +253,12 @@ export const configSchema = v.object({
                                 'The topic to pull control limits from',
                             ),
                         ),
+                        stalenessTimeoutSeconds: v.pipe(
+                            v.optional(v.pipe(v.number(), v.minValue(0))),
+                            v.description(
+                                'If set, MQTT setpoints are discarded if no message is received within this many seconds. Falls back to fixed setpoints. Acts as a dead-man switch for external automation.',
+                            ),
+                        ),
                     }),
                 ),
                 v.description('If defined, limit by MQTT'),
@@ -197,6 +273,12 @@ export const configSchema = v.object({
                     v.intersect([
                         v.object({
                             type: v.literal('sunspec'),
+                            batteryControlEnabled: v.pipe(
+                                v.optional(v.boolean()),
+                                v.description(
+                                    'Enable battery control for this inverter',
+                                ),
+                            ),
                         }),
                         modbusSchema,
                     ]),
@@ -252,6 +334,24 @@ export const configSchema = v.object({
         enabled: v.pipe(
             v.boolean(),
             v.description('Whether to control the inverters'),
+        ),
+        batteryControlEnabled: v.pipe(
+            v.optional(v.boolean()),
+            v.description(
+                'Whether to control battery storage (global setting)',
+            ),
+        ),
+        batteryPowerFlowControl: v.pipe(
+            v.optional(v.boolean(), false),
+            v.description(
+                'Enable intelligent battery power flow control (consumption → battery → export). When disabled, uses simple battery charge buffer instead.',
+            ),
+        ),
+        batteryAcceptanceHeadroomWatts: v.pipe(
+            v.optional(v.pipe(v.number(), v.minValue(0)), 100),
+            v.description(
+                `When export is restricted (e.g., during negativeFeedIn or a tight DER limit), the PV target is capped at the battery's recently-observed acceptance plus this headroom. The headroom lets an idle battery ramp up to its true acceptance ceiling — but anything between observed acceptance and the cap can briefly leak to grid before the battery responds. Larger values ramp faster; smaller values are stricter about export compliance. Set to 0 for strict zero export (battery cannot charge from solar while opModExpLimW=0). Users on dynamic export connections should not set this high, as it may violate connection-agreement limits during the ramp window.`,
+            ),
         ),
         sampleSeconds: v.pipe(
             v.optional(v.pipe(v.number(), v.minValue(0)), 5),
@@ -399,6 +499,25 @@ A longer time will smooth out load changes but may result in overshoot.`,
         v.description('Battery configuration'),
     ),
 });
+
+// Exported for JSON Schema generation (toJsonSchema cannot convert v.check)
+export { configObjectSchema };
+
+// Full schema with runtime validation
+export const configSchema = v.pipe(
+    configObjectSchema,
+    v.check((config) => {
+        // Reject configuration that uses both legacy battery charge buffer
+        // and new battery power flow control
+        const hasLegacyChargeBuffer =
+            config.battery?.chargeBufferWatts !== undefined;
+        const hasNewBatteryControl =
+            config.inverterControl.batteryPowerFlowControl === true;
+
+        // Both cannot be enabled simultaneously
+        return !(hasLegacyChargeBuffer && hasNewBatteryControl);
+    }, 'Cannot use both legacy battery.chargeBufferWatts and new inverterControl.batteryPowerFlowControl. Please use only one battery control method: either remove battery.chargeBufferWatts (legacy) or set inverterControl.batteryPowerFlowControl to false (use new battery control).'),
+);
 
 export type Config = v.InferOutput<typeof configSchema>;
 

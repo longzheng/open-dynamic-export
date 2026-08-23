@@ -59,13 +59,26 @@ To use a setpoint to specify fixed limits (such as for fixed export limits), add
             "connect": true, // (true/false) optional: whether the inverters should be connected to the grid
             "exportLimitWatts": 5000, // (number) optional: the maximum export limit in watts
             "generationLimitWatts": 10000, // (number) optional: the maximum generation limit in watts
-            "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (not currently used)
-            "loadLimitWatts": 10000 // (number) optional: the maximum load limit in watts (not currently used)
+            "importLimitWatts": 5000, // (number) optional: the maximum import limit in watts (constrains battery grid charging)
+            "loadLimitWatts": 10000, // (number) optional: the maximum load limit in watts (not currently used)
+
+            // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true)
+            "batterySocTargetPercent": 80, // (number) optional: target state of charge (0-100)
+            "batterySocMinPercent": 20, // (number) optional: minimum SoC, no discharge below this
+            "batterySocMaxPercent": 95, // (number) optional: maximum SoC, no charge above this
+            "batteryChargeMaxWatts": 5000, // (number) optional: maximum charging power. If omitted, the inverter's hardware limit applies
+            "batteryDischargeMaxWatts": 5000, // (number) optional: maximum discharging power. If omitted, the inverter's hardware limit applies
+            "batteryPriorityMode": "battery_first" // (string) optional: "battery_first" or "export_first"
         }
     }
     ...
 }
 ```
+
+> [!NOTE]
+> Battery control parameters require `inverterControl.batteryPowerFlowControl` to be enabled. See [Battery Configuration](./battery.md) for detailed information.
+
+````
 
 ## MQTT
 
@@ -76,14 +89,53 @@ To specify setpoint limits based on a MQTT topic, add the following property to 
     "setpoints": {
         "mqtt": {
             "host": "mqtt://192.168.1.123",
-            "topic": "setpoints"
+            "topic": "setpoints",
+            "stalenessTimeoutSeconds": 300 // (number) optional: discard MQTT setpoints if no message received within this many seconds
         }
     }
     ...
 }
-```
+````
+
+### Staleness Timeout
+
+If `stalenessTimeoutSeconds` is configured, MQTT setpoints act as a dead-man's switch: if no new MQTT message is received within the timeout period, all MQTT setpoint values are discarded and the system falls back to fixed setpoints.
+
+This protects against external automation tools crashing or losing connectivity — without it, the last MQTT message persists indefinitely, potentially leaving the system in an unintended state (e.g., grid charging left enabled).
+
+When a new MQTT message arrives after a staleness expiry, MQTT control resumes immediately.
+
+> [!TIP]
+> If not configured, the existing behavior is preserved: the last MQTT message persists indefinitely.
+
+### MQTT Message Schema
 
 The MQTT topic must contain a JSON message that meets the following schema
+
+```jsonc
+{
+    // Schema:
+    // opModConnect: boolean (optional)
+    // opModEnergize: boolean (optional)
+    // opModExpLimW: number (optional)
+    // opModGenLimW: number (optional)
+    // opModImpLimW: number (optional)
+    // opModLoadLimW: number (optional)
+    //
+    // Battery control parameters (requires inverterControl.batteryPowerFlowControl: true):
+    // batterySocTargetPercent: number (optional)
+    // batterySocMinPercent: number (optional)
+    // batterySocMaxPercent: number (optional)
+    // batteryChargeMaxWatts: number (optional)
+    // batteryDischargeMaxWatts: number (optional)
+    // batteryPriorityMode: "battery_first" | "export_first" (optional)
+    // batteryGridChargingEnabled: boolean (optional)
+    // batteryGridChargingMaxWatts: number (optional)
+    // batteryExportTargetWatts: number (optional) - site-level export target in watts; battery fills what PV doesn't cover
+}
+```
+
+### Example: Basic Limits
 
 ```jsonc
 {
@@ -110,6 +162,21 @@ The MQTT topic must contain a JSON message that meets the following schema
     "opModLoadLimW": 3500,
 }
 ```
+
+### Example: Battery Control via MQTT
+
+```js
+{
+    "opModExpLimW": 0,
+    "batterySocTargetPercent": 100,
+    "batteryPriorityMode": "battery_first",
+    "batteryChargeMaxWatts": 5000,
+    "batteryDischargeMaxWatts": 3000
+}
+```
+
+> [!NOTE]
+> Battery control parameters allow dynamic battery management via MQTT. This enables integration with home automation, VPP programs, and time-of-use optimization. See [Battery Configuration](./battery.md) for more details.
 
 ## Negative feed-in
 
