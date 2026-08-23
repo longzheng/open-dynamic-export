@@ -53,6 +53,13 @@ export type BatteryPowerFlowInput = {
     // When set, the battery discharges enough to cover house load AND export this
     // amount to the grid. When undefined/0, only self-consumption (zero grid import).
     batteryExportTargetWatts?: number | undefined;
+    // Target charge power INTO the battery in watts — the symmetric twin of
+    // batteryExportTargetWatts. When set, the battery charges toward this power
+    // (PV surplus first, then grid up to the import limit when grid charging is
+    // enabled), taking precedence over self-consumption discharge. When
+    // undefined/0, charging falls back to the batteryTargetSocPercent-driven
+    // behaviour. Capped at batteryChargeMaxWatts and stopped at batterySocMaxPercent.
+    batteryImportTargetWatts?: number | undefined;
     // Slack above recently-observed battery acceptance allowed by the PV target
     // when export is restricted. See the cap logic below for the rationale.
     // Defaults to 100W when undefined.
@@ -92,6 +99,7 @@ export function calculateBatteryPowerFlow(
         batteryGridChargingEnabled,
         batteryGridChargingMaxWatts,
         batteryExportTargetWatts,
+        batteryImportTargetWatts,
         batteryInverterSolarW,
         batteryAcceptanceHeadroomWatts,
     } = input;
@@ -137,6 +145,7 @@ export function calculateBatteryPowerFlow(
     // Battery export target: how much battery discharge power to export to grid.
     // When 0/undefined, only self-consumption (discharge to zero grid import).
     const exportTarget = batteryExportTargetWatts ?? 0;
+    const importTarget = batteryImportTargetWatts ?? 0;
     const gridChargingActive = batteryGridChargingEnabled === true;
 
     // Battery export target uses gap-filling semantics: PV surplus counts toward
@@ -170,7 +179,42 @@ export function calculateBatteryPowerFlow(
     const batteryDischargeNeeded =
         effectiveExportTarget + selfConsumptionDischarge;
 
-    if (batteryDischargeNeeded > 0 && canDischarge && !gridChargingActive) {
+    if (importTarget > 0 && canCharge) {
+        // Commanded charge — the symmetric twin of batteryExportTargetWatts.
+        // Charge the battery toward importTarget watts: PV surplus first, then a
+        // grid top-up when grid charging is enabled, bounded by the import (DOE)
+        // limit. Takes precedence over self-consumption discharge: when a
+        // controller commands a charge, the grid covers house load and the
+        // battery accumulates, rather than discharging to cover load. Capped at
+        // maxChargePower; stopped at socMax via the canCharge guard above.
+        //
+        // If no source is available (no PV surplus, grid charging off), the
+        // charge resolves to 0 and the deadband below snaps it to idle — i.e. a
+        // charge command with nothing to charge from HOLDS, never discharges.
+        const pvToBattery = Math.min(pvSurplus, importTarget, maxChargePower);
+        const gridChargeCap = gridChargingActive
+            ? (batteryGridChargingMaxWatts ?? maxChargePower)
+            : 0;
+        const currentImport = Math.max(0, siteWatts);
+        const importHeadroom = Math.max(0, importLimitWatts - currentImport);
+        const gridToBattery = Math.min(
+            Math.max(0, importTarget - pvToBattery),
+            gridChargeCap,
+            importHeadroom,
+            Math.max(0, maxChargePower - pvToBattery),
+        );
+        targetBatteryPowerWatts = pvToBattery + gridToBattery;
+        batteryMode = 'charge';
+        // Export any PV surplus the battery did not absorb.
+        targetExportWatts = Math.min(
+            Math.max(0, pvSurplus - pvToBattery),
+            exportLimitWatts,
+        );
+    } else if (
+        batteryDischargeNeeded > 0 &&
+        canDischarge &&
+        !gridChargingActive
+    ) {
         // Discharge battery: cover grid imports and/or meet battery export target
         targetBatteryPowerWatts = -Math.min(
             batteryDischargeNeeded,

@@ -783,6 +783,8 @@ export function calculateInverterConfiguration({
                 activeInverterControlLimit.batteryGridChargingMaxWatts?.value,
             batteryExportTargetWatts:
                 activeInverterControlLimit.batteryExportTargetWatts?.value,
+            batteryImportTargetWatts:
+                activeInverterControlLimit.batteryImportTargetWatts?.value,
             batteryInverterSolarW,
             batteryAcceptanceHeadroomWatts,
         };

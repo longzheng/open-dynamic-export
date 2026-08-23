@@ -1280,6 +1280,241 @@ describe('calculateBatteryPowerFlow', () => {
         });
     });
 
+    describe('battery import target', () => {
+        it('should charge from PV surplus toward the import target and export the rest', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 10000,
+                siteWatts: -6000, // Exporting 6000W surplus (load = 4000W)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryImportTargetWatts: 4000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // availablePower = 6000, pvSurplus = 6000, importTarget = 4000
+            // pvToBattery = min(6000, 4000, 8000) = 4000; no grid (charging off)
+            // export the unabsorbed surplus = 6000 - 4000 = 2000
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(4000);
+            expect(result.targetExportWatts).toBe(2000);
+        });
+
+        it('should top up from grid when PV cannot meet the import target', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 3000,
+                siteWatts: -1000, // Exporting 1000W surplus (load = 2000W)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 8000,
+                batteryImportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 1000 -> pvToBattery = 1000; grid top-up = 5000 - 1000 = 4000
+            // total charge = 5000, nothing left to export
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(5000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should charge from PV only when grid charging is disabled', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 3000,
+                siteWatts: -1000,
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryImportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 1000; grid charging off so no top-up -> charge only 1000
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(1000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should charge from grid and let the grid cover load, not discharge, on a deficit', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 3000, // Importing 3000W (load = 3000W, no PV)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: 20000,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 8000,
+                batteryImportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // A commanded charge takes precedence over self-consumption discharge:
+            // pvToBattery = 0; importHeadroom = 20000 - 3000 = 17000
+            // gridToBattery = min(5000, 8000, 17000, 8000) = 5000
+            // Battery charges 5000 from grid; grid also covers the 3000 load.
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(5000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should cap the charge at maxChargePower', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 15000,
+                siteWatts: -13000, // Exporting 13000W surplus (load = 2000W)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 15000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryImportTargetWatts: 10000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // pvSurplus = 13000; importTarget 10000 clamped to maxChargePower 8000
+            // export the rest = 13000 - 8000 = 5000
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(8000);
+            expect(result.targetExportWatts).toBe(5000);
+        });
+
+        it('should ignore the import target when the battery is at max SoC', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 10000,
+                siteWatts: -8000,
+                batterySocPercent: 100, // full -> canCharge = false
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false,
+                batteryGridChargingMaxWatts: undefined,
+                batteryImportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // canCharge = false so the import branch is skipped; surplus exports
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+            expect(result.targetExportWatts).toBe(8000);
+        });
+
+        it('should HOLD (idle), not discharge, when a charge is commanded with no available source', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 2000, // Importing 2000W (load = 2000W)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: Number.MAX_SAFE_INTEGER,
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: false, // no grid, no PV -> no source
+                batteryGridChargingMaxWatts: undefined,
+                batteryImportTargetWatts: 5000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // No PV surplus, grid charging off -> charge resolves to 0 -> deadband
+            // snaps to idle. Crucially it does NOT fall through to discharge.
+            expect(result.batteryMode).toBe('idle');
+            expect(result.targetBatteryPowerWatts).toBe(0);
+            expect(result.targetExportWatts).toBe(0);
+        });
+
+        it('should bound grid charging by the import (DOE) limit headroom', () => {
+            const input: BatteryPowerFlowInput = {
+                solarWatts: 0,
+                siteWatts: 1000, // Importing 1000W (load = 1000W)
+                batterySocPercent: 50,
+                batteryTargetSocPercent: 80,
+                batterySocMinPercent: 20,
+                batterySocMaxPercent: 100,
+                batteryChargeMaxWatts: 8000,
+                batteryDischargeMaxWatts: 5000,
+                exportLimitWatts: 10000,
+                importLimitWatts: 5000, // DOE import cap
+                batteryInverterSolarW: undefined,
+                batteryPriorityMode: 'battery_first',
+                currentBatteryPowerWatts: 0,
+                batteryGridChargingEnabled: true,
+                batteryGridChargingMaxWatts: 8000,
+                batteryImportTargetWatts: 8000,
+            };
+
+            const result = calculateBatteryPowerFlow(input);
+
+            // importHeadroom = 5000 - 1000 existing load = 4000
+            // gridToBattery = min(8000, 8000, 4000, 8000) = 4000
+            expect(result.batteryMode).toBe('charge');
+            expect(result.targetBatteryPowerWatts).toBe(4000);
+            expect(result.targetExportWatts).toBe(0);
+        });
+    });
+
     describe('DOE compliance', () => {
         it('should cap battery export at DOE headroom when PV partially covers target', () => {
             const input: BatteryPowerFlowInput = {
