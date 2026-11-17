@@ -271,6 +271,12 @@ export abstract class MirrorUsagePointHelperBase<
         // without samples, the reading values min/max will be infinity
         // we won't know what reading types we have
         if (samples.length > 0) {
+            const readingTimePeriod = getReadingTimePeriod({
+                samples,
+                currentIntervalStart: interval.start,
+                intervalSeconds: interval.intervalSeconds,
+            });
+
             const reading = this.getReadingFromSamples(samples);
             const mirrorMeterReadings = this.getReadingValues({
                 reading,
@@ -299,10 +305,7 @@ export abstract class MirrorUsagePointHelperBase<
                         Reading: {
                             value: scaledReadingValue.value,
 
-                            timePeriod: {
-                                start: interval.start,
-                                duration: interval.intervalSeconds,
-                            },
+                            timePeriod: readingTimePeriod,
                         },
                         ReadingType: {
                             ...readingDefinition.ReadingType,
@@ -480,6 +483,37 @@ export abstract class MirrorUsagePointHelperBase<
 
         return response;
     }
+}
+
+// the samples being posted belong to intervals that have already completed, so
+// the reported time period is the span ending at the current tick, not the tick
+// itself. labelling readings with the current interval places every value one
+// interval into the future. a post that catches up on more than one interval
+// (for example after a failed post) covers the whole span.
+export function getReadingTimePeriod({
+    samples,
+    currentIntervalStart,
+    intervalSeconds,
+}: {
+    samples: SampleBase[];
+    currentIntervalStart: Date;
+    intervalSeconds: number;
+}) {
+    const oldestSample = samples.reduce((oldest, sample) =>
+        sample.date < oldest.date ? sample : oldest,
+    );
+
+    const start = getUtcTickStart({
+        intervalSeconds,
+        date: oldestSample.date,
+    });
+
+    return {
+        start,
+        duration: Math.round(
+            (currentIntervalStart.getTime() - start.getTime()) / 1_000,
+        ),
+    };
 }
 
 export function scaleReadingValueToInt16({
