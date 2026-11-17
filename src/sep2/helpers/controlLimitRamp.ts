@@ -10,6 +10,12 @@ export type ControlLimitRampTarget =
       }
     | { type: 'none'; value: number | undefined };
 
+// CSIP-AUS table 5.2.5.1 note 1: when ramping to a DERControl with neither a
+// rampTms on the control nor a setGradW set, the client should meet the control
+// within 15 seconds, as described in AS/NZS 4777.2 (soft-start). Note 2 covers
+// ramping to a DefaultDERControl instead, which falls back to the Wgra rate.
+const softStartRampSeconds = 15;
+
 // DERControlBase.rampTms is expressed in hundredths of a second (resolution
 // 1/100 sec) but this helper works in seconds, so it must be scaled down.
 // e.g. rampTms 6000 = 60 seconds
@@ -30,7 +36,6 @@ export class ControlLimitRampHelper {
               type: 'active' | 'default';
               value: number;
               time: Date;
-              isRamping: boolean;
           }
         | { type: 'none'; value: number | undefined } = {
         type: 'none',
@@ -40,6 +45,9 @@ export class ControlLimitRampHelper {
         | {
               type: 'active' | 'default';
               value: number;
+              // retained so an unchanged target can be recognised without
+              // re-arming endDateTime on every poll
+              rampTimeSeconds: number | undefined;
               endDateTime: Date | null;
           }
         | { type: 'none'; value: number | undefined } = {
@@ -63,9 +71,26 @@ export class ControlLimitRampHelper {
                     return;
                 }
 
+                // ramping to a DERControl with no rampTms and no setGradW must
+                // meet the control within 15 seconds, so apply the soft-start
+                // as an explicit ramp time. ramping to a DefaultDERControl has
+                // no such deadline and falls through to the Wgra rate below.
+                const rampTimeSeconds =
+                    target.rampTimeSeconds ??
+                    (target.type === 'active' &&
+                    !this.rampRateHelper.hasSetGradW()
+                        ? softStartRampSeconds
+                        : undefined);
+
+                // the same target arrives on every poll, so ignore it unless
+                // something actually changed. comparing the type and ramp time
+                // as well as the value means a control that changes only its
+                // rampTms, or only from active to default, is still applied.
                 if (
                     this.target.type !== 'none' &&
-                    target.value === this.target.value
+                    target.value === this.target.value &&
+                    target.type === this.target.type &&
+                    rampTimeSeconds === this.target.rampTimeSeconds
                 ) {
                     return;
                 }
@@ -73,10 +98,10 @@ export class ControlLimitRampHelper {
                 this.target = {
                     type: target.type,
                     value: target.value,
-                    endDateTime: target.rampTimeSeconds
+                    rampTimeSeconds,
+                    endDateTime: rampTimeSeconds
                         ? new Date(
-                              new Date().getTime() +
-                                  target.rampTimeSeconds * 1000,
+                              new Date().getTime() + rampTimeSeconds * 1000,
                           )
                         : null,
                 };
@@ -96,19 +121,12 @@ export class ControlLimitRampHelper {
                             return this.target.value;
                         case 'active':
                         case 'default': {
-                            // skip ramping if going from active to active control
-                            // and not already ramping (due to a previous default target)
-                            // and the target does not have a specified end date
-                            if (
-                                this.cachedValue.type === 'active' &&
-                                this.target.type === 'active' &&
-                                this.target.endDateTime === null &&
-                                !this.cachedValue.isRamping
-                            ) {
-                                // No ramping needed, return target value immediately
-                                return this.target.value;
-                            }
-
+                            // every transition ramps. what differs is the rate,
+                            // which depends only on what is being ramped to:
+                            // an explicit rampTms or the 15s soft-start give an
+                            // endDateTime, otherwise setGradW (or the Wgra
+                            // fallback) applies as a rate. the previous control
+                            // does not affect the choice.
                             const ramping: Ramping = (() => {
                                 if (this.target.endDateTime) {
                                     return {
@@ -152,13 +170,10 @@ export class ControlLimitRampHelper {
                 return { type: 'none', value: this.target.value };
             }
 
-            const hasReachedTarget = value === this.target.value;
-
             return {
                 type: this.target.type,
                 value,
                 time: new Date(),
-                isRamping: !hasReachedTarget,
             };
         })();
 

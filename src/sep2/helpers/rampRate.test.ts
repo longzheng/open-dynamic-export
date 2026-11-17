@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { defaultRampRatePercentPerSecond, RampRateHelper } from './rampRate.js';
+import { RampRateHelper, wgra4777PercentPerSecond } from './rampRate.js';
 
 let helper: RampRateHelper;
 
@@ -12,9 +12,15 @@ afterEach(() => {
 });
 
 describe('getSetGradW', () => {
-    it('should return default setGradW for null ramp rate', () => {
+    it('should return the Wgra setGradW for null ramp rate', () => {
         helper.setDefaultDERControlRampRate(null);
 
+        // with no setGradW set we fall back to the AS/NZS 4777.2 Wgra rate when
+        // ramping to a DefaultDERControl, so that is what we report
+        expect(helper.getDerSettingsSetGradW()).toBe(28);
+    });
+
+    it('should return the Wgra setGradW before any ramp rate is set', () => {
         expect(helper.getDerSettingsSetGradW()).toBe(28);
     });
 
@@ -50,15 +56,44 @@ describe('getMaxChangeWatts', () => {
         } satisfies typeof result);
     });
 
-    it('should return limit for default ramp rate with nameplate', () => {
+    it('should fall back to the Wgra rate before any setGradW is set', () => {
         helper.onDerSample({ nameplate: { maxW: 10000 } });
+
+        const result = helper.getMaxChangeWatts();
+
+        // CSIP-AUS note 2: ramping to a DefaultDERControl with no setGradW set
+        // uses the AS/NZS 4777.2 Wgra rate
+        expect(result).toStrictEqual({
+            type: 'limited',
+            wattsPerSecond: 10000 * (wgra4777PercentPerSecond / 100),
+        } satisfies typeof result);
+    });
+
+    it('should fall back to the Wgra rate for null setGradW', () => {
+        helper.onDerSample({ nameplate: { maxW: 10000 } });
+
+        helper.setDefaultDERControlRampRate(null);
 
         const result = helper.getMaxChangeWatts();
 
         expect(result).toStrictEqual({
             type: 'limited',
-            wattsPerSecond: 10000 * (defaultRampRatePercentPerSecond / 100),
+            wattsPerSecond: 10000 * (wgra4777PercentPerSecond / 100),
         } satisfies typeof result);
+    });
+
+    it('should report whether a setGradW has been set', () => {
+        expect(helper.hasSetGradW()).toBe(false);
+
+        helper.setDefaultDERControlRampRate(null);
+        expect(helper.hasSetGradW()).toBe(false);
+
+        // a setGradW of 0 is an explicit "no limit", not an absent value
+        helper.setDefaultDERControlRampRate(0);
+        expect(helper.hasSetGradW()).toBe(true);
+
+        helper.setDefaultDERControlRampRate(100);
+        expect(helper.hasSetGradW()).toBe(true);
     });
 
     it('should return no limit for 1% ramp rate without nameplate', () => {

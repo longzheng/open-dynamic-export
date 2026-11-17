@@ -120,8 +120,9 @@ describe('ControlLimitRampHelper', () => {
         expect(helper.getRampedValue()).toBe(5000);
     });
 
-    it('should return target value immediately if going from active to active', () => {
+    it('should ramp at setGradW when going from active to active', () => {
         vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        // setGradW = 1%/second, so 100 W/s against a 10kW nameplate
         rampRateHelper.setDefaultDERControlRampRate(100);
         rampRateHelper.onDerSample({
             nameplate: { maxW: 10000 },
@@ -147,7 +148,171 @@ describe('ControlLimitRampHelper', () => {
             rampTimeSeconds: undefined,
         });
 
+        // a control with no rampTms still ramps at setGradW rather than
+        // stepping: 3500W at 100 W/s takes 35 seconds
+        vi.setSystemTime(new Date('2021-01-01T01:00:20Z'));
+        expect(helper.getRampedValue()).toBe(3000);
+
+        vi.setSystemTime(new Date('2021-01-01T01:00:35Z'));
         expect(helper.getRampedValue()).toBe(1500);
+    });
+
+    // CACTUS ALL-25 "Active control ramp rates": setGradW is set to 100 (1%/s)
+    // on the first default control poll, then a 30% control with a 60s rampTms
+    // is followed by an overlapping 50% control with no rampTms. The second
+    // transition must ramp at setGradW rather than stepping.
+    it('should match CACTUS ALL-25 active control ramp rates', () => {
+        const base = new Date('2021-01-01T00:00:00Z').getTime();
+        vi.setSystemTime(new Date(base));
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onDerSample({ nameplate: { maxW: 10000 } });
+
+        // (a, b) control 1: 30% of setMaxW, ramp_time_seconds 60
+        // (c, d) control 2: 50% of setMaxW, no ramp time, arriving at t=130
+        // the rate ramp measures from the previous poll, so tick every second
+        // the way the control loop does
+        const seen = new Map<number, number | undefined>();
+        for (let t = 0; t <= 160; t++) {
+            vi.setSystemTime(new Date(base + t * 1000));
+            helper.updateTarget(
+                t < 10
+                    ? // precondition: DER exporting unconstrained
+                      {
+                          type: 'active',
+                          value: 10000,
+                          rampTimeSeconds: undefined,
+                      }
+                    : t < 130
+                      ? { type: 'active', value: 3000, rampTimeSeconds: 60 }
+                      : {
+                            type: 'active',
+                            value: 5000,
+                            rampTimeSeconds: undefined,
+                        },
+            );
+            seen.set(t, helper.getRampedValue());
+        }
+
+        // control 1 ramps over its 60s rampTms, reaching 30% at t=70
+        expect(seen.get(40)).toBeGreaterThan(3000);
+        expect(seen.get(40)).toBeLessThan(10000);
+        expect(seen.get(70)).toBe(3000);
+
+        // control 2 has no rampTms, so it ramps at setGradW rather than
+        // stepping: 2000W at 100 W/s takes 20 seconds, the first 100W of which
+        // is applied on the tick the control arrives
+        expect(seen.get(130)).toBe(3100);
+        expect(seen.get(140)).toBe(4100);
+        expect(seen.get(150)).toBe(5000);
+    });
+
+    it('should soft-start to a DERControl in 15s when no setGradW is set', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        // no setDefaultDERControlRampRate call: the utility server has not sent
+        // a setGradW, as in the ALL28 precondition
+        rampRateHelper.onDerSample({ nameplate: { maxW: 5000 } });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // 30% -> 10% of a 5kW setMaxW, the ALL28 transition that must complete
+        // within 15s rather than the 72s the Wgra rate would have taken
+        helper.updateTarget({
+            type: 'active',
+            value: 500,
+            rampTimeSeconds: undefined,
+        });
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:07Z'));
+        expect(helper.getRampedValue()).toBeCloseTo(1033, 0);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:15Z'));
+        expect(helper.getRampedValue()).toBe(500);
+    });
+
+    it('should ramp to a DefaultDERControl at the Wgra rate when no setGradW is set', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.onDerSample({ nameplate: { maxW: 5000 } });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+        expect(helper.getRampedValue()).toBe(1500);
+
+        // falling back to the default control gets no 15s soft-start: CSIP-AUS
+        // note 2 requires the Wgra rate, which is 13.89 W/s against 5kW
+        helper.updateTarget({
+            type: 'default',
+            value: 0,
+            rampTimeSeconds: undefined,
+        });
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:15Z'));
+        expect(helper.getRampedValue()).toBeCloseTo(1500 - 13.89 * 15, 0);
+    });
+
+    it('should still ramp from a default target once setGradW is set', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        // setGradW = 1%/second, so 50 W/s against a 5kW nameplate
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onDerSample({ nameplate: { maxW: 5000 } });
+
+        helper.updateTarget({
+            type: 'default',
+            value: 0,
+            rampTimeSeconds: undefined,
+        });
+        expect(helper.getRampedValue()).toBe(0);
+
+        helper.updateTarget({
+            type: 'active',
+            value: 1500,
+            rampTimeSeconds: undefined,
+        });
+
+        // 1500W at 50 W/s takes 30 seconds, so it must not step
+        vi.setSystemTime(new Date('2021-01-01T00:00:15Z'));
+        expect(helper.getRampedValue()).toBeCloseTo(750, 0);
+
+        vi.setSystemTime(new Date('2021-01-01T00:00:30Z'));
+        expect(helper.getRampedValue()).toBe(1500);
+    });
+
+    it('should apply a target whose rampTms changed but whose value did not', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.setDefaultDERControlRampRate(100);
+        rampRateHelper.onDerSample({ nameplate: { maxW: 5000 } });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 1000,
+            rampTimeSeconds: undefined,
+        });
+        expect(helper.getRampedValue()).toBe(1000);
+
+        // reach 2000W via an explicit ramp so the next target starts from there
+        helper.updateTarget({
+            type: 'active',
+            value: 2000,
+            rampTimeSeconds: 10,
+        });
+        vi.setSystemTime(new Date('2021-01-01T00:00:10Z'));
+        expect(helper.getRampedValue()).toBe(2000);
+
+        // a replacement control with a 60 second rampTms
+        helper.updateTarget({
+            type: 'active',
+            value: 3000,
+            rampTimeSeconds: 60,
+        });
+        vi.setSystemTime(new Date('2021-01-01T00:00:40Z'));
+        expect(helper.getRampedValue()).toBeCloseTo(2500, 0);
     });
 
     it('should complete a rampTms ramp in hundredths of a second, not seconds', () => {
@@ -274,6 +439,11 @@ describe('ControlLimitRampHelper', () => {
             rampTimeSeconds: undefined,
         });
 
+        // active to active ramps at setGradW too: 5000W at 100 W/s takes 50s
+        vi.setSystemTime(new Date('2021-01-01T02:00:25Z'));
+        expect(helper.getRampedValue()).toBe(7500);
+
+        vi.setSystemTime(new Date('2021-01-01T02:00:50Z'));
         expect(helper.getRampedValue()).toBe(10000);
     });
 
@@ -468,7 +638,11 @@ describe('ControlLimitRampHelper', () => {
             rampTimeSeconds: undefined,
         });
 
-        // immediately new target
+        // active to active ramps at setGradW: 10000W at 100 W/s takes 100s
+        vi.setSystemTime(new Date('2021-01-01T01:05:50Z'));
+        expect(helper.getRampedValue()).toBe(15000);
+
+        vi.setSystemTime(new Date('2021-01-01T01:06:40Z'));
         expect(helper.getRampedValue()).toBe(20000);
     });
 
