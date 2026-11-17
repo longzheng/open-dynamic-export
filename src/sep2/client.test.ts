@@ -225,3 +225,43 @@ describe('axios-retry', () => {
         expect(result).toEqual(null);
     });
 });
+
+describe('scopeError', () => {
+    it('should emit scopeError and still reject on 403', async () => {
+        server.use(
+            http.put('http://example.com/forbidden', () =>
+                HttpResponse.xml(
+                    '<Error xmlns="urn:ieee:std:2030.5:ns"><reasonCode>0</reasonCode><message>not scoped to access this resource</message></Error>',
+                    { status: 403 },
+                ),
+            ),
+        );
+
+        const scopeError = vi.fn();
+        sep2Client.on('scopeError', scopeError);
+
+        await expect(sep2Client.put('/forbidden', '<x/>')).rejects.toThrow();
+
+        expect(scopeError).toHaveBeenCalledTimes(1);
+        expect(scopeError.mock.calls[0]![0].response.status).toBe(403);
+
+        sep2Client.off('scopeError', scopeError);
+    });
+
+    it('should not emit scopeError for other error statuses', async () => {
+        server.use(
+            http.get('http://example.com/missing', () =>
+                HttpResponse.xml('', { status: 404 }),
+            ),
+        );
+
+        const scopeError = vi.fn();
+        sep2Client.on('scopeError', scopeError);
+
+        await expect(sep2Client.get('/missing')).rejects.toThrow();
+
+        expect(scopeError).not.toHaveBeenCalled();
+
+        sep2Client.off('scopeError', scopeError);
+    });
+});

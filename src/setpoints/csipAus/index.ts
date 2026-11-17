@@ -1,4 +1,5 @@
 import type { Logger } from 'pino';
+import { AxiosError } from 'axios';
 import type {
     InverterControlLimit,
     SupportedControlTypes,
@@ -9,6 +10,7 @@ import { env } from '../../helpers/env.js';
 import { writeControlLimit } from '../../helpers/influxdb.js';
 import { pinoLogger } from '../../helpers/logger.js';
 import { numberWithPow10 } from '../../helpers/number.js';
+import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
 import { getSep2Certificate } from '../../helpers/sep2Cert.js';
 import type { SiteSample } from '../../meters/siteSample.js';
 import { SEP2Client } from '../../sep2/client.js';
@@ -48,29 +50,39 @@ export type CsipAusControlSchedules = Record<
     RandomizedControlSchedule[]
 >;
 
+// how long to wait after losing scope before re-running discovery, so a burst
+// of 403s from several resources collapses into a single recovery
+const rediscoverDebounceMs = 5_000;
+// exponential backoff bounds, in case the server will not accept us back yet
+const rediscoverMinDelayMs = 5_000;
+const rediscoverMaxDelayMs = 300_000;
+
 export class CsipAusSetpoint implements SetpointType {
-    private schedulerByControlType: {
+    private schedulerByControlType!: {
         [T in SupportedControlTypes]: ControlSchedulerHelper<T>;
     };
-    private opModExpLimWRampRateHelper: ControlLimitRampHelper;
-    private opModGenLimWRampRateHelper: ControlLimitRampHelper;
-    private opModImpLimWRampRateHelper: ControlLimitRampHelper;
-    private opModLoadLimWRampRateHelper: ControlLimitRampHelper;
+    private opModExpLimWRampRateHelper!: ControlLimitRampHelper;
+    private opModGenLimWRampRateHelper!: ControlLimitRampHelper;
+    private opModImpLimWRampRateHelper!: ControlLimitRampHelper;
+    private opModLoadLimWRampRateHelper!: ControlLimitRampHelper;
     private logger: Logger;
     private csipAusConfig: NonNullable<Config['setpoints']['csipAus']>;
-    private abortController: AbortController;
+    private abortController!: AbortController;
     private sep2Client: SEP2Client;
-    private timeHelper: TimeHelper;
-    private endDeviceListHelper: EndDeviceListHelper;
-    private registrationHelper: RegistrationHelper;
-    private derListHelper: DerListHelper;
-    private derHelper: DerHelper;
-    private functionSetAssignmentsListHelper: FunctionSetAssignmentsListHelper;
-    private mirrorUsagePointListHelper: MirrorUsagePointListHelper;
-    private derControlsHelper: DerControlsHelper;
-    private deviceCapabilityHelper: DeviceCapabilityHelper;
-    private rampRateHelper: RampRateHelper;
+    private timeHelper!: TimeHelper;
+    private endDeviceListHelper!: EndDeviceListHelper;
+    private registrationHelper!: RegistrationHelper;
+    private derListHelper!: DerListHelper;
+    private derHelper!: DerHelper;
+    private functionSetAssignmentsListHelper!: FunctionSetAssignmentsListHelper;
+    private mirrorUsagePointListHelper!: MirrorUsagePointListHelper;
+    private derControlsHelper!: DerControlsHelper;
+    private deviceCapabilityHelper!: DeviceCapabilityHelper;
+    private rampRateHelper!: RampRateHelper;
     private connected = false;
+    private destroyed = false;
+    private rediscoverTimer: NodeJS.Timeout | null = null;
+    private rediscoverDelayMs = rediscoverMinDelayMs;
 
     constructor({
         csipAusConfig,
@@ -79,8 +91,6 @@ export class CsipAusSetpoint implements SetpointType {
     }) {
         this.csipAusConfig = csipAusConfig;
         this.logger = pinoLogger.child({ module: 'CsipAusSetpoint' });
-        this.abortController = new AbortController();
-        this.rampRateHelper = new RampRateHelper();
 
         const sep2Certificate = getSep2Certificate();
 
@@ -90,6 +100,23 @@ export class CsipAusSetpoint implements SetpointType {
             key: sep2Certificate.key,
             pen: env.SEP2_PEN,
         });
+
+        // a 403 means the server no longer associates our certificate with our
+        // EndDevice registration, so every cached href we hold is dead. Re-run
+        // discovery from the device capability document, which is what a
+        // process restart would do.
+        this.sep2Client.on('scopeError', (error) => {
+            this.scheduleRediscover({
+                reason: `${error.config?.method?.toUpperCase() ?? 'request'} ${error.config?.url ?? 'unknown url'} returned 403`,
+            });
+        });
+
+        this.startDiscovery();
+    }
+
+    private startDiscovery() {
+        this.abortController = new AbortController();
+        this.rampRateHelper = new RampRateHelper();
 
         this.timeHelper = new TimeHelper({
             client: this.sep2Client,
@@ -221,16 +248,32 @@ export class CsipAusSetpoint implements SetpointType {
                         href: endDevice.registrationLink.href,
                     });
                 }
-            })();
+
+                // discovery completed, so the next loss of scope should recover
+                // promptly rather than inherit the backoff from this one
+                this.rediscoverDelayMs = rediscoverMinDelayMs;
+            })().catch((error: unknown) => {
+                // never let a discovery failure become an unhandled rejection,
+                // which would take down the process
+                this.logger.error(
+                    error instanceof AxiosError
+                        ? sanitizeAxiosError(error)
+                        : error,
+                    'Failed to handle SEP2 end device list',
+                );
+            });
         });
 
         this.derListHelper.on('data', (derList) => {
             this.logger.debug({ derList }, 'Received SEP2 end device DER list');
 
             if (derList.ders.length !== 1) {
-                throw new Error(
-                    `DERS list length is not 1, actual length ${derList.ders.length}`,
+                this.logger.error(
+                    { dersCount: derList.ders.length },
+                    'DERS list length is not 1, ignoring DER list',
                 );
+
+                return;
             }
 
             const der = derList.ders.at(0)!;
@@ -284,6 +327,53 @@ export class CsipAusSetpoint implements SetpointType {
             .on('pollError', () => {
                 this.updateConnected(false);
             });
+    }
+
+    private stopDiscovery() {
+        this.abortController.abort();
+        this.deviceCapabilityHelper.destroy();
+        this.timeHelper.destroy();
+        this.endDeviceListHelper.destroy();
+        this.registrationHelper.destroy();
+        this.derListHelper.destroy();
+        this.derHelper.destroy();
+        this.functionSetAssignmentsListHelper.destroy();
+        this.mirrorUsagePointListHelper.destroy();
+        this.derControlsHelper.destroy();
+    }
+
+    private scheduleRediscover({ reason }: { reason: string }) {
+        if (this.destroyed || this.rediscoverTimer) {
+            return;
+        }
+
+        const delayMs = Math.max(this.rediscoverDelayMs, rediscoverDebounceMs);
+
+        this.logger.warn(
+            { reason, delayMs },
+            'Lost scope on SEP2 server, scheduling SEP2 re-discovery',
+        );
+
+        this.rediscoverTimer = setTimeout(() => {
+            this.rediscoverTimer = null;
+
+            if (this.destroyed) {
+                return;
+            }
+
+            // back off in case the server is not ready to register us again,
+            // reset once discovery completes
+            this.rediscoverDelayMs = Math.min(
+                this.rediscoverDelayMs * 2,
+                rediscoverMaxDelayMs,
+            );
+
+            this.logger.info('Re-running SEP2 discovery');
+
+            this.updateConnected(false);
+            this.stopDiscovery();
+            this.startDiscovery();
+        }, delayMs);
     }
 
     getSchedulerByControlType() {
@@ -551,16 +641,15 @@ export class CsipAusSetpoint implements SetpointType {
 
     destroy(): void {
         this.logger.info('Destroying CSIP-AUS setpoint');
-        this.abortController.abort();
-        this.deviceCapabilityHelper.destroy();
-        this.timeHelper.destroy();
-        this.endDeviceListHelper.destroy();
-        this.registrationHelper.destroy();
-        this.derListHelper.destroy();
-        this.derHelper.destroy();
-        this.functionSetAssignmentsListHelper.destroy();
-        this.mirrorUsagePointListHelper.destroy();
-        this.derControlsHelper.destroy();
+        this.destroyed = true;
+
+        if (this.rediscoverTimer) {
+            clearTimeout(this.rediscoverTimer);
+            this.rediscoverTimer = null;
+        }
+
+        this.sep2Client.removeAllListeners();
+        this.stopDiscovery();
     }
 
     private updateConnected(connected: boolean) {

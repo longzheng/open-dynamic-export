@@ -1,7 +1,8 @@
 import * as https from 'node:https';
 import { createHash } from 'node:crypto';
+import EventEmitter from 'node:events';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import axiosRetry, { exponentialDelay } from 'axios-retry';
 import { numberToHex } from '../helpers/number.js';
@@ -14,7 +15,14 @@ import type { RoleFlagsType } from './models/roleFlagsType.js';
 
 const USER_AGENT = 'open-dynamic-export';
 
-export class SEP2Client {
+// the server responds with 403 Forbidden when our certificate is no longer
+// scoped to a resource, which happens when the server forgets our EndDevice
+// registration (for example when a CSIP-AUS test harness finalises a run)
+export type SEP2ClientEvents = {
+    scopeError: [AxiosError];
+};
+
+export class SEP2Client extends EventEmitter<SEP2ClientEvents> {
     private readonly host: string;
     public readonly pen: string;
     public readonly lfdi: string;
@@ -32,6 +40,8 @@ export class SEP2Client {
         key: string;
         pen: string;
     }) {
+        super();
+
         this.host = host;
         this.pen = pen.padStart(8, '0');
 
@@ -65,6 +75,16 @@ export class SEP2Client {
             retries: 5,
             retryDelay: (retryCount, error) =>
                 exponentialDelay(retryCount, error, 100),
+        });
+
+        // surface loss of scope so the caller can re-run discovery and
+        // re-register, rather than retrying a dead href forever
+        axiosClient.interceptors.response.use(undefined, (error: unknown) => {
+            if (error instanceof AxiosError && error.response?.status === 403) {
+                this.emit('scopeError', error);
+            }
+
+            throw error;
         });
 
         this.axiosInstance = axiosClient;
