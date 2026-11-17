@@ -3,11 +3,26 @@ import { addSeconds } from 'date-fns';
 import {
     ControlLimitRampHelper,
     calculateRampedValue,
+    rampTmsToSeconds,
 } from './controlLimitRamp.js';
 import { RampRateHelper } from './rampRate.js';
 
 afterEach(() => {
     vi.getRealSystemTime();
+});
+
+describe('rampTmsToSeconds', () => {
+    it('should convert hundredths of a second to seconds', () => {
+        expect(rampTmsToSeconds(6000)).toBe(60);
+        expect(rampTmsToSeconds(100)).toBe(1);
+        expect(rampTmsToSeconds(50)).toBe(0.5);
+        expect(rampTmsToSeconds(33)).toBe(0.33);
+    });
+
+    it('should pass through zero and undefined', () => {
+        expect(rampTmsToSeconds(0)).toBe(0);
+        expect(rampTmsToSeconds(undefined)).toBe(undefined);
+    });
 });
 
 describe('ControlLimitRampHelper', () => {
@@ -133,6 +148,37 @@ describe('ControlLimitRampHelper', () => {
         });
 
         expect(helper.getRampedValue()).toBe(1500);
+    });
+
+    it('should complete a rampTms ramp in hundredths of a second, not seconds', () => {
+        vi.setSystemTime(new Date('2021-01-01T00:00:00Z'));
+        rampRateHelper.onDerSample({
+            nameplate: { maxW: 5000 },
+        });
+
+        helper.updateTarget({
+            type: 'active',
+            value: 333,
+            rampTimeSeconds: undefined,
+        });
+
+        // cache initial value
+        expect(helper.getRampedValue()).toBe(333);
+
+        // a DERControl with rampTms 6000 (hundredths) = 60 seconds
+        helper.updateTarget({
+            type: 'active',
+            value: 2500,
+            rampTimeSeconds: rampTmsToSeconds(6000),
+        });
+
+        // halfway through the 60 second ramp
+        vi.setSystemTime(new Date('2021-01-01T00:00:30Z'));
+        expect(helper.getRampedValue()).toBeCloseTo(1416.5, 0);
+
+        // the ramp has completed by 60 seconds
+        vi.setSystemTime(new Date('2021-01-01T00:01:00Z'));
+        expect(helper.getRampedValue()).toBe(2500);
     });
 
     it('should return ramped value with 1% ramp rate if going from active to default', () => {

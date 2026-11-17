@@ -1,3 +1,4 @@
+import { Decimal } from 'decimal.js';
 import { cappedChange } from '../../helpers/math.js';
 import type { RampRateHelper } from './rampRate.js';
 
@@ -8,6 +9,19 @@ export type ControlLimitRampTarget =
           rampTimeSeconds: number | undefined;
       }
     | { type: 'none'; value: number | undefined };
+
+// DERControlBase.rampTms is expressed in hundredths of a second (resolution
+// 1/100 sec) but this helper works in seconds, so it must be scaled down.
+// e.g. rampTms 6000 = 60 seconds
+export function rampTmsToSeconds(
+    rampTms: number | undefined,
+): number | undefined {
+    if (rampTms === undefined) {
+        return undefined;
+    }
+
+    return new Decimal(rampTms).div(100).toNumber();
+}
 
 export class ControlLimitRampHelper {
     private rampRateHelper: RampRateHelper;

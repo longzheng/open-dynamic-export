@@ -14,6 +14,7 @@ import type { SiteSample } from '../../meters/siteSample.js';
 import { SEP2Client } from '../../sep2/client.js';
 import {
     ControlLimitRampHelper,
+    rampTmsToSeconds,
     type ControlLimitRampTarget,
 } from '../../sep2/helpers/controlLimitRamp.js';
 import {
@@ -351,7 +352,9 @@ export class CsipAusSetpoint implements SetpointType {
                                       opModExpLimW.control.multiplier,
                                   )
                                 : undefined,
-                            rampTimeSeconds: opModExpLimW.rampTms,
+                            rampTimeSeconds: rampTmsToSeconds(
+                                opModExpLimW.rampTms,
+                            ),
                         };
                     }
                     case 'none':
@@ -380,7 +383,9 @@ export class CsipAusSetpoint implements SetpointType {
                                       opModGenLimW.control.multiplier,
                                   )
                                 : undefined,
-                            rampTimeSeconds: opModGenLimW.rampTms,
+                            rampTimeSeconds: rampTmsToSeconds(
+                                opModGenLimW.rampTms,
+                            ),
                         };
                     }
                     case 'none':
@@ -405,7 +410,9 @@ export class CsipAusSetpoint implements SetpointType {
                                       opModImpLimW.control.multiplier,
                                   )
                                 : undefined,
-                            rampTimeSeconds: opModImpLimW.rampTms,
+                            rampTimeSeconds: rampTmsToSeconds(
+                                opModImpLimW.rampTms,
+                            ),
                         };
                     }
                     case 'none':
@@ -434,7 +441,9 @@ export class CsipAusSetpoint implements SetpointType {
                                       opModLoadLimW.control.multiplier,
                                   )
                                 : undefined,
-                            rampTimeSeconds: opModLoadLimW.rampTms,
+                            rampTimeSeconds: rampTmsToSeconds(
+                                opModLoadLimW.rampTms,
+                            ),
                         };
                     }
                     case 'none':
