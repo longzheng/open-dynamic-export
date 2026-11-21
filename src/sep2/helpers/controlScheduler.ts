@@ -215,7 +215,7 @@ export class ControlSchedulerHelper<ControlKey extends ControlType> {
                 status: ResponseStatus.EventStarted,
                 requestConfig: {
                     // recommendation from Energex to retry infinitely until the event ends
-                    'axios-retry': {
+                    retry: {
                         retries: Infinity,
                         retryCondition: () => {
                             return (

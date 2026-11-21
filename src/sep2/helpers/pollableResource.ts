@@ -1,9 +1,9 @@
 import EventEmitter from 'events';
-import { AxiosError } from 'axios';
+import { FetchHttpError } from '../../helpers/fetch.js';
 import type { PollRate } from '../models/pollRate.js';
 import type { SEP2Client } from '../client.js';
 import { pinoLogger } from '../../helpers/logger.js';
-import { sanitizeAxiosError } from '../../helpers/sanitizeAxiosError.js';
+import { sanitizeFetchError } from '../../helpers/sanitizeFetchError.js';
 
 export abstract class PollableResource<
     ResponseType extends { pollRate: PollRate },
@@ -61,8 +61,8 @@ export abstract class PollableResource<
                 }
 
                 pinoLogger.error(
-                    error instanceof AxiosError
-                        ? sanitizeAxiosError(error)
+                    error instanceof FetchHttpError
+                        ? sanitizeFetchError(error)
                         : error,
                     'Failed to poll resource',
                 );

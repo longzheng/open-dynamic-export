@@ -1,6 +1,6 @@
-import type { AxiosError } from 'axios';
+import type { FetchHttpError } from './fetch.js';
 
-export function sanitizeAxiosError(error: AxiosError) {
+export function sanitizeFetchError(error: FetchHttpError) {
     const { config, response, message, code, status } = error;
 
     return {
@@ -18,11 +18,10 @@ export function sanitizeAxiosError(error: AxiosError) {
         config: config
             ? {
                   headers: config.headers,
-                  baseURL: config.baseURL,
                   method: config.method,
                   url: config.url,
-                  data: config.data as unknown,
-                  'axios-retry': config['axios-retry'],
+                  body: config.body,
+                  retry: config.retry,
               }
             : undefined,
     };
