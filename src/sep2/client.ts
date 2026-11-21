@@ -4,6 +4,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import axiosRetry, { exponentialDelay } from 'axios-retry';
+import { lookupWithIpv4Fallback } from '../helpers/dnsLookup.js';
 import { numberToHex } from '../helpers/number.js';
 import {
     getCertificateFingerprint,
@@ -57,6 +58,8 @@ export class SEP2Client {
                 // the IEEE2023.5 certifiate does not have the host name as the certificate altnames
                 // bypass the server identity check
                 checkServerIdentity: () => undefined,
+                // some utility DNS zones fail AAAA queries, which fails the whole lookup on musl (alpine)
+                lookup: lookupWithIpv4Fallback,
             }),
         });
 

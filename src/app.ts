@@ -5,8 +5,23 @@ import ViteExpress from 'vite-express';
 import { RegisterRoutes } from './tsoa/routes.js';
 import swaggerJson from './tsoa/swagger.json' with { type: 'json' };
 import { env } from './helpers/env.js';
+import { pinoLogger } from './helpers/logger.js';
 
 const port = env.SERVER_PORT;
+
+// Build provenance — populated by Dockerfile ARG/ENV from `docker compose
+// build` args (see scripts/build-and-restart.sh in the home-fronius-inverters
+// repo). Logged once at startup so the running version is always visible
+// alongside the operational logs (not just in `docker inspect` labels).
+pinoLogger.info(
+    {
+        gitSha: process.env['GIT_SHA'] ?? 'unknown',
+        gitBranch: process.env['GIT_BRANCH'] ?? 'unknown',
+        buildDate: process.env['BUILD_DATE'] ?? 'unknown',
+        nodeEnv: process.env['NODE_ENV'] ?? 'unknown',
+    },
+    'open-dynamic-export starting',
+);
 
 export const app = express();
 

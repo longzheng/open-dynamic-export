@@ -93,6 +93,7 @@ describe('generateDerSample', () => {
                     ConnectStatusValue.Operating,
             },
             invertersCount: 1,
+            battery: null,
         } satisfies typeof result);
     });
 
@@ -198,6 +199,7 @@ describe('generateDerSample', () => {
                     ConnectStatusValue.Operating,
             },
             invertersCount: 2,
+            battery: null,
         } satisfies typeof result);
     });
 
@@ -249,6 +251,7 @@ describe('derSampleDataSchema', () => {
             genConnectStatus: ConnectStatusValue.Connected,
         },
         invertersCount: 1,
+        battery: null,
     };
 
     it('should accept operationalModeStatus enum number values', () => {
